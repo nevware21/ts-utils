@@ -1,0 +1,60 @@
+{
+    "name": "ts-utils",
+    "description": "Common JavaScript functions for TypeScript",
+    "version": "0.1.0",
+    "homepage": "https://github.com/nevware21/ts-utils",
+    "keywords": [
+        "typescript",
+        "javascript"
+    ],
+    "author": {
+        "name": "Nevware21",
+        "email": "github@nevware21.com"
+    },
+    "scripts": {
+        "postinstall": "node common/scripts/install-run-rush.js update",
+        "build": "node common/scripts/install-run-rush.js rebuild --verbose",
+        "test": "node common/scripts/install-run-rush.js test --verbose",
+        "lint": "node common/scripts/install-run-rush.js dolint --verbose",
+        "check": "node common/scripts/install-run-rush.js check",
+        "rupdate": "rush update --recheck --full",
+        "clean": "git clean -xdf && npm install && npm run rupdate",
+        "cleanBuild": "npm run clean && npm run build"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nevware21/ts-utils.git"
+    },
+    "bugs": {
+        "url": "https://github.com/nevware21/ts-utils/issues"
+    },
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "https://github.com/nevware21/ts-utils/blob/master/LICENSE-MIT"
+        }
+    ],
+    "engines": {
+        "node": ">= 0.8.0"
+    },
+    "dependencies": {
+        "eslint-formatter-codeframe": "^7.32.1"
+    },
+    "devDependencies": {
+        "@microsoft/rush": "^5.71.0",
+        "@nevware21/grunt-eslint-ts": "^0.2.1",
+        "@nevware21/grunt-ts-plugin": "^0.4.2",
+        "@rollup/plugin-commonjs": "^21.0.1",
+        "@rollup/plugin-node-resolve": "^13.0.6",
+        "@types/eslint": "^8.2.0",
+        "@types/estree": "^0.0.51",
+        "@typescript-eslint/eslint-plugin": "^5.4.0",
+        "@typescript-eslint/parser": "^5.4.0",
+        "eslint": "^8.3.0",
+        "eslint-plugin-security": "^1.4.0",
+        "grunt": "^1.4.0",
+        "grunt-cli": "^1.4.3",
+        "rollup": "^2.60.1",
+        "typescript": "^4.2.0"
+    }
+}

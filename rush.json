@@ -1,0 +1,16 @@
+
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
+  
+    "npmVersion": "8.11.0",
+    "rushVersion": "5.71.0",
+    "projectFolderMaxDepth": 4,
+    "projects": [
+        {
+            "packageName": "@nevware21/ts-utils",
+            "projectFolder": "ts-utils",
+            "shouldPublish": true
+        }      
+    ]
+  }
+  
