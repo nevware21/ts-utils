@@ -44,7 +44,7 @@
         "@microsoft/rush": "^5.71.0",
         "@nevware21/grunt-eslint-ts": "^0.2.1",
         "@nevware21/grunt-ts-plugin": "^0.4.2",
-        "@rollup/plugin-commonjs": "^21.0.1",
+        "@rollup/plugin-commonjs": "^22.0.0",
         "@rollup/plugin-node-resolve": "^13.0.6",
         "@types/eslint": "^8.2.0",
         "@types/estree": "^0.0.51",
