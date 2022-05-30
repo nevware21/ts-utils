@@ -1,7 +1,7 @@
 {
     "name": "@nevware21/ts-utils",
     "description": "Common JavaScript functions for TypeScript",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "homepage": "https://github.com/nevware21/ts-utils",
     "license": "MIT",
     "author": {

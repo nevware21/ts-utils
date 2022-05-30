@@ -1,5 +1,9 @@
 ![GitHub Workflow Status (main)](https://img.shields.io/github/workflow/status/nevware21/ts-utils/NodeCI/main)
 
+[![npm version](https://badge.fury.io/js/%40nevware21%2Fts-utils.svg)](https://www.npmjs.com/package/%40nevware21%2Fts-utils)
+[![downloads](https://img.shields.io/npm/dt/%40nevware21/ts-utils.svg)](https://www.npmjs.com/package/%40nevware21/ts-utils)
+[![downloads](https://img.shields.io/npm/dm/%40nevware21/ts-utils.svg)](https://www.npmjs.com/package/%40nevware21/ts-utils)
+
 # ts-utils
 Common JavaScript functions for TypeScript
 
