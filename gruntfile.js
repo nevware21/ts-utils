@@ -15,7 +15,6 @@ module.exports = function (grunt) {
         jshint: {
             all: [
                 "Gruntfile.js",
-                "tasks/*.js",
                 "<%= nodeunit.tests %>"
             ],
             options: {
@@ -38,13 +37,9 @@ module.exports = function (grunt) {
                 logOutput: true,
                 additionalFlags: "--removeComments"
             },
-            "rollupuglify": {
-                tsconfig: "./tools/rollup-plugin-uglify3-ts/tsconfig.json",
-                outDir: "tools/rollup-plugin-uglify3-ts/dist-esm"
-            },
             "ts_utils": {
                 tsconfig: "./ts-utils/tsconfig.json",
-                outDir: "ts-utils/dist-esm"
+                outDir: "./ts-utils/dist-esm"
             }
         },
         "lint": {
@@ -56,9 +51,19 @@ module.exports = function (grunt) {
                 tsconfig: "./ts-utils/tsconfig.json",
                 ignoreFailures: true
             },
+            "ts_utils-test": {
+                tsconfig: "./ts-utils/tsconfig.test.json",
+                ignoreFailures: true
+            },
             "ts_utils-fix": {
                 options: {
                     tsconfig: "./ts-utils/tsconfig.json",
+                    fix: true
+                }
+            },
+            "ts_utils-test-fix": {
+                options: {
+                    tsconfig: "./ts-utils/tsconfig.test.json",
                     fix: true
                 }
             }
@@ -70,10 +75,10 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("@nevware21/grunt-eslint-ts");
 
     grunt.registerTask("rollupuglify", ["ts:rollupuglify" ]);
-    grunt.registerTask("ts_utils", [ "lint:ts_utils-fix", "ts:ts_utils" ]);
-    grunt.registerTask("ts_utils-lint", [ "lint:ts_utils-fix" ]);
-    grunt.registerTask("dolint", [ "lint:ts_utils" ]);
-    grunt.registerTask("lint-fix", [ "lint:ts_utils-fix" ]);
+    grunt.registerTask("ts_utils", [ "lint:ts_utils-fix", "lint:ts_utils-test-fix", "ts:ts_utils" ]);
+    grunt.registerTask("ts_utils-lint", [ "lint:ts_utils-fix", "lint:ts_utils-test-fix" ]);
+    grunt.registerTask("dolint", [ "lint:ts_utils", "lint:ts_utils-test" ]);
+    grunt.registerTask("lint-fix", [ "lint:ts_utils-fix", "lint:ts_utils-test-fix" ]);
     // Whenever the "test" task is run, first clean the "tmp" dir, then run this
     // plugin's task(s), then test the result.
     // grunt.registerTask('ts_utils_test', ['clean', 'ts_utils']);

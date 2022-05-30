@@ -14,7 +14,8 @@ export function getIntValue(value?: string | number, defValue?: number): number 
             return value;
         }
 
-        return parseInt(value, 10);
+        let theValue = parseInt(value, 10);
+        return isNaN(theValue) ? defValue : theValue;
     }
 
     return defValue;

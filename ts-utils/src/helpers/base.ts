@@ -44,7 +44,7 @@ export function isNullOrUndefined(value:  any) {
 }
 
 export function isDefined(arg: any): arg is undefined {
-    return arg !== undefined;
+    return !!arg || arg !== undefined;
 }
 
 export function isString(value: any): value is string {

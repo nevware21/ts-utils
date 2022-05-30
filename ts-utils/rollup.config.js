@@ -80,12 +80,12 @@ export function uglify3(options = {}) {
   
 const rollupConfigFactory = (isMinified, path, format = "iife", postfix = "") => {
     const taskRollupConfig = {
-        input: `dist-esm/index.js`,
+        input: `ts-utils/dist-esm/index.js`,
         output: {
-            file: `dist/${path}/${outputName}${postfix}.js`,
+            file: `ts-utils/dist/${path}/${outputName}${postfix}.js`,
             banner: banner,
             format: format,
-            name: "Nevware21.ts-utils",
+            name: "nevware21.ts-utils",
             freeze: false,
             sourcemap: true
         },
@@ -100,7 +100,7 @@ const rollupConfigFactory = (isMinified, path, format = "iife", postfix = "") =>
     };
 
     if (isMinified) {
-        taskRollupConfig.output.file = `dist/${path}/${outputName}${postfix}.min.js`;
+        taskRollupConfig.output.file = `ts-utils/dist/${path}/${outputName}${postfix}.min.js`;
         if (format !== "esm") {
             taskRollupConfig.plugins.push(
                 uglify3({
@@ -123,7 +123,7 @@ const rollupConfigFactory = (isMinified, path, format = "iife", postfix = "") =>
                     toplevel: true,
                     compress: {
                         passes:3,
-                        unsafe: true,
+                        unsafe: true
                     },
                     output: {
                         preamble: banner,
@@ -139,12 +139,12 @@ const rollupConfigFactory = (isMinified, path, format = "iife", postfix = "") =>
 
 const polyfillRollupConfigFactory = (isMinified, format = "iife", postfix = "") => {
     const taskRollupConfig = {
-        input: `dist-esm/polyfills.js`,
+        input: `ts-utils/dist-esm/polyfills.js`,
         output: {
-            file: `browser/${polyFillOutputName}${postfix}.js`,
+            file: `ts-utils/browser/${polyFillOutputName}${postfix}.js`,
             banner: polyFillBanner,
             format: format,
-            name: "Nevware21.ts-utils",
+            name: "nevware21.ts-utils",
             freeze: false,
             sourcemap: true
         },
@@ -159,7 +159,7 @@ const polyfillRollupConfigFactory = (isMinified, format = "iife", postfix = "") 
     };
 
     if (isMinified) {
-        taskRollupConfig.output.file = `browser/${polyFillOutputName}${postfix}.min.js`;
+        taskRollupConfig.output.file = `ts-utils/browser/${polyFillOutputName}${postfix}.min.js`;
         taskRollupConfig.plugins.push(
             uglify3({
                 ie8: true,

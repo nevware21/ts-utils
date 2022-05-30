@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "sourceMap": true,
+        "inlineSources": true,
+        "noImplicitAny": true,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "target": "es5",
+        "forceConsistentCasingInFileNames": true,
+        "importHelpers": true,
+        "noEmitHelpers": false,
+        "alwaysStrict": true,
+        "declaration": true,
+        "declarationDir": "./test/types",
+        "outDir": "./test/dist-esm",
+        "suppressImplicitAnyIndexErrors": true,
+        "allowSyntheticDefaultImports": true,
+        "removeComments": true
+    },
+    "include": [
+        "./src/**/*.ts",
+        "./test/src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules/"
+    ]
+}
