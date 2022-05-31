@@ -23,7 +23,7 @@
         "build": "grunt ts_utils --verbose && npm run package",
         "rebuild": "npm run build && npm run test",
         "package": "rollup -c ts-utils/rollup.config.js",
-        "test": "nyc ts-mocha -p ts-utils/tsconfig.test.json ts-utils/test/**/*.test.ts",
+        "test": "nyc ts-mocha -p ts-utils/test/tsconfig.test.json ts-utils/test/**/*.test.ts",
         "lint": "grunt ts_utils-lint",
         "codecov": "nyc report --reporter=json && codecov -f coverage/*.json",
         "clean": "git clean -xdf && npm install",
