@@ -1,8 +1,13 @@
 {
-    "name": "ts-utils",
+    "name": "@nevware21/ts-utils",
     "description": "Common JavaScript functions for TypeScript",
     "version": "0.1.1",
     "homepage": "https://github.com/nevware21/ts-utils",
+    "license": "MIT",
+    "author": {
+        "name": "Nevware21",
+        "email": "github@nevware21.com"
+    },
     "keywords": [
         "typescript",
         "javascript"
@@ -11,15 +16,18 @@
         "name": "Nevware21",
         "email": "github@nevware21.com"
     },
+    "main": "dist/node/ts-utils.js",
+    "module": "dist/esm/ts-utils.js",
+    "types": "types/index.d.ts",    
     "scripts": {
-        "postinstall": "node common/scripts/install-run-rush.js update",
-        "build": "node common/scripts/install-run-rush.js rebuild --verbose",
-        "test": "node common/scripts/install-run-rush.js test --verbose",
-        "lint": "node common/scripts/install-run-rush.js dolint --verbose",
-        "check": "node common/scripts/install-run-rush.js check",
-        "rupdate": "rush update --recheck --full",
-        "clean": "git clean -xdf && npm install && npm run rupdate",
-        "cleanBuild": "npm run clean && npm run build"
+        "build": "grunt ts_utils --verbose && npm run package",
+        "rebuild": "npm run build && npm run test",
+        "package": "rollup -c ts-utils/rollup.config.js",
+        "test": "nyc ts-mocha -p ts-utils/tsconfig.test.json ts-utils/test/**/*.test.ts",
+        "lint": "grunt ts_utils-lint",
+        "codecov": "nyc report --reporter=json && codecov -f coverage/*.json",
+        "clean": "git clean -xdf && npm install",
+        "cleanBuild": "npm run clean && npm run rebuild"
     },
     "repository": {
         "type": "git",
@@ -31,30 +39,39 @@
     "licenses": [
         {
             "type": "MIT",
-            "url": "https://github.com/nevware21/ts-utils/blob/master/LICENSE-MIT"
+            "url": "https://github.com/nevware21/ts-utils/blob/main/LICENSE"
         }
     ],
     "engines": {
         "node": ">= 0.8.0"
     },
     "dependencies": {
-        "eslint-formatter-codeframe": "^7.32.1"
     },
     "devDependencies": {
-        "@microsoft/rush": "^5.71.0",
         "@nevware21/grunt-eslint-ts": "0.2.4",
         "@nevware21/grunt-ts-plugin": "0.4.5",
-        "@rollup/plugin-commonjs": "^22.0.0",
-        "@rollup/plugin-node-resolve": "^13.3.0",
         "@types/eslint": "^8.4.2",
         "@types/estree": "^0.0.51",
         "@typescript-eslint/eslint-plugin": "^5.26.0",
         "@typescript-eslint/parser": "^5.26.0",
         "eslint": "^8.16.0",
         "eslint-plugin-security": "^1.5.0",
+        "eslint-formatter-codeframe": "^7.32.1",
         "grunt": "^1.5.3",
         "grunt-cli": "^1.4.3",
         "rollup": "^2.75.3",
-        "typescript": "^4.7.2"
+        "@rollup/plugin-commonjs": "^22.0.0",
+        "@rollup/plugin-node-resolve": "^13.3.0",
+        "rollup-plugin-minify-es": "^1.1.1",
+        "uglify-js": "^3.15.5",
+        "typescript": "^4.7.2",
+        "mocha": "^9.2.2",
+        "ts-loader": "^9.3.0",
+        "ts-mocha": "^10.0.0",
+        "nyc": "^15.1.0",
+        "codecov": "^3.8.3"
+    },
+    "peerDependencies": {
+        "typescript": ">=1"
     }
 }

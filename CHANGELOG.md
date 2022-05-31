@@ -3,4 +3,4 @@
 
 ## Changelog
 
-- [Bug] v0.1.0 has an invalud entry point defined in the package.json #5
+- [Bug] v0.1.0 has an invalid entry point defined in the package.json #5

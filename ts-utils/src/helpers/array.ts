@@ -38,12 +38,14 @@ export function arrForEach<T>(arr: T[], callbackfn: (value: T, index?: number, a
  * @param target - The target array
  * @param elms - The item or items to add to the target
  */
-export function arrAppend(target: any[], elms: any[] | any) {
-    if (!isUndefined(elms)) {
+export function arrAppend<T = any>(target: T[], elms: any[] | any): T[] {
+    if (!isUndefined(elms) && target) {
         if (isArray(elms)) {
             Array[PROTOTYPE].push.apply(target, elms);
         } else {
             target.push(elms);
         }
     }
+
+    return target;
 }
