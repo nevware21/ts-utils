@@ -47,7 +47,7 @@
     },
     "devDependencies": {
         "@nevware21/grunt-eslint-ts": "0.2.2",
-        "@nevware21/grunt-ts-plugin": "0.4.3",
+        "@nevware21/grunt-ts-plugin": "0.4.5",
         "grunt": "^1.5.3",
         "grunt-cli": "^1.4.3",
         "typescript": "^4.7.2",
