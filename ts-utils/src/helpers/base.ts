@@ -11,6 +11,18 @@ import { BOOLEAN, FUNCTION, NUMBER, OBJECT, PROTOTYPE, STRING, UNDEFINED } from 
 export const ObjClass = Object;
 export const ObjProto = ObjClass[PROTOTYPE];
 
+function _createIs<T>(theType: string): (value: any) => value is T {
+    return function (value: any): value is T {
+        return typeof value === theType;
+    }
+}
+
+function _createObjIs<T>(theType: string): (value: any) => value is T {
+    return function (value: any): value is T {
+        return !!(value && objToString(value) === theType);
+    }
+}
+
 export function objToString(value: any): string {
     return ObjProto.toString.call(value);
 }
@@ -47,14 +59,10 @@ export function isDefined(arg: any): arg is undefined {
     return !!arg || arg !== undefined;
 }
 
-export function isString(value: any): value is string {
-    return typeof value === STRING;
-}
+export const isString = _createIs<string>(STRING);
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function isFunction(value: any): value is Function {
-    return typeof value === FUNCTION;
-}
+export const isFunction = _createIs<Function>(FUNCTION);
 
 export function isObject(value: any): value is object {
     if (isNullOrUndefined(value)) {
@@ -64,76 +72,106 @@ export function isObject(value: any): value is object {
     return typeof value === OBJECT;
 }
 
-export function isArray<T>(arg: any): arg is T[] {
-    if (isNullOrUndefined(arg)) {
-        return false;
-    }
-
-    return objToString(arg) === "[object Array]" || Array.isArray(arg);
-}
+/**
+ * Checks if the type of value is an Array.
+ * @param {any} value - Value to be checked.
+ * @return {boolean} True if the value is a Array, false otherwise.
+ */
+export const isArray = Array.isArray;
 
 /**
  * Check if an object is of type Date
  */
-export function isDate(value: any): value is Date {
-    return objToString(value) === "[object Date]";
-}
+export const isDate = _createObjIs<Date>("[object Date]");
 
 /**
  * Checks if the type of value is a number.
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a number, false otherwise.
  */
-export function isNumber(value: any): value is number {
-    return isTypeof(value, NUMBER);
-}
+export const isNumber = _createIs<number>(NUMBER);
 
 /**
  * Checks if the type of value is a boolean.
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a boolean, false otherwise.
  */
-export function isBoolean(value: any): value is boolean {
-    return isTypeof(value, BOOLEAN);
-}
+export const isBoolean = _createIs<boolean>(BOOLEAN);
 
 /**
  * Determines if a value is a regular expression object.
  * @param {*} value Reference to check.
  * @returns {boolean} True if `value` is a `RegExp`.
  */
-export function isRegExp(value: any): value is RegExp {
-    return objToString(value) === "[object RegExp]";
-}
+export const isRegExp = _createObjIs<RegExp>("[object RegExp]");
 
-export function isFile(value: any): value is File {
-    return objToString(value) === "[object File]";
-}
+/**
+ * Checks if the type of value is a File object.
+ * @param {any} value - Value to be checked.
+ * @return {boolean} True if the value is a File, false otherwise.
+ */
+export const isFile = _createObjIs<File>("[object File]");
 
-export function isFormData(value: any): value is FormData {
-    return objToString(value) === "[object FormData]";
-}
+/**
+ * Checks if the type of value is a FormData object.
+ * @param {any} value - Value to be checked.
+ * @return {boolean} True if the value is a FormData, false otherwise.
+ */
+export const isFormData = _createObjIs<FormData>("[object FormData]");
 
-export function isBlob(value: any): value is Blob {
-    return objToString(value) === "[object Blob]";
-}
+/**
+ * Checks if the type of value is a Blob object.
+ * @param {any} value - Value to be checked.
+ * @return {boolean} True if the value is a Blob, false otherwise.
+ */
+export const isBlob = _createObjIs<Blob>("[object Blob]");
 
-export function isArrayBuffer(value: any): value is ArrayBuffer {
-    return objToString(value) === "[object ArrayBuffer]";
-}
+/**
+ * Checks if the type of value is a ArrayBuffer object.
+ * @param {any} value - Value to be checked.
+ * @return {boolean} True if the value is a ArrayBuffer, false otherwise.
+ */
+export const isArrayBuffer = _createObjIs<ArrayBuffer>("[object ArrayBuffer]");
 
+/**
+ * Checks if the type of value is a Error object.
+ * @param {any} value - Value to be checked.
+ * @return {boolean} True if the value is a Error, false otherwise.
+ */
+export const isError = _createObjIs<ArrayBuffer>("[object Error]");
+
+/**
+ * Checks if the type of value is a PromiseLike instance (contains a then function).
+ * @param {any} value - Value to be checked.
+ * @return {boolean} True if the value is a PromiseLike, false otherwise.
+ */
 export function isPromiseLike<T>(value: any): value is PromiseLike<T> {
     return value && isFunction(value.then);
 }
 
+/**
+ * Checks if the type of value is a Promise instance (contains then and catch functions).
+ * @param {any} value - Value to be checked.
+ * @return {boolean} True if the value is a Promise, false otherwise.
+ */
 export function isPromise<T>(value: any): value is Promise<T> {
     return value && isPromiseLike(value) && isFunction((value as any).catch);
 }
 
+/**
+ * Checks if the type of value does not evaluate to true value.
+ * @param {any} value - Value to be checked.
+ * @return {boolean} True if the value is not truthy, false otherwise.
+ */
 export function isNotTruthy(value: any) {
     return !value;
 }
 
+/**
+ * Checks if the type of value evaluates to true value.
+ * @param {any} value - Value to be checked.
+ * @return {boolean} True if the value is not truthy, false otherwise.
+ */
 export function isTruthy(value: any) {
     return !!value;
 }

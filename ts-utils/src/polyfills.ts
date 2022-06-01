@@ -6,11 +6,26 @@
  * Licensed under the MIT license.
  */
 
-import { _polyObjKeys } from "./polyfills/object";
+import { arrForEach } from "./helpers/array";
+import { objDefineProp } from "./helpers/object";
+import { polyIsArray } from "./polyfills/array";
+import { polyObjKeys } from "./polyfills/object";
 
-const ObjClass = Object;
-const KEYS = "keys";
+(function () {
+    const objectPolyfills = {
+        "keys": polyObjKeys,
+        "defineProperty": objDefineProp
+    };
 
-if (!ObjClass[KEYS]) {
-    ObjClass[KEYS] = _polyObjKeys;
-}
+    // Add Object polyfills
+    const ObjClass = Object;
+    arrForEach(polyObjKeys(objectPolyfills), (key) => {
+        if (!ObjClass[key]) {
+            ObjClass[key] = objectPolyfills[key];
+        }
+    });
+    
+    if (!Array.isArray) {
+        Array.isArray = polyIsArray;
+    }
+})();

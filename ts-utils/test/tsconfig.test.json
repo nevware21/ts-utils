@@ -11,15 +11,15 @@
         "noEmitHelpers": false,
         "alwaysStrict": true,
         "declaration": true,
-        "declarationDir": "./test/types",
-        "outDir": "./test/dist-esm",
+        "declarationDir": "./types",
+        "outDir": "./dist-esm",
         "suppressImplicitAnyIndexErrors": true,
         "allowSyntheticDefaultImports": true,
         "removeComments": true
     },
     "include": [
-        "./src/**/*.ts",
-        "./test/src/**/*.ts"
+        "../src/**/*.ts",
+        "./src/**/*.ts"
     ],
     "exclude": [
         "node_modules/"

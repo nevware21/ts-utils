@@ -7,12 +7,12 @@ const version = require("./package.json").version;
 const outputName = "ts-utils";
 const polyFillOutputName = "ts-polyfills-utils";
 const banner = [
-  "/*!",
-  ` * NevWare21 - ts-utils, ${version}`,
-  " * https://github.com/nevware21/ts-utils",
-  " * Copyright (c) NevWare21 and contributors. All rights reserved.",
-  " * Licensed under the MIT license.",
-  " */"
+    "/*!",
+    ` * NevWare21 - ts-utils, ${version}`,
+    " * https://github.com/nevware21/ts-utils",
+    " * Copyright (c) NevWare21 and contributors. All rights reserved.",
+    " * Licensed under the MIT license.",
+    " */"
 ].join("\n");
 
 const polyFillBanner = [
@@ -22,15 +22,15 @@ const polyFillBanner = [
     " * Copyright (c) NevWare21 and contributors. All rights reserved.",
     " * Licensed under the MIT license.",
     " */"
-  ].join("\n");
+].join("\n");
 
-  function isSourceMapEnabled(options) {
+function isSourceMapEnabled(options) {
     if (options) {
         return options.sourceMap !== false && options.sourcemap !== false;
     }
 
     return false;
-} 
+}
 
 function _doMinify(code, filename, options, chunkOptions) {
     var theCode = {};
@@ -115,7 +115,7 @@ const rollupConfigFactory = (isMinified, path, format = "iife", postfix = "") =>
                         webkit:true
                     }
                 })
-            );        
+            );
         } else {
             taskRollupConfig.plugins.push(
                 minify({

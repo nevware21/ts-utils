@@ -40,6 +40,10 @@ module.exports = function (grunt) {
             "ts_utils": {
                 tsconfig: "./ts-utils/tsconfig.json",
                 outDir: "./ts-utils/dist-esm"
+            },
+            "ts_utils-test": {
+                tsconfig: "./ts-utils/test/tsconfig.test.json",
+                outDir: "./ts-utils/test/dist-esm"
             }
         },
         "lint": {
@@ -52,7 +56,7 @@ module.exports = function (grunt) {
                 ignoreFailures: true
             },
             "ts_utils-test": {
-                tsconfig: "./ts-utils/tsconfig.test.json",
+                tsconfig: "./ts-utils/test/tsconfig.test.json",
                 ignoreFailures: true
             },
             "ts_utils-fix": {
@@ -63,7 +67,7 @@ module.exports = function (grunt) {
             },
             "ts_utils-test-fix": {
                 options: {
-                    tsconfig: "./ts-utils/tsconfig.test.json",
+                    tsconfig: "./ts-utils/test/tsconfig.test.json",
                     fix: true
                 }
             }
