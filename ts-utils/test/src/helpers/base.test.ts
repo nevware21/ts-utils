@@ -1,6 +1,5 @@
 import * as assert from "assert";
-
-import { isArray, isBoolean, isDate, isDefined, isFunction, isNullOrUndefined, isNumber, isObject, isString, isTypeof, isUndefined } from "../../../src/helpers/base";
+import { isArray, isBoolean, isDate, isDefined, isFunction, isNullOrUndefined, isNumber, isObject, isString, isTypeof, isUndefined, isRegExp, objToString } from "../../../src/helpers/base";
 
 describe("base helpers", () => {
     describe("isTypeOf", () => {
@@ -298,6 +297,33 @@ describe("base helpers", () => {
             assert.equal(isBoolean(new Boolean(false)), false, "Checking typeof new Boolean(false)");
             assert.equal(isBoolean(new Boolean("true")), false, "Checking typeof new Boolean('true')");
             assert.equal(isBoolean(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+        });
+    });
+
+    describe("isRegExp", () => {
+        it("Validate values", () => {
+            assert.equal(isRegExp(null), false, "Checking typeof null");
+            assert.equal(isRegExp(undefined), false, "Checking typeof undefined");
+            assert.equal(isRegExp("null"), false, "Checking typeof 'null'");
+            assert.equal(isRegExp("undefined"), false, "Checking typeof 'undefined'");
+            assert.equal(isRegExp("1"), false, "Checking typeof '1'");
+            assert.equal(isRegExp("aa"), false, "Checking typeof 'aa'");
+            assert.equal(isRegExp(new Date()), false, "Checking typeof Date");
+            assert.equal(isRegExp(1), false, "Checking typeof 1");
+            assert.equal(isRegExp(""), false, "Checking typeof ''");
+            assert.equal(isRegExp(_dummyFunction), false, "Checking typeof _dummyFunction");
+            assert.equal(isRegExp([]), false, "Checking typeof []");
+            assert.equal(isRegExp(new Array(1)), false, "Checking typeof new Array(1)");
+            assert.equal(isRegExp(true), false, "Checking typeof true");
+            assert.equal(isRegExp(false), false, "Checking typeof false");
+            assert.equal(isRegExp("true"), false, "Checking typeof 'true'");
+            assert.equal(isRegExp("false"), false, "Checking typeof 'false'");
+            assert.equal(isRegExp(new Boolean(true)), false, "Checking typeof new Boolean(true)");
+            assert.equal(isRegExp(new Boolean(false)), false, "Checking typeof new Boolean(false)");
+            assert.equal(isRegExp(new Boolean("true")), false, "Checking typeof new Boolean('true')");
+            assert.equal(isRegExp(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+            assert.equal(isRegExp(/[a-z]/g), true, "Checking typeof '/[a-z]/g'");
+            assert.equal(isRegExp(new RegExp("")), true, "Checking typeof new RegExp('')");
         });
     });
 

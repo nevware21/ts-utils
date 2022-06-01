@@ -19,7 +19,7 @@ function _createIs<T>(theType: string): (value: any) => value is T {
 
 function _createObjIs<T>(theType: string): (value: any) => value is T {
     return function (value: any): value is T {
-        return !!(value && objToString(value) === theType);
+        return !!(objToString(value) === theType);
     }
 }
 
