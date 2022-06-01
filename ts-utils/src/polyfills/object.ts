@@ -16,7 +16,7 @@ import { objHasOwnProperty } from "../helpers/object";
  * Note: For consistency this will not use the Object.keys implementation if it exists as this would cause a testing requirement to test with and without the implementations
  * @param obj Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
  */
-export function _polyObjKeys(obj: any): string[] {
+export function polyObjKeys(obj: any): string[] {
     // eslint-disable-next-line no-prototype-builtins
     const hasDontEnumBug = !({ toString: null }).propertyIsEnumerable("toString");
 

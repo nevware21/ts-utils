@@ -8,7 +8,7 @@
 
 import { isNullOrUndefined, objToString } from "../helpers/base";
 
-export function _polyIsArray<T>(arg: any): arg is T[] {
+export function polyIsArray<T>(arg: any): arg is T[] {
     if (isNullOrUndefined(arg)) {
         return false;
     }
