@@ -13,7 +13,8 @@ export {
 export { arrForEach, arrAppend } from "./helpers/array";
 export { dumpObj } from "./helpers/disgnostics";
 export {
-    getGlobal, getInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory, getHistory
+    getGlobal, getInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory, getHistory,
+    isNode, isWebWorker
 } from "./helpers/environment";
 export { getIntValue } from "./helpers/number";
 export {

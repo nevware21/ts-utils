@@ -30,4 +30,4 @@ Note: For consistency this will not use the Object.keys implementation if it exi
 
 #### Defined in
 
-[polyfills/object.ts:19](https://github.com/nevware21/ts-utils/blob/8ea7298/ts-utils/src/polyfills/object.ts#L19)
+[polyfills/object.ts:19](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/polyfills/object.ts#L19)

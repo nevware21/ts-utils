@@ -16,3 +16,4 @@ export const OBJECT = "object";
 export const PROTOTYPE = "prototype";
 export const STRING = "string";
 export const UNDEFINED = "undefined";
+export const CONSTRUCTOR = "constructor";

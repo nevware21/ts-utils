@@ -30,6 +30,7 @@
 - [isFile](index.md#isfile)
 - [isFormData](index.md#isformdata)
 - [isFunction](index.md#isfunction)
+- [isNode](index.md#isnode)
 - [isNotTruthy](index.md#isnottruthy)
 - [isNullOrUndefined](index.md#isnullorundefined)
 - [isNumber](index.md#isnumber)
@@ -41,6 +42,7 @@
 - [isTruthy](index.md#istruthy)
 - [isTypeof](index.md#istypeof)
 - [isUndefined](index.md#isundefined)
+- [isWebWorker](index.md#iswebworker)
 - [objAssign](index.md#objassign)
 - [objCopyProps](index.md#objcopyprops)
 - [objDeepCopy](index.md#objdeepcopy)
@@ -204,6 +206,12 @@ Re-exports [isFunction](helpers_base.md#isfunction)
 
 ___
 
+### isNode
+
+Re-exports [isNode](helpers_environment.md#isnode)
+
+___
+
 ### isNotTruthy
 
 Re-exports [isNotTruthy](helpers_base.md#isnottruthy)
@@ -267,6 +275,12 @@ ___
 ### isUndefined
 
 Re-exports [isUndefined](helpers_base.md#isundefined)
+
+___
+
+### isWebWorker
+
+Re-exports [isWebWorker](helpers_environment.md#iswebworker)
 
 ___
 
