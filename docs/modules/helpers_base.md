@@ -42,7 +42,7 @@
 
 #### Defined in
 
-[helpers/base.ts:11](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L11)
+[helpers/base.ts:11](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L11)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 #### Defined in
 
-[helpers/base.ts:12](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L12)
+[helpers/base.ts:12](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L12)
 
 ## Functions
 
@@ -76,7 +76,7 @@ True if the value is a Array, false otherwise.
 
 #### Defined in
 
-[helpers/base.ts:99](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L99)
+[helpers/base.ts:99](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L99)
 
 ___
 
@@ -100,7 +100,7 @@ True if the value is a ArrayBuffer, false otherwise.
 
 #### Defined in
 
-[helpers/base.ts:153](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L153)
+[helpers/base.ts:153](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L153)
 
 ___
 
@@ -124,7 +124,7 @@ True if the value is a Blob, false otherwise.
 
 #### Defined in
 
-[helpers/base.ts:146](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L146)
+[helpers/base.ts:146](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L146)
 
 ___
 
@@ -148,7 +148,7 @@ True if the value is a boolean, false otherwise.
 
 #### Defined in
 
-[helpers/base.ts:118](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L118)
+[helpers/base.ts:118](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L118)
 
 ___
 
@@ -170,7 +170,7 @@ value is Date
 
 #### Defined in
 
-[helpers/base.ts:104](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L104)
+[helpers/base.ts:104](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L104)
 
 ___
 
@@ -192,7 +192,7 @@ arg is undefined
 
 #### Defined in
 
-[helpers/base.ts:63](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L63)
+[helpers/base.ts:63](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L63)
 
 ___
 
@@ -216,7 +216,7 @@ True if the value is a Error, false otherwise.
 
 #### Defined in
 
-[helpers/base.ts:160](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L160)
+[helpers/base.ts:160](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L160)
 
 ___
 
@@ -240,7 +240,7 @@ True if the value is a File, false otherwise.
 
 #### Defined in
 
-[helpers/base.ts:132](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L132)
+[helpers/base.ts:132](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L132)
 
 ___
 
@@ -264,7 +264,7 @@ True if the value is a FormData, false otherwise.
 
 #### Defined in
 
-[helpers/base.ts:139](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L139)
+[helpers/base.ts:139](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L139)
 
 ___
 
@@ -286,7 +286,7 @@ value is Function
 
 #### Defined in
 
-[helpers/base.ts:79](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L79)
+[helpers/base.ts:79](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L79)
 
 ___
 
@@ -310,7 +310,7 @@ True if the value is not truthy, false otherwise.
 
 #### Defined in
 
-[helpers/base.ts:185](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L185)
+[helpers/base.ts:185](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L185)
 
 ___
 
@@ -332,7 +332,7 @@ Checks if the provided value is null or undefined
 
 #### Defined in
 
-[helpers/base.ts:54](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L54)
+[helpers/base.ts:54](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L54)
 
 ___
 
@@ -356,7 +356,7 @@ True if the value is a number, false otherwise.
 
 #### Defined in
 
-[helpers/base.ts:111](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L111)
+[helpers/base.ts:111](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L111)
 
 ___
 
@@ -378,7 +378,7 @@ value is object
 
 #### Defined in
 
-[helpers/base.ts:86](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L86)
+[helpers/base.ts:86](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L86)
 
 ___
 
@@ -408,7 +408,7 @@ True if the value is a Promise, false otherwise.
 
 #### Defined in
 
-[helpers/base.ts:176](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L176)
+[helpers/base.ts:176](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L176)
 
 ___
 
@@ -438,7 +438,7 @@ True if the value is a PromiseLike, false otherwise.
 
 #### Defined in
 
-[helpers/base.ts:167](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L167)
+[helpers/base.ts:167](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L167)
 
 ___
 
@@ -462,7 +462,7 @@ True if `value` is a `RegExp`.
 
 #### Defined in
 
-[helpers/base.ts:125](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L125)
+[helpers/base.ts:125](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L125)
 
 ___
 
@@ -484,7 +484,7 @@ value is string
 
 #### Defined in
 
-[helpers/base.ts:72](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L72)
+[helpers/base.ts:72](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L72)
 
 ___
 
@@ -508,7 +508,7 @@ True if the value is not truthy, false otherwise.
 
 #### Defined in
 
-[helpers/base.ts:194](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L194)
+[helpers/base.ts:194](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L194)
 
 ___
 
@@ -531,7 +531,7 @@ Validate if the provided value object is of the expected type
 
 #### Defined in
 
-[helpers/base.ts:36](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L36)
+[helpers/base.ts:36](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L36)
 
 ___
 
@@ -553,7 +553,7 @@ Checks if the provided value is undefined
 
 #### Defined in
 
-[helpers/base.ts:45](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L45)
+[helpers/base.ts:45](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L45)
 
 ___
 
@@ -573,4 +573,4 @@ ___
 
 #### Defined in
 
-[helpers/base.ts:26](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/base.ts#L26)
+[helpers/base.ts:26](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/base.ts#L26)

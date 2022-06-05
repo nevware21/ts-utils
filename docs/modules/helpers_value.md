@@ -32,4 +32,4 @@ Return whether the value appears to have any `value`, this helper return true fo
 
 #### Defined in
 
-[helpers/value.ts:20](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/value.ts#L20)
+[helpers/value.ts:20](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/value.ts#L20)
