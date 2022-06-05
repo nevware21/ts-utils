@@ -7,19 +7,34 @@
  */
 
 import { UNDEFINED } from "../internal/constants";
+import { isNullOrUndefined, isObject, isUndefined } from "./base";
 
 const DOCUMENT = "document";
 const HISTORY = "history";
 const NAVIGATOR = "navigator";
 const WINDOW = "window";
 
+declare let WorkerGlobalScope: any;
 declare let globalThis: Window;
 declare let global: Window;
+declare let self: any;
 
 let _cachedGlobal: Window = null;
 
 const _hasWindow = !!(typeof window !== UNDEFINED && window);
 const _hasDocument = !!(typeof document !== UNDEFINED && document);
+const _isWebWorker: boolean = _safeCheck(() => !!(self && self instanceof WorkerGlobalScope), false);
+const _isNode: boolean = _safeCheck(() => !!(process && (process.versions||{}).node), false);
+
+function _safeCheck(cb: () => boolean, defValue: boolean) {
+    let result = defValue;
+    try {
+        result = cb();
+    } catch (e) {
+        // Do nothing
+    }
+    return result;
+}
 
 /**
  * Returns the current global scope object, for a normal web page this will be the current
@@ -36,7 +51,7 @@ const _hasDocument = !!(typeof document !== UNDEFINED && document);
  */
 export function getGlobal(useCached?: boolean): Window {
     if (!_cachedGlobal || useCached === false) {
-        if (typeof globalThis != undefined && globalThis) {
+        if (typeof globalThis != UNDEFINED && globalThis) {
             _cachedGlobal = globalThis;
         }
     
@@ -137,4 +152,20 @@ export function hasHistory(): boolean {
  */
 export function getHistory(): History | null {
     return history || getInst(HISTORY);
+}
+
+/**
+ * Simple method to determine if we are running in a node environment
+ * @returns True if you are
+ */
+export function isNode(): boolean {
+    return _isNode;
+}
+
+/**
+ * Helper to identify if you are running as a Dedicated, Shared or Service worker
+ * @returns True if the environment you are in looks like a Web Worker
+ */
+export function isWebWorker(): boolean {
+    return _isWebWorker;
 }

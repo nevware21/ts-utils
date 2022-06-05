@@ -1,6 +1,7 @@
 import * as assert from "assert";
-
-import { isArray, isBoolean, isDate, isDefined, isFunction, isNullOrUndefined, isNumber, isObject, isString, isTypeof, isUndefined } from "../../../src/helpers/base";
+import { isArray, isBoolean, isDate, isDefined, isFunction, isNullOrUndefined, isNumber, isObject, isString, isTypeof, isUndefined, isRegExp, objToString, isFile, isFormData, isBlob } from "../../../src/helpers/base";
+import { dumpObj } from "../../../src/helpers/disgnostics";
+import { isNode } from "../../../src/helpers/environment";
 
 describe("base helpers", () => {
     describe("isTypeOf", () => {
@@ -198,6 +199,11 @@ describe("base helpers", () => {
             assert.equal(isObject(new Boolean(false)), true, "Checking typeof new Boolean(false)");
             assert.equal(isObject(new Boolean("true")), true, "Checking typeof new Boolean('true')");
             assert.equal(isObject(new Boolean("false")), true, "Checking typeof new Boolean('false')");
+            assert.equal(isObject(/[a-z]/g), true, "Checking typeof '/[a-z]/g'");
+            assert.equal(isObject(new RegExp("")), true, "Checking typeof new RegExp('')");
+            _isFileCheck(isObject, true);
+            _isFormDataCheck(isObject, true);
+            _isBlobCheck(isObject, true);
         });
     });
 
@@ -223,6 +229,11 @@ describe("base helpers", () => {
             assert.equal(isArray(new Boolean(false)), false, "Checking typeof new Boolean(false)");
             assert.equal(isArray(new Boolean("true")), false, "Checking typeof new Boolean('true')");
             assert.equal(isArray(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+            assert.equal(isArray(/[a-z]/g), false, "Checking typeof '/[a-z]/g'");
+            assert.equal(isArray(new RegExp("")), false, "Checking typeof new RegExp('')");
+            _isFileCheck(isArray, false);
+            _isFormDataCheck(isArray, false);
+            _isBlobCheck(isArray, false);
         });
     });
 
@@ -248,6 +259,11 @@ describe("base helpers", () => {
             assert.equal(isDate(new Boolean(false)), false, "Checking typeof new Boolean(false)");
             assert.equal(isDate(new Boolean("true")), false, "Checking typeof new Boolean('true')");
             assert.equal(isDate(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+            assert.equal(isDate(/[a-z]/g), false, "Checking typeof '/[a-z]/g'");
+            assert.equal(isDate(new RegExp("")), false, "Checking typeof new RegExp('')");
+            _isFileCheck(isDate, false);
+            _isFormDataCheck(isDate, false);
+            _isBlobCheck(isDate, false);
         });
     });
 
@@ -273,6 +289,11 @@ describe("base helpers", () => {
             assert.equal(isNumber(new Boolean(false)), false, "Checking typeof new Boolean(false)");
             assert.equal(isNumber(new Boolean("true")), false, "Checking typeof new Boolean('true')");
             assert.equal(isNumber(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+            assert.equal(isNumber(/[a-z]/g), false, "Checking typeof '/[a-z]/g'");
+            assert.equal(isNumber(new RegExp("")), false, "Checking typeof new RegExp('')");
+            _isFileCheck(isNumber, false);
+            _isFormDataCheck(isNumber, false);
+            _isBlobCheck(isNumber, false);
         });
     });
 
@@ -298,10 +319,175 @@ describe("base helpers", () => {
             assert.equal(isBoolean(new Boolean(false)), false, "Checking typeof new Boolean(false)");
             assert.equal(isBoolean(new Boolean("true")), false, "Checking typeof new Boolean('true')");
             assert.equal(isBoolean(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+            assert.equal(isBoolean(/[a-z]/g), false, "Checking typeof '/[a-z]/g'");
+            assert.equal(isBoolean(new RegExp("")), false, "Checking typeof new RegExp('')");
+            _isFileCheck(isBoolean, false);
+            _isFormDataCheck(isBoolean, false);
+            _isBlobCheck(isBoolean, false);
+        });
+    });
+
+    describe("isRegExp", () => {
+        it("Validate values", () => {
+            assert.equal(isRegExp(null), false, "Checking typeof null");
+            assert.equal(isRegExp(undefined), false, "Checking typeof undefined");
+            assert.equal(isRegExp("null"), false, "Checking typeof 'null'");
+            assert.equal(isRegExp("undefined"), false, "Checking typeof 'undefined'");
+            assert.equal(isRegExp("1"), false, "Checking typeof '1'");
+            assert.equal(isRegExp("aa"), false, "Checking typeof 'aa'");
+            assert.equal(isRegExp(new Date()), false, "Checking typeof Date");
+            assert.equal(isRegExp(1), false, "Checking typeof 1");
+            assert.equal(isRegExp(""), false, "Checking typeof ''");
+            assert.equal(isRegExp(_dummyFunction), false, "Checking typeof _dummyFunction");
+            assert.equal(isRegExp([]), false, "Checking typeof []");
+            assert.equal(isRegExp(new Array(1)), false, "Checking typeof new Array(1)");
+            assert.equal(isRegExp(true), false, "Checking typeof true");
+            assert.equal(isRegExp(false), false, "Checking typeof false");
+            assert.equal(isRegExp("true"), false, "Checking typeof 'true'");
+            assert.equal(isRegExp("false"), false, "Checking typeof 'false'");
+            assert.equal(isRegExp(new Boolean(true)), false, "Checking typeof new Boolean(true)");
+            assert.equal(isRegExp(new Boolean(false)), false, "Checking typeof new Boolean(false)");
+            assert.equal(isRegExp(new Boolean("true")), false, "Checking typeof new Boolean('true')");
+            assert.equal(isRegExp(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+            assert.equal(isRegExp(/[a-z]/g), true, "Checking typeof '/[a-z]/g'");
+            assert.equal(isRegExp(new RegExp("")), true, "Checking typeof new RegExp('')");
+            _isFileCheck(isRegExp, false);
+            _isFormDataCheck(isRegExp, false);
+            _isBlobCheck(isRegExp, false);
+        });
+    });
+
+    describe("isFile", () => {
+        it("Validate values", () => {
+            assert.equal(isFile(null), false, "Checking typeof null");
+            assert.equal(isFile(undefined), false, "Checking typeof undefined");
+            assert.equal(isFile("null"), false, "Checking typeof 'null'");
+            assert.equal(isFile("undefined"), false, "Checking typeof 'undefined'");
+            assert.equal(isFile("1"), false, "Checking typeof '1'");
+            assert.equal(isFile("aa"), false, "Checking typeof 'aa'");
+            assert.equal(isFile(new Date()), false, "Checking typeof Date");
+            assert.equal(isFile(1), false, "Checking typeof 1");
+            assert.equal(isFile(""), false, "Checking typeof ''");
+            assert.equal(isFile(_dummyFunction), false, "Checking typeof _dummyFunction");
+            assert.equal(isFile([]), false, "Checking typeof []");
+            assert.equal(isFile(new Array(1)), false, "Checking typeof new Array(1)");
+            assert.equal(isFile(true), false, "Checking typeof true");
+            assert.equal(isFile(false), false, "Checking typeof false");
+            assert.equal(isFile("true"), false, "Checking typeof 'true'");
+            assert.equal(isFile("false"), false, "Checking typeof 'false'");
+            assert.equal(isFile(new Boolean(true)), false, "Checking typeof new Boolean(true)");
+            assert.equal(isFile(new Boolean(false)), false, "Checking typeof new Boolean(false)");
+            assert.equal(isFile(new Boolean("true")), false, "Checking typeof new Boolean('true')");
+            assert.equal(isFile(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+            assert.equal(isFile(/[a-z]/g), false, "Checking typeof '/[a-z]/g'");
+            assert.equal(isFile(new RegExp("")), false, "Checking typeof new RegExp('')");
+            _isFileCheck(isFile, true);
+            _isFormDataCheck(isFile, false);
+            _isBlobCheck(isFile, false);
+        });
+    });
+
+    describe("isFormData", () => {
+        it("Validate values", () => {
+            assert.equal(isFormData(null), false, "Checking typeof null");
+            assert.equal(isFormData(undefined), false, "Checking typeof undefined");
+            assert.equal(isFormData("null"), false, "Checking typeof 'null'");
+            assert.equal(isFormData("undefined"), false, "Checking typeof 'undefined'");
+            assert.equal(isFormData("1"), false, "Checking typeof '1'");
+            assert.equal(isFormData("aa"), false, "Checking typeof 'aa'");
+            assert.equal(isFormData(new Date()), false, "Checking typeof Date");
+            assert.equal(isFormData(1), false, "Checking typeof 1");
+            assert.equal(isFormData(""), false, "Checking typeof ''");
+            assert.equal(isFormData(_dummyFunction), false, "Checking typeof _dummyFunction");
+            assert.equal(isFormData([]), false, "Checking typeof []");
+            assert.equal(isFormData(new Array(1)), false, "Checking typeof new Array(1)");
+            assert.equal(isFormData(true), false, "Checking typeof true");
+            assert.equal(isFormData(false), false, "Checking typeof false");
+            assert.equal(isFormData("true"), false, "Checking typeof 'true'");
+            assert.equal(isFormData("false"), false, "Checking typeof 'false'");
+            assert.equal(isFormData(new Boolean(true)), false, "Checking typeof new Boolean(true)");
+            assert.equal(isFormData(new Boolean(false)), false, "Checking typeof new Boolean(false)");
+            assert.equal(isFormData(new Boolean("true")), false, "Checking typeof new Boolean('true')");
+            assert.equal(isFormData(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+            assert.equal(isFormData(/[a-z]/g), false, "Checking typeof '/[a-z]/g'");
+            assert.equal(isFormData(new RegExp("")), false, "Checking typeof new RegExp('')");
+            _isFileCheck(isFormData, false);
+            _isFormDataCheck(isFormData, true);
+            _isBlobCheck(isFormData, false);
+        });
+
+        describe("isBlob", () => {
+            it("Validate values", () => {
+                assert.equal(isBlob(null), false, "Checking typeof null");
+                assert.equal(isBlob(undefined), false, "Checking typeof undefined");
+                assert.equal(isBlob("null"), false, "Checking typeof 'null'");
+                assert.equal(isBlob("undefined"), false, "Checking typeof 'undefined'");
+                assert.equal(isBlob("1"), false, "Checking typeof '1'");
+                assert.equal(isBlob("aa"), false, "Checking typeof 'aa'");
+                assert.equal(isBlob(new Date()), false, "Checking typeof Date");
+                assert.equal(isBlob(1), false, "Checking typeof 1");
+                assert.equal(isBlob(""), false, "Checking typeof ''");
+                assert.equal(isBlob(_dummyFunction), false, "Checking typeof _dummyFunction");
+                assert.equal(isBlob([]), false, "Checking typeof []");
+                assert.equal(isBlob(new Array(1)), false, "Checking typeof new Array(1)");
+                assert.equal(isBlob(true), false, "Checking typeof true");
+                assert.equal(isBlob(false), false, "Checking typeof false");
+                assert.equal(isBlob("true"), false, "Checking typeof 'true'");
+                assert.equal(isBlob("false"), false, "Checking typeof 'false'");
+                assert.equal(isBlob(new Boolean(true)), false, "Checking typeof new Boolean(true)");
+                assert.equal(isBlob(new Boolean(false)), false, "Checking typeof new Boolean(false)");
+                assert.equal(isBlob(new Boolean("true")), false, "Checking typeof new Boolean('true')");
+                assert.equal(isBlob(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+                assert.equal(isBlob(/[a-z]/g), false, "Checking typeof '/[a-z]/g'");
+                assert.equal(isBlob(new RegExp("")), false, "Checking typeof new RegExp('')");
+                _isFileCheck(isBlob, false);
+                _isFormDataCheck(isBlob, false);
+                _isBlobCheck(isBlob, true);
+            });
         });
     });
 
     function _dummyFunction() {
 
     }
+
+    function _isFileCheck(chkFn: (value: any) => boolean, expected: boolean) {
+        let theFile: File = null;
+        try {
+            theFile = new File([], "text.txt");
+        } catch (e) {
+            // Node doesn't have the file class
+            assert.equal(e.name, "ReferenceError", "Expecting the error to be a ReferenceError - " + dumpObj(e));
+            expected = false;
+        }
+
+        assert.equal(chkFn(theFile), expected, "Checking typeof new File([], '')");
+    }
+
+    function _isFormDataCheck(chkFn: (value: any) => boolean, expected: boolean) {
+        let formData: FormData = null;
+        try {
+            formData = new FormData();
+        } catch (e) {
+            // Node doesn't have the FormData class
+            assert.equal(e.name, "ReferenceError", "Expecting the error to be a ReferenceError - " + dumpObj(e));
+            expected = false;
+        }
+
+        assert.equal(chkFn(formData), expected, "Checking typeof new FormData()");
+    }
+
+    function _isBlobCheck(chkFn: (value: any) => boolean, expected: boolean) {
+        let blob: Blob = null;
+        try {
+            blob = new Blob();
+        } catch (e) {
+            // Node doesn't have the Blob class
+            assert.equal(e.name, "ReferenceError", "Expecting the error to be a ReferenceError - " + dumpObj(e));
+            expected = false;
+        }
+
+        assert.equal(chkFn(blob), expected, "Checking typeof new Blob()");
+    }
+
 });

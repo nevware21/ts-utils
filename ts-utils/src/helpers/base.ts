@@ -55,15 +55,34 @@ export function isNullOrUndefined(value:  any) {
     return value === null || isUndefined(value);
 }
 
+/**
+ * Checks if the passed value is defined, which means it has any value and is not undefined.
+ * @param arg - The value to check
+ * @returns
+ */
 export function isDefined(arg: any): arg is undefined {
     return !!arg || arg !== undefined;
 }
 
+/**
+ * Checks to see if the past value is a string value
+ * @param value - The value to check
+ * @returns
+ */
 export const isString = _createIs<string>(STRING);
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+/**
+ * Checks to see if the past value is a function value
+ * @param value - The value to check
+ * @returns
+ */
 export const isFunction = _createIs<Function>(FUNCTION);
 
+/**
+ * Checks to see if the past value is an object value
+ * @param value - The value to check
+ * @returns
+ */
 export function isObject(value: any): value is object {
     if (isNullOrUndefined(value)) {
         return false;

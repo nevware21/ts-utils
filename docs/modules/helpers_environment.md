@@ -16,6 +16,8 @@
 - [hasHistory](helpers_environment.md#hashistory)
 - [hasNavigator](helpers_environment.md#hasnavigator)
 - [hasWindow](helpers_environment.md#haswindow)
+- [isNode](helpers_environment.md#isnode)
+- [isWebWorker](helpers_environment.md#iswebworker)
 
 ## Functions
 
@@ -31,7 +33,7 @@ Return the global `document` instance.
 
 #### Defined in
 
-[helpers/environment.ts:90](https://github.com/nevware21/ts-utils/blob/8ea7298/ts-utils/src/helpers/environment.ts#L90)
+[helpers/environment.ts:105](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/environment.ts#L105)
 
 ___
 
@@ -63,7 +65,7 @@ this can be an expensive operation.
 
 #### Defined in
 
-[helpers/environment.ts:37](https://github.com/nevware21/ts-utils/blob/8ea7298/ts-utils/src/helpers/environment.ts#L37)
+[helpers/environment.ts:52](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/environment.ts#L52)
 
 ___
 
@@ -79,7 +81,7 @@ Returns the global `history` instance
 
 #### Defined in
 
-[helpers/environment.ts:138](https://github.com/nevware21/ts-utils/blob/8ea7298/ts-utils/src/helpers/environment.ts#L138)
+[helpers/environment.ts:153](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/environment.ts#L153)
 
 ___
 
@@ -107,7 +109,7 @@ Return the named global object if available, will return null if the object is n
 
 #### Defined in
 
-[helpers/environment.ts:63](https://github.com/nevware21/ts-utils/blob/8ea7298/ts-utils/src/helpers/environment.ts#L63)
+[helpers/environment.ts:78](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/environment.ts#L78)
 
 ___
 
@@ -123,7 +125,7 @@ Returns the global `navigator` instance
 
 #### Defined in
 
-[helpers/environment.ts:122](https://github.com/nevware21/ts-utils/blob/8ea7298/ts-utils/src/helpers/environment.ts#L122)
+[helpers/environment.ts:137](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/environment.ts#L137)
 
 ___
 
@@ -139,7 +141,7 @@ Return the global `window` instance.
 
 #### Defined in
 
-[helpers/environment.ts:106](https://github.com/nevware21/ts-utils/blob/8ea7298/ts-utils/src/helpers/environment.ts#L106)
+[helpers/environment.ts:121](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/environment.ts#L121)
 
 ___
 
@@ -157,7 +159,7 @@ Identify whether the runtime contains a `document` object
 
 #### Defined in
 
-[helpers/environment.ts:82](https://github.com/nevware21/ts-utils/blob/8ea7298/ts-utils/src/helpers/environment.ts#L82)
+[helpers/environment.ts:97](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/environment.ts#L97)
 
 ___
 
@@ -173,7 +175,7 @@ Identifies whether the runtime contains a `history` object
 
 #### Defined in
 
-[helpers/environment.ts:130](https://github.com/nevware21/ts-utils/blob/8ea7298/ts-utils/src/helpers/environment.ts#L130)
+[helpers/environment.ts:145](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/environment.ts#L145)
 
 ___
 
@@ -189,7 +191,7 @@ Identify whether the runtimne contains a `navigator` object
 
 #### Defined in
 
-[helpers/environment.ts:114](https://github.com/nevware21/ts-utils/blob/8ea7298/ts-utils/src/helpers/environment.ts#L114)
+[helpers/environment.ts:129](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/environment.ts#L129)
 
 ___
 
@@ -205,4 +207,40 @@ Identify whether the runtime contains a `window` object
 
 #### Defined in
 
-[helpers/environment.ts:98](https://github.com/nevware21/ts-utils/blob/8ea7298/ts-utils/src/helpers/environment.ts#L98)
+[helpers/environment.ts:113](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/environment.ts#L113)
+
+___
+
+### isNode
+
+▸ **isNode**(): `boolean`
+
+Simple method to determine if we are running in a node environment
+
+#### Returns
+
+`boolean`
+
+True if you are
+
+#### Defined in
+
+[helpers/environment.ts:161](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/environment.ts#L161)
+
+___
+
+### isWebWorker
+
+▸ **isWebWorker**(): `boolean`
+
+Helper to identify if you are running as a Dedicated, Shared or Service worker
+
+#### Returns
+
+`boolean`
+
+True if the environment you are in looks like a Web Worker
+
+#### Defined in
+
+[helpers/environment.ts:169](https://github.com/nevware21/ts-utils/blob/2a92815/ts-utils/src/helpers/environment.ts#L169)

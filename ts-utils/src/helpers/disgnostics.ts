@@ -8,7 +8,6 @@
 
 import { isNumber, objToString } from "./base";
 
-
 /**
  * Returns string representation of an object suitable for diagnostics logging.
  */
@@ -29,5 +28,5 @@ export function dumpObj(object: any, format?: boolean | number): string {
         }
     }
 
-    return objectTypeDump + propertyValueDump;
+    return objectTypeDump + ": " + propertyValueDump;
 }
