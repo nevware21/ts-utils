@@ -1,7 +1,6 @@
 import * as assert from "assert";
-import { isArray, isBoolean, isDate, isDefined, isFunction, isNullOrUndefined, isNumber, isObject, isString, isTypeof, isUndefined, isRegExp, objToString, isFile, isFormData, isBlob } from "../../../src/helpers/base";
+import { isArray, isBoolean, isDate, isDefined, isFunction, isNullOrUndefined, isNumber, isObject, isString, isTypeof, isUndefined, isRegExp, objToString, isFile, isFormData, isBlob, isArrayBuffer, isError } from "../../../src/helpers/base";
 import { dumpObj } from "../../../src/helpers/disgnostics";
-import { isNode } from "../../../src/helpers/environment";
 
 describe("base helpers", () => {
     describe("isTypeOf", () => {
@@ -26,6 +25,13 @@ describe("base helpers", () => {
             assert.equal(isTypeof(new Boolean(false), null), false, "Checking typeof new Boolean(false)");
             assert.equal(isTypeof(new Boolean("true"), null), false, "Checking typeof new Boolean('true')");
             assert.equal(isTypeof(new Boolean("false"), null), false, "Checking typeof new Boolean('false')");
+            assert.equal(isTypeof(new RegExp(""), null), false, "Checking typeof new RegExp('')");
+            assert.equal(isTypeof(new ArrayBuffer(0), null), false, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isTypeof(new Error("Test Error"), null), false, "Checking typeof new Error('')");
+            assert.equal(isTypeof(new TypeError("Test TypeError"), null), false, "Checking typeof new TypeError('')");
+            assert.equal(isTypeof(new TestError("Test TestError"), null), false, "Checking typeof new TestError('')");
+            assert.equal(isTypeof(_dummyError(), null), false, "Checking dummy error (object that looks like an error)");
+
         });
 
         it("Validate values of type undefined", () => {
@@ -49,6 +55,13 @@ describe("base helpers", () => {
             assert.equal(isTypeof(new Boolean(false), undefined), false, "Checking typeof new Boolean(false)");
             assert.equal(isTypeof(new Boolean("true"), undefined), false, "Checking typeof new Boolean('true')");
             assert.equal(isTypeof(new Boolean("false"), undefined), false, "Checking typeof new Boolean('false')");
+            assert.equal(isTypeof(new RegExp(""), undefined), false, "Checking typeof new RegExp('')");
+            assert.equal(isTypeof(new ArrayBuffer(0), undefined), false, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isTypeof(new Error("Test Error"), undefined), false, "Checking typeof new Error('')");
+            assert.equal(isTypeof(new TypeError("Test TypeError"), undefined), false, "Checking typeof new TypeError('')");
+            assert.equal(isTypeof(new TestError("Test TestError"), undefined), false, "Checking typeof new TestError('')");
+            assert.equal(isTypeof(_dummyError(), undefined), false, "Checking dummy error (object that looks like an error)");
+
         });
     });
 
@@ -74,6 +87,13 @@ describe("base helpers", () => {
             assert.equal(isUndefined(new Boolean(false)), false, "Checking typeof new Boolean(false)");
             assert.equal(isUndefined(new Boolean("true")), false, "Checking typeof new Boolean('true')");
             assert.equal(isUndefined(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+            assert.equal(isUndefined(new RegExp("")), false, "Checking typeof new RegExp('')");
+            assert.equal(isUndefined(new ArrayBuffer(0)), false, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isUndefined(new Error("Test Error")), false, "Checking typeof new Error('')");
+            assert.equal(isUndefined(new TypeError("Test TypeError")), false, "Checking typeof new TypeError('')");
+            assert.equal(isUndefined(new TestError("Test TestError")), false, "Checking typeof new TestError('')");
+            assert.equal(isUndefined(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+
         });
     });
 
@@ -99,6 +119,13 @@ describe("base helpers", () => {
             assert.equal(isNullOrUndefined(new Boolean(false)), false, "Checking typeof new Boolean(false)");
             assert.equal(isNullOrUndefined(new Boolean("true")), false, "Checking typeof new Boolean('true')");
             assert.equal(isNullOrUndefined(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+            assert.equal(isNullOrUndefined(new RegExp("")), false, "Checking typeof new RegExp('')");
+            assert.equal(isNullOrUndefined(new ArrayBuffer(0)), false, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isNullOrUndefined(new Error("Test Error")), false, "Checking typeof new Error('')");
+            assert.equal(isNullOrUndefined(new TypeError("Test TypeError")), false, "Checking typeof new TypeError('')");
+            assert.equal(isNullOrUndefined(new TestError("Test TestError")), false, "Checking typeof new TestError('')");
+            assert.equal(isNullOrUndefined(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+
         });
     });
 
@@ -124,6 +151,13 @@ describe("base helpers", () => {
             assert.equal(isDefined(new Boolean(false)), true, "Checking typeof new Boolean(false)");
             assert.equal(isDefined(new Boolean("true")), true, "Checking typeof new Boolean('true')");
             assert.equal(isDefined(new Boolean("false")), true, "Checking typeof new Boolean('false')");
+            assert.equal(isDefined(new RegExp("")), true, "Checking typeof new RegExp('')");
+            assert.equal(isDefined(new ArrayBuffer(0)), true, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isDefined(new Error("Test Error")), true, "Checking typeof new Error('')");
+            assert.equal(isDefined(new TypeError("Test TypeError")), true, "Checking typeof new TypeError('')");
+            assert.equal(isDefined(new TestError("Test TestError")), true, "Checking typeof new TestError('')");
+            assert.equal(isDefined(_dummyError()), true, "Checking dummy error (object that looks like an error)");
+
         });
     });
 
@@ -149,6 +183,16 @@ describe("base helpers", () => {
             assert.equal(isString(new Boolean(false)), false, "Checking typeof new Boolean(false)");
             assert.equal(isString(new Boolean("true")), false, "Checking typeof new Boolean('true')");
             assert.equal(isString(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+            assert.equal(isString(new RegExp("")), false, "Checking typeof new RegExp('')");
+            _isFileCheck(isString, false);
+            _isFormDataCheck(isString, false);
+            _isBlobCheck(isString, false);
+            assert.equal(isString(new ArrayBuffer(0)), false, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isString(new Error("Test Error")), false, "Checking typeof new Error('')");
+            assert.equal(isString(new TypeError("Test TypeError")), false, "Checking typeof new TypeError('')");
+            assert.equal(isString(new TestError("Test TestError")), false, "Checking typeof new TestError('')");
+            assert.equal(isString(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+
         });
     });
 
@@ -174,6 +218,16 @@ describe("base helpers", () => {
             assert.equal(isFunction(new Boolean(false)), false, "Checking typeof new Boolean(false)");
             assert.equal(isFunction(new Boolean("true")), false, "Checking typeof new Boolean('true')");
             assert.equal(isFunction(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+            assert.equal(isFunction(new RegExp("")), false, "Checking typeof new RegExp('')");
+            _isFileCheck(isFunction, false);
+            _isFormDataCheck(isFunction, false);
+            _isBlobCheck(isFunction, false);
+            assert.equal(isFunction(new ArrayBuffer(0)), false, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isFunction(new Error("Test Error")), false, "Checking typeof new Error('')");
+            assert.equal(isFunction(new TypeError("Test TypeError")), false, "Checking typeof new TypeError('')");
+            assert.equal(isFunction(new TestError("Test TestError")), false, "Checking typeof new TestError('')");
+            assert.equal(isFunction(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+
         });
     });
 
@@ -204,6 +258,12 @@ describe("base helpers", () => {
             _isFileCheck(isObject, true);
             _isFormDataCheck(isObject, true);
             _isBlobCheck(isObject, true);
+            assert.equal(isObject(new ArrayBuffer(0)), true, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isObject(new Error("Test Error")), true, "Checking typeof new Error('')");
+            assert.equal(isObject(new TypeError("Test TypeError")), true, "Checking typeof new TypeError('')");
+            assert.equal(isObject(new TestError("Test TestError")), true, "Checking typeof new TestError('')");
+            assert.equal(isObject(_dummyError()), true, "Checking dummy error (object that looks like an error)");
+
         });
     });
 
@@ -234,6 +294,12 @@ describe("base helpers", () => {
             _isFileCheck(isArray, false);
             _isFormDataCheck(isArray, false);
             _isBlobCheck(isArray, false);
+            assert.equal(isArray(new ArrayBuffer(0)), false, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isArray(new Error("Test Error")), false, "Checking typeof new Error('')");
+            assert.equal(isArray(new TypeError("Test TypeError")), false, "Checking typeof new TypeError('')");
+            assert.equal(isArray(new TestError("Test TestError")), false, "Checking typeof new TestError('')");
+            assert.equal(isArray(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+
         });
     });
 
@@ -264,6 +330,12 @@ describe("base helpers", () => {
             _isFileCheck(isDate, false);
             _isFormDataCheck(isDate, false);
             _isBlobCheck(isDate, false);
+            assert.equal(isDate(new ArrayBuffer(0)), false, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isDate(new Error("Test Error")), false, "Checking typeof new Error('')");
+            assert.equal(isDate(new TypeError("Test TypeError")), false, "Checking typeof new TypeError('')");
+            assert.equal(isDate(new TestError("Test TestError")), false, "Checking typeof new TestError('')");
+            assert.equal(isDate(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+
         });
     });
 
@@ -294,6 +366,12 @@ describe("base helpers", () => {
             _isFileCheck(isNumber, false);
             _isFormDataCheck(isNumber, false);
             _isBlobCheck(isNumber, false);
+            assert.equal(isNumber(new ArrayBuffer(0)), false, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isNumber(new Error("Test Error")), false, "Checking typeof new Error('')");
+            assert.equal(isNumber(new TypeError("Test TypeError")), false, "Checking typeof new TypeError('')");
+            assert.equal(isNumber(new TestError("Test TestError")), false, "Checking typeof new TestError('')");
+            assert.equal(isNumber(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+
         });
     });
 
@@ -324,6 +402,12 @@ describe("base helpers", () => {
             _isFileCheck(isBoolean, false);
             _isFormDataCheck(isBoolean, false);
             _isBlobCheck(isBoolean, false);
+            assert.equal(isBoolean(new ArrayBuffer(0)), false, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isBoolean(new Error("Test Error")), false, "Checking typeof new Error('')");
+            assert.equal(isBoolean(new TypeError("Test TypeError")), false, "Checking typeof new TypeError('')");
+            assert.equal(isBoolean(new TestError("Test TestError")), false, "Checking typeof new TestError('')");
+            assert.equal(isBoolean(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+
         });
     });
 
@@ -354,6 +438,12 @@ describe("base helpers", () => {
             _isFileCheck(isRegExp, false);
             _isFormDataCheck(isRegExp, false);
             _isBlobCheck(isRegExp, false);
+            assert.equal(isRegExp(new ArrayBuffer(0)), false, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isRegExp(new Error("Test Error")), false, "Checking typeof new Error('')");
+            assert.equal(isRegExp(new TypeError("Test TypeError")), false, "Checking typeof new TypeError('')");
+            assert.equal(isRegExp(new TestError("Test TestError")), false, "Checking typeof new TestError('')");
+            assert.equal(isRegExp(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+
         });
     });
 
@@ -384,6 +474,12 @@ describe("base helpers", () => {
             _isFileCheck(isFile, true);
             _isFormDataCheck(isFile, false);
             _isBlobCheck(isFile, false);
+            assert.equal(isFile(new ArrayBuffer(0)), false, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isFile(new Error("Test Error")), false, "Checking typeof new Error('')");
+            assert.equal(isFile(new TypeError("Test TypeError")), false, "Checking typeof new TypeError('')");
+            assert.equal(isFile(new TestError("Test TestError")), false, "Checking typeof new TestError('')");
+            assert.equal(isFile(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+
         });
     });
 
@@ -414,6 +510,12 @@ describe("base helpers", () => {
             _isFileCheck(isFormData, false);
             _isFormDataCheck(isFormData, true);
             _isBlobCheck(isFormData, false);
+            assert.equal(isFormData(new ArrayBuffer(0)), false, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isFormData(new Error("Test Error")), false, "Checking typeof new Error('')");
+            assert.equal(isFormData(new TypeError("Test TypeError")), false, "Checking typeof new TypeError('')");
+            assert.equal(isFormData(new TestError("Test TestError")), false, "Checking typeof new TestError('')");
+            assert.equal(isFormData(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+
         });
 
         describe("isBlob", () => {
@@ -443,12 +545,96 @@ describe("base helpers", () => {
                 _isFileCheck(isBlob, false);
                 _isFormDataCheck(isBlob, false);
                 _isBlobCheck(isBlob, true);
+                assert.equal(isBlob(new ArrayBuffer(0)), false, "Checking typeof new ArrayBuffer([])");
+                assert.equal(isBlob(new Error("Test Error")), false, "Checking typeof new Error('')");
+                assert.equal(isBlob(new TypeError("Test TypeError")), false, "Checking typeof new TypeError('')");
+                assert.equal(isBlob(new TestError("Test TestError")), false, "Checking typeof new TestError('')");
+                assert.equal(isBlob(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+
             });
+        });
+
+
+        describe("isArrayBuffer", () => {
+            it("Validate values", () => {
+                assert.equal(isArrayBuffer(null), false, "Checking typeof null");
+                assert.equal(isArrayBuffer(undefined), false, "Checking typeof undefined");
+                assert.equal(isArrayBuffer("null"), false, "Checking typeof 'null'");
+                assert.equal(isArrayBuffer("undefined"), false, "Checking typeof 'undefined'");
+                assert.equal(isArrayBuffer("1"), false, "Checking typeof '1'");
+                assert.equal(isArrayBuffer("aa"), false, "Checking typeof 'aa'");
+                assert.equal(isArrayBuffer(new Date()), false, "Checking typeof Date");
+                assert.equal(isArrayBuffer(1), false, "Checking typeof 1");
+                assert.equal(isArrayBuffer(""), false, "Checking typeof ''");
+                assert.equal(isArrayBuffer(_dummyFunction), false, "Checking typeof _dummyFunction");
+                assert.equal(isArrayBuffer([]), false, "Checking typeof []");
+                assert.equal(isArrayBuffer(new Array(1)), false, "Checking typeof new Array(1)");
+                assert.equal(isArrayBuffer(true), false, "Checking typeof true");
+                assert.equal(isArrayBuffer(false), false, "Checking typeof false");
+                assert.equal(isArrayBuffer("true"), false, "Checking typeof 'true'");
+                assert.equal(isArrayBuffer("false"), false, "Checking typeof 'false'");
+                assert.equal(isArrayBuffer(new Boolean(true)), false, "Checking typeof new Boolean(true)");
+                assert.equal(isArrayBuffer(new Boolean(false)), false, "Checking typeof new Boolean(false)");
+                assert.equal(isArrayBuffer(new Boolean("true")), false, "Checking typeof new Boolean('true')");
+                assert.equal(isArrayBuffer(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+                assert.equal(isArrayBuffer(/[a-z]/g), false, "Checking typeof '/[a-z]/g'");
+                assert.equal(isArrayBuffer(new RegExp("")), false, "Checking typeof new RegExp('')");
+                _isFileCheck(isArrayBuffer, false);
+                _isFormDataCheck(isArrayBuffer, false);
+                _isBlobCheck(isArrayBuffer, false);
+                assert.equal(isArrayBuffer(new ArrayBuffer(0)), true, "Checking typeof new ArrayBuffer([])");
+                assert.equal(isArrayBuffer(new Error("Test Error")), false, "Checking typeof new Error('')");
+                assert.equal(isArrayBuffer(new TypeError("Test TypeError")), false, "Checking typeof new TypeError('')");
+                assert.equal(isArrayBuffer(new TestError("Test TestError")), false, "Checking typeof new TestError('')");
+                assert.equal(isArrayBuffer(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+            });
+        });
+    });
+
+    describe("isError", () => {
+        it("Validate values", () => {
+            assert.equal(isError(null), false, "Checking typeof null");
+            assert.equal(isError(undefined), false, "Checking typeof undefined");
+            assert.equal(isError("null"), false, "Checking typeof 'null'");
+            assert.equal(isError("undefined"), false, "Checking typeof 'undefined'");
+            assert.equal(isError("1"), false, "Checking typeof '1'");
+            assert.equal(isError("aa"), false, "Checking typeof 'aa'");
+            assert.equal(isError(new Date()), false, "Checking typeof Date");
+            assert.equal(isError(1), false, "Checking typeof 1");
+            assert.equal(isError(""), false, "Checking typeof ''");
+            assert.equal(isError(_dummyFunction), false, "Checking typeof _dummyFunction");
+            assert.equal(isError([]), false, "Checking typeof []");
+            assert.equal(isError(new Array(1)), false, "Checking typeof new Array(1)");
+            assert.equal(isError(true), false, "Checking typeof true");
+            assert.equal(isError(false), false, "Checking typeof false");
+            assert.equal(isError("true"), false, "Checking typeof 'true'");
+            assert.equal(isError("false"), false, "Checking typeof 'false'");
+            assert.equal(isError(new Boolean(true)), false, "Checking typeof new Boolean(true)");
+            assert.equal(isError(new Boolean(false)), false, "Checking typeof new Boolean(false)");
+            assert.equal(isError(new Boolean("true")), false, "Checking typeof new Boolean('true')");
+            assert.equal(isError(new Boolean("false")), false, "Checking typeof new Boolean('false')");
+            assert.equal(isError(/[a-z]/g), false, "Checking typeof '/[a-z]/g'");
+            assert.equal(isError(new RegExp("")), false, "Checking typeof new RegExp('')");
+            _isFileCheck(isError, false);
+            _isFormDataCheck(isError, false);
+            _isBlobCheck(isError, false);
+            assert.equal(isError(new ArrayBuffer(0)), false, "Checking typeof new ArrayBuffer([])");
+            assert.equal(isError(new Error("Test Error")), true, "Checking typeof new Error('')");
+            assert.equal(isError(new TypeError("Test TypeError")), true, "Checking typeof new TypeError('')");
+            assert.equal(isError(new TestError("Test TestError")), true, "Checking typeof new TestError('')");
+            assert.equal(isError(_dummyError()), false, "Checking dummy error (object that looks like an error)");
         });
     });
 
     function _dummyFunction() {
 
+    }
+
+    function _dummyError(): Error {
+        return {
+            name: "Dummy Error",
+            message: "Dummy Message"
+        };
     }
 
     function _isFileCheck(chkFn: (value: any) => boolean, expected: boolean) {
@@ -490,4 +676,10 @@ describe("base helpers", () => {
         assert.equal(chkFn(blob), expected, "Checking typeof new Blob()");
     }
 
+
+    class TestError extends Error {
+        public constructor(message: string) {
+            super(message);
+        }
+    }
 });

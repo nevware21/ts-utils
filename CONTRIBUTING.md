@@ -6,42 +6,58 @@ If making a large change we request that you open an [issue][GitHubIssue] first.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-[ContribGuide]: https://github.com/nevware21/grunt-plugins/blob/main/CONTRIBUTING.md
-[GitHubIssue]: https://github.com/nevware21/grunt-plugins/issues
+[ContribGuide]: https://github.com/nevware21/ts-utils/blob/main/CONTRIBUTING.md
+[GitHubIssue]: https://github.com/nevware21/ts-utils/issues
 
 ## Clone and setup
 
 1. Clone the repository and create a new branch
+	```
+	git clone https://github.com/nevware21/ts-utils.git
+	```
+
 2. Install all dependencies
 	```
-	npm install -g @microsoft/rush
 	npm install
 	```
-    > Note: The initial ```npm install``` may fail due to SHA-256 signatures, this is because the shrink-wrap is reference local versions that got checked in, to resolve run ```rush update --recheck --purge --full``` to cause the re-linking of the local build -- future ```npm install``` should now work.
 
-3. Navigate to the root folder and update rush dependencies
+3. Build
 	```
-	rush update
+	npm run rebuild
 	```
-4. Build
-	```
-	rush build
-	```
-5. Run Tests  (Currently not working)
+
+4. Run Tests  (Currently not working)
     ```
 	npm run test
     ```
 
-## Build and test
+5. Generate typedoc
+	```
+	npm run docs
+	```
 
-The root folder contains 8 packages that are components of this next version of the SDK. When making changes in multiple packages, you can build using the following commands in root folder:
+6. Debugging failing tests in a browser
 
-1. rush rebuild --verbose
+This runs karma in "watch" mode to avoid the browser automatically closing, to debug process the Debug button in the corner.
 
-    This will build all packages in order of dependencies. If there are build errors, verbose options is required to view error details.
+As this uses watch mode you can also just leave this running as you make code changes, however, if there is a compile error this can cause the browser to be closed.
 
-2. npm run test (TBD)
+Terminating the debug session can require several CTRL-C's in the terminal window used to start the debug session.
 
-    This will run tests in all packages.
+	```
+	npm run test:debug
+	```
 
-If you are changing package versions or adding/removing any package dependencies, run> **rush update --purge --recheck --full** or **npm run rupdate** before building. Please check-in any files that change under common\ folder.
+By default this is configured to run using chromiumn based Edge, you can change the `process.env.CHROME_BIN = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";` at the top of the `karma.debug.conf.js` file to use a different chromium based browser.
+
+
+## Build, test and generate typedoc docs
+
+This will build and run all of the tests in node and in headless chromium.
+
+	```
+	npm run rebuild
+	```
+
+
+If you are changing package versions or adding/removing any package dependencies, run> **npm install** before building. Please check-in any files that change under docs\ folder.
