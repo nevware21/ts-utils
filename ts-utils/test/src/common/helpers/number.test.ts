@@ -1,6 +1,5 @@
-import * as assert from "assert";
-
-import { getIntValue } from "../../../src/helpers/number";
+import { assert } from "chai";
+import { getIntValue } from "../../../../src/helpers/number";
 
 describe("number helpers", () => {
     describe("getIntValue", () => {

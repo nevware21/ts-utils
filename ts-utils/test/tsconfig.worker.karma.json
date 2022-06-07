@@ -3,19 +3,17 @@
         "sourceMap": true,
         "inlineSources": true,
         "noImplicitAny": true,
-        "module": "commonjs",
+        "module": "es6",
         "moduleResolution": "node",
         "target": "es5",
         "forceConsistentCasingInFileNames": true,
-        "importHelpers": true,
+        "importHelpers": false,
         "noEmitHelpers": false,
         "alwaysStrict": true,
-        "declaration": false,
-        "declarationDir": "./types",
-        "outDir": "./test-esm",
         "suppressImplicitAnyIndexErrors": true,
         "allowSyntheticDefaultImports": true,
-        "removeComments": true
+        "removeComments": true,
+        "esModuleInterop": true
     },
     "include": [
         "../src/**/*.ts",

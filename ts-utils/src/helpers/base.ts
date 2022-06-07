@@ -38,7 +38,7 @@ export function isTypeof(value: any, theType: string): boolean {
 }
 
 /**
- * Checks if the provided value is undefined
+ * Checks if the provided value is undefined or contains the string value "undefined".
  * @param value - The value to check
  * @returns
  */
@@ -47,7 +47,7 @@ export function isUndefined(value: any) {
 }
 
 /**
- * Checks if the provided value is null or undefined
+ * Checks if the provided value is null, undefined or contains the string value of "undefined".
  * @param value - The value to check
  * @returns
  */
@@ -57,6 +57,7 @@ export function isNullOrUndefined(value:  any) {
 
 /**
  * Checks if the passed value is defined, which means it has any value and is not undefined.
+ * A string value of "undefined" is considered to be defined.
  * @param arg - The value to check
  * @returns
  */
@@ -165,7 +166,7 @@ export const isError = _createObjIs<ArrayBuffer>("[object Error]");
  * @return {boolean} True if the value is a PromiseLike, false otherwise.
  */
 export function isPromiseLike<T>(value: any): value is PromiseLike<T> {
-    return value && isFunction(value.then);
+    return !!value && isFunction(value.then);
 }
 
 /**
@@ -174,23 +175,25 @@ export function isPromiseLike<T>(value: any): value is PromiseLike<T> {
  * @return {boolean} True if the value is a Promise, false otherwise.
  */
 export function isPromise<T>(value: any): value is Promise<T> {
-    return value && isPromiseLike(value) && isFunction((value as any).catch);
+    return isPromiseLike(value) && isFunction((value as any).catch);
 }
 
 /**
- * Checks if the type of value does not evaluate to true value.
+ * Checks if the type of value does not evaluate to true value, handling some special
+ * case usages of Boolean(true/false) and new Boolean(true/false).
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is not truthy, false otherwise.
  */
 export function isNotTruthy(value: any) {
-    return !value;
+    return !value || !(value && (0 + value));
 }
 
 /**
- * Checks if the type of value evaluates to true value.
+ * Checks if the type of value evaluates to true value, handling some special
+ * case usages of Boolean(true/false) and new Boolean(true/false).
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is not truthy, false otherwise.
  */
 export function isTruthy(value: any) {
-    return !!value;
+    return !(!value || !(value && (0 + value)));
 }

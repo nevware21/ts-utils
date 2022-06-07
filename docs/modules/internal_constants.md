@@ -23,7 +23,7 @@
 
 #### Defined in
 
-[internal/constants.ts:12](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/internal/constants.ts#L12)
+[internal/constants.ts:12](https://github.com/nevware21/ts-utils/blob/ac7ff62/ts-utils/src/internal/constants.ts#L12)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 #### Defined in
 
-[internal/constants.ts:19](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/internal/constants.ts#L19)
+[internal/constants.ts:19](https://github.com/nevware21/ts-utils/blob/ac7ff62/ts-utils/src/internal/constants.ts#L19)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 #### Defined in
 
-[internal/constants.ts:13](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/internal/constants.ts#L13)
+[internal/constants.ts:13](https://github.com/nevware21/ts-utils/blob/ac7ff62/ts-utils/src/internal/constants.ts#L13)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 #### Defined in
 
-[internal/constants.ts:14](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/internal/constants.ts#L14)
+[internal/constants.ts:14](https://github.com/nevware21/ts-utils/blob/ac7ff62/ts-utils/src/internal/constants.ts#L14)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 #### Defined in
 
-[internal/constants.ts:15](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/internal/constants.ts#L15)
+[internal/constants.ts:15](https://github.com/nevware21/ts-utils/blob/ac7ff62/ts-utils/src/internal/constants.ts#L15)
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 #### Defined in
 
-[internal/constants.ts:16](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/internal/constants.ts#L16)
+[internal/constants.ts:16](https://github.com/nevware21/ts-utils/blob/ac7ff62/ts-utils/src/internal/constants.ts#L16)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 
 #### Defined in
 
-[internal/constants.ts:17](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/internal/constants.ts#L17)
+[internal/constants.ts:17](https://github.com/nevware21/ts-utils/blob/ac7ff62/ts-utils/src/internal/constants.ts#L17)
 
 ___
 
@@ -93,4 +93,4 @@ ___
 
 #### Defined in
 
-[internal/constants.ts:18](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/internal/constants.ts#L18)
+[internal/constants.ts:18](https://github.com/nevware21/ts-utils/blob/ac7ff62/ts-utils/src/internal/constants.ts#L18)
