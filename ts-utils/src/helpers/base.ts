@@ -1,6 +1,6 @@
 /*
  * @nevware21/ts-utils
- * https://github.com/nevware21/grunt-plugins
+ * https://github.com/nevware21/ts-utils
  *
  * Copyright (c) 2022 Nevware21
  * Licensed under the MIT license.

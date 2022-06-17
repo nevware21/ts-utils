@@ -1,6 +1,6 @@
 ## Contributing
 
-Welcome and thank you for your interest in contributing to Grunt Plugins.
+Welcome and thank you for your interest in contributing to ts-utils
 
 If making a large change we request that you open an [issue][GitHubIssue] first.
 
@@ -22,11 +22,17 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 	```
 
 3. Build
+
+	Rebuilding also runs all of the tests in node, browser, a web worker and generates the typedoc docs.
+
 	```
 	npm run rebuild
 	```
 
-4. Run Tests  (Currently not working)
+
+4. Run Tests
+
+	Run all tests in node, browser and a web worker.
     ```
 	npm run test
     ```
@@ -38,17 +44,17 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 6. Debugging failing tests in a browser
 
-This runs karma in "watch" mode to avoid the browser automatically closing, to debug process the Debug button in the corner.
+    This runs karma in "watch" mode to avoid the browser automatically closing, to debug process the Debug button in the corner.
 
-As this uses watch mode you can also just leave this running as you make code changes, however, if there is a compile error this can cause the browser to be closed.
+    As this uses watch mode you can also just leave this running as you make code changes, however, if there is a compile error this can cause the browser to be closed.
 
-Terminating the debug session can require several CTRL-C's in the terminal window used to start the debug session.
+    Terminating the debug session can require several CTRL-C's in the terminal window used to start the debug session.
 
 	```
 	npm run test:debug
 	```
 
-By default this is configured to run using chromiumn based Edge, you can change the `process.env.CHROME_BIN = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";` at the top of the `karma.debug.conf.js` file to use a different chromium based browser.
+    By default this is configured to run using chromiumn based Edge, you can change the `process.env.CHROME_BIN = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";` at the top of the `karma.debug.conf.js` file to use a different chromium based browser.
 
 
 ## Build, test and generate typedoc docs
