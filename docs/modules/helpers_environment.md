@@ -33,7 +33,7 @@ Return the global `document` instance.
 
 #### Defined in
 
-[helpers/environment.ts:111](https://github.com/nevware21/ts-utils/blob/00051d1/ts-utils/src/helpers/environment.ts#L111)
+[helpers/environment.ts:111](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/environment.ts#L111)
 
 ___
 
@@ -65,7 +65,7 @@ this can be an expensive operation.
 
 #### Defined in
 
-[helpers/environment.ts:54](https://github.com/nevware21/ts-utils/blob/00051d1/ts-utils/src/helpers/environment.ts#L54)
+[helpers/environment.ts:54](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/environment.ts#L54)
 
 ___
 
@@ -81,7 +81,7 @@ Returns the global `history` instance
 
 #### Defined in
 
-[helpers/environment.ts:159](https://github.com/nevware21/ts-utils/blob/00051d1/ts-utils/src/helpers/environment.ts#L159)
+[helpers/environment.ts:159](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/environment.ts#L159)
 
 ___
 
@@ -109,7 +109,7 @@ Return the named global object if available, will return null if the object is n
 
 #### Defined in
 
-[helpers/environment.ts:84](https://github.com/nevware21/ts-utils/blob/00051d1/ts-utils/src/helpers/environment.ts#L84)
+[helpers/environment.ts:84](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/environment.ts#L84)
 
 ___
 
@@ -125,7 +125,7 @@ Returns the global `navigator` instance
 
 #### Defined in
 
-[helpers/environment.ts:143](https://github.com/nevware21/ts-utils/blob/00051d1/ts-utils/src/helpers/environment.ts#L143)
+[helpers/environment.ts:143](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/environment.ts#L143)
 
 ___
 
@@ -141,7 +141,7 @@ Return the global `window` instance.
 
 #### Defined in
 
-[helpers/environment.ts:127](https://github.com/nevware21/ts-utils/blob/00051d1/ts-utils/src/helpers/environment.ts#L127)
+[helpers/environment.ts:127](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/environment.ts#L127)
 
 ___
 
@@ -159,7 +159,7 @@ Identify whether the runtime contains a `document` object
 
 #### Defined in
 
-[helpers/environment.ts:103](https://github.com/nevware21/ts-utils/blob/00051d1/ts-utils/src/helpers/environment.ts#L103)
+[helpers/environment.ts:103](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/environment.ts#L103)
 
 ___
 
@@ -175,7 +175,7 @@ Identifies whether the runtime contains a `history` object
 
 #### Defined in
 
-[helpers/environment.ts:151](https://github.com/nevware21/ts-utils/blob/00051d1/ts-utils/src/helpers/environment.ts#L151)
+[helpers/environment.ts:151](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/environment.ts#L151)
 
 ___
 
@@ -191,7 +191,7 @@ Identify whether the runtimne contains a `navigator` object
 
 #### Defined in
 
-[helpers/environment.ts:135](https://github.com/nevware21/ts-utils/blob/00051d1/ts-utils/src/helpers/environment.ts#L135)
+[helpers/environment.ts:135](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/environment.ts#L135)
 
 ___
 
@@ -207,7 +207,7 @@ Identify whether the runtime contains a `window` object
 
 #### Defined in
 
-[helpers/environment.ts:119](https://github.com/nevware21/ts-utils/blob/00051d1/ts-utils/src/helpers/environment.ts#L119)
+[helpers/environment.ts:119](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/environment.ts#L119)
 
 ___
 
@@ -225,7 +225,7 @@ True if you are
 
 #### Defined in
 
-[helpers/environment.ts:167](https://github.com/nevware21/ts-utils/blob/00051d1/ts-utils/src/helpers/environment.ts#L167)
+[helpers/environment.ts:167](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/environment.ts#L167)
 
 ___
 
@@ -243,4 +243,4 @@ True if the environment you are in looks like a Web Worker
 
 #### Defined in
 
-[helpers/environment.ts:175](https://github.com/nevware21/ts-utils/blob/00051d1/ts-utils/src/helpers/environment.ts#L175)
+[helpers/environment.ts:175](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/environment.ts#L175)
