@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { polyIsArray } from "../../../../src/polyfills/array";
-import { dumpObj } from "../../../../src/helpers/disgnostics";
+import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 describe("array polyfills", () => {
     it("polyIsArray", () => {

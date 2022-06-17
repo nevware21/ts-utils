@@ -76,7 +76,7 @@ ___
 
 ### dumpObj
 
-Re-exports [dumpObj](helpers_disgnostics.md#dumpobj)
+Re-exports [dumpObj](helpers_diagnostics.md#dumpobj)
 
 ___
 

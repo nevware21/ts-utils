@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { dumpObj } from "../../../../src/helpers/disgnostics";
+import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 describe("diagnostic helpers", () => {
     describe("dumpObj", () => {

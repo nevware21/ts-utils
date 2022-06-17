@@ -1,12 +1,12 @@
-[@nevware21/ts-utils](../README.md) / helpers/disgnostics
+[@nevware21/ts-utils](../README.md) / helpers/diagnostics
 
-# Module: helpers/disgnostics
+# Module: helpers/diagnostics
 
 ## Table of contents
 
 ### Functions
 
-- [dumpObj](helpers_disgnostics.md#dumpobj)
+- [dumpObj](helpers_diagnostics.md#dumpobj)
 
 ## Functions
 
@@ -29,4 +29,4 @@ Returns string representation of an object suitable for diagnostics logging.
 
 #### Defined in
 
-[helpers/disgnostics.ts:14](https://github.com/nevware21/ts-utils/blob/94db9d6/ts-utils/src/helpers/disgnostics.ts#L14)
+helpers/diagnostics.ts:14

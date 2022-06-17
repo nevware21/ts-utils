@@ -8,7 +8,14 @@
 
 import { BOOLEAN, FUNCTION, NUMBER, OBJECT, PROTOTYPE, STRING, UNDEFINED } from "../internal/constants";
 
+/**
+ * @ignore
+ */
 export const ObjClass = Object;
+
+/**
+ * @ignore
+ */
 export const ObjProto = ObjClass[PROTOTYPE];
 
 function _createIs<T>(theType: string): (value: any) => value is T {

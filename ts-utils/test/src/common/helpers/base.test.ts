@@ -4,7 +4,7 @@ import {
     isUndefined, isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isError, isPromiseLike, isPromise, isNotTruthy,
     isTruthy
 } from "../../../../src/helpers/base";
-import { dumpObj } from "../../../../src/helpers/disgnostics";
+import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 describe("base helpers", () => {
     describe("isTypeOf", () => {

@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { isError } from "../../../../src/helpers/base";
-import { dumpObj } from "../../../../src/helpers/disgnostics";
+import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { throwError, throwTypeError } from "../../../../src/helpers/throw";
 
 
