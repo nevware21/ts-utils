@@ -36,7 +36,7 @@ Appends the `elms` to the `target` where the elms may be an array or single obje
 
 #### Defined in
 
-[helpers/array.ts:41](https://github.com/nevware21/ts-utils/blob/ac7ff62/ts-utils/src/helpers/array.ts#L41)
+[helpers/array.ts:41](https://github.com/nevware21/ts-utils/blob/94db9d6/ts-utils/src/helpers/array.ts#L41)
 
 ___
 
@@ -71,4 +71,4 @@ or elements which as assigned to indexes already processed will not be visited b
 
 #### Defined in
 
-[helpers/array.ts:23](https://github.com/nevware21/ts-utils/blob/ac7ff62/ts-utils/src/helpers/array.ts#L23)
+[helpers/array.ts:23](https://github.com/nevware21/ts-utils/blob/94db9d6/ts-utils/src/helpers/array.ts#L23)

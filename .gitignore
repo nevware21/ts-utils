@@ -63,7 +63,7 @@ bundle/
 node_modules/
 out/
 dist-esm/
-browser/
+bundle/
 types/
 dist/
 

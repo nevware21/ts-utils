@@ -29,4 +29,4 @@ Returns string representation of an object suitable for diagnostics logging.
 
 #### Defined in
 
-[helpers/disgnostics.ts:14](https://github.com/nevware21/ts-utils/blob/ac7ff62/ts-utils/src/helpers/disgnostics.ts#L14)
+[helpers/disgnostics.ts:14](https://github.com/nevware21/ts-utils/blob/94db9d6/ts-utils/src/helpers/disgnostics.ts#L14)
