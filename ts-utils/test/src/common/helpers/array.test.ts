@@ -1,6 +1,5 @@
-import * as assert from "assert";
-
-import { arrAppend, arrForEach } from "../../../src/helpers/array";
+import { assert } from "chai";
+import { arrAppend, arrForEach } from "../../../../src/helpers/array";
 
 describe("array helpers", () => {
     describe("arrForEach", () => {

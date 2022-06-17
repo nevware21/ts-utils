@@ -141,7 +141,7 @@ const polyfillRollupConfigFactory = (isMinified, format = "iife", postfix = "") 
     const taskRollupConfig = {
         input: `ts-utils/dist-esm/polyfills.js`,
         output: {
-            file: `ts-utils/browser/${polyFillOutputName}${postfix}.js`,
+            file: `ts-utils/bundle/${polyFillOutputName}${postfix}.js`,
             banner: polyFillBanner,
             format: format,
             name: "nevware21.ts-utils",
@@ -159,7 +159,7 @@ const polyfillRollupConfigFactory = (isMinified, format = "iife", postfix = "") 
     };
 
     if (isMinified) {
-        taskRollupConfig.output.file = `ts-utils/browser/${polyFillOutputName}${postfix}.min.js`;
+        taskRollupConfig.output.file = `ts-utils/bundle/${polyFillOutputName}${postfix}.min.js`;
         taskRollupConfig.plugins.push(
             uglify3({
                 ie8: true,
@@ -173,7 +173,7 @@ const polyfillRollupConfigFactory = (isMinified, format = "iife", postfix = "") 
                     webkit:true
                 }
             })
-        );        
+        );
     }
 
     return taskRollupConfig;

@@ -14,11 +14,18 @@
 
 ▸ **hasValue**(`value`): `boolean`
 
-Return whether the value appears to have any `value`, this helper return true for
+Return whether the value appears to have any `value`, this helper returns true for
+- value is not null, undefined or string value of "undefined"
+- value === false
+- value === 0
 - An array with a length >= 1
 - A valid Date
-- An object with at least 1 key of it's onw property (hasOwnProperty)
-- Is truthy (not null, undefined, numeric zero, empty string)
+- If object has a `length` property or function and the returned value.length or value.length() !== 0
+- If object has a `byteLength` property or function and the returned value.byteLength or value.byteLength() !== 0
+- If object has a `size` property or function and the returned value.size or value.size() !== 0
+- If object has a `valueOf` function then the returned value hasValue(value.valueOf()) to a maximum recursion of 5 levels
+- If object with at least 1 key of it's own property (hasOwnProperty)
+- else if isTruthy (empty string, etc)
 
 #### Parameters
 
@@ -32,4 +39,4 @@ Return whether the value appears to have any `value`, this helper return true fo
 
 #### Defined in
 
-[helpers/value.ts:20](https://github.com/nevware21/ts-utils/blob/9dde265/ts-utils/src/helpers/value.ts#L20)
+[helpers/value.ts:76](https://github.com/nevware21/ts-utils/blob/00051d1/ts-utils/src/helpers/value.ts#L76)

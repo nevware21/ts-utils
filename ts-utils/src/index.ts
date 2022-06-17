@@ -11,7 +11,7 @@ export {
     isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isNotTruthy, isTruthy, objToString
 } from "./helpers/base";
 export { arrForEach, arrAppend } from "./helpers/array";
-export { dumpObj } from "./helpers/disgnostics";
+export { dumpObj } from "./helpers/diagnostics";
 export {
     getGlobal, getInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory, getHistory,
     isNode, isWebWorker

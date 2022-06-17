@@ -7,7 +7,7 @@
  */
 
 import { UNDEFINED } from "../internal/constants";
-import { isNullOrUndefined, isObject, isUndefined } from "./base";
+import { isDefined } from "./base";
 
 const DOCUMENT = "document";
 const HISTORY = "history";
@@ -21,8 +21,10 @@ declare let self: any;
 
 let _cachedGlobal: Window = null;
 
-const _hasWindow = !!(typeof window !== UNDEFINED && window);
-const _hasDocument = !!(typeof document !== UNDEFINED && document);
+const _hasWindow = _safeCheck(() => isDefined(window), false);
+const _hasDocument = _safeCheck(() => isDefined(document), false);
+const _hasNavigator = _safeCheck(() => isDefined(navigator), false);
+const _hasHistory = _safeCheck(() => isDefined(history), false);
 const _isWebWorker: boolean = _safeCheck(() => !!(self && self instanceof WorkerGlobalScope), false);
 const _isNode: boolean = _safeCheck(() => !!(process && (process.versions||{}).node), false);
 
@@ -50,25 +52,29 @@ function _safeCheck(cb: () => boolean, defValue: boolean) {
  * this can be an expensive operation.
  */
 export function getGlobal(useCached?: boolean): Window {
-    if (!_cachedGlobal || useCached === false) {
-        if (typeof globalThis != UNDEFINED && globalThis) {
-            _cachedGlobal = globalThis;
+    let result = useCached === false ? null : _cachedGlobal;
+
+    if (!result) {
+        if (!result && typeof globalThis !== UNDEFINED) {
+            result = globalThis;
         }
     
-        if (typeof self !== UNDEFINED && self) {
-            _cachedGlobal = self;
+        if (!result && typeof self !== UNDEFINED) {
+            result = self;
         }
     
-        if (typeof window !== UNDEFINED && window) {
-            _cachedGlobal = window;
+        if (!result && typeof window !== UNDEFINED) {
+            result = window;
         }
     
-        if (typeof global !== UNDEFINED && global) {
-            _cachedGlobal = global;
+        if (!result && typeof global !== UNDEFINED) {
+            result = global;
         }
+
+        _cachedGlobal = result;
     }
 
-    return _cachedGlobal;
+    return result;
 }
 
 /**
@@ -135,7 +141,7 @@ export function hasNavigator(): boolean {
  * @returns
  */
 export function getNavigator(): Navigator {
-    return navigator || getInst(NAVIGATOR);
+    return _hasNavigator ? navigator : getInst(NAVIGATOR);
 }
 
 /**
@@ -151,7 +157,7 @@ export function hasHistory(): boolean {
  * @returns
  */
 export function getHistory(): History | null {
-    return history || getInst(HISTORY);
+    return _hasHistory ? history : getInst(HISTORY);
 }
 
 /**

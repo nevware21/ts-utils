@@ -8,7 +8,7 @@
 
 - [helpers/array](modules/helpers_array.md)
 - [helpers/base](modules/helpers_base.md)
-- [helpers/disgnostics](modules/helpers_disgnostics.md)
+- [helpers/diagnostics](modules/helpers_diagnostics.md)
 - [helpers/environment](modules/helpers_environment.md)
 - [helpers/number](modules/helpers_number.md)
 - [helpers/object](modules/helpers_object.md)
@@ -16,6 +16,5 @@
 - [helpers/throw](modules/helpers_throw.md)
 - [helpers/value](modules/helpers_value.md)
 - [index](modules/index.md)
-- [internal/constants](modules/internal_constants.md)
 - [polyfills/array](modules/polyfills_array.md)
 - [polyfills/object](modules/polyfills_object.md)

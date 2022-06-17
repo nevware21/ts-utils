@@ -10,14 +10,12 @@
     },
     "keywords": [
         "typescript",
-        "javascript"
+        "javascript", 
+        "minification",
+        "browser"
     ],
-    "author": {
-        "name": "Nevware21",
-        "email": "github@nevware21.com"
-    },
-    "main": "dist/node/ts-utils.js",
-    "module": "dist/esm/ts-utils.js",
+    "main": "dist/umd/ts-utils.js",
+    "module": "dist-esm/index.js",
     "types": "types/index.d.ts",    
     "repository": {
         "type": "git",
