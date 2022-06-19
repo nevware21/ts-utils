@@ -59,7 +59,6 @@ report.*.json
 .vscode/**
 
 # Temp directories
-bundle/
 node_modules/
 out/
 dist-esm/
@@ -76,7 +75,7 @@ tests_output
 lib-cov
 
 # Coverage directory used by tools like istanbul
-coverage
+/coverage/
 
 # Optional npm cache directory
 .npm

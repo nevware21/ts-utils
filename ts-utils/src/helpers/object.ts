@@ -25,9 +25,7 @@ export function objHasOwnProperty(obj: any, prop: string): boolean {
 }
 
 export function objKeys(value: any): string[] {
-    const valueType = typeof value;
-
-    if (valueType !== FUNCTION && (valueType !== OBJECT || value === null)) {
+    if (!isObject(value) || value === null) {
         throwTypeError("objKeys called on non-object");
     }
 

@@ -46,7 +46,7 @@
 
 #### Defined in
 
-[helpers/object.ts:58](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L58)
+[helpers/object.ts:56](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L56)
 
 ▸ **objAssign**<`T`, `U`, `V`\>(`target`, `source1`, `source2`): `T` & `U` & `V`
 
@@ -72,7 +72,7 @@
 
 #### Defined in
 
-[helpers/object.ts:58](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L58)
+[helpers/object.ts:56](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L56)
 
 ▸ **objAssign**<`T`, `U`, `V`, `W`\>(`target`, `source1`, `source2`, `source3`): `T` & `U` & `V` & `W`
 
@@ -100,7 +100,7 @@
 
 #### Defined in
 
-[helpers/object.ts:58](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L58)
+[helpers/object.ts:56](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L56)
 
 ▸ **objAssign**(`target`, ...`sources`): `any`
 
@@ -117,7 +117,7 @@
 
 #### Defined in
 
-[helpers/object.ts:58](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L58)
+[helpers/object.ts:56](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L56)
 
 ___
 
@@ -144,7 +144,7 @@ ___
 
 #### Defined in
 
-[helpers/object.ts:82](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L82)
+[helpers/object.ts:80](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L80)
 
 ___
 
@@ -172,7 +172,7 @@ Performs a deep copy of the source object
 
 #### Defined in
 
-[helpers/object.ts:64](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L64)
+[helpers/object.ts:62](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L62)
 
 ___
 
@@ -198,7 +198,7 @@ ___
 
 #### Defined in
 
-[helpers/object.ts:174](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L174)
+[helpers/object.ts:172](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L172)
 
 ___
 
@@ -233,7 +233,7 @@ True if it was able to create the accessors otherwise false
 
 #### Defined in
 
-[helpers/object.ts:148](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L148)
+[helpers/object.ts:146](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L146)
 
 ___
 
@@ -255,7 +255,7 @@ ___
 
 #### Defined in
 
-[helpers/object.ts:124](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L124)
+[helpers/object.ts:122](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L122)
 
 ___
 
@@ -279,7 +279,7 @@ Defines a new property directly on an object, or modifies an existing property o
 
 #### Defined in
 
-[helpers/object.ts:111](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L111)
+[helpers/object.ts:109](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L109)
 
 ___
 
@@ -300,7 +300,7 @@ ___
 
 #### Defined in
 
-[helpers/object.ts:93](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L93)
+[helpers/object.ts:91](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L91)
 
 ___
 
@@ -326,7 +326,7 @@ keys before iterating over them and like the `arrForEach` helper you CAN stop or
 
 #### Defined in
 
-[helpers/object.ts:46](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L46)
+[helpers/object.ts:44](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L44)
 
 ___
 
@@ -352,7 +352,7 @@ ___
 
 #### Defined in
 
-[helpers/object.ts:186](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L186)
+[helpers/object.ts:184](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L184)
 
 ___
 
@@ -373,7 +373,7 @@ ___
 
 #### Defined in
 
-[helpers/object.ts:23](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L23)
+[helpers/object.ts:23](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L23)
 
 ___
 
@@ -393,7 +393,7 @@ ___
 
 #### Defined in
 
-[helpers/object.ts:27](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L27)
+[helpers/object.ts:27](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L27)
 
 ___
 
@@ -419,4 +419,4 @@ ___
 
 #### Defined in
 
-[helpers/object.ts:187](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/object.ts#L187)
+[helpers/object.ts:185](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/object.ts#L185)

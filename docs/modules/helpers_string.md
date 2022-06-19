@@ -27,7 +27,7 @@
 
 #### Defined in
 
-[helpers/string.ts:21](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/string.ts#L21)
+[helpers/string.ts:21](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/string.ts#L21)
 
 ___
 
@@ -47,4 +47,4 @@ ___
 
 #### Defined in
 
-[helpers/string.ts:13](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/string.ts#L13)
+[helpers/string.ts:13](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/string.ts#L13)

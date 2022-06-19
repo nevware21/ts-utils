@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { isString } from "./base";
+import { isNullOrUndefined, isString } from "./base";
 
 const EMPTY = "";
 
@@ -15,7 +15,7 @@ export function strIsNullOrWhiteSpace(value: string): boolean {
         return value.replace(/[\s\t\r\n\f]+/g, EMPTY) === EMPTY;
     }
 
-    return !!value;
+    return isNullOrUndefined(value)
 }
 
 export function strIsNullOrEmpty(value: string): boolean {
@@ -23,6 +23,6 @@ export function strIsNullOrEmpty(value: string): boolean {
         return value === EMPTY;
     }
 
-    return !!value;
+    return isNullOrUndefined(value)
 }
 
