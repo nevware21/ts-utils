@@ -6,8 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { arrForEach } from "../helpers/array";
-import { isFunction, isObject } from "../helpers/base";
+import { isObject } from "../helpers/base";
 import { objHasOwnProperty } from "../helpers/object";
 
 /**
@@ -17,11 +16,8 @@ import { objHasOwnProperty } from "../helpers/object";
  * @param obj Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
  */
 export function polyObjKeys(obj: any): string[] {
-    // eslint-disable-next-line no-prototype-builtins
-    const hasDontEnumBug = !({ toString: null }).propertyIsEnumerable("toString");
-
-    if (!isFunction(obj) && (!isObject(obj) || obj === null)) {
-        throw new TypeError("objKeys called on non-object");
+    if (!isObject(obj) || obj === null) {
+        throw new TypeError("polyObjKeys called on non-object");
     }
 
     const result: string[] = [];
@@ -29,24 +25,6 @@ export function polyObjKeys(obj: any): string[] {
         if (objHasOwnProperty(obj, prop)) {
             result.push(prop);
         }
-    }
-
-    if (hasDontEnumBug) {
-        const dontEnums: string[] = [
-            "toString",
-            "toLocaleString",
-            "valueOf",
-            "hasOwnProperty",
-            "isPrototypeOf",
-            "propertyIsEnumerable",
-            "constructor"
-        ];
-
-        arrForEach(dontEnums, (value) => {
-            if (objHasOwnProperty(obj, value)) {
-                result.push(value);
-            }
-        });
     }
 
     return result;

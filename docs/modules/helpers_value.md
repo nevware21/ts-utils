@@ -39,4 +39,4 @@ Return whether the value appears to have any `value`, this helper returns true f
 
 #### Defined in
 
-[helpers/value.ts:76](https://github.com/nevware21/ts-utils/blob/6c0f84c/ts-utils/src/helpers/value.ts#L76)
+[helpers/value.ts:76](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/helpers/value.ts#L76)

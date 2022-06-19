@@ -1,5 +1,7 @@
 process.env.CHROME_BIN = require('puppeteer').executablePath();
 
+const path = require('path');
+
 module.exports = function (config) {
     config.set({
         browsers: ["ChromeHeadless"],
@@ -25,15 +27,46 @@ module.exports = function (config) {
             },
             coverageOptions: {
                 instrumentation: true,
-                sourceMap: true
+                sourceMap: true,
+                exclude: [
+                    /\.(d|spec|test)\.ts$/i,
+                    /index.ts$/i
+                ]
+            },
+            reports: {
+                "html-spa":  {
+                    "directory": "./coverage",
+                    "subdirectory": "browser"
+                },
+                "json": {
+                    "directory": "./coverage",
+                    "subdirectory": "browser",
+                    "filename": "coverage-final.json"
+                },
+                "text": ""
             }
         },
-        coverageIstanbulReporter: {
-            reports: ["html", "json"],
-            dir: ".nyc_output"
-        },
+        // coverageIstanbulReporter: {
+        //     reports: {
+        //         "html-spa":  {
+        //             "directory": "./coverage",
+        //             "subdirectory": "browser"
+        //         }, 
+        //         "json": {
+        //             "directory": "./nyc_output"
+        //         },
+        //         "text-summary": ""
+        //     },
 
-        reporters: [ "spec", "coverage-istanbul" ],
+        //     // base output directory. If you include %browser% in the path it will be replaced with the karma browser name
+        //     //dir: path.join(__dirname, "coverage/browser"),
+
+        //     // Combines coverage information from multiple browsers into one report rather than outputting a report
+        //     // for each browser.
+        //     combineBrowserReports: true
+        // },
+
+        reporters: [ "spec", "karma-typescript" ],
 
         logLevel: config.LOG_INFO
     })
