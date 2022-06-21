@@ -10,6 +10,7 @@
     "include": [ "ts-utils/src/**/*.ts" ],
     "exclude": [ 
         "**/src/index.ts", 
+        "**/src/polyfills.ts", 
         "**/karma*.conf.js" 
     ],
     "report-dir": "./coverage/nyc"

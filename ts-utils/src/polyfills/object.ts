@@ -7,7 +7,7 @@
  */
 
 import { isObject } from "../helpers/base";
-import { objHasOwnProperty } from "../helpers/object";
+import { objHasOwnProperty } from "../object/has_own_prop";
 
 /**
  * Returns the names of the enumerable string properties and methods of an object. This helper exists to avoid adding a polyfil for older browsers

@@ -96,7 +96,7 @@ lib-cov
 .vs/
 
 # Common toolchain intermediate files
-temp
+temp/
 
 # Rush files
 /common/temp/**

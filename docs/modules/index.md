@@ -6,8 +6,11 @@
 
 ### References
 
+- [CustomErrorConstructor](index.md#customerrorconstructor)
 - [arrAppend](index.md#arrappend)
 - [arrForEach](index.md#arrforeach)
+- [createCustomError](index.md#createcustomerror)
+- [deepExtend](index.md#deepextend)
 - [dumpObj](index.md#dumpobj)
 - [getDocument](index.md#getdocument)
 - [getGlobal](index.md#getglobal)
@@ -45,6 +48,7 @@
 - [isWebWorker](index.md#iswebworker)
 - [objAssign](index.md#objassign)
 - [objCopyProps](index.md#objcopyprops)
+- [objCreate](index.md#objcreate)
 - [objDeepCopy](index.md#objdeepcopy)
 - [objDeepFreeze](index.md#objdeepfreeze)
 - [objDefineAccessors](index.md#objdefineaccessors)
@@ -52,15 +56,27 @@
 - [objDefineProp](index.md#objdefineprop)
 - [objExtend](index.md#objextend)
 - [objForEachKey](index.md#objforeachkey)
+- [objFreeze](index.md#objfreeze)
 - [objHasOwnProperty](index.md#objhasownproperty)
 - [objKeys](index.md#objkeys)
+- [objSeal](index.md#objseal)
+- [objSetPrototypeOf](index.md#objsetprototypeof)
 - [objToString](index.md#objtostring)
+- [strEndsWith](index.md#strendswith)
 - [strIsNullOrEmpty](index.md#strisnullorempty)
 - [strIsNullOrWhiteSpace](index.md#strisnullorwhitespace)
+- [strStartsWith](index.md#strstartswith)
 - [throwError](index.md#throwerror)
 - [throwTypeError](index.md#throwtypeerror)
+- [throwUnsupported](index.md#throwunsupported)
 
 ## References
+
+### CustomErrorConstructor
+
+Re-exports [CustomErrorConstructor](../interfaces/helpers_customError.CustomErrorConstructor.md)
+
+___
 
 ### arrAppend
 
@@ -71,6 +87,18 @@ ___
 ### arrForEach
 
 Re-exports [arrForEach](helpers_array.md#arrforeach)
+
+___
+
+### createCustomError
+
+Re-exports [createCustomError](helpers_customError.md#createcustomerror)
+
+___
+
+### deepExtend
+
+Re-exports [deepExtend](helpers_extend.md#deepextend)
 
 ___
 
@@ -286,73 +314,103 @@ ___
 
 ### objAssign
 
-Re-exports [objAssign](helpers_object.md#objassign)
+Re-exports [objAssign](object_object.md#objassign)
 
 ___
 
 ### objCopyProps
 
-Re-exports [objCopyProps](helpers_object.md#objcopyprops)
+Re-exports [objCopyProps](object_object.md#objcopyprops)
+
+___
+
+### objCreate
+
+Re-exports [objCreate](object_create.md#objcreate)
 
 ___
 
 ### objDeepCopy
 
-Re-exports [objDeepCopy](helpers_object.md#objdeepcopy)
+Re-exports [objDeepCopy](object_object.md#objdeepcopy)
 
 ___
 
 ### objDeepFreeze
 
-Re-exports [objDeepFreeze](helpers_object.md#objdeepfreeze)
+Re-exports [objDeepFreeze](object_object.md#objdeepfreeze)
 
 ___
 
 ### objDefineAccessors
 
-Re-exports [objDefineAccessors](helpers_object.md#objdefineaccessors)
+Re-exports [objDefineAccessors](object_define.md#objdefineaccessors)
 
 ___
 
 ### objDefineGet
 
-Re-exports [objDefineGet](helpers_object.md#objdefineget)
+Re-exports [objDefineGet](object_define.md#objdefineget)
 
 ___
 
 ### objDefineProp
 
-Re-exports [objDefineProp](helpers_object.md#objdefineprop)
+Re-exports [objDefineProp](object_define.md#objdefineprop)
 
 ___
 
 ### objExtend
 
-Re-exports [objExtend](helpers_object.md#objextend)
+Re-exports [objExtend](helpers_extend.md#objextend)
 
 ___
 
 ### objForEachKey
 
-Re-exports [objForEachKey](helpers_object.md#objforeachkey)
+Re-exports [objForEachKey](object_for_each_key.md#objforeachkey)
+
+___
+
+### objFreeze
+
+Re-exports [objFreeze](object_object.md#objfreeze)
 
 ___
 
 ### objHasOwnProperty
 
-Re-exports [objHasOwnProperty](helpers_object.md#objhasownproperty)
+Re-exports [objHasOwnProperty](object_has_own_prop.md#objhasownproperty)
 
 ___
 
 ### objKeys
 
-Re-exports [objKeys](helpers_object.md#objkeys)
+Re-exports [objKeys](object_object.md#objkeys)
+
+___
+
+### objSeal
+
+Re-exports [objSeal](object_object.md#objseal)
+
+___
+
+### objSetPrototypeOf
+
+Re-exports [objSetPrototypeOf](object_set_proto.md#objsetprototypeof)
 
 ___
 
 ### objToString
 
 Re-exports [objToString](helpers_base.md#objtostring)
+
+___
+
+### strEndsWith
+
+Re-exports [strEndsWith](helpers_string.md#strendswith)
 
 ___
 
@@ -368,6 +426,12 @@ Re-exports [strIsNullOrWhiteSpace](helpers_string.md#strisnullorwhitespace)
 
 ___
 
+### strStartsWith
+
+Re-exports [strStartsWith](helpers_string.md#strstartswith)
+
+___
+
 ### throwError
 
 Re-exports [throwError](helpers_throw.md#throwerror)
@@ -377,3 +441,9 @@ ___
 ### throwTypeError
 
 Re-exports [throwTypeError](helpers_throw.md#throwtypeerror)
+
+___
+
+### throwUnsupported
+
+Re-exports [throwUnsupported](helpers_customError.md#throwunsupported)

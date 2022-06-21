@@ -8,7 +8,7 @@
 
 import { arrForEach } from "./array";
 import { isArray, isBoolean, isDate, isFunction, isNullOrUndefined, isObject, isTruthy } from "./base";
-import { objKeys } from "./object";
+import { objKeys } from "../object/object";
 
 function _checkLength(value: any, props: string[]) {
     let result: any;

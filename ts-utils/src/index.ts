@@ -6,21 +6,29 @@
  * Licensed under the MIT license.
  */
 
+export { arrForEach, arrAppend } from "./helpers/array";
 export {
     isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isDate, isNumber, isBoolean,
     isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isNotTruthy, isTruthy, objToString
 } from "./helpers/base";
-export { arrForEach, arrAppend } from "./helpers/array";
+export { CustomErrorConstructor, createCustomError, throwUnsupported } from "./helpers/customError";
 export { dumpObj } from "./helpers/diagnostics";
 export {
     getGlobal, getInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory, getHistory,
     isNode, isWebWorker
 } from "./helpers/environment";
-export { getIntValue } from "./helpers/number";
 export {
-    objAssign, objHasOwnProperty, objKeys, objForEachKey, objDeepCopy, objCopyProps, objExtend,
-    objDefineProp, objDefineGet, objDefineAccessors, objDeepFreeze
-} from "./helpers/object";
-export { strIsNullOrWhiteSpace, strIsNullOrEmpty } from "./helpers/string";
+    deepExtend, objExtend
+} from "./helpers/extend";
+export { getIntValue } from "./helpers/number";
+export { objCreate } from "./object/create";
+export { objDefineProp, objDefineGet, objDefineAccessors } from "./object/define";
+export { objForEachKey } from "./object/for_each_key";
+export { objHasOwnProperty } from "./object/has_own_prop";
+export {
+    objAssign, objKeys, objDeepCopy, objCopyProps, objDeepFreeze, objFreeze, objSeal
+} from "./object/object";
+export { objSetPrototypeOf } from "./object/set_proto";
+export { strIsNullOrWhiteSpace, strIsNullOrEmpty, strStartsWith, strEndsWith } from "./helpers/string";
 export { throwError, throwTypeError } from "./helpers/throw";
 export { hasValue } from "./helpers/value";
