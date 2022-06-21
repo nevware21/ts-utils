@@ -4,7 +4,7 @@ const path = require('path');
 
 module.exports = function (config) {
     config.set({
-        browsers: ["ChromeHeadless"],
+        browsers: [ "ChromeHeadless" ],
         listenAddress: 'localhost',
         hostname: 'localhost',
         frameworks: [ "mocha", "karma-typescript" ],
@@ -30,7 +30,8 @@ module.exports = function (config) {
                 sourceMap: true,
                 exclude: [
                     /\.(d|spec|test)\.ts$/i,
-                    /index.ts$/i
+                    /index.ts$/i,
+                    /polyfills.ts$/i
                 ]
             },
             reports: {
@@ -46,25 +47,6 @@ module.exports = function (config) {
                 "text": ""
             }
         },
-        // coverageIstanbulReporter: {
-        //     reports: {
-        //         "html-spa":  {
-        //             "directory": "./coverage",
-        //             "subdirectory": "browser"
-        //         }, 
-        //         "json": {
-        //             "directory": "./nyc_output"
-        //         },
-        //         "text-summary": ""
-        //     },
-
-        //     // base output directory. If you include %browser% in the path it will be replaced with the karma browser name
-        //     //dir: path.join(__dirname, "coverage/browser"),
-
-        //     // Combines coverage information from multiple browsers into one report rather than outputting a report
-        //     // for each browser.
-        //     combineBrowserReports: true
-        // },
 
         reporters: [ "spec", "karma-typescript" ],
 

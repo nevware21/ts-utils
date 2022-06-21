@@ -6,17 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { BOOLEAN, FUNCTION, NUMBER, OBJECT, PROTOTYPE, STRING, UNDEFINED } from "../internal/constants";
-
-/**
- * @ignore
- */
-export const ObjClass = Object;
-
-/**
- * @ignore
- */
-export const ObjProto = ObjClass[PROTOTYPE];
+import { BOOLEAN, FUNCTION, NUMBER, OBJECT, ObjProto, STRING, UNDEFINED } from "../internal/constants";
 
 function _createIs<T>(theType: string): (value: any) => value is T {
     return function (value: any): value is T {

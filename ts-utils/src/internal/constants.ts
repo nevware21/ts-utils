@@ -9,6 +9,7 @@
 // These constants are currently NOT exported directly, we may export them later associated with a frozen namespace (maybe)
 // For now do NOT expect that we will export these values.
 
+
 export const BOOLEAN = "boolean";
 export const FUNCTION = "function";
 export const NUMBER = "number";
@@ -17,3 +18,14 @@ export const PROTOTYPE = "prototype";
 export const STRING = "string";
 export const UNDEFINED = "undefined";
 export const CONSTRUCTOR = "constructor";
+export const HAS_OWN_PROPERTY = "hasOwnProperty";
+
+/**
+ * @ignore
+ */
+export const ObjClass = Object;
+
+/**
+ * @ignore
+ */
+export const ObjProto = ObjClass[PROTOTYPE];

@@ -1,5 +1,6 @@
 import { assert } from "chai";
 import { isError } from "../../../../src/helpers/base";
+import { throwUnsupported } from "../../../../src/helpers/customError";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { throwError, throwTypeError } from "../../../../src/helpers/throw";
 
@@ -46,6 +47,24 @@ describe("throw helpers", () => {
             assert.ok(error.message.indexOf("Failed") !== -1, "Message contains Failed");
             error = _expectThrow(() => throwTypeError("Crashed"), "Crashed");
             assert.ok(isError(error), "Crashed");
+            assert.ok(error.message.indexOf("Crashed") !== -1, "Message contains Crashed");
+        });
+    });
+
+    describe("throwUnsupported", () => {
+        it("null or undefined", () => {
+            assert.ok(isError(_expectThrow(() => throwUnsupported(null), "null")));
+            assert.ok(isError(_expectThrow(() => throwUnsupported(undefined), "undefined")));
+        });
+
+        it("with message", () => {
+            let error = _expectThrow(() => throwUnsupported("Failed"), "Failed");
+            assert.ok(isError(error), "Validating an error was returned");
+            assert.ok(error.message.indexOf("Failed") !== -1, "Message contains Failed");
+            assert.ok(error.name.indexOf("UnsupportedError") !== -1, "Name contains type Unsupported");
+            error = _expectThrow(() => throwUnsupported("Crashed"), "Crashed");
+            assert.ok(isError(error), "Crashed");
+            assert.ok(error.name.indexOf("UnsupportedError") !== -1, "Name contains type Unsupported");
             assert.ok(error.message.indexOf("Crashed") !== -1, "Message contains Crashed");
         });
     });

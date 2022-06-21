@@ -7,9 +7,11 @@
  */
 
 import { arrForEach } from "./helpers/array";
-import { objDefineProp } from "./helpers/object";
+import { objDefineProp } from "./object/define";
+import { PROTOTYPE } from "./internal/constants";
 import { polyIsArray } from "./polyfills/array";
 import { polyObjKeys } from "./polyfills/object";
+import { polyStrEndsWith, polyStrStartsWith } from "./polyfills/string";
 
 (function () {
     const objectPolyfills = {
@@ -27,5 +29,16 @@ import { polyObjKeys } from "./polyfills/object";
     
     if (!Array.isArray) {
         Array.isArray = polyIsArray;
+    }
+
+    const StrProto = String[PROTOTYPE];
+    if (!StrProto.startsWith) {
+        StrProto.startsWith = (searchString: string, position?: number) => {
+            return polyStrStartsWith(this, searchString, position);
+        }
+
+        StrProto.endsWith = (searchString: string, position?: number) => {
+            return polyStrEndsWith(this, searchString, position);
+        }
     }
 })();

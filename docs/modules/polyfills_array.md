@@ -32,4 +32,4 @@ arg is T[]
 
 #### Defined in
 
-[polyfills/array.ts:11](https://github.com/nevware21/ts-utils/blob/bf0ec81/ts-utils/src/polyfills/array.ts#L11)
+[polyfills/array.ts:11](https://github.com/nevware21/ts-utils/blob/65eb5b0/ts-utils/src/polyfills/array.ts#L11)
