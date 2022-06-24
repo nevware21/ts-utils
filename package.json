@@ -92,7 +92,7 @@
         "karma-rollup-preprocessor": "^7.0.8",
         "karma-typescript": "^5.5.3",
         "chromium": "^3.0.3",
-        "puppeteer": "^14.2.1",
+        "puppeteer": "^15.0.2",
         "sinon": "^14.0.0"
     },
     "peerDependencies": {
