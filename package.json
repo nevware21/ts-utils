@@ -57,7 +57,7 @@
         "@nevware21/grunt-ts-plugin": "0.4.5",
         "@types/chai": "^4.3.1",
         "@types/eslint": "^8.4.2",
-        "@types/estree": "^0.0.51",
+        "@types/estree": "^0.0.52",
         "@types/mocha": "^9.1.1",
         "@types/sinon": "^10.0.11",
         "@typescript-eslint/eslint-plugin": "^5.26.0",
