@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
-import { polyStrEndsWith, polyStrStartsWith } from "../../../../src/polyfills/string";
-
+import { polyStrStartsWith } from "../../../../src/string/starts_with";
+import { polyStrEndsWith } from "../../../../src/string/ends_with";
 
 describe("string polyfills", () => {
     describe("polyStrStartsWith null / undefined", () => {

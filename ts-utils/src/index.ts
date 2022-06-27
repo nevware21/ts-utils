@@ -21,6 +21,10 @@ export {
     deepExtend, objExtend
 } from "./helpers/extend";
 export { getIntValue } from "./helpers/number";
+export { hasValue } from "./helpers/value";
+export { mathCeil, mathFloor } from "./math/floor";
+export { mathToInt } from "./math/to_int";
+export { mathTrunc } from "./math/trunc";
 export { objCreate } from "./object/create";
 export { objDefineProp, objDefineGet, objDefineAccessors } from "./object/define";
 export { objForEachKey } from "./object/for_each_key";
@@ -29,6 +33,7 @@ export {
     objAssign, objKeys, objDeepCopy, objCopyProps, objDeepFreeze, objFreeze, objSeal
 } from "./object/object";
 export { objSetPrototypeOf } from "./object/set_proto";
-export { strIsNullOrWhiteSpace, strIsNullOrEmpty, strStartsWith, strEndsWith } from "./helpers/string";
-export { throwError, throwTypeError } from "./helpers/throw";
-export { hasValue } from "./helpers/value";
+export { strIsNullOrWhiteSpace, strIsNullOrEmpty } from "./string/is_null_or";
+export { strStartsWith } from "./string/starts_with";
+export {  strEndsWith } from "./string/ends_with";
+export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";

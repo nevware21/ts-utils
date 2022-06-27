@@ -7,22 +7,20 @@
  */
 
 import { isString, isUndefined } from "../helpers/base";
+import { StrProto } from "../internal/constants";
+
+const _strEndsWith = StrProto.endsWith;
 
 /**
- * This method lets you determine whether or not a string begins with another string. This method is case-sensitive.
+ * This method lets you determine whether or not a string ends with another string. This method is case-sensitive.
  * @param value - The value to be checked
- * @param searchString - The characters to be searched for at the start of the string
- * @param position - [Optional] The position in this string at which to begin searching for `searchString`.
- * Defaults to 0
- * @returns `true` if the given characters are found at the beginning of the string; otherwise, `false`.
+ * @param searchString - The characters to be searched for at the end of `value` string.
+ * @param length - If provided, it is used as the length of `value`. Defaults to value.length.
  */
-export function polyStrStartsWith(value: string, searchString: string, position?: number) {
+export function strEndsWith(value: string, searchString: string, length?: number): boolean {
     let theValue = (isString(value) ? value : "" + value);
-    let searchValue = isString(searchString) ? searchString : "" + searchString;
-    let chkLen = searchValue.length;
-    let pos = position > 0 ? position : 0;
 
-    return theValue.substring(pos, pos + chkLen) === searchValue;
+    return _strEndsWith ? _strEndsWith.call(theValue, searchString, length) : polyStrEndsWith(theValue, searchString, length);
 }
 
 /**
@@ -31,7 +29,7 @@ export function polyStrStartsWith(value: string, searchString: string, position?
  * @param searchString - The characters to be searched for at the end of `value` string.
  * @param length - If provided, it is used as the length of `value`. Defaults to value.length.
  */
-export function polyStrEndsWith(value: string, searchString: string, length?: number) {
+export function polyStrEndsWith(value: string, searchString: string, length?: number): boolean {
     let theValue = (isString(value) ? value : "" + value);
     let searchValue = isString(searchString) ? searchString : "" + searchString;
     let chkLen = searchValue.length;

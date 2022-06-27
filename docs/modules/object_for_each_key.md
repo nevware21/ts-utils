@@ -32,4 +32,4 @@ keys before iterating over them and like the `arrForEach` helper you CAN stop or
 
 #### Defined in
 
-object/for_each_key.ts:21
+[object/for_each_key.ts:21](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/for_each_key.ts#L21)

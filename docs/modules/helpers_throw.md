@@ -7,6 +7,7 @@
 ### Functions
 
 - [throwError](helpers_throw.md#throwerror)
+- [throwRangeError](helpers_throw.md#throwrangeerror)
 - [throwTypeError](helpers_throw.md#throwtypeerror)
 
 ## Functions
@@ -29,7 +30,29 @@ Throw an error exception with the specified optional message
 
 #### Defined in
 
-[helpers/throw.ts:13](https://github.com/nevware21/ts-utils/blob/65eb5b0/ts-utils/src/helpers/throw.ts#L13)
+[helpers/throw.ts:13](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/helpers/throw.ts#L13)
+
+___
+
+### throwRangeError
+
+▸ **throwRangeError**(`message?`): `never`
+
+Throw a RangeError with the specified optional message
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `message?` | `string` |
+
+#### Returns
+
+`never`
+
+#### Defined in
+
+[helpers/throw.ts:29](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/helpers/throw.ts#L29)
 
 ___
 
@@ -51,4 +74,4 @@ Throw a type error with the specified optional message
 
 #### Defined in
 
-[helpers/throw.ts:21](https://github.com/nevware21/ts-utils/blob/65eb5b0/ts-utils/src/helpers/throw.ts#L21)
+[helpers/throw.ts:21](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/helpers/throw.ts#L21)
