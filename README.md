@@ -1,5 +1,5 @@
-<h1 align="center">@Nevware21 ts-utils</h1>
-<h2 align="center">Common JavaScript functions for TypeScript</h2>
+<h1 align="center">@nevware21 ts-utils</h1>
+<h2 align="center">Common JavaScript/TypeScript helper functions for better minification</h2>
 
 
 ![GitHub Workflow Status (main)](https://img.shields.io/github/workflow/status/nevware21/ts-utils/NodeCI/main)
@@ -10,19 +10,21 @@
 
 ## Description
 
-This is a collection of general JavaScript functions (written in and for TypeScript) to aid with removing code duplication and assist with minification, as such the provided functions are expected to only rarely be included in their namespaced environment.
+This is a collection of general JavaScript functions (written in and for TypeScript) to aid with removing code duplication to assist with minification, the provided functions are expected to only rarely be included in their namespaced environment.
+
+Support for standard JavaScript functions (ES5+) that are not support in all environments will be backed by internal polyfill implementations when not available. All of the polyfill functions are tested against the standard native implementations for node, browser and web-worker to ensure compatibility.
 
 ### Documentation and details
 - [Exported functions](./docs/modules/index.md) 
 - [The individual modules](./docs/README.md)
 
-Some polyfills are provided for simple backward compatability to enable the utility functions in older environments (such as ES3 / IE8), you don't have to use or include the provided polyfils (AND they are NOT exported as part of the main module). If you need them you will need to import the "polyfill" file directly or host and load the provided `browser/ts-polyfills-utils.min.js` or provide your own alternatives.
+Some polyfills are provided for simple backward compatability to enable the utility functions in older environments (such as ES3 / IE8), you don't have to use or include the provided polyfils (AND they are NOT exported as part of the main module). If you need them you will need to import the "polyfill" file directly or host and load the provided `bundle/ts-polyfills-utils.min.js` or provide your own alternatives.
 
 See [Browser Support](#browser-support) for details.
 
 ## Quickstart
 
-Install the npm packare: `npm install @nevware21/ts-utils --save-dev`
+Install the npm packare: `npm install @nevware21/ts-utils --save`
 
 And then just import the helpers and use them.
 
