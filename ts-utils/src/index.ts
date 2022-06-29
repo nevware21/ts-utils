@@ -9,7 +9,8 @@
 export { arrForEach, arrAppend } from "./helpers/array";
 export {
     isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isDate, isNumber, isBoolean,
-    isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isNotTruthy, isTruthy, objToString
+    isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isNotTruthy, isTruthy, objToString,
+    isStrictNullOrUndefined, isStrictUndefined, isError
 } from "./helpers/base";
 export { CustomErrorConstructor, createCustomError, throwUnsupported } from "./helpers/customError";
 export { dumpObj } from "./helpers/diagnostics";
@@ -21,6 +22,7 @@ export {
     deepExtend, objExtend
 } from "./helpers/extend";
 export { getIntValue } from "./helpers/number";
+export { isSymbol, getSymbol, getSymbolInst, hasSymbol, newSymbol, symbolFor, symbolKeyFor } from "./helpers/symbol";
 export { hasValue } from "./helpers/value";
 export { mathCeil, mathFloor } from "./math/floor";
 export { mathToInt } from "./math/to_int";
@@ -35,5 +37,5 @@ export {
 export { objSetPrototypeOf } from "./object/set_proto";
 export { strIsNullOrWhiteSpace, strIsNullOrEmpty } from "./string/is_null_or";
 export { strStartsWith } from "./string/starts_with";
-export {  strEndsWith } from "./string/ends_with";
+export { strEndsWith } from "./string/ends_with";
 export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";

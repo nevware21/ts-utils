@@ -1,9 +1,16 @@
 {
     "$schema": "https://typedoc.org/schema.json",
-    "entryPoints": [ "./ts-utils/src" ],
-    "exclude": "**/internal/**/*.ts",
+    "entryPoints": [ "./ts-utils/src/index.ts" ],
+    "exclude": [ "**/internal/**/*.ts", "polyfill.ts", "node_modules/**" ],
+    "externalPattern": [
+        "**/node_modules/**",
+        "node_modules/**"
+    ],
+    "excludeExternals": true,
+    "excludeInternal": true,
+    "excludePrivate": true,
     "entryPointStrategy": "expand",
     "tsconfig": "./ts-utils/tsconfig.json",
-    "out": "docs",
+    "out": "./docs",
     "readme": "none"
 }

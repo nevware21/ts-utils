@@ -8,13 +8,19 @@
 
 import { BOOLEAN, FUNCTION, NUMBER, OBJECT, ObjProto, STRING, UNDEFINED } from "../internal/constants";
 
-function _createIs<T>(theType: string): (value: any) => value is T {
+/**
+ * @ignore
+ */
+export function _createIs<T>(theType: string): (value: any) => value is T {
     return function (value: any): value is T {
         return typeof value === theType;
     }
 }
 
-function _createObjIs<T>(theType: string): (value: any) => value is T {
+/**
+ * @ignore
+ */
+export function _createObjIs<T>(theType: string): (value: any) => value is T {
     return function (value: any): value is T {
         return !!(value && objToString(value) === theType);
     }
@@ -44,21 +50,41 @@ export function isUndefined(value: any) {
 }
 
 /**
+ * Checks if the provided value is undefined, a string value of "undefined" is NOT considered
+ * to be undefined.
+ * @param value - The value to check
+ * @returns true if the typeof value === UNDEFINED
+ */
+export function isStrictUndefined(arg: any): arg is undefined {
+    return !isDefined(arg);
+}
+
+/**
  * Checks if the provided value is null, undefined or contains the string value of "undefined".
  * @param value - The value to check
  * @returns
  */
-export function isNullOrUndefined(value:  any) {
+export function isNullOrUndefined(value:  any): boolean {
     return value === null || isUndefined(value);
+}
+
+/**
+ * Checks if the provided value is null, undefined only, a string value of "undefined" is NOT considered
+ * to be undefined.
+ * @param value - The value to check
+ * @returns
+ */
+export function isStrictNullOrUndefined(value: any): boolean {
+    return value === null || !isDefined(value);
 }
 
 /**
  * Checks if the passed value is defined, which means it has any value and is not undefined.
  * A string value of "undefined" is considered to be defined.
  * @param arg - The value to check
- * @returns
+ * @returns true if arg has a value (is not === undefined)
  */
-export function isDefined(arg: any): arg is undefined {
+export function isDefined(arg: any): boolean {
     return !!arg || arg !== undefined;
 }
 
@@ -91,6 +117,20 @@ export function isObject(value: any): value is object {
 
 /**
  * Checks if the type of value is an Array.
+ *
+ * @example
+ * ```ts
+ * import { isArray, isObject } from "@nevware21/ts-utils";
+ *
+ * function performAction(value: any) {
+ *     if (isArray(value) || isObject(value)) {
+ *         // Do something
+ *     } else {
+ *         // Do something else
+ *     }
+ * }
+ * ```
+ *
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a Array, false otherwise.
  */
@@ -98,6 +138,18 @@ export const isArray = Array.isArray;
 
 /**
  * Check if an object is of type Date
+ * @example
+ * ```ts
+ * import { isDate } from "@nevware21/ts-utils";
+ *
+ * let _theDate = null;
+ *
+ * function getSetDate(newDate?: any) {
+ *     _theDate = isDate(newDate) ? newDate : new Date();
+ *
+ *     return _theDate;
+ * }
+ * ```
  */
 export const isDate = _createObjIs<Date>("[object Date]");
 

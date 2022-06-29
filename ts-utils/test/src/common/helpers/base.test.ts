@@ -2,7 +2,9 @@ import { assert } from "chai";
 import {
     isArray, isBoolean, isDate, isDefined, isFunction, isNullOrUndefined, isNumber, isObject, isString, isTypeof,
     isUndefined, isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isError, isPromiseLike, isPromise, isNotTruthy,
-    isTruthy
+    isTruthy,
+    isStrictUndefined,
+    isStrictNullOrUndefined
 } from "../../../../src/helpers/base";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 
@@ -128,6 +130,47 @@ describe("base helpers", () => {
         });
     });
 
+    describe("isStrictUndefined", () => {
+        it("Validate values", () => {
+            assert.equal(isStrictUndefined(null), false, "Checking null");
+            assert.equal(isStrictUndefined(undefined), true, "Checking undefined");
+            assert.equal(isStrictUndefined("null"), false, "Checking 'null'");
+            assert.equal(isStrictUndefined("undefined"), false, "Checking 'undefined'");
+            assert.equal(isStrictUndefined("1"), false, "Checking '1'");
+            assert.equal(isStrictUndefined("aa"), false, "Checking 'aa'");
+            assert.equal(isStrictUndefined(new Date()), false, "Checking Date");
+            assert.equal(isStrictUndefined(1), false, "Checking 1");
+            assert.equal(isStrictUndefined(""), false, "Checking ''");
+            assert.equal(isStrictUndefined(_dummyFunction), false, "Checking _dummyFunction");
+            assert.equal(isStrictUndefined([]), false, "Checking []");
+            assert.equal(isStrictUndefined(new Array(1)), false, "Checking new Array(1)");
+            assert.equal(isStrictUndefined(true), false, "Checking true");
+            assert.equal(isStrictUndefined(false), false, "Checking false");
+            assert.equal(isStrictUndefined("true"), false, "Checking 'true'");
+            assert.equal(isStrictUndefined("false"), false, "Checking 'false'");
+            assert.equal(isStrictUndefined(new Boolean(true)), false, "Checking new Boolean(true)");
+            assert.equal(isStrictUndefined(new Boolean(false)), false, "Checking new Boolean(false)");
+            assert.equal(isStrictUndefined(new Boolean("true")), false, "Checking new Boolean('true')");
+            assert.equal(isStrictUndefined(new Boolean("false")), false, "Checking new Boolean('false')");
+            assert.equal(isStrictUndefined(Boolean(true)), false, "Checking Boolean(true)");
+            assert.equal(isStrictUndefined(Boolean(false)), false, "Checking Boolean(false)");
+            assert.equal(isStrictUndefined(Boolean("true")), false, "Checking Boolean('true')");
+            assert.equal(isStrictUndefined(Boolean("false")), false, "Checking Boolean('false')");
+            assert.equal(isStrictUndefined(new RegExp("")), false, "Checking new RegExp('')");
+            assert.equal(isStrictUndefined(new ArrayBuffer(0)), false, "Checking new ArrayBuffer([])");
+            assert.equal(isStrictUndefined(new Error("Test Error")), false, "Checking new Error('')");
+            assert.equal(isStrictUndefined(new TypeError("Test TypeError")), false, "Checking new TypeError('')");
+            assert.equal(isStrictUndefined(new TestError("Test TestError")), false, "Checking new TestError('')");
+            assert.equal(isStrictUndefined(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+            assert.equal(isStrictUndefined(Promise.reject()), false, "Checking Promise.reject");
+            assert.equal(isStrictUndefined(Promise.resolve()), false, "Checking Promise.reject");
+            assert.equal(isStrictUndefined(new Promise(() => {})), false, "Checking new Promise(() => {})");
+            assert.equal(isStrictUndefined(_simplePromise()), false, "Checking _simplePromise");
+            assert.equal(isStrictUndefined(_simplePromiseLike()), false, "Checking _simplePromiseLike");
+
+        });
+    });
+
     describe("isNullOrUndefined", () => {
         it("Validate values", () => {
             assert.equal(isNullOrUndefined(null), true, "Checking null");
@@ -166,6 +209,46 @@ describe("base helpers", () => {
             assert.equal(isNullOrUndefined(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isNullOrUndefined(_simplePromiseLike()), false, "Checking _simplePromiseLike");
 
+        });
+    });
+
+    describe("isStrictNullOrUndefined", () => {
+        it("Validate values", () => {
+            assert.equal(isStrictNullOrUndefined(null), true, "Checking null");
+            assert.equal(isStrictNullOrUndefined(undefined), true, "Checking undefined");
+            assert.equal(isStrictNullOrUndefined("null"), false, "Checking 'null'");
+            assert.equal(isStrictNullOrUndefined("undefined"), false, "Checking 'undefined'");
+            assert.equal(isStrictNullOrUndefined("1"), false, "Checking '1'");
+            assert.equal(isStrictNullOrUndefined("aa"), false, "Checking 'aa'");
+            assert.equal(isStrictNullOrUndefined(new Date()), false, "Checking Date");
+            assert.equal(isStrictNullOrUndefined(1), false, "Checking 1");
+            assert.equal(isStrictNullOrUndefined(""), false, "Checking ''");
+            assert.equal(isStrictNullOrUndefined(_dummyFunction), false, "Checking _dummyFunction");
+            assert.equal(isStrictNullOrUndefined([]), false, "Checking []");
+            assert.equal(isStrictNullOrUndefined(new Array(1)), false, "Checking new Array(1)");
+            assert.equal(isStrictNullOrUndefined(true), false, "Checking true");
+            assert.equal(isStrictNullOrUndefined(false), false, "Checking false");
+            assert.equal(isStrictNullOrUndefined("true"), false, "Checking 'true'");
+            assert.equal(isStrictNullOrUndefined("false"), false, "Checking 'false'");
+            assert.equal(isStrictNullOrUndefined(new Boolean(true)), false, "Checking new Boolean(true)");
+            assert.equal(isStrictNullOrUndefined(new Boolean(false)), false, "Checking new Boolean(false)");
+            assert.equal(isStrictNullOrUndefined(new Boolean("true")), false, "Checking new Boolean('true')");
+            assert.equal(isStrictNullOrUndefined(new Boolean("false")), false, "Checking new Boolean('false')");
+            assert.equal(isStrictNullOrUndefined(Boolean(true)), false, "Checking Boolean(true)");
+            assert.equal(isStrictNullOrUndefined(Boolean(false)), false, "Checking Boolean(false)");
+            assert.equal(isStrictNullOrUndefined(Boolean("true")), false, "Checking Boolean('true')");
+            assert.equal(isStrictNullOrUndefined(Boolean("false")), false, "Checking Boolean('false')");
+            assert.equal(isStrictNullOrUndefined(new RegExp("")), false, "Checking new RegExp('')");
+            assert.equal(isStrictNullOrUndefined(new ArrayBuffer(0)), false, "Checking new ArrayBuffer([])");
+            assert.equal(isStrictNullOrUndefined(new Error("Test Error")), false, "Checking new Error('')");
+            assert.equal(isStrictNullOrUndefined(new TypeError("Test TypeError")), false, "Checking new TypeError('')");
+            assert.equal(isStrictNullOrUndefined(new TestError("Test TestError")), false, "Checking new TestError('')");
+            assert.equal(isStrictNullOrUndefined(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+            assert.equal(isStrictNullOrUndefined(Promise.reject()), false, "Checking Promise.reject");
+            assert.equal(isStrictNullOrUndefined(Promise.resolve()), false, "Checking Promise.reject");
+            assert.equal(isStrictNullOrUndefined(new Promise(() => {})), false, "Checking new Promise(() => {})");
+            assert.equal(isStrictNullOrUndefined(_simplePromise()), false, "Checking _simplePromise");
+            assert.equal(isStrictNullOrUndefined(_simplePromiseLike()), false, "Checking _simplePromiseLike");
         });
     });
 
