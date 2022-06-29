@@ -38,7 +38,7 @@ A new string containing the specified number of copies of the given string.
 
 #### Defined in
 
-[string/repeat.ts:41](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/repeat.ts#L41)
+[string/repeat.ts:41](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/repeat.ts#L41)
 
 ___
 
@@ -69,4 +69,4 @@ A new string containing the specified number of copies of the given string.
 
 #### Defined in
 
-[string/repeat.ts:27](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/repeat.ts#L27)
+[string/repeat.ts:27](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/repeat.ts#L27)

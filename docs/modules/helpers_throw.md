@@ -30,7 +30,7 @@ Throw an error exception with the specified optional message
 
 #### Defined in
 
-[helpers/throw.ts:13](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/helpers/throw.ts#L13)
+[helpers/throw.ts:13](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/helpers/throw.ts#L13)
 
 ___
 
@@ -52,7 +52,7 @@ Throw a RangeError with the specified optional message
 
 #### Defined in
 
-[helpers/throw.ts:29](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/helpers/throw.ts#L29)
+[helpers/throw.ts:29](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/helpers/throw.ts#L29)
 
 ___
 
@@ -74,4 +74,4 @@ Throw a type error with the specified optional message
 
 #### Defined in
 
-[helpers/throw.ts:21](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/helpers/throw.ts#L21)
+[helpers/throw.ts:21](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/helpers/throw.ts#L21)

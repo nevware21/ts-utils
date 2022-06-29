@@ -31,7 +31,7 @@ The smallest integer greater than or equal to the given number.
 
 #### Defined in
 
-[math/floor.ts:23](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/math/floor.ts#L23)
+[math/floor.ts:23](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/math/floor.ts#L23)
 
 ___
 
@@ -55,4 +55,4 @@ A number representing the largest integer less than or equal to the specified nu
 
 #### Defined in
 
-[math/floor.ts:16](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/math/floor.ts#L16)
+[math/floor.ts:16](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/math/floor.ts#L16)

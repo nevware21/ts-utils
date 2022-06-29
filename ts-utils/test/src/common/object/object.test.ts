@@ -5,6 +5,9 @@ import { objForEachKey } from "../../../../src/object/for_each_key";
 import { objHasOwnProperty } from "../../../../src/object/has_own_prop";
 import { objDeepFreeze, objFreeze, objKeys } from "../../../../src/object/object";
 import { objDefineAccessors, objDefineGet } from "../../../../src/object/define";
+import { FUNCTION } from "../../../../src/internal/constants";
+import { objSetPrototypeOf } from "../../../../src/object/set_proto";
+import { objCreate, polyObjCreate } from "../../../../src/object/create";
 
 describe("object helpers", () => {
     it("objKeys", () => {
@@ -348,6 +351,152 @@ describe("object helpers", () => {
 
         result = 64;
         assert.equal(value.test, 64, "Expected a value of ");
+    });
+
+    describe("setPrototypeOf", () => {
+
+        it("native setPrototype", () => {
+            let orgSetPrototypeOf = Object.setPrototypeOf;
+            try {
+                let newProto1 = {
+                    hello: () => "World"
+                };
+    
+                let newProto2 = {
+                    hello: () => "Darkness"
+                };
+    
+                let testObject: any = {
+                    friend: "maybe"
+                }
+    
+                assert.equal(testObject.friend, "maybe", "testing instance property");
+                assert.equal(testObject.hello, undefined, "testing prototype function is not present");
+    
+                objSetPrototypeOf(testObject, newProto1);
+                assert.equal(testObject.friend, "maybe", "testing instance property");
+                assert.ok(typeof testObject.hello === FUNCTION, "testing prototype function is a function");
+                assert.equal(testObject.hello(), "World", "testing prototype1 function return value");
+    
+                objSetPrototypeOf(testObject, newProto2);
+                assert.equal(testObject.friend, "maybe", "testing instance property");
+                assert.ok(typeof testObject.hello === FUNCTION, "testing prototype function is a function");
+                assert.equal(testObject.hello(), "Darkness", "testing prototype1 function return value");
+    
+                objSetPrototypeOf(testObject, Object.prototype);
+                assert.equal(testObject.friend, "maybe", "testing instance property");
+                assert.equal(testObject.hello, undefined, "testing restored prototype");
+    
+            } finally {
+                Object.setPrototypeOf = orgSetPrototypeOf;
+            }
+        });
+
+        it("removed native setPrototype", () => {
+            let orgSetPrototypeOf = Object.setPrototypeOf;
+            try {
+                let newProto1 = {
+                    hello: () => "World"
+                };
+    
+                let newProto2 = {
+                    hello: () => "Darkness"
+                };
+    
+                let testObject: any = {
+                    friend: "maybe"
+                };
+
+                (Object as any)["setPrototypeOf"] = undefined;
+    
+                assert.equal(testObject.friend, "maybe", "testing instance property");
+                assert.equal(testObject.hello, undefined, "testing prototype function is not present");
+    
+                objSetPrototypeOf(testObject, newProto1);
+                assert.equal(testObject.friend, "maybe", "testing instance property");
+                assert.ok(typeof testObject.hello === FUNCTION, "testing prototype function is a function");
+                assert.equal(testObject.hello(), "World", "testing prototype1 function return value");
+    
+                objSetPrototypeOf(testObject, newProto2);
+                assert.equal(testObject.friend, "maybe", "testing instance property");
+                assert.ok(typeof testObject.hello === FUNCTION, "testing prototype function is a function");
+                assert.equal(testObject.hello(), "Darkness", "testing prototype1 function return value");
+    
+                objSetPrototypeOf(testObject, Object.prototype);
+                assert.equal(testObject.friend, "maybe", "testing instance property");
+                assert.equal(testObject.hello, undefined, "testing restored prototype");
+    
+            } finally {
+                Object.setPrototypeOf = orgSetPrototypeOf;
+            }
+        });
+    });
+
+    describe("objCreate", () => {
+        it("native objCreate", () => {
+            let newProto1 = {
+                hello: () => "World"
+            };
+
+            let newProto2 = {
+                hello: () => "Darkness"
+            };
+
+            let newObj = objCreate(newProto1);
+            assert.ok(typeof newObj.hasOwnProperty === FUNCTION, "The object has the hasOwnProperty function inherited from object");
+            assert.ok(typeof newObj.hello === FUNCTION, "testing prototype function is a function");
+            assert.equal(newObj.hello(), "World", "testing prototype1 function return value");
+
+            newObj = objCreate(newProto2);
+            assert.ok(typeof newObj.hasOwnProperty === FUNCTION, "The object has the hasOwnProperty function inherited from object");
+            assert.ok(typeof newObj.hello === FUNCTION, "testing prototype function is a function");
+            assert.equal(newObj.hello(), "Darkness", "testing prototype1 function return value");
+
+            newObj = objCreate(null);
+            assert.equal(newObj.hasOwnProperty, undefined, "The object does not have the hasOwnProperty function");
+            assert.equal(newObj.hello, undefined, "testing that the hello prototype function also is not present");
+
+
+            try {
+                newObj = objCreate("Hello" as any);
+                assert.ok(false, "An Expected should have been thrown");
+            } catch (e) {
+                assert.ok(true, "Expected an exception to be thrown");
+            }
+
+        });
+
+        it("polyObjCreate", () => {
+            let newProto1 = {
+                hello: () => "World"
+            };
+
+            let newProto2 = {
+                hello: () => "Darkness"
+            };
+
+            let newObj = polyObjCreate(newProto1);
+            assert.ok(typeof newObj.hasOwnProperty === FUNCTION, "The object has the hasOwnProperty function inherited from object");
+            assert.ok(typeof newObj.hello === FUNCTION, "testing prototype function is a function");
+            assert.equal(newObj.hello(), "World", "testing prototype1 function return value");
+
+            newObj = polyObjCreate(newProto2);
+            assert.ok(typeof newObj.hasOwnProperty === FUNCTION, "The object has the hasOwnProperty function inherited from object");
+            assert.ok(typeof newObj.hello === FUNCTION, "testing prototype function is a function");
+            assert.equal(newObj.hello(), "Darkness", "testing prototype1 function return value");
+
+            newObj = polyObjCreate(null);
+            assert.ok(typeof newObj.hasOwnProperty === FUNCTION, "The object will still have the hasOwnProperty as object.prototype will still be used");
+            assert.equal(newObj.hasOwnProperty, Object.prototype.hasOwnProperty, "The object does have the hasOwnProperty function");
+            assert.equal(newObj.hello, undefined, "testing that the hello prototype function also is not present");
+
+            try {
+                newObj = polyObjCreate("Hello");
+                assert.ok(false, "An Expected should have been thrown");
+            } catch (e) {
+                assert.ok(true, "Expected an exception to be thrown");
+            }
+        });
     });
 
     function _checkObjKeys(value: any) {

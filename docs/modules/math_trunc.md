@@ -35,7 +35,7 @@ The integer path of the given number
 
 #### Defined in
 
-[math/trunc.ts:23](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/math/trunc.ts#L23)
+[math/trunc.ts:23](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/math/trunc.ts#L23)
 
 ___
 
@@ -63,4 +63,4 @@ The integer path of the given number
 
 #### Defined in
 
-[math/trunc.ts:34](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/math/trunc.ts#L34)
+[math/trunc.ts:34](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/math/trunc.ts#L34)

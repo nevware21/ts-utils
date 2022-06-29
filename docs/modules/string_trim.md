@@ -40,7 +40,7 @@ To return a new string with whitespace trimmed from just one end, use `strTrimSt
 
 #### Defined in
 
-[string/trim.ts:27](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/trim.ts#L27)
+[string/trim.ts:27](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/trim.ts#L27)
 
 ___
 
@@ -66,7 +66,7 @@ with no exception being thrown.
 
 #### Defined in
 
-[string/trim.ts:58](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/trim.ts#L58)
+[string/trim.ts:58](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/trim.ts#L58)
 
 ___
 
@@ -92,7 +92,7 @@ with no exception being thrown.
 
 #### Defined in
 
-[string/trim.ts:49](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/trim.ts#L49)
+[string/trim.ts:49](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/trim.ts#L49)
 
 ___
 
@@ -118,7 +118,7 @@ with no exception being thrown.
 
 #### Defined in
 
-[string/trim.ts:69](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/trim.ts#L69)
+[string/trim.ts:69](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/trim.ts#L69)
 
 ___
 
@@ -144,4 +144,4 @@ with no exception being thrown.
 
 #### Defined in
 
-[string/trim.ts:38](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/trim.ts#L38)
+[string/trim.ts:38](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/trim.ts#L38)

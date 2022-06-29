@@ -27,4 +27,4 @@
 
 #### Defined in
 
-[helpers/number.ts:11](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/helpers/number.ts#L11)
+[helpers/number.ts:11](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/helpers/number.ts#L11)

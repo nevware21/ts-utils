@@ -39,4 +39,4 @@ A new string containing the extracted section of the string.
 
 #### Defined in
 
-[string/slice.ts:39](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/slice.ts#L39)
+[string/slice.ts:39](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/slice.ts#L39)
