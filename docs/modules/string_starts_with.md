@@ -33,7 +33,7 @@ This method lets you determine whether or not a string begins with another strin
 
 #### Defined in
 
-[string/starts_with.ts:36](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/starts_with.ts#L36)
+[string/starts_with.ts:36](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/starts_with.ts#L36)
 
 ___
 
@@ -59,4 +59,4 @@ This method lets you determine whether or not a string begins with another strin
 
 #### Defined in
 
-[string/starts_with.ts:22](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/starts_with.ts#L22)
+[string/starts_with.ts:22](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/starts_with.ts#L22)

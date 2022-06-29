@@ -14,7 +14,7 @@
 
 ▸ **objSetPrototypeOf**(`obj`, `proto`): `any`
 
-The objSetPrototypeOf() method sets the prototype (i.e., the internal [[Prototype]] property) of a specified
+The objSetPrototypeOf() method sets the prototype (i.e., the internal [Prototype] property) of a specified
 object to another object or null.
 
 #### Parameters
@@ -32,4 +32,4 @@ The specified object.
 
 #### Defined in
 
-[object/set_proto.ts:19](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/set_proto.ts#L19)
+[object/set_proto.ts:19](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/object/set_proto.ts#L19)

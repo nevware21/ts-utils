@@ -31,4 +31,4 @@ The value converted to an integer
 
 #### Defined in
 
-[math/to_int.ts:19](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/math/to_int.ts#L19)
+[math/to_int.ts:19](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/math/to_int.ts#L19)

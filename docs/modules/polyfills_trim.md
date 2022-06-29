@@ -38,7 +38,7 @@ To return a new string with whitespace trimmed from just one end, use `strTrimSt
 
 #### Defined in
 
-polyfills/trim.ts:38
+[polyfills/trim.ts:38](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/polyfills/trim.ts#L38)
 
 ___
 
@@ -64,7 +64,7 @@ with no exception being thrown.
 
 #### Defined in
 
-polyfills/trim.ts:56
+[polyfills/trim.ts:56](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/polyfills/trim.ts#L56)
 
 ___
 
@@ -90,4 +90,4 @@ with no exception being thrown.
 
 #### Defined in
 
-polyfills/trim.ts:47
+[polyfills/trim.ts:47](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/polyfills/trim.ts#L47)

@@ -31,7 +31,7 @@ Checks whether the passed `value` is null, undefined or an empty string.
 
 #### Defined in
 
-[string/is_null_or.ts:31](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/is_null_or.ts#L31)
+[string/is_null_or.ts:31](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/is_null_or.ts#L31)
 
 ___
 
@@ -56,4 +56,4 @@ whiltespace `\t \r \n \f \v` characters.
 
 #### Defined in
 
-[string/is_null_or.ts:18](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/is_null_or.ts#L18)
+[string/is_null_or.ts:18](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/is_null_or.ts#L18)

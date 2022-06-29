@@ -31,7 +31,7 @@ This method lets you determine whether or not a string ends with another string.
 
 #### Defined in
 
-[string/ends_with.ts:32](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/ends_with.ts#L32)
+[string/ends_with.ts:32](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/ends_with.ts#L32)
 
 ___
 
@@ -55,4 +55,4 @@ This method lets you determine whether or not a string ends with another string.
 
 #### Defined in
 
-[string/ends_with.ts:20](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/ends_with.ts#L20)
+[string/ends_with.ts:20](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/ends_with.ts#L20)

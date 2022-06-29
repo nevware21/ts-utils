@@ -36,7 +36,7 @@ A String of the specified targetLength with the padString applied at the end of 
 
 #### Defined in
 
-[string/pad.ts:95](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/pad.ts#L95)
+[string/pad.ts:95](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/pad.ts#L95)
 
 ___
 
@@ -62,7 +62,7 @@ current string. Provided for runtimes that don't support see [padStart](https://
 
 #### Defined in
 
-[string/pad.ts:81](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/pad.ts#L81)
+[string/pad.ts:81](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/pad.ts#L81)
 
 ___
 
@@ -89,7 +89,7 @@ A String of the specified targetLength with the padString applied at the end of 
 
 #### Defined in
 
-[string/pad.ts:66](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/pad.ts#L66)
+[string/pad.ts:66](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/pad.ts#L66)
 
 ___
 
@@ -116,4 +116,4 @@ provided polyfill for runtimes that don't support [padStart](https://caniuse.com
 
 #### Defined in
 
-[string/pad.ts:51](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/string/pad.ts#L51)
+[string/pad.ts:51](https://github.com/nevware21/ts-utils/blob/9e4a475/ts-utils/src/string/pad.ts#L51)
