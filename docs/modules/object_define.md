@@ -45,7 +45,7 @@ The object that was passed to the function
 
 #### Defined in
 
-object/define.ts:66
+[object/define.ts:66](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/define.ts#L66)
 
 ___
 
@@ -79,7 +79,7 @@ The object that was passed to the function
 
 #### Defined in
 
-object/define.ts:40
+[object/define.ts:40](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/define.ts#L40)
 
 ___
 
@@ -109,4 +109,4 @@ Defines a new property directly on an object, or modifies an existing property o
 
 #### Defined in
 
-object/define.ts:22
+[object/define.ts:22](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/define.ts#L22)

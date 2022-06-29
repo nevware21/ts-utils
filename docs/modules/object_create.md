@@ -30,4 +30,4 @@ Note: For consistency this will not use the Object.create implementation if it e
 
 #### Defined in
 
-object/create.ts:20
+[object/create.ts:20](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/create.ts#L20)

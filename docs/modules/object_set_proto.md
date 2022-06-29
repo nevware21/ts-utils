@@ -32,4 +32,4 @@ The specified object.
 
 #### Defined in
 
-object/set_proto.ts:19
+[object/set_proto.ts:19](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/set_proto.ts#L19)

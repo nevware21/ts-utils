@@ -32,7 +32,7 @@
 
 #### Defined in
 
-helpers/customError.ts:30
+[helpers/customError.ts:30](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/helpers/customError.ts#L30)
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 #### Defined in
 
-helpers/customError.ts:46
+[helpers/customError.ts:46](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/helpers/customError.ts#L46)

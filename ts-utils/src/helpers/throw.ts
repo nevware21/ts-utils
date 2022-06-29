@@ -21,3 +21,11 @@ export function throwError(message?: string): never {
 export function throwTypeError(message?: string): never {
     throw new TypeError(message);
 }
+
+/**
+ * Throw a RangeError with the specified optional message
+ * @param message
+ */
+export function throwRangeError(message?: string): never {
+    throw new RangeError(message);
+}

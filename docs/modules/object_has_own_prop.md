@@ -27,4 +27,4 @@
 
 #### Defined in
 
-object/has_own_prop.ts:11
+[object/has_own_prop.ts:11](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/has_own_prop.ts#L11)

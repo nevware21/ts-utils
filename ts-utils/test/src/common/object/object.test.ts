@@ -177,7 +177,6 @@ describe("object helpers", () => {
         objDefineGet(value, "test", 64);
 
         assert.equal(value.test, 64, "Expected 64");
-
     });
 
     it("objDefineGet value - not configurable", () => {
@@ -269,6 +268,42 @@ describe("object helpers", () => {
         }
 
         result = 64;
+        assert.equal(value.test, 64, "Expected 64");
+    });
+
+    it("objDefineAccessors - getter only - not configurable", () => {
+        let value: any = {};
+        let result = 42;
+        let result2 = 12;
+        function getFunc() {
+            return result;
+        }
+
+        function getFunc2() {
+            return result2;
+        }
+
+        objDefineAccessors(value, "test", getFunc, null, false);
+        assert.equal(value.test, 42, "Expected 42");
+
+        try {
+            value.test = 53;
+            assert.ok(false, "Expected an exception when attempting to set with only a getter");
+        } catch(e) {
+            assert.ok(true, "Expected exception - " + dumpObj(e));
+        }
+
+        result = 64;
+        assert.equal(value.test, 64, "Expected 64");
+
+        // Redefine
+        try {
+            objDefineAccessors(value, "test", getFunc2, null, false);
+            assert.ok(false, "Expected an exception when attempting to reset a getter");
+        } catch (e) {
+            assert.ok(true, "Expected exception - " + dumpObj(e));
+        }
+
         assert.equal(value.test, 64, "Expected 64");
     });
 

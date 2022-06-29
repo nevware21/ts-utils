@@ -32,7 +32,7 @@
         "codecov": "nyc merge .nyc_output coverage/coverage-node.json && nyc report --reporter=json && codecov -f coverage/*.json",
         "clean": "git clean -xdf && npm install",
         "cleanBuild": "npm run clean && npm run rebuild",
-        "docs": "typedoc"
+        "docs": "typedoc --plugin typedoc-plugin-markdown"
     },
     "repository": {
         "type": "git",

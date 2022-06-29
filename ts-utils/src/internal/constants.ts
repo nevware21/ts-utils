@@ -10,6 +10,7 @@
 // For now do NOT expect that we will export these values.
 
 
+export const EMPTY = "";
 export const BOOLEAN = "boolean";
 export const FUNCTION = "function";
 export const NUMBER = "number";
@@ -29,3 +30,13 @@ export const ObjClass = Object;
  * @ignore
  */
 export const ObjProto = ObjClass[PROTOTYPE];
+
+/**
+ * @ignore
+ */
+export const StrProto = String[PROTOTYPE];
+
+/**
+ * @ignore
+ */
+export const MathCls = Math;

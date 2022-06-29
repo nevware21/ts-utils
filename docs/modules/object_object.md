@@ -40,7 +40,7 @@
 
 #### Defined in
 
-object/object.ts:22
+[object/object.ts:22](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/object.ts#L22)
 
 ▸ **objAssign**<`T`, `U`, `V`\>(`target`, `source1`, `source2`): `T` & `U` & `V`
 
@@ -66,7 +66,7 @@ object/object.ts:22
 
 #### Defined in
 
-object/object.ts:22
+[object/object.ts:22](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/object.ts#L22)
 
 ▸ **objAssign**<`T`, `U`, `V`, `W`\>(`target`, `source1`, `source2`, `source3`): `T` & `U` & `V` & `W`
 
@@ -94,7 +94,7 @@ object/object.ts:22
 
 #### Defined in
 
-object/object.ts:22
+[object/object.ts:22](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/object.ts#L22)
 
 ▸ **objAssign**(`target`, ...`sources`): `any`
 
@@ -111,7 +111,7 @@ object/object.ts:22
 
 #### Defined in
 
-object/object.ts:22
+[object/object.ts:22](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/object.ts#L22)
 
 ___
 
@@ -138,7 +138,7 @@ ___
 
 #### Defined in
 
-object/object.ts:54
+[object/object.ts:54](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/object.ts#L54)
 
 ___
 
@@ -166,7 +166,7 @@ Performs a deep copy of the source object
 
 #### Defined in
 
-object/object.ts:36
+[object/object.ts:36](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/object.ts#L36)
 
 ___
 
@@ -197,7 +197,7 @@ The originally passed in object.
 
 #### Defined in
 
-object/object.ts:72
+[object/object.ts:72](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/object.ts#L72)
 
 ___
 
@@ -242,7 +242,7 @@ The object that was passed to the function.
 
 #### Defined in
 
-object/object.ts:105
+[object/object.ts:105](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/object.ts#L105)
 
 ___
 
@@ -262,7 +262,7 @@ ___
 
 #### Defined in
 
-object/object.ts:24
+[object/object.ts:24](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/object.ts#L24)
 
 ___
 
@@ -294,4 +294,4 @@ The object being sealed.
 
 #### Defined in
 
-object/object.ts:114
+[object/object.ts:114](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/object/object.ts#L114)

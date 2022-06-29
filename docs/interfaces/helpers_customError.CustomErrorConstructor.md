@@ -22,7 +22,7 @@
 
 #### Defined in
 
-helpers/customError.ts:26
+[helpers/customError.ts:26](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/helpers/customError.ts#L26)
 
 ## Table of contents
 
@@ -48,7 +48,7 @@ helpers/customError.ts:26
 
 #### Defined in
 
-helpers/customError.ts:25
+[helpers/customError.ts:25](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/helpers/customError.ts#L25)
 
 ## Properties
 
@@ -58,4 +58,4 @@ helpers/customError.ts:25
 
 #### Defined in
 
-helpers/customError.ts:27
+[helpers/customError.ts:27](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/helpers/customError.ts#L27)

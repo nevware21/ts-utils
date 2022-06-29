@@ -50,7 +50,7 @@ all of the arguments are added to a new object that is returned.
 
 #### Defined in
 
-helpers/extend.ts:27
+[helpers/extend.ts:27](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/helpers/extend.ts#L27)
 
 ___
 
@@ -92,4 +92,4 @@ Extend the target object by merging the passed arguments into it
 
 #### Defined in
 
-helpers/extend.ts:38
+[helpers/extend.ts:38](https://github.com/nevware21/ts-utils/blob/e2a920b/ts-utils/src/helpers/extend.ts#L38)

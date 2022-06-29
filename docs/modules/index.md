@@ -46,6 +46,10 @@
 - [isTypeof](index.md#istypeof)
 - [isUndefined](index.md#isundefined)
 - [isWebWorker](index.md#iswebworker)
+- [mathCeil](index.md#mathceil)
+- [mathFloor](index.md#mathfloor)
+- [mathToInt](index.md#mathtoint)
+- [mathTrunc](index.md#mathtrunc)
 - [objAssign](index.md#objassign)
 - [objCopyProps](index.md#objcopyprops)
 - [objCreate](index.md#objcreate)
@@ -67,6 +71,7 @@
 - [strIsNullOrWhiteSpace](index.md#strisnullorwhitespace)
 - [strStartsWith](index.md#strstartswith)
 - [throwError](index.md#throwerror)
+- [throwRangeError](index.md#throwrangeerror)
 - [throwTypeError](index.md#throwtypeerror)
 - [throwUnsupported](index.md#throwunsupported)
 
@@ -312,6 +317,30 @@ Re-exports [isWebWorker](helpers_environment.md#iswebworker)
 
 ___
 
+### mathCeil
+
+Re-exports [mathCeil](math_floor.md#mathceil)
+
+___
+
+### mathFloor
+
+Re-exports [mathFloor](math_floor.md#mathfloor)
+
+___
+
+### mathToInt
+
+Re-exports [mathToInt](math_to_int.md#mathtoint)
+
+___
+
+### mathTrunc
+
+Re-exports [mathTrunc](math_trunc.md#mathtrunc)
+
+___
+
 ### objAssign
 
 Re-exports [objAssign](object_object.md#objassign)
@@ -410,31 +439,37 @@ ___
 
 ### strEndsWith
 
-Re-exports [strEndsWith](helpers_string.md#strendswith)
+Re-exports [strEndsWith](string_ends_with.md#strendswith)
 
 ___
 
 ### strIsNullOrEmpty
 
-Re-exports [strIsNullOrEmpty](helpers_string.md#strisnullorempty)
+Re-exports [strIsNullOrEmpty](string_is_null_or.md#strisnullorempty)
 
 ___
 
 ### strIsNullOrWhiteSpace
 
-Re-exports [strIsNullOrWhiteSpace](helpers_string.md#strisnullorwhitespace)
+Re-exports [strIsNullOrWhiteSpace](string_is_null_or.md#strisnullorwhitespace)
 
 ___
 
 ### strStartsWith
 
-Re-exports [strStartsWith](helpers_string.md#strstartswith)
+Re-exports [strStartsWith](string_starts_with.md#strstartswith)
 
 ___
 
 ### throwError
 
 Re-exports [throwError](helpers_throw.md#throwerror)
+
+___
+
+### throwRangeError
+
+Re-exports [throwRangeError](helpers_throw.md#throwrangeerror)
 
 ___
 
