@@ -109,7 +109,7 @@
         "nyc": "^15.1.0",
         "@istanbuljs/nyc-config-typescript": "^1.0.2",
         "codecov": "^3.8.3",
-        "typedoc": "^0.22.0",
+        "typedoc": "^0.23.7",
         "typedoc-plugin-markdown": "~3.12.1",
         "chai": "^4.3.6",
         "karma": "^6.3.20",
