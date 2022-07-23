@@ -15,8 +15,8 @@ This is a collection of general JavaScript functions (written in and for TypeScr
 Support for standard JavaScript functions (ES5+) that are not support in all environments will be backed by internal polyfill implementations when not available. All of the polyfill functions are tested against the standard native implementations for node, browser and web-worker to ensure compatibility.
 
 ### Documentation and details
-- [Exported functions](https://github.com/nevware21/ts-utils/blob/main/docs/modules/index.md) 
-- [The individual modules](https://github.com/nevware21/ts-utils/blob/main/docs/README.md)
+
+Documentation [generated from source code](https://htmlpreview.github.io/?https://github.com/nevware21/ts-utils/blob/main/docs/index.html) via typedoc
 
 Some polyfills are provided for simple backward compatability to enable the utility functions in older environments (such as ES3 / IE8), you don't have to use or include the provided polyfils (AND they are NOT exported as part of the main module). If you need them you will need to import the "polyfill" file directly or host and load the provided `bundle/ts-polyfills-utils.min.js` or provide your own alternatives.
 See [Browser Support](#browser-support) for details.
