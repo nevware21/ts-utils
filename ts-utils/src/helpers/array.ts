@@ -35,6 +35,13 @@ export function arrForEach<T>(arr: T[], callbackfn: (value: T, index?: number, a
 
 /**
  * Appends the `elms` to the `target` where the elms may be an array or single object
+ * @example
+ * ```ts
+ * let theArray = arrAppend([], 1);
+ * arrAppend(theArray, [ 2, 3, 4 ]);
+ * arrAppend(theArray, [ "a", "b", "c" ]);
+ * // theArray is now [ 1, 2, 3, 4, "a", "b", "c" ]
+ * ```
  * @param target - The target array
  * @param elms - The item or items to add to the target
  */

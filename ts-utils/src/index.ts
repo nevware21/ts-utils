@@ -14,6 +14,7 @@ export {
 } from "./helpers/base";
 export { CustomErrorConstructor, createCustomError, throwUnsupported } from "./helpers/customError";
 export { dumpObj } from "./helpers/diagnostics";
+export { EnumCls, EnumNameMap, EnumValueMap, EnumTypeMap, createEnum, createEnumKeyMap, createEnumValueMap, createSimpleMap, createTypeMap } from "./helpers/enum";
 export {
     getGlobal, getInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory, getHistory,
     isNode, isWebWorker
@@ -22,7 +23,8 @@ export {
     deepExtend, objExtend
 } from "./helpers/extend";
 export { getIntValue } from "./helpers/number";
-export { isSymbol, getSymbol, getSymbolInst, hasSymbol, newSymbol, symbolFor, symbolKeyFor } from "./helpers/symbol";
+export { isSymbol, getSymbol, getKnownSymbol, hasSymbol, newSymbol, symbolFor, symbolKeyFor } from "./symbol/symbol";
+export { WellKnownSymbols } from "./symbol/well_known";
 export { hasValue } from "./helpers/value";
 export { mathCeil, mathFloor } from "./math/floor";
 export { mathToInt } from "./math/to_int";

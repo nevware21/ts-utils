@@ -8,8 +8,9 @@
 
 import { SYMBOL } from "../internal/constants";
 import { polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "../polyfills/symbol";
-import { isDefined, _createIs } from "./base";
-import { getInst, _safeCheck } from "./environment";
+import { WellKnownSymbols, _wellKnownSymbolMap } from "./well_known";
+import { isDefined, _createIs } from "../helpers/base";
+import { getInst, _safeCheck } from "../helpers/environment";
 
 const _hasSymbol = _safeCheck(() => isDefined(Symbol), false);
 let _symbol: Symbol = getInst<Symbol>(SYMBOL);
@@ -46,11 +47,18 @@ export function getSymbol(useCached?: boolean): Symbol {
 /**
  * If Symbols are supported then get the property of the global Symbol, if Symbol's are
  * not supported then it returns undefined. Used to access the well known symbols.
+ * @example
+ * ```ts
+ * // If Symbol is supported in the runtime
+ * getKnownSymbol("toStringTag") === Symbol.toStringTag;                // true
+ * getKnownSymbol(WellKnownSymbols.toStringTag) === Symbol.toStringTag; // true
+ * ```
  * @param name - The property name to return (if it exists) for Symbol
  * @returns The value of the property if present
  */
-export function getSymbolInst<T>(name: string): T {
-    return _symbol && _symbol[name];
+export function getKnownSymbol<T>(name: string | WellKnownSymbols): T {
+    let knownName = _wellKnownSymbolMap[name];
+    return _symbol ? _symbol[knownName || name] : null;
 }
 
 /**

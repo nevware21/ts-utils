@@ -13,5 +13,8 @@
     "tsconfig": "./ts-utils/tsconfig.json",
     "out": "./docs/typedoc",
     "readme": "none",
-    "githubPages": true
+    "githubPages": true,
+    "compilerOptions": {
+        "stripInternal": true
+    }
 }

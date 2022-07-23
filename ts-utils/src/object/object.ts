@@ -53,9 +53,9 @@ export function objDeepCopy<T>(source: T): T {
 
 export function objCopyProps<T>(target: T, source: any) {
     if (!isNullOrUndefined(source)) {
-        objForEachKey(source, (key) => {
+        objForEachKey(source, (key, value) => {
             // Perform a deep copy of the object
-            target[key] = objDeepCopy(source[key]);
+            target[key] = objDeepCopy(value);
         });
     }
 
@@ -71,7 +71,7 @@ export function objCopyProps<T>(target: T, source: any) {
  */
 export function objDeepFreeze<T>(value: T): T {
     if (_objFreeze) {
-        objForEachKey(value, (name, value) => {
+        objForEachKey(value, (key, value) => {
             if (isArray(value) || isObject(value)) {
                 _objFreeze(value);
             }
