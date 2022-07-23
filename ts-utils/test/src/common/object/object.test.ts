@@ -320,6 +320,7 @@ describe("object helpers", () => {
         objDefineAccessors(value, "test", null, setFunc);
 
         try {
+            // @eslint-disable-next-line @typescript-eslint/no-unused-vars
             let theValue = value.test;
             assert.ok(false, "Expected an exception when attempting to get with only a setter");
         } catch(e) {

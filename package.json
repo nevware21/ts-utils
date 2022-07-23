@@ -61,7 +61,7 @@
         "codecov": "npm run coverage:report && codecov -f coverage/*.json --disable=gcov",
         "clean": "git clean -xdf && npm install",
         "cleanBuild": "npm run clean && npm run rebuild",
-        "docs": "typedoc --plugin typedoc-plugin-markdown"
+        "docs": "typedoc"
     },
     "repository": {
         "type": "git",
@@ -110,7 +110,6 @@
         "@istanbuljs/nyc-config-typescript": "^1.0.2",
         "codecov": "^3.8.3",
         "typedoc": "^0.22.0",
-        "typedoc-plugin-markdown": "~3.12.1",
         "chai": "^4.3.6",
         "karma": "^6.3.20",
         "karma-mocha": "^2.0.1",

@@ -28,7 +28,14 @@ const _hasHistory = _safeCheck(() => isDefined(history), false);
 const _isWebWorker: boolean = _safeCheck(() => !!(self && self instanceof WorkerGlobalScope), false);
 const _isNode: boolean = _safeCheck(() => !!(process && (process.versions||{}).node), false);
 
-function _safeCheck(cb: () => boolean, defValue: boolean) {
+/**
+ * @ignore
+ * Internal helper for safely checking whether types exist
+ * @param cb - Callback function be wrapped with an exception
+ * @param defValue - The default value to return when an exception is thrown
+ * @returns The value from the `cb` or the default value
+ */
+export function _safeCheck<T = boolean>(cb: () => T, defValue: T) {
     let result = defValue;
     try {
         result = cb();
@@ -50,6 +57,8 @@ function _safeCheck(cb: () => boolean, defValue: boolean) {
  * While the return type is a Window for the normal case, not all environments will support all
  * of the properties or functions. And this caches the lookup of the global as in some environments
  * this can be an expensive operation.
+ * @param useCached - [Optional] used for testing to bypass the cached lookup, when `true` this will
+ * cause the cached global to be reset.
  */
 export function getGlobal(useCached?: boolean): Window {
     let result = useCached === false ? null : _cachedGlobal;
@@ -80,9 +89,11 @@ export function getGlobal(useCached?: boolean): Window {
 /**
  * Return the named global object if available, will return null if the object is not available.
  * @param name The globally named object
- */
-export function getInst<T>(name: string): T {
-    const gbl = getGlobal();
+ * @param useCached - [Optional] used for testing to bypass the cached lookup, when `true` this will
+ * cause the cached global to be reset.
+*/
+export function getInst<T>(name: string, useCached?: boolean): T {
+    const gbl = getGlobal(useCached);
     if (gbl && gbl[name]) {
         return gbl[name] as T;
     }
