@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { isDefined, isNullOrUndefined, isStrictNullOrUndefined } from "../helpers/base";
+import { isNullOrUndefined } from "../helpers/base";
 import { getGlobal } from "../helpers/environment";
 import { throwTypeError } from "../helpers/throw";
 import { SYMBOL } from "../internal/constants";
