@@ -16,7 +16,7 @@ Support for standard JavaScript functions (ES5+) that are not support in all env
 
 ### Documentation and details
 
-Documentation [generated from source code](https://nevware21.github.io/ts-utils//typedoc/index.html) via typedoc
+Documentation [generated from source code](https://nevware21.github.io/ts-utils/typedoc/index.html) via typedoc
 
 Some polyfills are provided for simple backward compatability to enable the utility functions in older environments (such as ES3 / IE8), you don't have to use or include the provided polyfils (AND they are NOT exported as part of the main module). If you need them you will need to import the "polyfill" file directly or host and load the provided `bundle/ts-polyfills-utils.min.js` or provide your own alternatives.
 See [Browser Support](#browser-support) for details.
