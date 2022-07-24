@@ -11,6 +11,6 @@
     "excludePrivate": true,
     "entryPointStrategy": "expand",
     "tsconfig": "./ts-utils/tsconfig.json",
-    "out": "./docs",
+    "out": "./docs/pages/typedoc",
     "readme": "none"
 }
