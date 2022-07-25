@@ -101,37 +101,20 @@ const rollupConfigFactory = (isMinified, path, format = "iife", postfix = "") =>
 
     if (isMinified) {
         taskRollupConfig.output.file = `ts-utils/dist/${path}/${outputName}${postfix}.min.js`;
-        if (format !== "esm") {
-            taskRollupConfig.plugins.push(
-                uglify3({
-                    ie8: true,
-                    toplevel: true,
-                    compress: {
-                        passes:3,
-                        unsafe: true
-                    },
-                    output: {
-                        preamble: banner,
-                        webkit:true
-                    }
-                })
-            );
-        } else {
-            taskRollupConfig.plugins.push(
-                minify({
-                    ie8: true,
-                    toplevel: true,
-                    compress: {
-                        passes:3,
-                        unsafe: true
-                    },
-                    output: {
-                        preamble: banner,
-                        webkit:true
-                    }
-                })
-            );
-        }
+        taskRollupConfig.plugins.push(
+            uglify3({
+                ie8: true,
+                toplevel: true,
+                compress: {
+                    passes:3,
+                    unsafe: true
+                },
+                output: {
+                    preamble: banner,
+                    webkit:true
+                }
+            })
+        );
     }
 
     return taskRollupConfig;

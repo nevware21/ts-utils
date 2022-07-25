@@ -1,14 +1,34 @@
 
+# v0.3.0 Jul, 25th, 2022
+
+## Changelog
+
+- #32 Bump @types/estree from 0.0.52 to 1.0.0
+- #34 Add more `Object.create` and `objSetPrototypeOf` tests
+  - Add `symbol` support
+  - Rollup back typedoc version so descriptions are published (there is an issue with isArray and isArrayBuffer)
+  - Switch to HTML Docs
+- #42 Add `enum helpers` and update `symbol` support
+  - Update Custom Error to support `custom error types` (not just messages)
+  - Add some more examples
+
+Documentation Updates
+- #35 Update HTML link to preview
+- #36 Update to use github pages link
+- #37 Restore Old documentation references for npm
+- #40 Update readme path
+- #41 Remove old pages folder
+
 # v0.2.0 Jun 29th, 2022
 
 ## Changelog
 
-- #26 Add Object.create and setPrototypeOf tests
+- #26 Add `Object.create` and `objSetPrototypeOf` tests
     - Rollup back typedoc version so descriptions are published
-- #23 Add initial math, additional string and throwRangeError
-    - Add math floor, ceil, trunc and toInt
-    - Add string, pad, slice and trim, rework string file layout
-    - Add throwRangeError
+- #23 Add initial `math`, additional `string` and `throwRangeError`
+    - Add `math` `floor`, `ceil`, `trunc` and `toInt`
+    - Add `string`, `pad`, `slice` and `trim`, rework string file layout
+    - Add `throwRangeError`
 - #25 Bump @types/estree from 0.0.51 to 0.0.52
 - #24 Bump typedoc from 0.22.18 to 0.23.1
 - #22 Bump puppeteer from 14.4.1 to 15.0.2
@@ -16,16 +36,16 @@
     - Split out extend
     - Split out object to avoid circular dependencies
     - Remove partial ES3 compatibility from objDefine functions
-    - Add string startsWith and endsWith (with polyfills for IE)
-    - Add throwUnsupportedError and createCustomError
+    - Add string `startsWith` and `endsWith` (with polyfills for IE)
+    - Add `throwUnsupportedError` and `createCustomError`
     - Increase test coverage
 - #19 Add string and object tests -- fixing issues
     - Add combined (merge) coverage report and summary
 - #18 Add Security policy and fix a few copyright header comments
-- #17 Add web worker tests
+- #17 Add `web worker tests`
     - Add more tests coverage
     - Fix identified issues
-- #16 Add Local browser based debugging option
+- #16 Add `Local browser based debugging` option
 - #15 Add additional tests and browser coverage
 - #13 Update Documentation
     - Rework some base functions for better minification

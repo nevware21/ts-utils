@@ -28,10 +28,10 @@ Install the npm packare: `npm install @nevware21/ts-utils --save`
 
 And then just import the helpers and use them.
 
-
 ### Simple Example
 
 These are simple representations of using some of the basic function vs the standard provided JavaScript versions.
+Examples are also being included in the source and generated typedoc documentation.
 
 __Using Helpers__
 
