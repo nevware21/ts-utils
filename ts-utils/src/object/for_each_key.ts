@@ -16,8 +16,20 @@ import { objHasOwnProperty } from "./has_own_prop";
  * @param callbackfn  A function that accepts up to two arguments, the key name and the current value of the property represented by the key.
  * @param thisArg  [Optional] An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, null or undefined
  * the object will be used as the this value.
+ * @example
+ * ```ts
+ * function performAction<T>(target: T, source: any) {
+ *    if (!isNullOrUndefined(source)) {
+ *        objForEachKey(source, (key, value) => {
+ *            // Set the target with a reference to the same value with the same name
+ *            target[key] = value;
+ *        });
+ *    }
+ *
+ *    return target;
+ * }
+ * ```
  */
-
 export function objForEachKey(theObject: any, callbackfn: (key: string, value: any) => void | number, thisArg?: any): void {
     if (theObject && isObject(theObject)) {
         for (const prop in theObject) {

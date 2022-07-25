@@ -1,11 +1,11 @@
 import { assert } from "chai";
-import { isError } from "../../../../src/helpers/base";
-import { throwUnsupported } from "../../../../src/helpers/customError";
+import { isError, objToString } from "../../../../src/helpers/base";
+import { createCustomError, CustomErrorConstructor, throwUnsupported } from "../../../../src/helpers/customError";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { throwError, throwTypeError } from "../../../../src/helpers/throw";
 
 
-function _expectThrow(cb: () => never, message: string): Error {
+function _expectThrow<T = Error>(cb: () => never, message: string): T {
     try {
         cb();
     } catch (e) {
@@ -66,6 +66,95 @@ describe("throw helpers", () => {
             assert.ok(isError(error), "Crashed");
             assert.ok(error.name.indexOf("UnsupportedError") !== -1, "Name contains type Unsupported");
             assert.ok(error.message.indexOf("Crashed") !== -1, "Message contains Crashed");
+        });
+    });
+
+    describe("createCustomError", () => {
+        it("null or undefined", () => {
+            let myCustomError = createCustomError("CriticalErrorTest");
+
+            assert.ok(isError(_expectThrow(() => {
+                throw new myCustomError(null);
+            }, "null")));
+            assert.ok(isError(_expectThrow(() => {
+                throw new myCustomError(undefined);
+            }, "undefined")));
+        });
+
+        it("with message", () => {
+            let totalErrors = 0;
+            let myCustomError = createCustomError("CriticalErrorMessageTest", (self, args) => {
+                totalErrors++;
+                self.errorId = totalErrors;
+                self.args = args;
+            });
+
+            let error = _expectThrow(() => {
+                throw new myCustomError("Failed")
+            }, "Failed") as any;
+
+            assert.ok(error instanceof Error, "The custom error is an error");
+            assert.ok(isError(error), "Validating an error was returned");
+            assert.ok(error.message.indexOf("Failed") !== -1, "Message contains Failed");
+            assert.ok(error.name.indexOf("CriticalErrorMessageTest") !== -1, "Name contains type CriticalErrorMessageTest");
+            assert.equal(error.errorId, 1, "Expected this to be error #1");
+            assert.equal(objToString(error), "[object Error]", "Expected the error to resolve as an error");
+
+            error = _expectThrow(() => {
+                throw new myCustomError("Crashed");
+            }, "Crashed") as any;
+            assert.ok(error instanceof Error, "The custom error is an error");
+            assert.ok(isError(error), "Crashed");
+            assert.ok(error.name.indexOf("CriticalErrorMessageTest") !== -1, "Name contains type CriticalErrorMessageTest");
+            assert.ok(error.message.indexOf("Crashed") !== -1, "Message contains Crashed");
+            assert.equal(error.errorId, 2, "Expected this to be error #2");
+            assert.equal(objToString(error), "[object Error]", "Expected the error to resolve as an error");
+        });
+
+        it("custom type aith additional args", () => {
+            let totalErrors = 0;
+            interface CriticalError extends CustomErrorConstructor {
+                new(message: string, file: string, line: number, col: number): Error;
+                (message: string, file: string, line: number, col: number): Error;
+
+                readonly errorId: number;
+                readonly args: any[];
+            }
+
+            let myCustomError = createCustomError<CriticalError>("CriticalErrorMessageTest", (self, args) => {
+                totalErrors++;
+                self.errorId = totalErrors;
+                self.args = args;
+            });
+
+            let error = _expectThrow(() => {
+                throw new myCustomError("Failed", "test.ts", 1, 32);
+            }, "Failed") as CriticalError;
+
+            assert.ok(error instanceof Error, "The custom error is an error");
+            assert.ok(isError(error), "Validating an error was returned");
+            assert.ok(error.message.indexOf("Failed") !== -1, "Message contains Failed");
+            assert.ok(error.name.indexOf("CriticalErrorMessageTest") !== -1, "Name contains type CriticalErrorMessageTest");
+            assert.equal(error.errorId, 1, "Expected this to be error #1");
+            assert.equal(error.args[0], "Failed");
+            assert.equal(error.args[1], "test.ts");
+            assert.equal(error.args[2], 1);
+            assert.equal(error.args[3], 32);
+            assert.equal(objToString(error), "[object Error]", "Expected the error to resolve as an error");
+
+            error = _expectThrow(() => {
+                throw new myCustomError("Crashed", "loader.ts", 42, 100);
+            }, "Crashed") as CriticalError;
+            assert.ok(error instanceof Error, "The custom error is an error");
+            assert.ok(isError(error), "Crashed");
+            assert.ok(error.name.indexOf("CriticalErrorMessageTest") !== -1, "Name contains type CriticalErrorMessageTest");
+            assert.ok(error.message.indexOf("Crashed") !== -1, "Message contains Crashed");
+            assert.equal(error.errorId, 2, "Expected this to be error #2");
+            assert.equal(error.args[0], "Crashed");
+            assert.equal(error.args[1], "loader.ts");
+            assert.equal(error.args[2], 42);
+            assert.equal(error.args[3], 100);
+            assert.equal(objToString(error), "[object Error]", "Expected the error to resolve as an error");
         });
     });
 });

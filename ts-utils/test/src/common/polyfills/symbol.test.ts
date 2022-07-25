@@ -1,7 +1,8 @@
 import { assert } from "chai";
 import { isUndefined } from "../../../../src/helpers/base";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
-import { polySymbolFor, polySymbolKeyFor } from "../../../../src/polyfills/symbol";
+import { polyGetKnownSymbol, polySymbolFor, polySymbolKeyFor } from "../../../../src/polyfills/symbol";
+import { WellKnownSymbols } from "../../../../src/symbol/well_known";
 
 describe("symbol polyfills", () => {
     it("polySymbolFor null / undefined", () => {
@@ -39,6 +40,52 @@ describe("symbol polyfills", () => {
         _checkSymbolKeyFor(0);
         _checkSymbolKeyFor(10000);
     });
+
+    it("polyGetKnownSymbol", () => {
+        let expectedSymbols = {
+            asyncIterator: polyGetKnownSymbol("asyncIterator"),
+            hasInstance: polyGetKnownSymbol("hasInstance"),
+            isConcatSpreadable: polyGetKnownSymbol("isConcatSpreadable"),
+            iterator: polyGetKnownSymbol("iterator"),
+            match: polyGetKnownSymbol("match"),
+            matchAll: polyGetKnownSymbol("matchAll"),
+            replace: polyGetKnownSymbol("replace"),
+            search: polyGetKnownSymbol("search"),
+            species: polyGetKnownSymbol("species"),
+            split: polyGetKnownSymbol("split"),
+            toPrimitive: polyGetKnownSymbol("toPrimitive"),
+            toStringTag: polyGetKnownSymbol("toStringTag"),
+            unscopables: polyGetKnownSymbol("unscopables")
+        };
+
+        assert.equal(polyGetKnownSymbol("asyncIterator"), expectedSymbols.asyncIterator, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol("hasInstance"), expectedSymbols.hasInstance, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol("isConcatSpreadable"), expectedSymbols.isConcatSpreadable, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol("iterator"), expectedSymbols.iterator, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol("match"), expectedSymbols.match, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol("matchAll"), expectedSymbols.matchAll, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol("replace"), expectedSymbols.replace, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol("search"), expectedSymbols.search, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol("species"), expectedSymbols.species, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol("split"), expectedSymbols.split, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol("toPrimitive"), expectedSymbols.toPrimitive, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol("toStringTag"), expectedSymbols.toStringTag, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol("unscopables"), expectedSymbols.unscopables, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol(WellKnownSymbols.asyncIterator), expectedSymbols.asyncIterator, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol(WellKnownSymbols.hasInstance), expectedSymbols.hasInstance, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol(WellKnownSymbols.isConcatSpreadable), expectedSymbols.isConcatSpreadable, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol(WellKnownSymbols.iterator), expectedSymbols.iterator, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol(WellKnownSymbols.match), expectedSymbols.match, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol(WellKnownSymbols.matchAll), expectedSymbols.matchAll, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol(WellKnownSymbols.replace), expectedSymbols.replace, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol(WellKnownSymbols.search), expectedSymbols.search, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol(WellKnownSymbols.species), expectedSymbols.species, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol(WellKnownSymbols.split), expectedSymbols.split, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol(WellKnownSymbols.toPrimitive), expectedSymbols.toPrimitive, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol(WellKnownSymbols.toStringTag), expectedSymbols.toStringTag, "Check that the expected symbol is returned");
+        assert.equal(polyGetKnownSymbol(WellKnownSymbols.unscopables), expectedSymbols.unscopables, "Check that the expected symbol is returned");
+    });
+
 
 
     function _checkSymbolFor(value: any) {
