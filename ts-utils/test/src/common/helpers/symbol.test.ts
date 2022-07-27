@@ -67,9 +67,9 @@ describe("symbol helpers", () => {
 
     describe("Remove Native", () => {
 
-        it("getSymbol", () => {
+        it("getSymbol with noPoly", () => {
             // Get the native Symbol and force it to be cached
-            let orgSymbol = getSymbol();
+            let orgSymbol = getSymbol(false);
             let toStringTag = Symbol.toStringTag;
 
             try {
@@ -81,8 +81,50 @@ describe("symbol helpers", () => {
 
                 // Force the cache Symbol to be dropped
                 assert.equal(getSymbol(false), undefined, "Check that the Symbol is now not available");
-                assert.equal(getKnownSymbol("toStringTag"), undefined, "Check that the expected symbol is returned");
-                assert.equal(getKnownSymbol(WellKnownSymbols.toStringTag), undefined, "Check that the expected symbol is returned");
+                assert.equal(getKnownSymbol("toStringTag", true), undefined, "Check that the expected symbol is returned");
+                assert.equal(getKnownSymbol(WellKnownSymbols.toStringTag, true), undefined, "Check that the expected symbol is returned");
+            } finally {
+                Symbol = orgSymbol;
+            }
+        });
+
+        it("getSymbol - default noPoly", () => {
+            // Get the native Symbol and force it to be cached
+            let orgSymbol = getSymbol(false);
+            let toStringTag = Symbol.toStringTag;
+
+            try {
+
+                Symbol = undefined;
+                assert.equal(getSymbol(), theSymbol, "Check that the Symbol is returned");
+                assert.equal(getKnownSymbol("toStringTag"), toStringTag, "Check that the expected symbol is returned");
+                assert.equal(getKnownSymbol(WellKnownSymbols.toStringTag), toStringTag, "Check that the expected symbol is returned");
+
+                // Force the cache Symbol to be dropped
+                assert.equal(getSymbol(false), undefined, "Check that the Symbol is now not available");
+                assert.equal(getKnownSymbol<any>("toStringTag", false)._polyfill, true, "Check that the expected symbol is returned");
+                assert.equal(getKnownSymbol<any>(WellKnownSymbols.toStringTag, false)._polyfill, true, "Check that the expected symbol is returned");
+            } finally {
+                Symbol = orgSymbol;
+            }
+        });
+
+        it("getSymbol - explicit noPoly false", () => {
+            // Get the native Symbol and force it to be cached
+            let orgSymbol = getSymbol(false);
+            let toStringTag = Symbol.toStringTag;
+
+            try {
+
+                Symbol = undefined;
+                assert.equal(getSymbol(), theSymbol, "Check that the Symbol is returned");
+                assert.equal(getKnownSymbol("toStringTag"), toStringTag, "Check that the expected symbol is returned");
+                assert.equal(getKnownSymbol(WellKnownSymbols.toStringTag), toStringTag, "Check that the expected symbol is returned");
+
+                // Force the cache Symbol to be dropped
+                assert.equal(getSymbol(false), undefined, "Check that the Symbol is now not available");
+                assert.equal(getKnownSymbol<any>("toStringTag", false)._polyfill, true, "Check that the expected symbol is returned");
+                assert.equal(getKnownSymbol<any>(WellKnownSymbols.toStringTag, false)._polyfill, true, "Check that the expected symbol is returned");
             } finally {
                 Symbol = orgSymbol;
             }

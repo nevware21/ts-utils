@@ -21,6 +21,7 @@ export const UNDEFINED = "undefined";
 export const CONSTRUCTOR = "constructor";
 export const HAS_OWN_PROPERTY = "hasOwnProperty";
 export const SYMBOL = "Symbol";
+export const POLYFILL_TAG = "_polyfill";
 
 /**
  * @ignore

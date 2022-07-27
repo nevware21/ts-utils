@@ -44,6 +44,7 @@
     "main": "dist/umd/ts-utils.js",
     "module": "dist-esm/index.js",
     "types": "types/index.d.ts",    
+    "sideEffects": false,
     "scripts": {
         "build": "grunt ts_utils --verbose && npm run package",
         "rebuild": "npm run build && npm run test && npm run docs",

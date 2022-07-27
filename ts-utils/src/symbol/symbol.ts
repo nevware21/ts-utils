@@ -7,7 +7,7 @@
  */
 
 import { SYMBOL } from "../internal/constants";
-import { polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "../polyfills/symbol";
+import { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "../polyfills/symbol";
 import { WellKnownSymbols, _wellKnownSymbolMap } from "./well_known";
 import { isDefined, _createIs } from "../helpers/base";
 import { getInst, _safeCheck } from "../helpers/environment";
@@ -46,7 +46,7 @@ export function getSymbol(useCached?: boolean): Symbol {
 
 /**
  * If Symbols are supported then get the property of the global Symbol, if Symbol's are
- * not supported then it returns undefined. Used to access the well known symbols.
+ * not supported and noPoly is true it returns null. Used to access the well known symbols.
  * @example
  * ```ts
  * // If Symbol is supported in the runtime
@@ -54,32 +54,37 @@ export function getSymbol(useCached?: boolean): Symbol {
  * getKnownSymbol(WellKnownSymbols.toStringTag) === Symbol.toStringTag; // true
  * ```
  * @param name - The property name to return (if it exists) for Symbol
+ * @param noPoly - Flag indicating whether to return a polyfill if symbols are not supported.
  * @returns The value of the property if present
  */
-export function getKnownSymbol<T>(name: string | WellKnownSymbols): T {
+export function getKnownSymbol<T>(name: string | WellKnownSymbols, noPoly?: boolean): T {
     let knownName = _wellKnownSymbolMap[name];
-    return _symbol ? _symbol[knownName || name] : null;
+    return _symbol ? _symbol[knownName || name] : (!noPoly ? polyGetKnownSymbol(name) : null);
 }
 
 /**
- * Returns a new unique Symbol value.
+ * Returns a new unique Symbol value. If noPoly is true and symbols are not supported
+ * then this will return null.
  * @param  description Description of the new Symbol object.
+ * @param noPoly - Flag indicating whether to return a polyfil if symbols are not supported.
  * @returns The new symbol
  */
-export function newSymbol(description?: string | number): symbol {
-    return _hasSymbol ? Symbol(description) : polyNewSymbol(description);
+export function newSymbol(description?: string | number, noPoly?: boolean): symbol {
+    return _hasSymbol ? Symbol(description) : (!noPoly ? polyNewSymbol(description) : null);
 }
 
 /**
  * Returns a Symbol object from the global symbol registry matching the given key if found.
- * Otherwise, returns a new symbol with this key.
+ * Otherwise, returns a new symbol with this key. This will always return a polyfill if symbols
+ * are not supported.
  * @param key key to search for.
  */
 export let symbolFor = _symbolFor || polySymbolFor;
 
 /**
  * Returns a key from the global symbol registry matching the given Symbol if found.
- * Otherwise, returns a undefined.
+ * Otherwise, returns a undefined. This will always attempt to lookup the polyfill
+ * implementation if symbols are not supported
  * @param sym Symbol to find the key for.
  */
 export let symbolKeyFor = _symbolKeyFor || polySymbolKeyFor;
