@@ -10,7 +10,7 @@ import { isNullOrUndefined } from "../helpers/base";
 import { getGlobal } from "../helpers/environment";
 import { WellKnownSymbols, _wellKnownSymbolMap } from "../symbol/well_known";
 import { throwTypeError } from "../helpers/throw";
-import { SYMBOL } from "../internal/constants";
+import { POLYFILL_TAG, SYMBOL } from "../internal/constants";
 import { objHasOwnProperty } from "../object/has_own_prop";
 
 const POLY_GLOBAL_REGISTORT = "__polySymbols$ts_utils";
@@ -30,11 +30,25 @@ function _globalSymbolRegistry() {
 
 let _wellKnownSymbolCache: { [key in keyof typeof WellKnownSymbols ]: symbol } = {} as any;
 
+/**
+ * Returns a new (polyfill) Symbol object for the provided description that's guaranteed to be unique.
+ * Symbols are often used to add unique property keys to an object that won't collide with keys any
+ * other code might add to the object, and which are hidden from any mechanisms other code will
+ * typically use to access the object. That enables a form of weak encapsulation, or a weak form of
+ * information hiding.
+ * @param description - The description of the symbol
+ * @returns A new polyfill version of a Symbol object
+ */
 export function polyNewSymbol(description?: string | number): symbol {
-    return {
+    let theSymbol: symbol = {
         description: "" + description,
         toString: () => SYMBOL + "(" + description + ")"
     } as symbol;
+
+    // Tag the symbol so we know it a polyfill
+    theSymbol[POLYFILL_TAG] = true;
+
+    return theSymbol;
 }
 
 /**

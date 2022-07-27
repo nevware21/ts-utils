@@ -8,11 +8,16 @@
 
 import { isNullOrUndefined, objToString } from "../helpers/base";
 
-export function polyIsArray<T>(arg: any): arg is T[] {
-    if (isNullOrUndefined(arg)) {
+/**
+ * Polyfill support function for Array.isArray
+ * @param value - The value to be checked
+ * @returns true if the value is an array otherwise false.
+ */
+export function polyIsArray<T>(value: any): value is T[] {
+    if (isNullOrUndefined(value)) {
         return false;
     }
 
-    return objToString(arg) === "[object Array]";
+    return objToString(value) === "[object Array]";
 }
 

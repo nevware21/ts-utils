@@ -100,7 +100,7 @@ export function createCustomError<T extends CustomErrorConstructor = CustomError
  * @internal
  * @ignore
  */
-const _unsupportedError = createCustomError("UnsupportedError");
+let _unsupportedError: CustomErrorConstructor;
 
 /**
  * Throw a custom `UnsupportedError` Error instance with the given message.
@@ -115,5 +115,10 @@ const _unsupportedError = createCustomError("UnsupportedError");
  * ```
  */
 export function throwUnsupported(message?: string): never {
+    if (!_unsupportedError) {
+        // Lazily create the class
+        _unsupportedError = createCustomError("UnsupportedError");
+    }
+
     throw new _unsupportedError(message);
 }

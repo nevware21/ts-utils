@@ -41,3 +41,10 @@ export { strIsNullOrWhiteSpace, strIsNullOrEmpty } from "./string/is_null_or";
 export { strStartsWith } from "./string/starts_with";
 export { strEndsWith } from "./string/ends_with";
 export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";
+
+// Exporting the helpers, but not the "initialization" code to populate any missing values
+// This will enable anyone to "reuse" or create their own polyfills.ts implementation if they want.
+export { polyIsArray } from "./polyfills/array";
+export { polyObjKeys } from "./polyfills/object";
+export { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "./polyfills/symbol";
+export { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "./polyfills/trim";
