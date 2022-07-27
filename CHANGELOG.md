@@ -1,4 +1,12 @@
 
+
+# v0.3.0 Jul, 27th, 2022
+
+## Changelog
+
+- #45 [TreeShaking Issue] The createCustomError is always getting included in the output.
+- #46 [Symbol support] Have the ability to always return the polyfill symbols if not supported
+
 # v0.3.0 Jul, 25th, 2022
 
 ## Changelog
