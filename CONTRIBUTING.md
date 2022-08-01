@@ -4,10 +4,11 @@ Welcome and thank you for your interest in contributing to ts-utils
 
 If making a large change we request that you open an [issue][GitHubIssue] first.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+[Code of Conduct](https://github.com/nevware21/ts-utils/blob/main/CODE_OF_CONDUCT.md)
 
-[ContribGuide]: https://github.com/nevware21/ts-utils/blob/main/CONTRIBUTING.md
-[GitHubIssue]: https://github.com/nevware21/ts-utils/issues
+[Contributing Guide](https://github.com/nevware21/ts-utils/blob/main/CONTRIBUTING.md)
+
+[GitHub Issues](https://github.com/nevware21/ts-utils/issues)
 
 ## Clone and setup
 
