@@ -6,8 +6,11 @@
  * Licensed under the MIT license.
  */
 
-import { PROTOTYPE } from "../internal/constants";
+import { INDEX_OF, PROTOTYPE } from "../internal/constants";
+import { _unwrapFunction } from "../internal/unwrapFunction";
 import { isArray, isUndefined } from "./base";
+
+export type ArrReduceCallbackFn<T, R = T> = (previousValue: T, currentValue: R, currentIndex: number, array: T[]) => R;
 
 /**
  * Calls the provided `callbackFn` function once for each element in an array in ascending index order. It is not invoked for index properties
@@ -56,3 +59,71 @@ export function arrAppend<T = any>(target: T[], elms: any[] | any): T[] {
 
     return target;
 }
+
+/**
+ * The arrIndexOf() method returns the first index at which a given element can be found in the array,
+ * or -1 if it is not present.
+ * `arrIndexOf()` compares searchElement to elements of the Array using strict equality (the same
+ * method used by the === or triple-equals operator).
+ * @typeParam T - Identifies the type of array elements
+ * @param theArray - The array of elements to be searched
+ * @param searchElement - The element to locate in the array.
+ * @param fromIndex - The index to start the search at. If the index is greater than or equal to
+ * the array's length, -1 is returned, which means the array will not be searched. If the provided
+ * index value is a negative number, it is taken as the offset from the end of the array.
+ * Note: if the provided index is negative, the array is still searched from front to back. If the
+ * provided index is 0, then the whole array will be searched. Default: 0 (entire array is searched).
+ * @return The first index of the element in the array; -1 if not found.
+ * @example
+ * ```ts
+ * const array = [2, 9, 9];
+ * arrIndexOf(array, 2);     // 0
+ * arrIndexOf(array, 7);     // -1
+ * arrIndexOf(array, 9, 2);  // 2
+ * arrIndexOf(array, 2, -1); // -1
+ * arrIndexOf(array, 2, -3); // 0
+ *
+ * let indices: number[] = [];
+ * const array = ['a', 'b', 'a', 'c', 'a', 'd'];
+ * const element = 'a';
+ * let idx = arrIndexOf(array, element);
+ * while (idx !== -1) {
+ *   indices.push(idx);
+ *   idx = arrIndexOf(array, element, idx + 1);
+ * }
+ * console.log(indices);
+ * // [0, 2, 4]
+ *
+ * function updateVegetablesCollection (veggies, veggie) {
+ *     if (arrIndexOf(veggies, veggie) === -1) {
+ *         veggies.push(veggie);
+ *         console.log('New veggies collection is : ' + veggies);
+ *     } else {
+ *         console.log(veggie + ' already exists in the veggies collection.');
+ *     }
+ * }
+ *
+ * let veggies = ['potato', 'tomato', 'chillies', 'green-pepper'];
+ *
+ * updateVegetablesCollection(veggies, 'spinach');
+ * // New veggies collection is : potato,tomato,chillies,green-pepper,spinach
+ * updateVegetablesCollection(veggies, 'spinach');
+ * // spinach already exists in the veggies collection.
+ * ```
+ */
+export const arrIndexOf: <T>(theArray: T[], searchElement: T, fromIndex?: number) => number = _unwrapFunction("indexOf");
+
+/**
+ * The arrReduce() method executes a user-supplied "reducer" callback function on each element of the array,
+ * in order, passing in the return value from the calculation on the preceding element. The final result of
+ * running the reducer across all elements of the array is a single value.
+ *
+ * The first time that the callback is run there is no "return value of the previous calculation". If supplied,
+ * an initial value may be used in its place. Otherwise the array element at index 0 is used as the initial
+ * value and iteration starts from the next element (index 1 instead of index 0).
+ * @typeParam T - Identifies the type of array elements
+ * @param theArray - The array of elements to be searched
+ * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+ * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
+ */
+export const arrReduce: <T, R = T>(theArray: T[], callbackfn: ArrReduceCallbackFn<T, R>, initialValue?: T | R) => R = _unwrapFunction("reduce");
