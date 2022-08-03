@@ -9,16 +9,16 @@ module.exports = function (config) {
         hostname: 'localhost',
         frameworks: [ "mocha", "karma-typescript"  ],
         files: [
-            { pattern: "ts-utils/src/**/*.ts" },
-            { pattern: "ts-utils/test/src/browser/**/*.ts" },
-            { pattern: "ts-utils/test/src/common/**/*.ts" }
+            { pattern: "lib/src/**/*.ts" },
+            { pattern: "lib/test/src/browser/**/*.ts" },
+            { pattern: "lib/test/src/common/**/*.ts" }
         ],
         preprocessors: {
-            "ts-utils/src/**/*.ts": [ "karma-typescript" ],
-            "ts-utils/test/src/**/*.ts": [ "karma-typescript" ]
+            "lib/src/**/*.ts": [ "karma-typescript" ],
+            "lib/test/src/**/*.ts": [ "karma-typescript" ]
         },
         karmaTypescriptConfig: {
-            tsconfig: "./ts-utils/test/tsconfig.test.karma.json",
+            tsconfig: "./lib/test/tsconfig.test.karma.json",
             compilerOptions: {
                 sourceMap: true
             },

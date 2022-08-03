@@ -11,11 +11,6 @@ updates:
       interval: "daily"
 
   - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/ts-utils" # Location of package manifests
-    schedule:
-      interval: "daily"
-      
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/ts-poly" # Location of package manifests
+    directory: "/lib" # Location of package manifests
     schedule:
       interval: "daily"

@@ -38,12 +38,12 @@ module.exports = function (grunt) {
                 additionalFlags: "--removeComments"
             },
             "ts_utils": {
-                tsconfig: "./ts-utils/tsconfig.json",
-                outDir: "./ts-utils/dist-esm"
+                tsconfig: "./lib/tsconfig.json",
+                outDir: "./lib/dist-esm"
             },
             "ts_utils-test": {
-                tsconfig: "./ts-utils/test/tsconfig.test.json",
-                outDir: "./ts-utils/test/dist-esm"
+                tsconfig: "./lib/test/tsconfig.test.json",
+                outDir: "./lib/test/dist-esm"
             }
         },
         "lint": {
@@ -52,22 +52,22 @@ module.exports = function (grunt) {
                 suppressWarnings: false
             },
             "ts_utils": {
-                tsconfig: "./ts-utils/tsconfig.json",
+                tsconfig: "./lib/tsconfig.json",
                 ignoreFailures: true
             },
             "ts_utils-test": {
-                tsconfig: "./ts-utils/test/tsconfig.test.json",
+                tsconfig: "./lib/test/tsconfig.test.json",
                 ignoreFailures: true
             },
             "ts_utils-fix": {
                 options: {
-                    tsconfig: "./ts-utils/tsconfig.json",
+                    tsconfig: "./lib/tsconfig.json",
                     fix: true
                 }
             },
             "ts_utils-test-fix": {
                 options: {
-                    tsconfig: "./ts-utils/test/tsconfig.test.json",
+                    tsconfig: "./lib/test/tsconfig.test.json",
                     fix: true
                 }
             }
