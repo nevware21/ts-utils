@@ -1,6 +1,30 @@
 
+# v0.3.2 Aug 3rd, 2022
 
-# v0.3.0 Jul, 27th, 2022
+## Changelog
+
+- [Bug] String trim functions are not exported #51
+  - Added missing exports for
+    - strEndsWith
+    - strPadEnd
+    - strPadStart
+    - strRepeat
+    - strSlice
+    - strTrim
+    - strTrimEnd
+    - strTrimStart
+    - strTrimLeft
+    - strTrimRight
+
+- Added functions
+  - arrIndexOf
+  - arrReduce
+  - strIndexOf
+  - strLastIndexOf
+
+- #53 [Bug] The build generated polyfill bundle is missing from the npm package
+
+# v0.3.1 Jul, 27th, 2022
 
 ## Changelog
 

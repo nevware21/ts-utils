@@ -10,6 +10,6 @@
 !/LICENSE
 !dist-esm/**
 !dist/**
-!browser/**
+!bundle/**
 !src/**
 !types/**
