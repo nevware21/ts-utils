@@ -1,5 +1,6 @@
 import { assert } from "chai";
-import { arrAppend, arrForEach } from "../../../../src/helpers/array";
+import { arrAppend, arrForEach, arrIndexOf } from "../../../../src/helpers/array";
+import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 describe("array helpers", () => {
     describe("arrForEach", () => {
@@ -156,6 +157,78 @@ describe("array helpers", () => {
             assert.equal(target[1], 2, "Should have value of 2");
         });
 
+    });
+
+    describe("arrIndexOf", () => {
+
+        it("with no args", () => {
+            _expectThrow(() => {
+                (arrIndexOf as any)();
+            });
+        });
+
+        it("null / undefined", () => {
+            _expectThrow(() => {
+                arrIndexOf(null as any, null);
+            });
+
+            _expectThrow(() => {
+                arrIndexOf(undefined as any, null);
+            });
+        });
+
+        it("simple example 1", () => {
+            const array = [2, 9, 9];
+            assert.equal(arrIndexOf(array, 2), 0);
+            assert.equal(arrIndexOf(array, 7), -1);
+            assert.equal(arrIndexOf(array, 9, 2), 2);
+            assert.equal(arrIndexOf(array, 2, -1), -1);
+            assert.equal(arrIndexOf(array, 2, -3), 0);
+        });
+        
+        it("example 2", () => {
+            let indices: number[] = [];
+            const array = ["a", "b", "a", "c", "a", "d"];
+            const element = "a";
+            let idx = arrIndexOf(array, element);
+            while (idx !== -1) {
+                indices.push(idx);
+                idx = arrIndexOf(array, element, idx + 1);
+            }
+
+            assert.equal(indices.length, 3, "checking length");
+            assert.equal(indices[0], 0, "1st");
+            assert.equal(indices[1], 2, "2dn");
+            assert.equal(indices[2], 4, "3rd");
+        });
+
+        it("example 3", () => {
+            function updateVegetablesCollection (veggies: string[], veggie: string) {
+                if (veggies.indexOf(veggie) === -1) {
+                    veggies.push(veggie);
+                }
+            }
+            
+            let veggies = ["potato", "tomato", "chillies", "green-pepper"];
+            
+            updateVegetablesCollection(veggies, "spinach");
+
+            assert.equal(veggies.length, 5, "checking length - " + dumpObj(veggies));
+            assert.equal(veggies[0], "potato");
+            assert.equal(veggies[1], "tomato");
+            assert.equal(veggies[2], "chillies");
+            assert.equal(veggies[3], "green-pepper");
+            assert.equal(veggies[4], "spinach");
+
+            // New veggies collection is : potato,tomato,chillies,green-pepper,spinach
+            updateVegetablesCollection(veggies, "spinach");
+            assert.equal(veggies.length, 5, "checking length 2 - " + dumpObj(veggies));
+            assert.equal(veggies[0], "potato");
+            assert.equal(veggies[1], "tomato");
+            assert.equal(veggies[2], "chillies");
+            assert.equal(veggies[3], "green-pepper");
+            assert.equal(veggies[4], "spinach");
+        })
     });
 
     function _expectThrow(cb: () => void): Error {

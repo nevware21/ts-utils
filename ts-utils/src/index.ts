@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-export { arrForEach, arrAppend } from "./helpers/array";
+export { ArrReduceCallbackFn, arrForEach, arrAppend, arrIndexOf, arrReduce } from "./helpers/array";
 export {
     isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isDate, isNumber, isBoolean,
     isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isNotTruthy, isTruthy, objToString,
@@ -23,8 +23,7 @@ export {
     deepExtend, objExtend
 } from "./helpers/extend";
 export { getIntValue } from "./helpers/number";
-export { isSymbol, getSymbol, getKnownSymbol, hasSymbol, newSymbol, symbolFor, symbolKeyFor } from "./symbol/symbol";
-export { WellKnownSymbols } from "./symbol/well_known";
+export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";
 export { hasValue } from "./helpers/value";
 export { mathCeil, mathFloor } from "./math/floor";
 export { mathToInt } from "./math/to_int";
@@ -37,10 +36,16 @@ export {
     objAssign, objKeys, objDeepCopy, objCopyProps, objDeepFreeze, objFreeze, objSeal
 } from "./object/object";
 export { objSetPrototypeOf } from "./object/set_proto";
-export { strIsNullOrWhiteSpace, strIsNullOrEmpty } from "./string/is_null_or";
-export { strStartsWith } from "./string/starts_with";
 export { strEndsWith } from "./string/ends_with";
-export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";
+export { strIndexOf, strLastIndexOf } from "./string/index_of";
+export { strIsNullOrWhiteSpace, strIsNullOrEmpty } from "./string/is_null_or";
+export { strPadEnd, strPadStart } from "./string/pad";
+export { strRepeat } from "./string/repeat";
+export { strSlice } from "./string/slice";
+export { strStartsWith } from "./string/starts_with";
+export { strTrim, strTrimEnd, strTrimLeft, strTrimRight, strTrimStart } from "./string/trim";
+export { isSymbol, getSymbol, getKnownSymbol, hasSymbol, newSymbol, symbolFor, symbolKeyFor } from "./symbol/symbol";
+export { WellKnownSymbols } from "./symbol/well_known";
 
 // Exporting the helpers, but not the "initialization" code to populate any missing values
 // This will enable anyone to "reuse" or create their own polyfills.ts implementation if they want.
