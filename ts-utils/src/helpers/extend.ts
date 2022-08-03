@@ -9,6 +9,10 @@
 import { arrForEach } from "./array";
 import { objCopyProps, objDeepCopy } from "../object/object";
 
+/**
+ * @internal
+ * @ignore
+ */
 function _doExtend<T>(target: T, theArgs: any[]) {
     arrForEach(theArgs, (theArg) => {
         objCopyProps(target, theArg);
