@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-export { ArrReduceCallbackFn, arrForEach, arrAppend, arrIndexOf, arrReduce } from "./helpers/array";
+export { ArrReduceCallbackFn, ArrMapCallbackFn, arrForEach, arrAppend, arrIndexOf, arrReduce, arrMap } from "./helpers/array";
 export {
     isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isDate, isNumber, isBoolean,
     isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isNotTruthy, isTruthy, objToString,

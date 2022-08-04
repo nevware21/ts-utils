@@ -22,4 +22,3 @@ export function polyIsArray<T>(value: any): value is T[] {
 
     return objToString(value) === "[object Array]";
 }
-

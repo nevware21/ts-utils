@@ -6,17 +6,36 @@
  * Licensed under the MIT license.
  */
 
-import { PROTOTYPE } from "../internal/constants";
+import { ArrProto, MAP } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 import { isArray, isUndefined } from "./base";
 
 /**
- * Callback signature for the {@link arrReduce} function.
+ * The `reducer` function called for {@link arrReduce}.
  * @group Array
  * @typeParam T - Identifies the type of array elements
  * @typeParam R - Identifies the type of the return array elements (defaults to T)
+ * @param previousValue - The value resulting from the previous call to callbackFn. On first call, initialValue if
+ * specified, otherwise the value of array[0].
+ * @param currentValue - The value of the current element. On first call, the value of array[0] if an initialValue
+ * was specified, otherwise the value of array[1].
+ * @param currentIndex - The index position of currentValue in the array. On first call, 0 if initialValue was
+ * specified, otherwise 1.
+ * @param array -The array being traversed.
  */
 export type ArrReduceCallbackFn<T, R = T> = (previousValue: T, currentValue: R, currentIndex: number, array: T[]) => R;
+
+/**
+ * Callback signature for {@link arrMap} that is called for every element of array. Each time callbackFn
+ * executes, the returned value is added to newArray.
+ * @group Array
+ * @typeParam T - Identifies the type of the array elements
+ * @typeParam R - Identifies the type of the elements returned by the callback function, defaults to T.
+ * @param value - The current element being processed in the array.
+ * @param index - The index of the current element being processed in the array.
+ * @param array - The array that the `map` function was called on.
+ */
+export type ArrMapCallbackFn<T, R = T> = (value: T, index?: number, array?: T[]) => R;
 
 /**
  * Calls the provided `callbackFn` function once for each element in an array in ascending index order. It is not invoked for index properties
@@ -84,7 +103,7 @@ export function arrForEach<T>(arr: T[], callbackfn: (value: T, index?: number, a
 export function arrAppend<T>(target: T[], elms: any[] | any): T[] {
     if (!isUndefined(elms) && target) {
         if (isArray(elms)) {
-            Array[PROTOTYPE].push.apply(target, elms);
+            ArrProto.push.apply(target, elms);
         } else {
             target.push(elms);
         }
@@ -162,3 +181,45 @@ export const arrIndexOf: <T>(theArray: T[], searchElement: T, fromIndex?: number
  * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
  */
 export const arrReduce: <T, R = T>(theArray: T[], callbackfn: ArrReduceCallbackFn<T, R>, initialValue?: T | R) => R = _unwrapFunction("reduce");
+
+
+/**
+ * The arrMap() method creates a new array populated with the results of calling a provided function on every
+ * element in the calling array.
+ *
+ * `arrMap` calls a provided callbackFn function once for each element in an array, in order, and constructs
+ * a new array from the results. callbackFn is invoked only for indexes of the array which have assigned
+ * values (including undefined).
+ *
+ * It is not called for missing elements of the array; that is:
+ * - indexes that have never been set;
+ * - indexes which have been deleted.
+ * @group Array
+ * @typeParam T - Identifies the type of the array elements
+ * @typeParam R - Identifies the type of the elements returned by the callback function, defaults to T.
+ * @param theArray
+ * @param callbackFn - The function that is called for evetn element of `theArray`.
+ * @param thisArg - The value to use as the `this` when executing the `callbackFn`.
+ * @example
+ * ```ts
+ * const numbers = [1, 4, 9];
+ * const roots = arrMap(numbers, (num) => Math.sqrt(num));
+ *
+ * // roots is now     [1, 2, 3]
+ * // numbers is still [1, 4, 9]
+ *
+ * const kvArray = [{ key: 1, value: 10 },
+ *                  { key: 2, value: 20 },
+ *                  { key: 3, value: 30 }];
+ *
+ * const reformattedArray = arrMap(kvArray, ({ key, value}) => ({ [key]: value }));
+ *
+ * // reformattedArray is now [{1: 10}, {2: 20}, {3: 30}],
+ *
+ * // kvArray is still:
+ * // [{key: 1, value: 10},
+ * //  {key: 2, value: 20},
+ * //  {key: 3, value: 30}]
+ * ```
+ */
+export const arrMap: <T, R = T>(theArray: T[], callbackFn: ArrMapCallbackFn<T, R>, thisArg?: any) => R[] = _unwrapFunction(MAP);

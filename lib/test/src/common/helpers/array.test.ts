@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { arrAppend, arrForEach, arrIndexOf } from "../../../../src/helpers/array";
+import { arrAppend, arrForEach, arrIndexOf, arrMap, arrReduce } from "../../../../src/helpers/array";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 describe("array helpers", () => {
@@ -229,6 +229,49 @@ describe("array helpers", () => {
             assert.equal(veggies[3], "green-pepper");
             assert.equal(veggies[4], "spinach");
         })
+    });
+
+    describe("arrReduce", () => {
+        it("example", () => {
+
+            const getMax = (a: number, b: number) => Math.max(a, b);
+
+            // callback is invoked for each element in the array starting at index 0
+            assert.equal(arrReduce([1, 100], getMax, 50), 100);
+            assert.equal(arrReduce([    50], getMax, 10), 50); // 50
+
+            // callback is invoked once for element at index 1
+            assert.equal(arrReduce([1, 100], getMax), 100);     // 100
+
+            // callback is not invoked
+            assert.equal(arrReduce([    50], getMax), 50);     // 50
+            assert.equal(arrReduce([      ], getMax, 1), 1);  // 1
+            _expectThrow(() => {
+                arrReduce([      ], getMax);     // TypeError
+            });
+        });
+    });
+
+    describe("arrMap", () => {
+        it("example", () => {
+            const kvArray = [
+                { key: 1, value: 10 },
+                { key: 2, value: 20 },
+                { key: 3, value: 30 }
+            ];
+
+            const reformattedArray = arrMap(kvArray, ({ key, value}) => ({ [key]: value }));
+
+            assert.equal(reformattedArray.length, 3);
+            assert.equal(JSON.stringify(reformattedArray), "[{\"1\":10},{\"2\":20},{\"3\":30}]");
+            assert.equal(JSON.stringify(kvArray), "[{\"key\":1,\"value\":10},{\"key\":2,\"value\":20},{\"key\":3,\"value\":30}]");
+
+            // kvArray is still:
+            // [{key: 1, value: 10},
+            //  {key: 2, value: 20},
+            //  {key: 3, value: 30}]
+        });
+        
     });
 
     function _expectThrow(cb: () => void): Error {

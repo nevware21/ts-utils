@@ -24,6 +24,7 @@ export const SYMBOL = "Symbol";
 export const POLYFILL_TAG = "_polyfill";
 export const INDEX_OF = "indexOf";
 export const LAST_INDEX_OF = "lastIndexOf";
+export const MAP = "map";
 
 /**
  * @ignore
@@ -44,3 +45,13 @@ export const StrProto = String[PROTOTYPE];
  * @ignore
  */
 export const MathCls = Math;
+
+/**
+ * @ignore
+ */
+export const ArrCls = Array;
+
+/**
+ * @ignore
+ */
+export const ArrProto = ArrCls[PROTOTYPE];
