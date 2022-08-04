@@ -104,10 +104,11 @@ export const isFunction = _createIs<Function>(FUNCTION);
 
 /**
  * Checks to see if the past value is an object value
+ * @typeParam T - The object type, defaults to any
  * @param value - The value to check
  * @returns
  */
-export function isObject(value: any): value is object {
+export function isObject<T>(value: T): value is T {
     if (isNullOrUndefined(value)) {
         return false;
     }
@@ -134,7 +135,7 @@ export function isObject(value: any): value is object {
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a Array, false otherwise.
  */
-export const isArray = Array.isArray;
+export const isArray: <T = any>(arg: any) => arg is Array<T> = Array.isArray;
 
 /**
  * Check if an object is of type Date

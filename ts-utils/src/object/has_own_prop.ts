@@ -8,6 +8,6 @@
 
 import { HAS_OWN_PROPERTY, ObjProto } from "../internal/constants";
 
-export function objHasOwnProperty(obj: any, prop: string): boolean {
+export function objHasOwnProperty<T = any>(obj: T, prop: PropertyKey): boolean {
     return obj && ObjProto[HAS_OWN_PROPERTY].call(obj, prop);
 }

@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
-import { isObject, isUndefined } from "../../../../src/helpers/base";
+import { isObject, isString, isUndefined } from "../../../../src/helpers/base";
 import { objForEachKey } from "../../../../src/object/for_each_key";
 import { objHasOwnProperty } from "../../../../src/object/has_own_prop";
 import { objDeepFreeze, objFreeze, objKeys } from "../../../../src/object/object";
@@ -72,9 +72,11 @@ describe("object helpers", () => {
 
         let keys: string[] = [];
         objForEachKey(src, (key, value) => {
-            keys.push(key);
-            assert.ok(objHasOwnProperty(src, key));
-            assert.equal(value, src[key]);
+            if (isString(key)) {
+                keys.push(key);
+                assert.ok(objHasOwnProperty(src, key));
+                assert.equal(value, src[key]);
+            }
         });
         assert.equal(keys.length, 2, "Expected 2 keys - " + dumpObj(keys));
 

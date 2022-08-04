@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { INDEX_OF, PROTOTYPE } from "../internal/constants";
+import { PROTOTYPE } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 import { isArray, isUndefined } from "./base";
 
@@ -48,7 +48,7 @@ export function arrForEach<T>(arr: T[], callbackfn: (value: T, index?: number, a
  * @param target - The target array
  * @param elms - The item or items to add to the target
  */
-export function arrAppend<T = any>(target: T[], elms: any[] | any): T[] {
+export function arrAppend<T>(target: T[], elms: any[] | any): T[] {
     if (!isUndefined(elms) && target) {
         if (isArray(elms)) {
             Array[PROTOTYPE].push.apply(target, elms);
