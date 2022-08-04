@@ -7,7 +7,7 @@
     "all": true,
     "check-coverage": false,
     "reporter": [ "text", "html" ],
-    "include": [ "ts-utils/src/**/*.ts" ],
+    "include": [ "lib/src/**/*.ts" ],
     "exclude": [ 
         "**/src/index.ts", 
         "**/src/polyfills.ts", 

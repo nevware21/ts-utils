@@ -1,19 +1,25 @@
 {
     "$schema": "https://typedoc.org/schema.json",
-    "entryPoints": [ "./ts-utils/src/index.ts" ],
+    "entryPoints": [ "./lib/src/index.ts" ],
     "exclude": [ "**/internal/**/*.ts", "polyfill.ts", "node_modules/**" ],
     "externalPattern": [
         "**/node_modules/**",
         "node_modules/**"
     ],
+    "sort": [
+        "alphabetical",
+        "kind",
+        "instance-first"
+    ],
+    "basePath": "./",
     "excludeExternals": true,
     "excludeInternal": true,
     "excludePrivate": true,
-    "entryPointStrategy": "expand",
-    "tsconfig": "./ts-utils/tsconfig.json",
+    "tsconfig": "./lib/tsconfig.json",
     "out": "./docs/typedoc",
     "readme": "none",
     "githubPages": true,
+    "gitRevision": "main",
     "compilerOptions": {
         "stripInternal": true
     }
