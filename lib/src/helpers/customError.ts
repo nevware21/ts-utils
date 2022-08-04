@@ -11,8 +11,8 @@ import { objSetPrototypeOf } from "../object/set_proto";
 
 /**
  * Defines the definition of the custom error constructor
- *
  * Used by: {@link createCustomError}
+ * @group Error
  */
 export interface CustomErrorConstructor extends Error {
     new(message?: string): Error;
@@ -38,6 +38,7 @@ function _createCustomError(name: string, d: any, b: any) {
 
 /**
  * Create a Custom Error class which may be used to throw custom errors.
+ * @group Error
  * @param name - The name of the Custom Error
  * @param constructCb - [Optional] An optional callback function to call when a
  * new Customer Error instance is being created.
@@ -104,6 +105,7 @@ let _unsupportedError: CustomErrorConstructor;
 
 /**
  * Throw a custom `UnsupportedError` Error instance with the given message.
+ * @group Error
  * @param message - The message to include in the exception
  * @example
  * ```ts

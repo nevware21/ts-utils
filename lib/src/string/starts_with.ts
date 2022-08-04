@@ -13,6 +13,7 @@ const _strStartsWith = StrProto.startsWith;
 
 /**
  * This method lets you determine whether or not a string begins with another string. This method is case-sensitive.
+ * @group String
  * @param value - The value to be checked
  * @param searchString - The characters to be searched for at the start of the string
  * @param position - [Optional] The position in this string at which to begin searching for `searchString`.
@@ -27,6 +28,8 @@ export function strStartsWith(value: string, searchString: string, position?: nu
 
 /**
  * This method lets you determine whether or not a string begins with another string. This method is case-sensitive.
+ * @group Polyfill
+ * @group String
  * @param value - The value to be checked
  * @param searchString - The characters to be searched for at the start of the string
  * @param position - [Optional] The position in this string at which to begin searching for `searchString`.

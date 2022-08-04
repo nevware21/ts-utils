@@ -17,6 +17,7 @@ const _mathTrunc = MathCls.trunc;
  * works is very simple. It truncates (cuts off) the dot and the digits to the right of it, no matter
  * whether the argument is a positive or negative number.
  * The argument passed to this method will be converted to number type implicitly.
+ * @group Math
  * @param value - The value to be truncated
  * @returns The integer path of the given number
  */
@@ -28,6 +29,8 @@ export const mathTrunc = _mathTrunc ? _mathTrunc : polyMathTrunc;
  * works is very simple. It truncates (cuts off) the dot and the digits to the right of it, no matter
  * whether the argument is a positive or negative number.
  * The argument passed to this method will be converted to number type implicitly.
+ * @group Polyfill
+ * @group Math
  * @param value - The value to be truncated
  * @returns The integer path of the given number
  */

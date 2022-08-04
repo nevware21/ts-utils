@@ -12,6 +12,7 @@ import { createEnumKeyMap } from "../helpers/enum";
  * enum to aid in minification when fetching them from the global symbol implementation.
  *
  * See: [Well Known Symbols](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Symbol#well-known_symbols)
+ * @group Symbol
  */
 export const enum WellKnownSymbols {
     /**

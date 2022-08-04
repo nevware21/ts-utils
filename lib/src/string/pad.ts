@@ -41,6 +41,7 @@ function _padValue(value: string, targetLength: number, padString?: string) {
  * until the resulting string reaches the given length. The padding is applied from the start of the
  * current string. This will use any native implementation if available, but will fall back to the
  * provided polyfill for runtimes that don't support [padStart](https://caniuse.com/?search=padStart)
+ * @group String
  * @param value - The value to be padded
  * @param targetLength - The length of the resulting string once the current str has been padded.
  * If the value is less than str.length, then str is returned as-is.
@@ -55,6 +56,7 @@ export function strPadStart(value: string, targetLength: number, padString?: str
 /**
  * The `strPadEnd()` method pads the current string with a given string (repeated, if needed) so that
  * the resulting string reaches a given length. The padding is applied from the end of the current string.
+ * @group String
  * @param value - The value to be padded
  * @param targetLength - The length of the resulting string once the current `value`` has been padded. If
  * the `targetLength` is lower than `value.length`, the current string will be returned as-is.
@@ -71,6 +73,8 @@ export function strPadEnd(value: string, targetLength: number, padString?: strin
  * The `strPadStart()` method pads the current string with another string (multiple times, if needed)
  * until the resulting string reaches the given length. The padding is applied from the start of the
  * current string. Provided for runtimes that don't support see [padStart](https://caniuse.com/?search=padStart)
+ * @group Polyfill
+ * @group String
  * @param value - The value to be padded
  * @param targetLength - The length of the resulting string once the current str has been padded.
  * If the value is less than str.length, then str is returned as-is.
@@ -85,6 +89,8 @@ export function polyStrPadStart(value: string, targetLength: number, padString?:
 /**
  * The `strPadEnd()` method pads the current string with a given string (repeated, if needed) so that
  * the resulting string reaches a given length. The padding is applied from the end of the current string.
+ * @group Polyfill
+ * @group String
  * @param value - The value to be padded
  * @param targetLength - The length of the resulting string once the current `value`` has been padded. If
  * the `targetLength` is lower than `value.length`, the current string will be returned as-is.

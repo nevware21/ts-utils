@@ -12,6 +12,7 @@ import { mathTrunc } from "./trunc";
 
 /**
  * Convert the provided value to an integer
+ * @group Math
  * @param value - The value to be converted to an integer.
  * @param throwInfinity - [Optional] Throws RangeError if value is Infinity, defaults to false
  * @returns The value converted to an integer

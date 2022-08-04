@@ -10,6 +10,8 @@ import { isNullOrUndefined, objToString } from "../helpers/base";
 
 /**
  * Polyfill support function for Array.isArray
+ * @group Polyfill
+ * @group Array
  * @param value - The value to be checked
  * @returns true if the value is an array otherwise false.
  */

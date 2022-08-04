@@ -26,12 +26,25 @@ export function _createObjIs<T>(theType: string): (value: any) => value is T {
     }
 }
 
+/**
+ * The `objToString()` method returns a string representing the object. This explicitly
+ * always calls the `Object.prototype.toString()` method.
+ *
+ * An object's toString() method is most commonly invoked when that object undergoes:
+ * - explicit type conversion to a string (for example, String(myObject))
+ * - implicit type coercion into a string (for example, myObject + "hello world")
+ *
+ * @group Object
+ * @param value - The object to be converted into a string
+ * @returns A string representation of the object
+ */
 export function objToString(value: any): string {
     return ObjProto.toString.call(value);
 }
 
 /**
  * Validate if the provided value object is of the expected type
+ * @group Type Identity
  * @param value - The value to check
  * @param theType - The expected type name as a string
  * @returns
@@ -42,6 +55,8 @@ export function isTypeof(value: any, theType: string): boolean {
 
 /**
  * Checks if the provided value is undefined or contains the string value "undefined".
+ * @group Type Identity
+ * @group Value Check
  * @param value - The value to check
  * @returns
  */
@@ -52,6 +67,8 @@ export function isUndefined(value: any) {
 /**
  * Checks if the provided value is undefined, a string value of "undefined" is NOT considered
  * to be undefined.
+ * @group Type Identity
+ * @group Value Check
  * @param value - The value to check
  * @returns true if the typeof value === UNDEFINED
  */
@@ -61,6 +78,8 @@ export function isStrictUndefined(arg: any): arg is undefined {
 
 /**
  * Checks if the provided value is null, undefined or contains the string value of "undefined".
+ * @group Type Identity
+ * @group Value Check
  * @param value - The value to check
  * @returns
  */
@@ -71,6 +90,8 @@ export function isNullOrUndefined(value:  any): boolean {
 /**
  * Checks if the provided value is null, undefined only, a string value of "undefined" is NOT considered
  * to be undefined.
+ * @group Type Identity
+ * @group Value Check
  * @param value - The value to check
  * @returns
  */
@@ -81,6 +102,7 @@ export function isStrictNullOrUndefined(value: any): boolean {
 /**
  * Checks if the passed value is defined, which means it has any value and is not undefined.
  * A string value of "undefined" is considered to be defined.
+ * @group Value Check
  * @param arg - The value to check
  * @returns true if arg has a value (is not === undefined)
  */
@@ -90,6 +112,8 @@ export function isDefined(arg: any): boolean {
 
 /**
  * Checks to see if the past value is a string value
+ * @group Type Identity
+ * @group String
  * @param value - The value to check
  * @returns
  */
@@ -97,6 +121,7 @@ export const isString: (value: any) => value is string = _createIs<string>(STRIN
 
 /**
  * Checks to see if the past value is a function value
+ * @group Type Identity
  * @param value - The value to check
  * @returns
  */
@@ -104,6 +129,8 @@ export const isFunction: (value: any) => value is Function = _createIs<Function>
 
 /**
  * Checks to see if the past value is an object value
+ * @group Type Identity
+ * @group Object
  * @typeParam T - The object type, defaults to any
  * @param value - The value to check
  * @returns
@@ -119,6 +146,10 @@ export function isObject<T>(value: T): value is T {
 /**
  * Checks if the type of value is an Array.
  *
+ * @group Type Identity
+ * @group Array
+ * @param {any} value - Value to be checked.
+ * @return {boolean} True if the value is a Array, false otherwise.
  * @example
  * ```ts
  * import { isArray, isObject } from "@nevware21/ts-utils";
@@ -131,14 +162,12 @@ export function isObject<T>(value: T): value is T {
  *     }
  * }
  * ```
- *
- * @param {any} value - Value to be checked.
- * @return {boolean} True if the value is a Array, false otherwise.
  */
 export const isArray: <T = any>(arg: any) => arg is Array<T> = Array.isArray;
 
 /**
  * Check if an object is of type Date
+ * @group Type Identity
  * @example
  * ```ts
  * import { isDate } from "@nevware21/ts-utils";
@@ -156,6 +185,7 @@ export const isDate: (value: any) => value is Date = _createObjIs<Date>("[object
 
 /**
  * Checks if the type of value is a number.
+ * @group Type Identity
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a number, false otherwise.
  */
@@ -163,6 +193,7 @@ export const isNumber: (value: any) => value is number = _createIs<number>(NUMBE
 
 /**
  * Checks if the type of value is a boolean.
+ * @group Type Identity
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a boolean, false otherwise.
  */
@@ -170,6 +201,7 @@ export const isBoolean: (value: any) => value is boolean = _createIs<boolean>(BO
 
 /**
  * Determines if a value is a regular expression object.
+ * @group Type Identity
  * @param {*} value Reference to check.
  * @returns {boolean} True if `value` is a `RegExp`.
  */
@@ -177,6 +209,7 @@ export const isRegExp: (value: any) => value is RegExp = _createObjIs<RegExp>("[
 
 /**
  * Checks if the type of value is a File object.
+ * @group Type Identity
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a File, false otherwise.
  */
@@ -184,6 +217,7 @@ export const isFile: (value: any) => value is File = _createObjIs<File>("[object
 
 /**
  * Checks if the type of value is a FormData object.
+ * @group Type Identity
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a FormData, false otherwise.
  */
@@ -191,6 +225,7 @@ export const isFormData: (value: any) => value is FormData = _createObjIs<FormDa
 
 /**
  * Checks if the type of value is a Blob object.
+ * @group Type Identity
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a Blob, false otherwise.
  */
@@ -198,6 +233,7 @@ export const isBlob: (value: any) => value is Blob = _createObjIs<Blob>("[object
 
 /**
  * Checks if the type of value is a ArrayBuffer object.
+ * @group Type Identity
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a ArrayBuffer, false otherwise.
  */
@@ -205,6 +241,8 @@ export const isArrayBuffer: (value: any) => value is ArrayBuffer = _createObjIs<
 
 /**
  * Checks if the type of value is a Error object.
+ * @group Type Identity
+ * @group Error
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a Error, false otherwise.
  */
@@ -212,6 +250,7 @@ export const isError: (value: any) => value is Error = _createObjIs<Error>("[obj
 
 /**
  * Checks if the type of value is a PromiseLike instance (contains a then function).
+ * @group Type Identity
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a PromiseLike, false otherwise.
  */
@@ -221,6 +260,7 @@ export function isPromiseLike<T>(value: any): value is PromiseLike<T> {
 
 /**
  * Checks if the type of value is a Promise instance (contains then and catch functions).
+ * @group Type Identity
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a Promise, false otherwise.
  */
@@ -231,6 +271,7 @@ export function isPromise<T>(value: any): value is Promise<T> {
 /**
  * Checks if the type of value does not evaluate to true value, handling some special
  * case usages of Boolean(true/false) and new Boolean(true/false).
+ * @group Value Check
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is not truthy, false otherwise.
  */
@@ -241,6 +282,7 @@ export function isNotTruthy(value: any) {
 /**
  * Checks if the type of value evaluates to true value, handling some special
  * case usages of Boolean(true/false) and new Boolean(true/false).
+ * @group Value Check
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is not truthy, false otherwise.
  */

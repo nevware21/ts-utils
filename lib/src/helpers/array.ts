@@ -10,6 +10,12 @@ import { PROTOTYPE } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 import { isArray, isUndefined } from "./base";
 
+/**
+ * Callback signature for the {@link arrReduce} function.
+ * @group Array
+ * @typeParam T - Identifies the type of array elements
+ * @typeParam R - Identifies the type of the return array elements (defaults to T)
+ */
 export type ArrReduceCallbackFn<T, R = T> = (previousValue: T, currentValue: R, currentIndex: number, array: T[]) => R;
 
 /**
@@ -19,9 +25,35 @@ export type ArrReduceCallbackFn<T, R = T> = (previousValue: T, currentValue: R, 
  *
  * The range (number of elements) processed by arrForEach() is set before the first call to the `callbackFn`. Any elements added beyond the range
  * or elements which as assigned to indexes already processed will not be visited by the `callbackFn`.
- * @param callbackfn  A function that accepts up to three arguments. arrForEach calls the callbackfn function one time for each element in the array.
- * @param thisArg  [Optional] An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, null or undefined
+ * @group Array
+ * @typeParam T - Identifies the element type of the array
+ * @param callbackfn A `synchronous` function that accepts up to three arguments. arrForEach calls the callbackfn function one time for each element in the array.
+ * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, null or undefined
  * the array will be used as the this value.
+ * @remarks
+ * arrForEach expects a `synchronous` function.
+ * arrForEach does not wait for promises. Make sure you are aware of the implications while using promises (or async functions) as forEach callback.
+ * @example
+ * ```ts
+ * const items = ['item1', 'item2', 'item3'];
+ * const copyItems = [];
+ *
+ * // before using for loop
+ * for (let i = 0; i < items.length; i++) {
+ *   copyItems.push(items[i]);
+ * }
+ *
+ * // before using forEach()
+ * items.forEach((item) => {
+ *   copyItems.push(item);
+ * });
+ *
+ * // after
+ * arrForEach(items, (item) => {
+ *   copyItems.push(item);
+ *   // May return -1 to abort the iteration
+ * });
+ * ```
  */
 export function arrForEach<T>(arr: T[], callbackfn: (value: T, index?: number, array?: T[]) => void | number, thisArg?: any): void {
     if (arr) {
@@ -38,6 +70,7 @@ export function arrForEach<T>(arr: T[], callbackfn: (value: T, index?: number, a
 
 /**
  * Appends the `elms` to the `target` where the elms may be an array or single object
+ * @group Array
  * @example
  * ```ts
  * let theArray = arrAppend([], 1);
@@ -65,6 +98,7 @@ export function arrAppend<T>(target: T[], elms: any[] | any): T[] {
  * or -1 if it is not present.
  * `arrIndexOf()` compares searchElement to elements of the Array using strict equality (the same
  * method used by the === or triple-equals operator).
+ * @group Array
  * @typeParam T - Identifies the type of array elements
  * @param theArray - The array of elements to be searched
  * @param searchElement - The element to locate in the array.
@@ -121,6 +155,7 @@ export const arrIndexOf: <T>(theArray: T[], searchElement: T, fromIndex?: number
  * The first time that the callback is run there is no "return value of the previous calculation". If supplied,
  * an initial value may be used in its place. Otherwise the array element at index 0 is used as the initial
  * value and iteration starts from the next element (index 1 instead of index 0).
+ * @group Array
  * @typeParam T - Identifies the type of array elements
  * @param theArray - The array of elements to be searched
  * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.

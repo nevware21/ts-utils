@@ -30,6 +30,7 @@ const _isNode: boolean = _safeCheck(() => !!(process && (process.versions||{}).n
 
 /**
  * @ignore
+ * @internal
  * Internal helper for safely checking whether types exist
  * @param cb - Callback function be wrapped with an exception
  * @param defValue - The default value to return when an exception is thrown
@@ -57,6 +58,7 @@ export function _safeCheck<T = boolean>(cb: () => T, defValue: T) {
  * While the return type is a Window for the normal case, not all environments will support all
  * of the properties or functions. And this caches the lookup of the global as in some environments
  * this can be an expensive operation.
+ * @group Environment
  * @param useCached - [Optional] used for testing to bypass the cached lookup, when `true` this will
  * cause the cached global to be reset.
  */
@@ -88,6 +90,7 @@ export function getGlobal(useCached?: boolean): Window {
 
 /**
  * Return the named global object if available, will return null if the object is not available.
+ * @group Environment
  * @param name The globally named object
  * @param useCached - [Optional] used for testing to bypass the cached lookup, when `true` this will
  * cause the cached global to be reset.
@@ -109,6 +112,7 @@ export function getInst<T>(name: string, useCached?: boolean): T {
 
 /**
  * Identify whether the runtime contains a `document` object
+ * @group Environment
  * @returns - True if a `document` exists
  */
 export function hasDocument(): boolean {
@@ -117,6 +121,7 @@ export function hasDocument(): boolean {
 
 /**
  * Return the global `document` instance.
+ * @group Environment
  * @returns
  */
 export function getDocument(): Document {
@@ -125,6 +130,7 @@ export function getDocument(): Document {
 
 /**
  * Identify whether the runtime contains a `window` object
+ * @group Environment
  * @returns
  */
 export function hasWindow(): boolean {
@@ -133,6 +139,7 @@ export function hasWindow(): boolean {
 
 /**
  * Return the global `window` instance.
+ * @group Environment
  * @returns
  */
 export function getWindow(): Window {
@@ -141,6 +148,7 @@ export function getWindow(): Window {
 
 /**
  * Identify whether the runtimne contains a `navigator` object
+ * @group Environment
  * @returns
  */
 export function hasNavigator(): boolean {
@@ -149,6 +157,7 @@ export function hasNavigator(): boolean {
 
 /**
  * Returns the global `navigator` instance
+ * @group Environment
  * @returns
  */
 export function getNavigator(): Navigator {
@@ -157,6 +166,7 @@ export function getNavigator(): Navigator {
 
 /**
  * Identifies whether the runtime contains a `history` object
+ * @group Environment
  * @returns
  */
 export function hasHistory(): boolean {
@@ -165,6 +175,7 @@ export function hasHistory(): boolean {
 
 /**
  * Returns the global `history` instance
+ * @group Environment
  * @returns
  */
 export function getHistory(): History | null {
@@ -173,6 +184,7 @@ export function getHistory(): History | null {
 
 /**
  * Simple method to determine if we are running in a node environment
+ * @group Environment
  * @returns True if you are
  */
 export function isNode(): boolean {
@@ -181,6 +193,7 @@ export function isNode(): boolean {
 
 /**
  * Helper to identify if you are running as a Dedicated, Shared or Service worker
+ * @group Environment
  * @returns True if the environment you are in looks like a Web Worker
  */
 export function isWebWorker(): boolean {

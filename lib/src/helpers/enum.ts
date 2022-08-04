@@ -11,6 +11,7 @@ import { objDeepFreeze } from "../object/object";
 
 /**
  * A type that identifies an enum class generated from a constant enum.
+ * @group Enum
  * @typeParam E - The constant enum type
  *
  * Returned from {@link createEnum}
@@ -19,6 +20,7 @@ export declare type EnumCls<E = any> = { readonly [key in keyof E extends string
 
 /**
  * A type that identifies an object whose property values are generally mapped to the key of the source type.
+ * @group Enum
  * @typeParam E - The source constant enum type which isendifies the keys and values
  * @typeParam I - The resulting set of keys from the source type.
  *
@@ -28,6 +30,7 @@ export declare type EnumNameMap<E = any, I = keyof E> = { readonly [key in keyof
 
 /**
  * A type that identifies an object whose property values are mapped to the resulting values of the source objects keys.
+ * @group Enum
  * @typeParam E - The source type which identifies the keys.
  * @typeParam V - The resulting set of keys from the source type.
  *
@@ -37,6 +40,7 @@ export declare type EnumValueMap<E = any, V = E[keyof E]> = { readonly [key in k
 
 /**
  * A type that maps the keys of E to the type of V.
+ * @group Enum
  * @typeParam E - The type of object that defines the Key (typically a constant enum)
  * @typeParam V - The value type, typically `string`, `number` but may also be a complex type.
  *
@@ -47,6 +51,7 @@ export declare type EnumTypeMap<E, V> = { readonly [key in keyof E extends strin
 /**
  * Create a TypeScript style enum class which is a mapping that maps from the key -> value and the value -> key.
  * This is effectively the same as defining a non-constant enum, but this only repeats the "Name" of the enum value once.
+ * @group Enum
  * @example
  * ```ts
  * const enum Animal {
@@ -87,6 +92,7 @@ export function createEnum<E>(values: { [key in keyof E]: E[keyof E] }): EnumCls
 /**
  * Create a map object which contains both the property key and value which both map to the key,
  * E[key] => key and E[value] => key.
+ * @group Enum
  * @example
  * ```ts
  * const enum Animal {
@@ -130,6 +136,7 @@ export function createEnumKeyMap<E>(values: { [key in keyof E]: E[keyof E] }): E
 /**
  * Create a map object which contains both the perperty key and value which both map to the resulting value,
  * E[key] => value and E[value] => value.
+ * @group Enum
  * @example
  * ```ts
  * const enum Animal {
@@ -175,6 +182,7 @@ export function createEnumValueMap<E>(values: { [key in keyof E]: E[keyof E] }):
 /**
  * Create a map object which contains both the perperty key and value which both map to the requested
  * generic mapValue with a type of V, E[key] => mapValue and E[value] => mapValue.
+ * @group Enum
  * @example
  * ```ts
  * const enum Animal {
@@ -220,6 +228,7 @@ export function createSimpleMap<E, V>(values: { [key in keyof E]: [ E[keyof E], 
  * - E = the const enum type (typeof Animal);
  * - V = Identifies the valid values for the keys, this should include both the enum numeric and string key of the type. The
  * resulting "Value" of each entry identifies the valid values withing the assignments.
+ * @group Enum
  * @example
  * ```ts
  * // Create a strongly types map

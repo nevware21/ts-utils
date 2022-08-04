@@ -6,6 +6,11 @@
         "**/node_modules/**",
         "node_modules/**"
     ],
+    "sort": [
+        "alphabetical",
+        "kind",
+        "instance-first"
+    ],
     "basePath": "./",
     "excludeExternals": true,
     "excludeInternal": true,

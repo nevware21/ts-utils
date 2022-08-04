@@ -15,6 +15,7 @@ const _objDefineProperty = ObjClass["defineProperty"];
 
 /**
  * Defines a new property directly on an object, or modifies an existing property on an object, and returns the object.
+ * @group Object
  * @param target - The object on which to define the property.
  * @param key - The name or Symbol of the property to be defined or modified.
  * @param descriptor - The descriptor for the property being defined or modified.
@@ -30,7 +31,7 @@ export function objDefineProp<T>(target: T, key: PropertyKey, descriptor: Proper
 
 /**
  * Try to define a get object property accessor for the target object.
- *
+ * @group Object
  * @param target - The object on which to define the property.
  * @param key - The name of the property to be defined or modified
  * @param value - The value or a function that returns the value
@@ -56,6 +57,7 @@ export function objDefineGet<T, V = any>(target: T, key: PropertyKey, value: (()
  * Try to define get/set object property accessors for the target object/prototype, this will provide compatibility with
  * existing API definition when run within an ES5+ container that supports accessors but still enable the code to be loaded
  * and executed in an ES3 container, providing basic IE8 compatibility.
+ * @group Object
  * @param target - The object on which to define the property.
  * @param prop - The name of the property to be defined or modified.
  * @param getProp - The getter function to wire against the getter.

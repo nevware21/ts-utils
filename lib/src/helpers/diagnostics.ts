@@ -10,6 +10,8 @@ import { isNumber, objToString } from "./base";
 
 /**
  * Returns string representation of an object suitable for diagnostics logging.
+ * @group Error
+ * @group Diagnostic
  */
 export function dumpObj(object: any, format?: boolean | number): string {
     const objectTypeDump: string = objToString(object);

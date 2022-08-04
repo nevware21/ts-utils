@@ -12,6 +12,7 @@ import { EMPTY } from "../internal/constants";
 /**
  * This method checks if the string `value` is null, undefined, an empty string or only contains
  * whiltespace `\t \r \n \f \v` characters.
+ * @group String
  * @param value - The string value to be checked.
  * @returns `true` if the string is null, undefined an empty string or contains only whitespace characters.
  */
@@ -25,6 +26,7 @@ export function strIsNullOrWhiteSpace(value: string): boolean {
 
 /**
  * Checks whether the passed `value` is null, undefined or an empty string.
+ * @group String
  * @param value - The string value to be checked.
  * @returns `true` if the string is null, undefined or an empty string.
  */

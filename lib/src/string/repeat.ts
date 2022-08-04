@@ -18,6 +18,7 @@ const _strRepeat = StrProto.repeat;
  * The `strRepeat()` method constructs and returns a new string which contains the
  * specified number of copies of the string on which it was called, concatenated
  * together.
+ * @group String
  * @param value - The value to be repeated
  * @param count - An integer between 0 and +Infinity, indicating the number of times to repeat the string.
  * @returns A new string containing the specified number of copies of the given string.
@@ -32,6 +33,8 @@ export function strRepeat(value: string, count: number): string {
  * The `strRepeat()` method constructs and returns a new string which contains the
  * specified number of copies of the string on which it was called, concatenated
  * together.
+ * @group Polyfill
+ * @group String
  * @param value - The value to be repeated
  * @param count - An integer between 0 and +Infinity, indicating the number of times to repeat the string.
  * @returns A new string containing the specified number of copies of the given string.

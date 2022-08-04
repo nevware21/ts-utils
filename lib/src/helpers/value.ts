@@ -71,6 +71,7 @@ function _hasValue(value: any, depth: number): boolean {
  * - If object has a `valueOf` function then the returned value hasValue(value.valueOf()) to a maximum recursion of 5 levels
  * - If object with at least 1 key of it's own property (hasOwnProperty)
  * - else if isTruthy (empty string, etc)
+ * @group Value Check
  * @param value
  */
 export function hasValue(value: any): boolean {

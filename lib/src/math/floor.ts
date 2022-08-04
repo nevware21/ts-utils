@@ -10,6 +10,7 @@ import { MathCls } from "../internal/constants";
 
 /**
  * The `mathFloor()` function returns the largest integer less than or equal to a given number.
+ * @group Math
  * @param x - A number
  * @returns A number representing the largest integer less than or equal to the specified number.
  */
@@ -17,6 +18,7 @@ export const mathFloor = MathCls.floor;
 
 /**
  * The `mathCeil()` function always rounds a number up to the next largest integer.
+ * @group Math
  * @param x - A number
  * @returns The smallest integer greater than or equal to the given number.
  */

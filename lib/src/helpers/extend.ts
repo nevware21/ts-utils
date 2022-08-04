@@ -24,6 +24,7 @@ function _doExtend<T>(target: T, theArgs: any[]) {
 /**
  * Create a new object by merging the passed arguments, this is effectively the same as calling `objExtend({}, ...theArgs)` where
  * all of the arguments are added to a new object that is returned.
+ * @group Object
  * @param target - The original object to be extended.
  * @param theArgs - The optional number of arguments to be copied
  * @returns - A new object or the original
@@ -35,6 +36,7 @@ export function deepExtend<T>(target: T, ...theArgs: any): any {
  
 /**
  * Extend the target object by merging the passed arguments into it
+ * @group Object
  * @param target - The object to be extended or overwritten
  * @param theArgs - The optional number of arguments to be copied
  * @returns - A new object or the original

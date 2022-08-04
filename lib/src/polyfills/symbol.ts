@@ -36,6 +36,8 @@ let _wellKnownSymbolCache: { [key in keyof typeof WellKnownSymbols ]: symbol } =
  * other code might add to the object, and which are hidden from any mechanisms other code will
  * typically use to access the object. That enables a form of weak encapsulation, or a weak form of
  * information hiding.
+ * @group Polyfill
+ * @group Symbol
  * @param description - The description of the symbol
  * @returns A new polyfill version of a Symbol object
  */
@@ -54,6 +56,8 @@ export function polyNewSymbol(description?: string | number): symbol {
 /**
  * Returns a Symbol object from the global symbol registry matching the given key if found.
  * Otherwise, returns a new symbol with this key.
+ * @group Polyfill
+ * @group Symbol
  * @param key key to search for.
  */
 export function polySymbolFor(key: string): symbol {
@@ -70,6 +74,8 @@ export function polySymbolFor(key: string): symbol {
 /**
  * Returns a key from the global symbol registry matching the given Symbol if found.
  * Otherwise, returns a undefined.
+ * @group Polyfill
+ * @group Symbol
  * @param sym Symbol to find the key for.
  */
 export function polySymbolKeyFor(sym: symbol): string | undefined {
@@ -95,6 +101,8 @@ export function polySymbolKeyFor(sym: symbol): string | undefined {
  * polyGetKnownSymbol("toStringTag") !== polyNewSymbol("toStringTag");      // true
  * polyGetKnownSymbol(WellKnownSymbols.toStringTag) !== polyNewSymbol("toStringTag"); // true
  * ```
+ * @group Polyfill
+ * @group Symbol
  * @param name - The property name to return (if it exists) for Symbol
  * @returns The value of the property if present
  */

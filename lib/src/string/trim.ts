@@ -18,6 +18,7 @@ const _strTrimEnd = StrProto.trimEnd;
  * without modifying the original string. Whitespace in this context is all the whitespace
  * characters (space, tab, no-break space, etc.) and all the line terminator characters
  * (LF, CR, etc.).
+ * @group String
  * @param value - The string value to be trimmed.
  * @returns A new string representing str stripped of whitespace from both its beginning and end.
  * If neither the beginning or end of str has any whitespace, a new string is still returned (essentially
@@ -30,6 +31,7 @@ export function strTrim(value: string): string {
 
 /**
  * The `strTrimStart()` method removes whitespace from the beginning of a string.
+ * @group String
  * @param value - The value to be trimmed.
  * @returns A new string representing str stripped of whitespace from its beginning (left side).
  * If the beginning of str has no whitespace, a new string is still returned (essentially a copy of str),
@@ -41,6 +43,7 @@ export function strTrimStart(value: string): string {
 
 /**
  * Alias for `strTrimStart()` method removes whitespace from the beginning of a string.
+ * @group String
  * @param value - The value to be trimmed.
  * @returns A new string representing str stripped of whitespace from its beginning (left side).
  * If the beginning of str has no whitespace, a new string is still returned (essentially a copy of str),
@@ -50,6 +53,7 @@ export const strTrimLeft = strTrimStart;
 
 /**
  * The `strTrimEnd()` method removes whitespace from the end of a string.
+ * @group String
  * @param value - The value to be trimmed.
  * @returns A new string representing str stripped of whitespace from its end (right side).
  * If the end of str has no whitespace, a new string is still returned (essentially a copy of str),
@@ -61,6 +65,7 @@ export function strTrimEnd(value: string): string {
 
 /**
  * Alias for `strTrimEnd()` method removes whitespace from the end of a string.
+ * @group String
  * @param value - The value to be trimmed.
  * @returns A new string representing str stripped of whitespace from its end (right side).
  * If the end of str has no whitespace, a new string is still returned (essentially a copy of str),

@@ -13,6 +13,7 @@ const _strEndsWith = StrProto.endsWith;
 
 /**
  * This method lets you determine whether or not a string ends with another string. This method is case-sensitive.
+ * @group String
  * @param value - The value to be checked
  * @param searchString - The characters to be searched for at the end of `value` string.
  * @param length - If provided, it is used as the length of `value`. Defaults to value.length.
@@ -25,6 +26,8 @@ export function strEndsWith(value: string, searchString: string, length?: number
 
 /**
  * This method lets you determine whether or not a string ends with another string. This method is case-sensitive.
+ * @group Polyfill
+ * @category String
  * @param value - The value to be checked
  * @param searchString - The characters to be searched for at the end of `value` string.
  * @param length - If provided, it is used as the length of `value`. Defaults to value.length.

@@ -12,6 +12,7 @@ import { objForEachKey } from "./for_each_key";
 /**
  * The objSetPrototypeOf() method sets the prototype (i.e., the internal [Prototype] property) of a specified
  * object to another object or null.
+ * @group Object
  * @param obj - The object which is to have it's prototype set.
  * @param proto - The object's new prototype (an object or null)
  * @returns The specified object.
