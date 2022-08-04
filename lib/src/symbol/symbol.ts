@@ -22,7 +22,7 @@ let _symbolKeyFor: (sym: symbol) => string | undefined = _symbol && _safeCheck((
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a symbol, false otherwise.
  */
-export const isSymbol = _createIs<symbol>("symbol");
+export const isSymbol: (value: any) => value is symbol = _createIs<symbol>("symbol");
 
 /**
  * Helper to identify whether the runtime support the Symbols either via native or an installed polyfill
