@@ -1,4 +1,13 @@
 
+# v0.3.3 Aug 5th, 2022
+
+## Changelog
+
+- #55 Add generic typing's to some functions
+- #56 Move source folder from ts-utils to lib and upgrade typedoc
+- #57 Bump puppeteer from 15.5.0 to 16.0.0
+- #58 Add arrMap and update typedoc groupings
+
 # v0.3.2 Aug 3rd, 2022
 
 ## Changelog
