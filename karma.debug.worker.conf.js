@@ -19,7 +19,7 @@ module.exports = function (config) {
         rollupPreprocessor: {
             plugins: [
                 typescript({
-                    tsconfig: "./lib/test/tsconfig.test.karma.json"
+                    tsconfig: "./lib/test/tsconfig.worker.karma.json"
                 }),
                 plugin.nodeResolve({
                     browser: true

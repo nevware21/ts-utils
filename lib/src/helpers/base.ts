@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { BOOLEAN, FUNCTION, NUMBER, OBJECT, ObjProto, STRING, UNDEFINED } from "../internal/constants";
+import { ArrCls, BOOLEAN, FUNCTION, NUMBER, OBJECT, ObjProto, STRING, UNDEFINED } from "../internal/constants";
 
 /**
  * @ignore
@@ -163,7 +163,7 @@ export function isObject<T>(value: T): value is T {
  * }
  * ```
  */
-export const isArray: <T = any>(arg: any) => arg is Array<T> = Array.isArray;
+export const isArray: <T = any>(arg: any) => arg is Array<T> = ArrCls.isArray;
 
 /**
  * Check if an object is of type Date
