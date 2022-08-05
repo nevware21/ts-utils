@@ -63,7 +63,8 @@ node_modules/
 out/
 dist-esm/
 bundle/
-types/
+/types/
+/lib/types/
 dist/
 
 # Misc
