@@ -1,4 +1,11 @@
 
+# v0.3.4 Aug 8th, 2022
+
+## Changelog
+
+- #61 [Compatibilty] ReactNative uses a JavaScript Core that does not support regex lookbehinds
+- #62 [Bug] The generic definition of the arrReduce does not handle different arguments correctly
+
 # v0.3.3 Aug 5th, 2022
 
 ## Changelog
