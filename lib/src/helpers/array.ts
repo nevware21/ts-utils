@@ -23,7 +23,7 @@ import { isArray, isUndefined } from "./base";
  * specified, otherwise 1.
  * @param array -The array being traversed.
  */
-export type ArrReduceCallbackFn<T, R = T> = (previousValue: T, currentValue: R, currentIndex: number, array: T[]) => R;
+export type ArrReduceCallbackFn<T, R = T> = (previousValue: T | R, currentValue: T, currentIndex: number, array: T[]) => R;
 
 /**
  * Callback signature for {@link arrMap} that is called for every element of array. Each time callbackFn
