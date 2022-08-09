@@ -47,7 +47,7 @@
     "sideEffects": false,
     "scripts": {
         "build": "grunt ts_utils --verbose && npm run package",
-        "rebuild": "npm run build && npm run test && npm run docs",
+        "rebuild": "npm run build && npm run test",
         "package": "rollup -c lib/rollup.config.js",
         "test": "npm run test:node && npm run test:worker && npm run test:browser && npm run coverage:report",
         "test:node": "nyc ts-mocha -p lib/test/tsconfig.test.json lib/test/src/node/**/*.test.ts lib/test/src/common/**/*.test.ts",
@@ -61,7 +61,7 @@
         "coverage:merge": "node tools/coverage/merge-coverage.js",
         "codecov": "npm run coverage:report && codecov -f coverage/*.json --disable=gcov",
         "clean": "git clean -xdf && npm install",
-        "cleanBuild": "npm run clean && npm run rebuild",
+        "cleanBuild": "npm run clean && npm run rebuild && npm run docs",
         "docs": "typedoc"
     },
     "repository": {
