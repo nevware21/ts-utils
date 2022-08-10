@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { arrForEach } from "./helpers/array";
+import { arrForEach } from "./array/forEach";
 import { objDefineProp } from "./object/define";
 import { PROTOTYPE } from "./internal/constants";
 import { polyIsArray } from "./polyfills/array";

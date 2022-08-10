@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { StrProto } from "../internal/constants";
+import { _unwrapFunction } from "../internal/unwrapFunction";
 
 /**
  * The `strSlice()` method extracts a section of a string and returns it as a new string, without
@@ -37,6 +37,4 @@ import { StrProto } from "../internal/constants";
  * returns "". (E.g `strSlice("test", 2, -10)`, strSlice("test", -1, -2)` or `strSlice("test", 3, 2)`).
  * @returns A new string containing the extracted section of the string.
  */
-export function strSlice(value: string, beginIndex: number, endIndex?: number): string {
-    return StrProto.slice.call(value, beginIndex, endIndex);
-}
+export const strSlice: (value: string, beginIndex: number, endIndex?: number) => string = _unwrapFunction("slice");

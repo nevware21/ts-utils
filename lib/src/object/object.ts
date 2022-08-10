@@ -7,7 +7,7 @@
  */
 
 import { ObjClass } from "../internal/constants";
-import { arrForEach } from "../helpers/array";
+import { arrForEach } from "../array/forEach";
 import { isArray, isNullOrUndefined, isObject } from "../helpers/base";
 import { throwTypeError } from "../helpers/throw";
 import { objForEachKey } from "./for_each_key";

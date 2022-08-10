@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { arrForEach } from "./array";
+import { arrForEach } from "../array/forEach";
 import { objCopyProps, objDeepCopy } from "../object/object";
 
 /**

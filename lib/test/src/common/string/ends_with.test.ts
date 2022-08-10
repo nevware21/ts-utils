@@ -6,21 +6,51 @@ import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 describe("string helpers", () => {
     describe("strEndsWith null / undefined", () => {
-        _checkEndsWith(null, null as any);
-        _checkEndsWith(null, "" as any);
-        _checkEndsWith(null, "n" as any);
-        _checkEndsWith(null, "nu" as any);
-        _checkEndsWith(null, "nul" as any);
-        _checkEndsWith(null, "l" as any, 2);
-        _checkEndsWith(null, "l" as any, 3);
-        _checkEndsWith(null, null as any, 0);
-        _checkEndsWith(null, null as any, -1);
-        _checkEndsWith(undefined, undefined as any);
-        _checkEndsWith(undefined, "");
-        _checkEndsWith(undefined, "u");
-        _checkEndsWith(undefined, "undef");
-        _checkEndsWith(undefined, "fined", 4);
-        _checkEndsWith(undefined, "unde", 4);
+        _expectThrow(() => {
+            _checkEndsWith(null, null as any);
+        });
+        _expectThrow(() => {
+            _checkEndsWith(null, "" as any);
+        });
+        _expectThrow(() => {
+            _checkEndsWith(null, "n" as any);
+        });
+        _expectThrow(() => {
+            _checkEndsWith(null, "nu" as any);
+        });
+        _expectThrow(() => {
+            _checkEndsWith(null, "nul" as any);
+        });
+        _expectThrow(() => {
+            _checkEndsWith(null, "l" as any, 2);
+        });
+        _expectThrow(() => {
+            _checkEndsWith(null, "l" as any, 3);
+        });
+        _expectThrow(() => {
+            _checkEndsWith(null, null as any, 0);
+        });
+        _expectThrow(() => {
+            _checkEndsWith(null, null as any, -1);
+        });
+        _expectThrow(() => {
+            _checkEndsWith(undefined, undefined as any);
+        });
+        _expectThrow(() => {
+            _checkEndsWith(undefined, "");
+        });
+        _expectThrow(() => {
+            _checkEndsWith(undefined, "u");
+        });
+        _expectThrow(() => {
+            _checkEndsWith(undefined, "undef");
+        });
+        _expectThrow(() => {
+            _checkEndsWith(undefined, "fined", 4);
+        });
+        _expectThrow(() => {
+            _checkEndsWith(undefined, "unde", 4);
+        });
         _checkEndsWith("null", null as any);
         _checkEndsWith("undefined", undefined as any);
         _checkEndsWith("", null as any);
@@ -74,10 +104,18 @@ describe("string helpers", () => {
 
     function _checkEndsWith(value: any, search: any, length?: number) {
         let helperResult = strEndsWith(value, search, length);
-        let nativeResult = String.prototype.endsWith.call("" + value, search, length);
+        let nativeResult = String.prototype.endsWith.call(value, search, length);
 
         assert.equal(helperResult, nativeResult, "Checking endsWith Native (" + nativeResult + ") and result for [" + dumpObj(value) + "] for [" + search + "] len:" + (length || 0));
     }
 
+    function _expectThrow(cb: () => void): Error {
+        try {
+            cb();
+        } catch (e) {
+            assert.ok(true, "Expected an exception to be thrown");
+            return e;
+        }
+    }
 });
 

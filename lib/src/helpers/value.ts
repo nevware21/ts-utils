@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { arrForEach } from "./array";
+import { arrForEach } from "../array/forEach";
 import { isArray, isBoolean, isDate, isFunction, isNullOrUndefined, isObject, isTruthy } from "./base";
 import { objKeys } from "../object/object";
 

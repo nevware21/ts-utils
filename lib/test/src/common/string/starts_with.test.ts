@@ -4,19 +4,45 @@ import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 describe("string helpers", () => {
     describe("strStartsWith null / undefined", () => {
-        _checkStartsWith(null, null as any);
-        _checkStartsWith(null, "" as any);
-        _checkStartsWith(null, "n" as any);
-        _checkStartsWith(null, "nu" as any);
-        _checkStartsWith(null, "nul" as any);
-        _checkStartsWith(null, "l" as any, 2);
-        _checkStartsWith(null, "l" as any, -2);
-        _checkStartsWith(null, null as any, -1);
-        _checkStartsWith(undefined, undefined as any);
-        _checkStartsWith(undefined, "");
-        _checkStartsWith(undefined, "u");
-        _checkStartsWith(undefined, "undef");
-        _checkStartsWith(undefined, "fined", 4);
+        _expectThrow(() => {
+            _checkStartsWith(null, null as any);
+        });
+        _expectThrow(() => {
+            _checkStartsWith(null, "" as any);
+        });
+        _expectThrow(() => {
+            _checkStartsWith(null, "n" as any);
+        });
+        _expectThrow(() => {
+            _checkStartsWith(null, "nu" as any);
+        });
+        _expectThrow(() => {
+            _checkStartsWith(null, "nul" as any);
+        });
+        _expectThrow(() => {
+            _checkStartsWith(null, "l" as any, 2);
+        });
+        _expectThrow(() => {
+            _checkStartsWith(null, "l" as any, -2);
+        });
+        _expectThrow(() => {
+            _checkStartsWith(null, null as any, -1);
+        });
+        _expectThrow(() => {
+            _checkStartsWith(undefined, undefined as any);
+        });
+        _expectThrow(() => {
+            _checkStartsWith(undefined, "");
+        });
+        _expectThrow(() => {
+            _checkStartsWith(undefined, "u");
+        });
+        _expectThrow(() => {
+            _checkStartsWith(undefined, "undef");
+        });
+        _expectThrow(() => {
+            _checkStartsWith(undefined, "fined", 4);
+        });
         _checkStartsWith("null", null as any);
         _checkStartsWith("undefined", undefined as any);
         _checkStartsWith("", null as any);
@@ -73,6 +99,15 @@ describe("string helpers", () => {
         let nativeResult = String.prototype.startsWith.call("" + value, search, position);
 
         assert.equal(helperResult, nativeResult, "Checking startsWith Native (" + nativeResult + ") and result for [" + dumpObj(value) + "] for [" + search + "] @ " + (position || 0));
+    }
+
+    function _expectThrow(cb: () => void): Error {
+        try {
+            cb();
+        } catch (e) {
+            assert.ok(true, "Expected an exception to be thrown");
+            return e;
+        }
     }
 });
 
