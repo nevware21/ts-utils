@@ -7,9 +7,12 @@
  */
 
 import { isString } from "../helpers/base";
+import { dumpObj } from "../helpers/diagnostics";
+import { throwTypeError } from "../helpers/throw";
 import { StrProto } from "../internal/constants";
+import { _unwrapFunction } from "../internal/unwrapFunction";
 
-const _strStartsWith = StrProto.startsWith;
+const STARTS_WITH = "startsWith";
 
 /**
  * This method lets you determine whether or not a string begins with another string. This method is case-sensitive.
@@ -20,11 +23,7 @@ const _strStartsWith = StrProto.startsWith;
  * Defaults to 0
  * @returns `true` if the given characters are found at the beginning of the string; otherwise, `false`.
  */
-export function strStartsWith(value: string, searchString: string, position?: number): boolean {
-    let theValue = (isString(value) ? value : "" + value);
-
-    return _strStartsWith ? _strStartsWith.call(theValue, searchString, position) : polyStrStartsWith(theValue, searchString, position);
-}
+export const strStartsWith: (value: string, searchString: string, length?: number) => boolean = StrProto[STARTS_WITH] ? _unwrapFunction(STARTS_WITH) : polyStrStartsWith;
 
 /**
  * This method lets you determine whether or not a string begins with another string. This method is case-sensitive.
@@ -37,10 +36,12 @@ export function strStartsWith(value: string, searchString: string, position?: nu
  * @returns `true` if the given characters are found at the beginning of the string; otherwise, `false`.
  */
 export function polyStrStartsWith(value: string, searchString: string, position?: number): boolean {
-    let theValue = (isString(value) ? value : "" + value);
+    if (!isString(value)) {
+        throwTypeError("'" + dumpObj(value) + "' is not a string");
+    }
     let searchValue = isString(searchString) ? searchString : "" + searchString;
     let chkLen = searchValue.length;
     let pos = position > 0 ? position : 0;
 
-    return theValue.substring(pos, pos + chkLen) === searchValue;
+    return value.substring(pos, pos + chkLen) === searchValue;
 }

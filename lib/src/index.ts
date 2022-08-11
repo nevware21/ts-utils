@@ -6,7 +6,11 @@
  * Licensed under the MIT license.
  */
 
-export { ArrReduceCallbackFn, ArrMapCallbackFn, arrForEach, arrAppend, arrIndexOf, arrReduce, arrMap } from "./helpers/array";
+export { arrAppend } from "./array/append";
+export { arrForEach } from "./array/forEach";
+export { arrIndexOf } from "./array/indexOf";
+export { ArrMapCallbackFn, arrMap } from "./array/map";
+export { ArrReduceCallbackFn, arrReduce } from "./array/reduce";
 export {
     isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isDate, isNumber, isBoolean,
     isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isNotTruthy, isTruthy, objToString,
@@ -25,6 +29,7 @@ export {
 export { getIntValue } from "./helpers/number";
 export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";
 export { hasValue } from "./helpers/value";
+export { isIterable, isIterator} from "./helpers/iterator";
 export { mathCeil, mathFloor } from "./math/floor";
 export { mathToInt } from "./math/to_int";
 export { mathTrunc } from "./math/trunc";

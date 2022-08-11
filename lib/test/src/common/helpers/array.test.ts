@@ -1,5 +1,9 @@
 import { assert } from "chai";
-import { arrAppend, arrForEach, arrIndexOf, arrMap, arrReduce } from "../../../../src/helpers/array";
+import { arrAppend } from "../../../../src/array/append";
+import { arrForEach } from "../../../../src/array/forEach";
+import { arrIndexOf } from "../../../../src/array/indexOf";
+import { arrMap } from "../../../../src/array/map";
+import { arrReduce } from "../../../../src/array/reduce";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 describe("array helpers", () => {
@@ -140,7 +144,7 @@ describe("array helpers", () => {
         });
 
         it("Validate appending values", () => {
-            let target = arrAppend([], []);
+            let target = arrAppend([], [] as number[]);
             assert.equal(target.length, 0, "Should have no elements");
 
             target = arrAppend([], [0]);
@@ -155,6 +159,29 @@ describe("array helpers", () => {
             assert.equal(target.length, 2, "Should have 1 element");
             assert.equal(target[0], 1, "Should have value of 1");
             assert.equal(target[1], 2, "Should have value of 2");
+        });
+
+        it("Validate with iterator", () => {
+            let target = arrAppend([], ([] as number[]).values());
+            assert.equal(target.length, 0, "Should have no elements");
+
+            target = arrAppend([], [0].values());
+            assert.equal(target.length, 1, "Should have 1 element");
+            assert.equal(target[0], 0, "Should have value of zero");
+
+            target = arrAppend([1], [].keys());
+            assert.equal(target.length, 1, "Should have 1 element");
+            assert.equal(target[0], 1, "Should have value of 1");
+
+            target = arrAppend([1], [2].values());
+            assert.equal(target.length, 2, "Should have 1 element");
+            assert.equal(target[0], 1, "Should have value of 1");
+            assert.equal(target[1], 2, "Should have value of 2");
+
+            target = arrAppend([1], [2].keys());
+            assert.equal(target.length, 2, "Should have 1 element");
+            assert.equal(target[0], 1, "Should have value of 1");
+            assert.equal(target[1], 0, "Should have value of 0 (the index from the first element)");
         });
 
     });

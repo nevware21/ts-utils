@@ -2,9 +2,7 @@ import { assert } from "chai";
 import {
     isArray, isBoolean, isDate, isDefined, isFunction, isNullOrUndefined, isNumber, isObject, isString, isTypeof,
     isUndefined, isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isError, isPromiseLike, isPromise, isNotTruthy,
-    isTruthy,
-    isStrictUndefined,
-    isStrictNullOrUndefined
+    isTruthy, isStrictUndefined, isStrictNullOrUndefined
 } from "../../../../src/helpers/base";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 

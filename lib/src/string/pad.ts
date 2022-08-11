@@ -8,12 +8,13 @@
 
 import { isNullOrUndefined } from "../helpers/base";
 import { EMPTY, StrProto } from "../internal/constants";
+import { _unwrapFunction } from "../internal/unwrapFunction";
 import { mathCeil } from "../math/floor";
 import { mathToInt } from "../math/to_int";
 import { strRepeat } from "./repeat";
 
-const _strPadStart = StrProto.padStart;
-const _strPadEnd = StrProto.padEnd;
+const PAD_START = "padStart";
+const PAD_END = "padEnd";
 
 function _padValue(value: string, targetLength: number, padString?: string) {
     let result = EMPTY;
@@ -49,9 +50,7 @@ function _padValue(value: string, targetLength: number, padString?: string) {
  * the targetLength, it will be truncated from the end. The default value is the unicode "space"
  * character (U+0020).
  */
-export function strPadStart(value: string, targetLength: number, padString?: string): string {
-    return _strPadStart ? _strPadStart.call(value, targetLength, padString) : polyStrPadStart(value, targetLength, padString);
-}
+export const strPadStart: (value: string, targetLength: number, padString?: string) => string = StrProto[PAD_START] ? _unwrapFunction(PAD_START) : polyStrPadStart;
 
 /**
  * The `strPadEnd()` method pads the current string with a given string (repeated, if needed) so that
@@ -65,9 +64,7 @@ export function strPadStart(value: string, targetLength: number, padString?: str
  * languages the right-most will be applied. The default value for this parameter is " " (U+0020).
  * @returns A String of the specified targetLength with the padString applied at the end of the current str.
  */
-export function strPadEnd(value: string, targetLength: number, padString?: string): string {
-    return _strPadEnd ? _strPadEnd.call(value, targetLength, padString) : polyStrPadEnd(value, targetLength, padString);
-}
+export const strPadEnd: (value: string, targetLength: number, padString?: string) => string = StrProto[PAD_END] ? _unwrapFunction(PAD_END) : polyStrPadEnd;
 
 /**
  * The `strPadStart()` method pads the current string with another string (multiple times, if needed)

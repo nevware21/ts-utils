@@ -1,8 +1,6 @@
 import { assert } from "chai";
 import { createEnum, createEnumKeyMap, createEnumValueMap, createSimpleMap, createTypeMap } from "../../../../src/helpers/enum";
 
-type ValueOf<T> = T[keyof T];
-
 describe("enum helpers", () => {
     it("createEnum", () => {
         const enum Animal {
@@ -198,8 +196,6 @@ describe("enum helpers", () => {
             Bear: [ Animal.Bear, "Ursidae"]
         });
        
-        type StringValueOf<T> = T[keyof T] & string;
-
         // You end up with an object that maps everything to the name
         assert.equal(animalFamilyMap.Dog, "Canidae");
         assert.equal(animalFamilyMap[0], "Canidae");

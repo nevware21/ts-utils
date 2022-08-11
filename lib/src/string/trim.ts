@@ -7,11 +7,12 @@
  */
 
 import { StrProto } from "../internal/constants";
+import { _unwrapFunction } from "../internal/unwrapFunction";
 import { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "../polyfills/trim";
 
-const _strTrim = StrProto.trim;
-const _strTrimStart = StrProto.trimStart;
-const _strTrimEnd = StrProto.trimEnd;
+const TRIM = "trim";
+const TRIM_START = "trimStart";
+const TRIM_END = "trimEnd";
 
 /**
  * The trim() method removes whitespace from both ends of a string and returns a new string,
@@ -25,9 +26,7 @@ const _strTrimEnd = StrProto.trimEnd;
  * a copy of str), with no exception being thrown.
  * To return a new string with whitespace trimmed from just one end, use `strTrimStart()` or `strTrimEnd()`.
  */
-export function strTrim(value: string): string {
-    return _strTrim ? _strTrim.call(value) : polyStrTrim(value);
-}
+export const strTrim: (value: string) => string = StrProto[TRIM] ? _unwrapFunction(TRIM) : polyStrTrim;
 
 /**
  * The `strTrimStart()` method removes whitespace from the beginning of a string.
@@ -37,9 +36,7 @@ export function strTrim(value: string): string {
  * If the beginning of str has no whitespace, a new string is still returned (essentially a copy of str),
  * with no exception being thrown.
  */
-export function strTrimStart(value: string): string {
-    return _strTrimStart ? _strTrimStart.call(value) : polyStrTrimStart(value);
-}
+export const strTrimStart: (value: string) => string = StrProto[TRIM_START] ? _unwrapFunction(TRIM_START) : polyStrTrimStart;
 
 /**
  * Alias for `strTrimStart()` method removes whitespace from the beginning of a string.
@@ -59,9 +56,7 @@ export const strTrimLeft = strTrimStart;
  * If the end of str has no whitespace, a new string is still returned (essentially a copy of str),
  * with no exception being thrown.
  */
-export function strTrimEnd(value: string): string {
-    return _strTrimEnd ? _strTrimEnd.call(value) : polyStrTrimEnd(value);
-}
+export const strTrimEnd: (value: string) => string = StrProto[TRIM_END] ? _unwrapFunction(TRIM_END) : polyStrTrimEnd;
 
 /**
  * Alias for `strTrimEnd()` method removes whitespace from the end of a string.

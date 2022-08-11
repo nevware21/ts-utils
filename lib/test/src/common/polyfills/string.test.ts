@@ -2,6 +2,7 @@ import { assert } from "chai";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { polyStrStartsWith } from "../../../../src/string/starts_with";
 import { polyStrEndsWith } from "../../../../src/string/ends_with";
+import { isUndefined } from "../../../../src/helpers/base";
 
 describe("string polyfills", () => {
     describe("polyStrStartsWith null / undefined", () => {
@@ -128,18 +129,68 @@ describe("string polyfills", () => {
         _checkEndsWith("zyxyvutsrqponmlkjihgfedcba", "ponm", 14);
     });
 
-
     function _checkStartsWith(value: any, search: any, position?: number) {
-        let polyResult = polyStrStartsWith(value, search, position);
-        let nativeResult = String.prototype.startsWith.call("" + value, search, position);
+        let polyResult: any;
+        let nativeResult: any;
+        let polyThrew: any;
+        let nativeThrew: any;
+        try {
+            polyResult = polyStrStartsWith(value, search, position);
+        } catch (e) {
+            polyThrew = e;
+        }
+        try {
+            nativeResult = value.startsWith(search, position);
+        } catch (e) {
+            nativeThrew = e;
+        }
 
-        assert.equal(polyResult, nativeResult, "Checking startsWith Native (" + nativeResult + ") and polyfill result for [" + dumpObj(value) + "] for [" + search + "] @ " + (position || 0));
+        if (polyThrew) {
+            assert.equal(true, !!nativeThrew || isUndefined(nativeResult) || !!nativeResult,
+                "Checking whether the Native and polyfill threw or returned undefined [" + dumpObj(polyThrew || polyResult) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
+        } else if(nativeThrew) {
+            assert.ok(false,
+                "Native threw but poly didn't [" + dumpObj(polyThrew) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
+        } else {
+            assert.equal(polyResult, nativeResult,
+                "Checking whether the Native and polyfill returned the same result [" + dumpObj(polyThrew || polyResult) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
+        }
     }
 
     function _checkEndsWith(value: any, search: any, length?: number) {
-        let polyResult = polyStrEndsWith(value, search, length);
-        let nativeResult = String.prototype.endsWith.call("" + value, search, length);
+        let polyResult: any;
+        let nativeResult: any;
+        let polyThrew: any;
+        let nativeThrew: any;
+        try {
+            polyResult = polyStrEndsWith(value, search, length);
+        } catch (e) {
+            polyThrew = e;
+        }
+        try {
+            nativeResult = value.endsWith(search, length);
+        } catch (e) {
+            nativeThrew = e;
+        }
 
-        assert.equal(polyResult, nativeResult, "Checking endsWith Native (" + nativeResult + ") and polyfill result for [" + dumpObj(value) + "] for [" + search + "] len:" + (length || 0));
+        if (polyThrew) {
+            assert.equal(true, !!nativeThrew || isUndefined(nativeResult) || !!nativeResult,
+                "Checking whether the Native and polyfill threw or returned undefined [" + dumpObj(polyThrew || polyResult) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
+        } else if(nativeThrew) {
+            assert.ok(false,
+                "Native threw but poly didn't [" + dumpObj(polyThrew) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
+        } else {
+            assert.equal(polyResult,nativeResult,
+                "Checking whether the Native and polyfill returned the same result [" + dumpObj(polyThrew || polyResult) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
+        }
+    }
+
+    function _expectThrow(cb: () => void): Error {
+        try {
+            cb();
+        } catch (e) {
+            assert.ok(true, "Expected an exception to be thrown");
+            return e;
+        }
     }
 });

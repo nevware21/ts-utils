@@ -61,7 +61,7 @@ export function getSymbol(useCached?: boolean): Symbol {
  * getKnownSymbol(WellKnownSymbols.toStringTag) === Symbol.toStringTag; // true
  * ```
  */
-export function getKnownSymbol<T>(name: string | WellKnownSymbols, noPoly?: boolean): T {
+export function getKnownSymbol<T = symbol>(name: string | WellKnownSymbols, noPoly?: boolean): T {
     let knownName = _wellKnownSymbolMap[name];
     return _symbol ? _symbol[knownName || name] : (!noPoly ? polyGetKnownSymbol(name) : null);
 }
