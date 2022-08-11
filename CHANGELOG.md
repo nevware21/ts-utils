@@ -1,4 +1,13 @@
 
+# v0.4.0 Aug 10th, 2022
+
+## Changelog
+
+- #66 [Bug] strStartsWith and strEndsWith are converting all arguments to strings even if they are not
+- #67 Add isIterator() and isIterable()
+  - Break out array functions into separate files
+  - Update string stubs to use generated function
+
 # v0.3.4 Aug 8th, 2022
 
 ## Changelog
