@@ -7,6 +7,7 @@
  */
 
 import { UNDEFINED } from "../internal/constants";
+import { _safeCheck } from "../internal/safe_check";
 import { isDefined } from "./base";
 
 const DOCUMENT = "document";
@@ -27,24 +28,6 @@ const _hasNavigator = _safeCheck(() => isDefined(navigator), false);
 const _hasHistory = _safeCheck(() => isDefined(history), false);
 const _isWebWorker: boolean = _safeCheck(() => !!(self && self instanceof WorkerGlobalScope), false);
 const _isNode: boolean = _safeCheck(() => !!(process && (process.versions||{}).node), false);
-
-/**
- * @ignore
- * @internal
- * Internal helper for safely checking whether types exist
- * @param cb - Callback function be wrapped with an exception
- * @param defValue - The default value to return when an exception is thrown
- * @returns The value from the `cb` or the default value
- */
-export function _safeCheck<T = boolean>(cb: () => T, defValue: T) {
-    let result = defValue;
-    try {
-        result = cb();
-    } catch (e) {
-        // Do nothing
-    }
-    return result;
-}
 
 /**
  * Returns the current global scope object, for a normal web page this will be the current

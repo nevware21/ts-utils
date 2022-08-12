@@ -10,7 +10,8 @@ import { SYMBOL } from "../internal/constants";
 import { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "../polyfills/symbol";
 import { WellKnownSymbols, _wellKnownSymbolMap } from "./well_known";
 import { isDefined, _createIs } from "../helpers/base";
-import { getInst, _safeCheck } from "../helpers/environment";
+import { getInst } from "../helpers/environment";
+import { _safeCheck } from "../internal/safe_check";
 
 const _hasSymbol = _safeCheck(() => isDefined(Symbol), false);
 let _symbol: Symbol = getInst<Symbol>(SYMBOL);
