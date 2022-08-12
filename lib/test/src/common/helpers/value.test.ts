@@ -1,5 +1,6 @@
 import { assert } from "chai";
 import { hasValue } from "../../../../src/helpers/value";
+import { polyObjCreate } from "../../../../src/object/create";
 
 
 describe("value helpers", () => {
@@ -62,6 +63,10 @@ describe("value helpers", () => {
             assert.equal(hasValue(Boolean(0)), true, "Checking Boolean(0)");
             assert.equal(hasValue(Boolean("1")), true, "Checking Boolean('1')");
             assert.equal(hasValue(Boolean(1)), true, "Checking Boolean(1)");
+
+            assert.equal(hasValue({}), false, "Checking {}");
+            assert.equal(hasValue(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(hasValue(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
 
             assert.equal(hasValue({ length: 0 }), false, "Checking object with length property of 0");
             assert.equal(hasValue({ length: 1 }), true, "Checking object with length property of 1");

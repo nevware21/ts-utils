@@ -7,6 +7,7 @@
  */
 
 import { ArrCls, BOOLEAN, FUNCTION, NUMBER, OBJECT, ObjProto, STRING, UNDEFINED } from "../internal/constants";
+import { _safeCheck } from "../internal/safe_check";
 
 /**
  * @ignore
@@ -54,14 +55,56 @@ export function isTypeof(value: any, theType: string): boolean {
 }
 
 /**
- * Checks if the provided value is undefined or contains the string value "undefined".
+ * Checks if the provided value is undefined or contains the string value "undefined",
+ * if you want to consider the string value as undefined see {@link isStrictUndefined}
  * @group Type Identity
  * @group Value Check
  * @param value - The value to check
- * @returns
+ * @returns true if the value is undefined or "undefined", otherwise false
+ * @example
+ * ```ts
+ * isUndefined(undefined);              // true
+ * isUndefined("undefined");            // true
+ *
+ * isUndefined(null);                   // false
+ * isUndefined("null");                 // false
+ * isUndefined("1");                    // false
+ * isUndefined("aa");                   // false
+ * isUndefined(new Date());             // false
+ * isUndefined(1);                      // false
+ * isUndefined("");                     // false
+ * isUndefined(_dummyFunction);         // false
+ * isUndefined([]);                     // false
+ * isUndefined(new Array(1));           // false
+ * isUndefined(true);                   // false
+ * isUndefined(false);                  // false
+ * isUndefined("true");                 // false
+ * isUndefined("false");                // false
+ * isUndefined(new Boolean(true));      // false
+ * isUndefined(new Boolean(false));     // false
+ * isUndefined(new Boolean("true"));    // false
+ * isUndefined(new Boolean("false"));   // false
+ * isUndefined(Boolean(true));          // false
+ * isUndefined(Boolean(false));         // false
+ * isUndefined(Boolean("true"));        // false
+ * isUndefined(Boolean("false"));       // false
+ * isUndefined(new RegExp(""));         // false
+ * isUndefined(new ArrayBuffer(0));     // false
+ * isUndefined(new Error("Test Error"));// false
+ * isUndefined(new TypeError("Test TypeError"));    // false
+ * isUndefined(new TestError("Test TestError"));    // false
+ * isUndefined(_dummyError());          // false
+ * isUndefined(Promise.reject());       // false
+ * isUndefined(Promise.resolve());      // false
+ * isUndefined(new Promise(() => {}));  // false
+ * isUndefined(_simplePromise());       // false
+ * isUndefined(_simplePromiseLike());   // false
+ * isUndefined(Object.create(null));    // false
+ * isUndefined(polyObjCreate(null));    // false
+ * ```
  */
 export function isUndefined(value: any) {
-    return value == UNDEFINED || typeof value === UNDEFINED;
+    return typeof value === UNDEFINED || value === UNDEFINED;
 }
 
 /**
@@ -71,6 +114,20 @@ export function isUndefined(value: any) {
  * @group Value Check
  * @param value - The value to check
  * @returns true if the typeof value === UNDEFINED
+ * @example
+ * ```ts
+ * isStrictUndefined(undefined);    // true
+ *
+ * isStrictUndefined(null);         // false
+ * isStrictUndefined("null");       // false
+ * isStrictUndefined("undefined");  // false
+ * isStrictUndefined("1");          // false
+ * isStrictUndefined("aa");         // false
+ * isStrictUndefined(new Date());   // false
+ * isStrictUndefined(0);            // false
+ * isStrictUndefined(1);            // false
+ * isStrictUndefined("");           // false
+ * ```
  */
 export function isStrictUndefined(arg: any): arg is undefined {
     return !isDefined(arg);
@@ -140,7 +197,7 @@ export function isObject<T>(value: T): value is T {
         return false;
     }
 
-    return typeof value === OBJECT;
+    return !!value && typeof value === OBJECT;
 }
 
 /**
@@ -276,7 +333,7 @@ export function isPromise<T>(value: any): value is Promise<T> {
  * @return {boolean} True if the value is not truthy, false otherwise.
  */
 export function isNotTruthy(value: any) {
-    return !value || !(value && (0 + value));
+    return !value || !_safeCheck(() => (value && (0 + value)), value);
 }
 
 /**
@@ -287,5 +344,9 @@ export function isNotTruthy(value: any) {
  * @return {boolean} True if the value is not truthy, false otherwise.
  */
 export function isTruthy(value: any) {
-    return !(!value || !(value && (0 + value)));
+    // Objects created with no prototype (Object.create(null)) cannot be converted to primitives
+    // Which causes this code to throw, additionally just using !! also fails for Boolean objects
+    // !!(new Boolean(false)) evaluates to true
+    return !(!value || _safeCheck(() => !(value && (0 + value)), !value));
+    //return !(!value || !(value && (0 + value)));
 }

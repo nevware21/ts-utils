@@ -4,6 +4,7 @@ import {
     isUndefined, isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isError, isPromiseLike, isPromise, isNotTruthy,
     isTruthy, isStrictUndefined, isStrictNullOrUndefined
 } from "../../../../src/helpers/base";
+import { polyObjCreate } from "../../../../src//object/create";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 describe("base helpers", () => {
@@ -44,7 +45,8 @@ describe("base helpers", () => {
             assert.equal(isTypeof(new Promise(() => {}), null), false, "Checking new Promise(() => {})");
             assert.equal(isTypeof(_simplePromise(), null), false, "Checking _simplePromise");
             assert.equal(isTypeof(_simplePromiseLike(), null), false, "Checking _simplePromiseLike");
-
+            assert.equal(isTypeof(Object.create(null), null), false, "Checking Object.create(null)");
+            assert.equal(isTypeof(polyObjCreate(null), null), false, "Checking polyObjCreate(null)");
         });
 
         it("Validate values of type undefined", () => {
@@ -83,7 +85,8 @@ describe("base helpers", () => {
             assert.equal(isTypeof(new Promise(() => {}), undefined), false, "Checking new Promise(() => {})");
             assert.equal(isTypeof(_simplePromise(), undefined), false, "Checking _simplePromise");
             assert.equal(isTypeof(_simplePromiseLike(), undefined), false, "Checking _simplePromiseLike");
-
+            assert.equal(isTypeof(Object.create(null), undefined), false, "Checking Object.create(null)");
+            assert.equal(isTypeof(polyObjCreate(null), undefined), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -124,7 +127,8 @@ describe("base helpers", () => {
             assert.equal(isUndefined(new Promise(() => {})), false, "Checking new Promise(() => {})");
             assert.equal(isUndefined(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isUndefined(_simplePromiseLike()), false, "Checking _simplePromiseLike");
-
+            assert.equal(isUndefined(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isUndefined(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -137,6 +141,7 @@ describe("base helpers", () => {
             assert.equal(isStrictUndefined("1"), false, "Checking '1'");
             assert.equal(isStrictUndefined("aa"), false, "Checking 'aa'");
             assert.equal(isStrictUndefined(new Date()), false, "Checking Date");
+            assert.equal(isStrictUndefined(0), false, "Checking 1");
             assert.equal(isStrictUndefined(1), false, "Checking 1");
             assert.equal(isStrictUndefined(""), false, "Checking ''");
             assert.equal(isStrictUndefined(_dummyFunction), false, "Checking _dummyFunction");
@@ -165,7 +170,8 @@ describe("base helpers", () => {
             assert.equal(isStrictUndefined(new Promise(() => {})), false, "Checking new Promise(() => {})");
             assert.equal(isStrictUndefined(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isStrictUndefined(_simplePromiseLike()), false, "Checking _simplePromiseLike");
-
+            assert.equal(isStrictUndefined(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isStrictUndefined(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -206,7 +212,8 @@ describe("base helpers", () => {
             assert.equal(isNullOrUndefined(new Promise(() => {})), false, "Checking new Promise(() => {})");
             assert.equal(isNullOrUndefined(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isNullOrUndefined(_simplePromiseLike()), false, "Checking _simplePromiseLike");
-
+            assert.equal(isNullOrUndefined(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isNullOrUndefined(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -247,6 +254,8 @@ describe("base helpers", () => {
             assert.equal(isStrictNullOrUndefined(new Promise(() => {})), false, "Checking new Promise(() => {})");
             assert.equal(isStrictNullOrUndefined(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isStrictNullOrUndefined(_simplePromiseLike()), false, "Checking _simplePromiseLike");
+            assert.equal(isStrictNullOrUndefined(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isStrictNullOrUndefined(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -287,7 +296,8 @@ describe("base helpers", () => {
             assert.equal(isDefined(new Promise(() => {})), true, "Checking new Promise(() => {})");
             assert.equal(isDefined(_simplePromise()), true, "Checking _simplePromise");
             assert.equal(isDefined(_simplePromiseLike()), true, "Checking _simplePromiseLike");
-
+            assert.equal(isDefined(Object.create(null)), true, "Checking Object.create(null)");
+            assert.equal(isDefined(polyObjCreate(null)), true, "Checking polyObjCreate(null)");
         });
     });
 
@@ -327,7 +337,8 @@ describe("base helpers", () => {
             assert.equal(isString(new Promise(() => {})), false, "Checking new Promise(() => {})");
             assert.equal(isString(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isString(_simplePromiseLike()), false, "Checking _simplePromiseLike");
-
+            assert.equal(isString(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isString(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -367,7 +378,8 @@ describe("base helpers", () => {
             assert.equal(isFunction(new Promise(() => {})), false, "Checking new Promise(() => {})");
             assert.equal(isFunction(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isFunction(_simplePromiseLike()), false, "Checking _simplePromiseLike");
-
+            assert.equal(isFunction(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isFunction(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -426,6 +438,8 @@ describe("base helpers", () => {
             assert.equal(isObject(_simplePromise()), true, "Checking _simplePromise");
             assert.equal(isObject(_simplePromiseLike()), true, "Checking _simplePromiseLike");
 
+            assert.equal(isObject(Object.create(null)), true, "Checking Object.create(null)");
+            assert.equal(isObject(polyObjCreate(null)), true, "Checking polyObjCreate(null)");
         });
     });
 
@@ -466,7 +480,8 @@ describe("base helpers", () => {
             assert.equal(isArray(new Promise(() => {})), false, "Checking new Promise(() => {})");
             assert.equal(isArray(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isArray(_simplePromiseLike()), false, "Checking _simplePromiseLike");
-
+            assert.equal(isArray(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isArray(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -507,7 +522,8 @@ describe("base helpers", () => {
             assert.equal(isDate(new Promise(() => {})), false, "Checking new Promise(() => {})");
             assert.equal(isDate(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isDate(_simplePromiseLike()), false, "Checking _simplePromiseLike");
-
+            assert.equal(isDate(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isDate(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -548,7 +564,8 @@ describe("base helpers", () => {
             assert.equal(isNumber(new Promise(() => {})), false, "Checking new Promise(() => {})");
             assert.equal(isNumber(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isNumber(_simplePromiseLike()), false, "Checking _simplePromiseLike");
-
+            assert.equal(isNumber(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isNumber(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -606,7 +623,8 @@ describe("base helpers", () => {
             assert.equal(isBoolean(new Promise(() => {})), false, "Checking new Promise(() => {})");
             assert.equal(isBoolean(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isBoolean(_simplePromiseLike()), false, "Checking _simplePromiseLike");
-
+            assert.equal(isBoolean(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isBoolean(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -647,7 +665,8 @@ describe("base helpers", () => {
             assert.equal(isRegExp(new Promise(() => {})), false, "Checking new Promise(() => {})");
             assert.equal(isRegExp(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isRegExp(_simplePromiseLike()), false, "Checking _simplePromiseLike");
-
+            assert.equal(isRegExp(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isRegExp(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -688,7 +707,8 @@ describe("base helpers", () => {
             assert.equal(isFile(new Promise(() => {})), false, "Checking new Promise(() => {})");
             assert.equal(isFile(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isFile(_simplePromiseLike()), false, "Checking _simplePromiseLike");
-
+            assert.equal(isFile(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isFile(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -729,7 +749,8 @@ describe("base helpers", () => {
             assert.equal(isFormData(new Promise(() => {})), false, "Checking new Promise(() => {})");
             assert.equal(isFormData(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isFormData(_simplePromiseLike()), false, "Checking _simplePromiseLike");
-
+            assert.equal(isFormData(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isFormData(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
 
         describe("isBlob", () => {
@@ -769,7 +790,8 @@ describe("base helpers", () => {
                 assert.equal(isBlob(new Promise(() => {})), false, "Checking new Promise(() => {})");
                 assert.equal(isBlob(_simplePromise()), false, "Checking _simplePromise");
                 assert.equal(isBlob(_simplePromiseLike()), false, "Checking _simplePromiseLike");
-
+                assert.equal(isBlob(Object.create(null)), false, "Checking Object.create(null)");
+                assert.equal(isBlob(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
             });
         });
 
@@ -811,6 +833,8 @@ describe("base helpers", () => {
                 assert.equal(isArrayBuffer(new Promise(() => {})), false, "Checking new Promise(() => {})");
                 assert.equal(isArrayBuffer(_simplePromise()), false, "Checking _simplePromise");
                 assert.equal(isArrayBuffer(_simplePromiseLike()), false, "Checking _simplePromiseLike");
+                assert.equal(isArrayBuffer(Object.create(null)), false, "Checking Object.create(null)");
+                assert.equal(isArrayBuffer(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
             });
         });
     });
@@ -852,6 +876,8 @@ describe("base helpers", () => {
             assert.equal(isError(new Promise(() => {})), false, "Checking new Promise(() => {})");
             assert.equal(isError(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isError(_simplePromiseLike()), false, "Checking _simplePromiseLike");
+            assert.equal(isError(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isError(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -892,6 +918,8 @@ describe("base helpers", () => {
             assert.equal(isPromiseLike(new Promise(() => {})), true, "Checking new Promise(() => {})");
             assert.equal(isPromiseLike(_simplePromise()), true, "Checking _simplePromise");
             assert.equal(isPromiseLike(_simplePromiseLike()), true, "Checking _simplePromiseLike");
+            assert.equal(isPromiseLike(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isPromiseLike(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -933,6 +961,8 @@ describe("base helpers", () => {
             assert.equal(isPromise(new Promise(() => {})), true, "Checking new Promise(() => {})");
             assert.equal(isPromise(_simplePromise()), true, "Checking _simplePromise");
             assert.equal(isPromise(_simplePromiseLike()), false, "Checking _simplePromiseLike");
+            assert.equal(isPromise(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isPromise(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -989,6 +1019,8 @@ describe("base helpers", () => {
             assert.equal(isNotTruthy(new Promise(() => {})), false, "Checking new Promise(() => {})");
             assert.equal(isNotTruthy(_simplePromise()), false, "Checking _simplePromise");
             assert.equal(isNotTruthy(_simplePromiseLike()), false, "Checking _simplePromiseLike");
+            assert.equal(isNotTruthy(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isNotTruthy(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -1044,6 +1076,8 @@ describe("base helpers", () => {
             assert.equal(isTruthy(new Promise(() => {})), true, "Checking new Promise(() => {})");
             assert.equal(isTruthy(_simplePromise()), true, "Checking _simplePromise");
             assert.equal(isTruthy(_simplePromiseLike()), true, "Checking _simplePromiseLike");
+            assert.equal(isTruthy(Object.create(null)), true, "Checking Object.create(null)");
+            assert.equal(isTruthy(polyObjCreate(null)), true, "Checking polyObjCreate(null)");
         });
     });
 
