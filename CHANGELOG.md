@@ -1,4 +1,10 @@
 
+# v0.4.1 Aug 12th, 2022
+
+## Changelog
+
+- #69 [Bug] isObject() throws a TypeError when an object is created via Object.create(null)
+
 # v0.4.0 Aug 10th, 2022
 
 ## Changelog
