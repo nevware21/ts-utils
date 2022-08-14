@@ -9,8 +9,9 @@
 import { isString, isUndefined } from "../helpers/base";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
-import { StrProto } from "../internal/constants";
+import { LENGTH, StrProto } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
+import { strSubstring } from "./substring";
 
 const ENDS_WITH = "endsWith";
 
@@ -37,9 +38,9 @@ export function polyStrEndsWith(value: string, searchString: string, length?: nu
     }
 
     let searchValue = isString(searchString) ? searchString : "" + searchString;
-    let chkLen = searchValue.length;
-    let len = value.length;
+    let chkLen = searchValue[LENGTH];
+    let len = value[LENGTH];
     let end = !isUndefined(length) && length < len ? length : len;
 
-    return value.substring(end - chkLen, end) === searchValue;
+    return strSubstring(value, end - chkLen, end) === searchValue;
 }

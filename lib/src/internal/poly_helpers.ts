@@ -6,10 +6,12 @@
  * Licensed under the MIT license.
  */
 
+import { LENGTH } from "./constants";
+
 export function makePolyFn<T extends Function>(poly: T): T {
     return function(): T {
         let theArgs = [ this ];
-        for (let lp = 0; lp < arguments.length; lp++) {
+        for (let lp = 0; lp < arguments[LENGTH]; lp++) {
             theArgs.push(arguments[lp]);
         }
         

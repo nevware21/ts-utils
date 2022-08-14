@@ -12,6 +12,8 @@ import { isFunction, isStrictNullOrUndefined } from "./base";
 
 /**
  * Checks if the type of value looks like an iterator instance (contains a next function).
+ *
+ * @since 0.4.0
  * @group Type Identity
  * @group Iterator
  * @typeParam T - Identifies the return type of the iterator defaults to any
@@ -25,6 +27,8 @@ export function isIterator<T = any>(value: any): value is Iterator<T> {
 /**
  * Checks if the value looks like it is iterable, contains a [symbol.iterator] if `symbols`
  * are supported or `isIterator(value)` is `symbols` are not supported
+ *
+ * @since 0.4.0
  * @group Type Identity
  * @group Iterator
  * @typeParam T - Identifies the return type of the iterator

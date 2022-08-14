@@ -6,6 +6,8 @@
  * Licensed under the MIT license.
  */
 
+import { LENGTH } from "../internal/constants";
+
 /**
  * Calls the provided `callbackFn` function once for each element in an array in ascending index order. It is not invoked for index properties
  * that have been deleted or are uninitialized. And unlike the ES6 forEach() you CAN stop or break the iteration by returning -1 from the
@@ -45,7 +47,7 @@
  */
 export function arrForEach<T>(arr: T[], callbackfn: (value: T, index?: number, array?: T[]) => void | number, thisArg?: any): void {
     if (arr) {
-        const len = arr.length;
+        const len = arr[LENGTH];
         for (let idx = 0; idx < len; idx++) {
             if (idx in arr) {
                 if (callbackfn.call(thisArg || arr, arr[idx], idx, arr) === -1) {

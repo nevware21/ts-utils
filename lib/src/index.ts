@@ -26,11 +26,13 @@ export {
 export {
     deepExtend, objExtend
 } from "./helpers/extend";
+export { GetLengthImpl, getLength } from "./helpers/length";
 export { getIntValue } from "./helpers/number";
 export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";
 export { hasValue } from "./helpers/value";
 export { isIterable, isIterator} from "./helpers/iterator";
 export { mathCeil, mathFloor } from "./math/floor";
+export { mathMin, mathMax } from "./math/min_max";
 export { mathToInt } from "./math/to_int";
 export { mathTrunc } from "./math/trunc";
 export { objCreate } from "./object/create";
@@ -48,6 +50,7 @@ export { strPadEnd, strPadStart } from "./string/pad";
 export { strRepeat } from "./string/repeat";
 export { strSlice } from "./string/slice";
 export { strStartsWith } from "./string/starts_with";
+export { strSubstr, strSubstring, strLeft, strRight, polyStrSubstr } from "./string/substring";
 export { strTrim, strTrimEnd, strTrimLeft, strTrimRight, strTrimStart } from "./string/trim";
 export { isSymbol, getSymbol, getKnownSymbol, hasSymbol, newSymbol, symbolFor, symbolKeyFor } from "./symbol/symbol";
 export { WellKnownSymbols } from "./symbol/well_known";

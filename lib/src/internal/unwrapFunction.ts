@@ -26,3 +26,19 @@ export function _unwrapFunction<T>(funcName: string) {
         throwTypeError("'" + funcName + "' not defined for " + dumpObj(thisArg));
     };
 }
+
+/**
+ * @internal
+ * @ignore
+ * Internal helper to lookup and return the named property from the first argument (which becomes the this)
+ *
+ * @since 0.4.2
+ * @typeParam T - The type of the object which contains the propName
+ * @param propName - The property name
+ * @returns The value of the property
+ */
+export function _unwrapProp<T>(propName: keyof T) {
+    return function (thisArg: T) {
+        return thisArg[propName];
+    };
+}

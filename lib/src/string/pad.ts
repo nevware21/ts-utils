@@ -7,11 +7,12 @@
  */
 
 import { isNullOrUndefined } from "../helpers/base";
-import { EMPTY, StrProto } from "../internal/constants";
+import { EMPTY, LENGTH, StrProto } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 import { mathCeil } from "../math/floor";
 import { mathToInt } from "../math/to_int";
 import { strRepeat } from "./repeat";
+import { strSubstring } from "./substring";
 
 const PAD_START = "padStart";
 const PAD_END = "padEnd";
@@ -21,16 +22,16 @@ function _padValue(value: string, targetLength: number, padString?: string) {
     targetLength = mathToInt(targetLength, true);
     targetLength >>= 0;
 
-    let len = value.length;
+    let len = value[LENGTH];
     if (len < targetLength) {
         result = isNullOrUndefined(padString) ? " " : "" + padString;
         targetLength = targetLength - len;
-        if (targetLength > result.length) {
-            result = strRepeat(result, mathCeil(targetLength / result.length));
+        if (targetLength > result[LENGTH]) {
+            result = strRepeat(result, mathCeil(targetLength / result[LENGTH]));
         }
 
-        if (result.length > targetLength) {
-            result = result.substring(0, targetLength);
+        if (result[LENGTH] > targetLength) {
+            result = strSubstring(result, 0, targetLength);
         }
     }
 

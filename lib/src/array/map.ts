@@ -11,6 +11,8 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
 /**
  * Callback signature for {@link arrMap} that is called for every element of array. Each time callbackFn
  * executes, the returned value is added to newArray.
+ *
+ * @since 0.3.3
  * @group Array
  * @typeParam T - Identifies the type of the array elements
  * @typeParam R - Identifies the type of the elements returned by the callback function, defaults to T.
@@ -31,6 +33,8 @@ export type ArrMapCallbackFn<T, R = T> = (value: T, index?: number, array?: T[])
  * It is not called for missing elements of the array; that is:
  * - indexes that have never been set;
  * - indexes which have been deleted.
+ *
+ * @since 0.3.3
  * @group Array
  * @typeParam T - Identifies the type of the array elements
  * @typeParam R - Identifies the type of the elements returned by the callback function, defaults to T.
