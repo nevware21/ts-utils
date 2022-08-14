@@ -14,7 +14,9 @@ import { _unwrapProp } from "../internal/unwrapFunction";
  * constraint for {@link getLength}
  *
  * @since 0.4.2
- * @group Get Value
+ * @group String
+ * @group Array
+ * @group Object
  */
 export interface IGetLength {
 
@@ -31,7 +33,9 @@ export interface IGetLength {
  * @since 0.4.2
  * @group Array
  * @group String
- * @group Get Value
+ * @group String
+ * @group Array
+ * @group Object
  * @param value - The value to return the length property from, must contain a `length` property
  * @example
  * ```ts
