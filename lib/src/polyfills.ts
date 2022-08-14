@@ -7,8 +7,7 @@
  */
 
 import { arrForEach } from "./array/forEach";
-import { objDefineProp } from "./object/define";
-import { PROTOTYPE } from "./internal/constants";
+import { ArrCls, ObjClass, StrProto } from "./internal/constants";
 import { polyIsArray } from "./polyfills/array";
 import { polyObjKeys } from "./polyfills/object";
 import { polyStrStartsWith } from "./string/starts_with";
@@ -20,8 +19,7 @@ import { makePolyFn } from "./internal/poly_helpers";
 (function () {
 
     const objectPolyfills = {
-        "keys": polyObjKeys,
-        "defineProperty": objDefineProp
+        "keys": polyObjKeys
     };
 
     const stringPolyfills = {
@@ -37,18 +35,16 @@ import { makePolyFn } from "./internal/poly_helpers";
     };
 
     // Add Object polyfills
-    const ObjClass = Object;
     arrForEach(polyObjKeys(objectPolyfills), (key) => {
         if (!ObjClass[key]) {
             ObjClass[key] = makePolyFn(objectPolyfills[key]);
         }
     });
     
-    if (!Array.isArray) {
-        Array.isArray = makePolyFn(polyIsArray);
+    if (!ArrCls.isArray) {
+        ArrCls.isArray = makePolyFn(polyIsArray);
     }
 
-    const StrProto = String[PROTOTYPE];
     arrForEach(polyObjKeys(stringPolyfills), (key) => {
         if (!StrProto[key]) {
             StrProto[key] = makePolyFn(stringPolyfills[key]);

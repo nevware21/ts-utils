@@ -16,11 +16,32 @@ Support for standard JavaScript functions (ES5+) that are not support in all env
 
 ### Documentation
 
-Documentation [generated from source code](https://nevware21.github.io/ts-utils/typedoc/index.html) via typedoc
-
-Some polyfills are provided for simple backward compatability to enable the utility functions in older environments (such as ES3 / IE8), you don't have to use or include the provided polyfils (AND they are NOT exported as part of the main module). If you need them you will need to import the "polyfill" file directly or host and load the provided `bundle/ts-polyfills-utils.min.js` or provide your own alternatives.
+See the documentation [generated from source code](https://nevware21.github.io/ts-utils/typedoc/index.html) via typedoc for a full list and details of all of the available types,  functions and interfaces.
 
 See [Browser Support](#browser-support) for details.
+
+| Type                       | Functions / Helpers / Aliases / Polyfills
+|----------------------------|---------------------------------------------------
+| Runtime Environment Checks | <code>getDocument(); getGlobal(); getHistory(); getInst(); getNavigator(); getWindow(); hasDocument(); hasHistory(); hasNavigator(); hasWindow(); isNode(); isWebWorker();</code>
+| Type Identity              | <code>isArray(); isArrayBuffer(); isBlob(); isBoolean(); isDate(); isError(); isFile(); isFormData(); isFunction(); isIterable(); isIterator(); isNullOrUndefined(); isNumber(); isObject(); isPromise(); isPromiseLike(); isRegExp(); isStrictNullOrUndefined(); isStrictUndefined(); isString(); isTypeof(); isUndefined();</code>
+| Value Check                | <code>hasValue(); isDefined(); isNotTruthy(); isNullOrUndefined(); isStrictNullOrUndefined(); isStrictUndefined(); isTruthy(); isUndefined();</code>
+| &nbsp;                     | &nbsp;
+| Array                      | <code>arrAppend(); arrForEach(); arrIndexOf(); arrMap(); arrReduce(); getLength(); isArray();<br/>polyIsArray</code>
+| Enum                       | <code>createEnum(); createEnumKeyMap(); createEnumValueMap(); createSimpleMap(); createTypeMap();</code>
+| Error                      | <code>createCustomError(); isError(); throwError(); throwRangeError(); throwTypeError(); throwUnsupported();</code>
+| Iterator                   | <code>createArrayIterator(); createIterator(); createIterable(); createRangeIterator(); iterForOf(); isIterable(); isIterator(); makeIterable();</code>
+| Math                       | <code>mathCeil(); mathFloor(); mathMax(); mathMin(); mathToInt(); mathTrunc();</code>
+| Object                     | <code>deepExtend(); isObject(); objAssign(); objCopyProps(); objCreate(); objDeepCopy(); objDeepFreeze(); objDefineAccessors(); objDefineGet(); objDefineProp(); objExtend(); objForEachKey(); objFreeze(); objHasOwnProperty(); objKeys(); objSeal(); objSetPrototypeOf(); objToString();<br/>polyObjKeys</code>
+| String                     | <code>getLength(); isString(); strEndsWith(); strIndexOf(); strIsNullOrEmpty(); strIsNullOrWhiteSpace(); strLastIndexOf(); strLeft(); strPadEnd(); strPadStart(); strRepeat(); strRight(); strSlice(); strStartsWith(); strSubstr(); strSubstring(); strTrim(); strTrimEnd(); strTrimLeft(); strTrimRight(); strTrimStart();<br/>polyStrSubstr(); polyStrTrim(); polyStrTrimEnd(); polyStrTrimStart();</code>
+| Symbol                     | <code>WellKnownSymbols (const enum);<br/>getKnownSymbol(); getSymbol(); hasSymbol(); isSymbol(); newSymbol(); symbolFor(); symbolKeyFor();<br/>polyGetKnownSymbol(); polyNewSymbol(); polySymbolFor(); polySymbolKeyFor();</code><br/>Polyfills are used to automatically backfill runtimes that do not support `Symbol`, not all of the Symbol functionality is provided.
+
+> Unless otherwise stated in the functions documentation polyfills are used to automatically backfill unsupported functions in older ES5 runtimes
+
+### Polyfills
+
+All of the included polyfills are tested against the current native implementation running in `node`, `browser` and `worker` environments to ensure that they conform to the current specification, these polyfills are only internally used for ES5 compatibility and when running in an environment (mostly IE) that does not support the required function.
+
+Some additional polyfills are provided for simple backward compatability to enable the utility functions in older environments (such as ES3 / IE8), however, you don't have to use or include these provided polyfils. If you need to use them you will need to import the pre-packaged "polyfill" bundle (`bundle/ts-polyfills-utils.min.js`) directly by hosting it on your own CDN or all of the non-internal polyfill implementations are exported so you could implement your own version of the [polyfill initializer](https://github.com/nevware21/ts-utils/blob/main/lib/src/polyfills.ts) or more simply provide your own alternatives.
 
 ## Quickstart
 
@@ -126,6 +147,8 @@ Could you do all of this yourself and create your own "helper" function -- Yes. 
 ## Browser Support
 
 General support is currently set to ES5 supported runtimes higher.
+
+Internal polyfills are used to backfill ES5 functionality which is not provided by older browsers.
 
 ![Chrome](https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png) | ![Firefox](https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png) | ![IE](https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png) | ![Opera](https://raw.githubusercontent.com/alrra/browser-logos/master/src/opera/opera_48x48.png) | ![Safari](https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png)
 --- | --- | --- | --- | --- |

@@ -14,9 +14,13 @@ import { _unwrapProp } from "../internal/unwrapFunction";
  * constraint for {@link getLength}
  *
  * @since 0.4.2
- * @group Value
+ * @group Get Value
  */
-export interface GetLengthImpl {
+export interface IGetLength {
+
+    /**
+     * Identifies the property that returns the length of the instance
+     */
     length: unknown;
 }
 
@@ -27,6 +31,7 @@ export interface GetLengthImpl {
  * @since 0.4.2
  * @group Array
  * @group String
+ * @group Get Value
  * @param value - The value to return the length property from, must contain a `length` property
  * @example
  * ```ts
@@ -38,4 +43,4 @@ export interface GetLengthImpl {
  * getLength({ length: () => 53; }); // returns the function that if called would return 53
  * ```
  */
-export const getLength: <T extends GetLengthImpl>(value: T) => T["length"] = _unwrapProp<GetLengthImpl>(LENGTH);
+export const getLength: <T extends IGetLength>(value: T) => T["length"] = _unwrapProp<IGetLength>(LENGTH);

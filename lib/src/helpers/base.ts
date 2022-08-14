@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { ArrCls, BOOLEAN, FUNCTION, NUMBER, OBJECT, ObjProto, STRING, UNDEFINED } from "../internal/constants";
+import { ArrCls, BOOLEAN, FUNCTION, NUMBER, OBJECT, ObjProto, STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
 import { _safeCheck } from "../internal/safe_check";
 
 /**
@@ -164,7 +164,7 @@ export function isStrictNullOrUndefined(value: any): boolean {
  * @returns true if arg has a value (is not === undefined)
  */
 export function isDefined(arg: any): boolean {
-    return !!arg || arg !== undefined;
+    return !!arg || arg !== UNDEF_VALUE;
 }
 
 /**

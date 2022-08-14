@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { ObjClass } from "../internal/constants";
+import { ObjClass, VALUE } from "../internal/constants";
 import { isFunction, isUndefined, objToString } from "../helpers/base";
 import { throwUnsupported } from "../helpers/customError";
 import { dumpObj } from "../helpers/diagnostics";
@@ -47,7 +47,7 @@ export function objDefineGet<T, V = any>(target: T, key: PropertyKey, value: (()
     if (isFunction(value)) {
         desc.get = value;
     } else {
-        desc.value = value;
+        desc[VALUE] = value;
     }
 
     return objDefineProp(target, key, desc);

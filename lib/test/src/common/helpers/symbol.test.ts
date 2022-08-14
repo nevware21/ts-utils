@@ -1,3 +1,11 @@
+/*
+ * @nevware21/ts-utils
+ * https://github.com/nevware21/ts-utils
+ *
+ * Copyright (c) 2022 Nevware21
+ * Licensed under the MIT license.
+ */
+
 import { assert } from "chai";
 import { getInst } from "../../../../src/helpers/environment";
 import { hasSymbol, getSymbol, getKnownSymbol} from "../../../../src/symbol/symbol";
@@ -85,6 +93,8 @@ describe("symbol helpers", () => {
                 assert.equal(getKnownSymbol(WellKnownSymbols.toStringTag, true), undefined, "Check that the expected symbol is returned");
             } finally {
                 Symbol = orgSymbol;
+                // Reset the internal cache
+                getSymbol(false);
             }
         });
 
@@ -106,6 +116,8 @@ describe("symbol helpers", () => {
                 assert.equal(getKnownSymbol<any>(WellKnownSymbols.toStringTag, false)._polyfill, true, "Check that the expected symbol is returned");
             } finally {
                 Symbol = orgSymbol;
+                // Reset the internal cache
+                getSymbol(false);
             }
         });
 
@@ -127,6 +139,8 @@ describe("symbol helpers", () => {
                 assert.equal(getKnownSymbol<any>(WellKnownSymbols.toStringTag, false)._polyfill, true, "Check that the expected symbol is returned");
             } finally {
                 Symbol = orgSymbol;
+                // Reset the internal cache
+                getSymbol(false);
             }
         });
     });

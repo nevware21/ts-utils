@@ -1,8 +1,13 @@
+/*
+ * @nevware21/ts-utils
+ * https://github.com/nevware21/ts-utils
+ *
+ * Copyright (c) 2022 Nevware21
+ * Licensed under the MIT license.
+ */
+
 import { assert } from "chai";
-import {
-    isIterator, isIterable
-} from "../../../../src/helpers/iterator";
-import { dumpObj } from "../../../../src/helpers/diagnostics";
+import { isIterator, isIterable } from "../../../../src/iterator/iterator";
 
 describe("iterator helpers", () => {
     describe("isIterator", () => {
