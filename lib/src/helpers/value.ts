@@ -9,6 +9,7 @@
 import { arrForEach } from "../array/forEach";
 import { isArray, isBoolean, isDate, isFunction, isNullOrUndefined, isObject, isTruthy } from "./base";
 import { objKeys } from "../object/object";
+import { LENGTH } from "../internal/constants";
 
 function _checkLength(value: any, props: string[]) {
     let result: any;
@@ -29,14 +30,14 @@ function _hasValue(value: any, depth: number): boolean {
 
     if (!result && !isNullOrUndefined(value)) {
         if (isArray(value)) {
-            result = value.length > 0;
+            result = value[LENGTH] > 0;
         } else if (isDate(value)) {
             result = !isNaN(value.getTime());
         } else if (isBoolean(value)) {
             return true;
         } else if (isObject(value)) {
             try {
-                let chkValue = _checkLength(value, [ "length", "byteLength", "size", "count"]);
+                let chkValue = _checkLength(value, [ LENGTH, "byteLength", "size", "count"]);
                 if (isBoolean(chkValue)) {
                     return chkValue;
                 }
@@ -48,7 +49,7 @@ function _hasValue(value: any, depth: number): boolean {
                 // Best effort to try calling functions and lookup properties
             }
 
-            return !!objKeys(value).length;
+            return !!objKeys(value)[LENGTH];
         } else {
             result = isTruthy(value);
         }

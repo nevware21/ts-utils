@@ -24,6 +24,7 @@ export const SYMBOL = "Symbol";
 export const POLYFILL_TAG = "_polyfill";
 export const INDEX_OF = "indexOf";
 export const LAST_INDEX_OF = "lastIndexOf";
+export const LENGTH = "length";
 
 /**
  * @ignore

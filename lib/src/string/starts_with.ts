@@ -9,8 +9,9 @@
 import { isString } from "../helpers/base";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
-import { StrProto } from "../internal/constants";
+import { LENGTH, StrProto } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
+import { strSubstring } from "./substring";
 
 const STARTS_WITH = "startsWith";
 
@@ -40,8 +41,8 @@ export function polyStrStartsWith(value: string, searchString: string, position?
         throwTypeError("'" + dumpObj(value) + "' is not a string");
     }
     let searchValue = isString(searchString) ? searchString : "" + searchString;
-    let chkLen = searchValue.length;
+    let chkLen = searchValue[LENGTH];
     let pos = position > 0 ? position : 0;
 
-    return value.substring(pos, pos + chkLen) === searchValue;
+    return strSubstring(value, pos, pos + chkLen) === searchValue;
 }
