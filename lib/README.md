@@ -12,7 +12,14 @@
 
 This is a collection of general JavaScript functions (written in and for TypeScript) to aid with removing code duplication to assist with minification, the provided functions are expected to only rarely be included in their namespaced environment.
 
-Support for standard JavaScript functions (ES5+) that are not support in all environments will be backed by internal polyfill implementations when not available. All of the polyfill functions are tested against the standard native implementations for node, browser and web-worker to ensure compatibility.
+Support for standard JavaScript functions (ES5+) that are not support in all environments will be backed by internal polyfill implementations when not available. 
+
+### Test Environments 
+- Node (12, 14, 16)
+- Browser (Chromium - headless)
+- Web Worker (Chromium - headless)
+
+All of the polyfill functions are tested against the standard native implementations for node, browser and web-worker to ensure compatibility.
 
 ### Documentation and details
 
@@ -36,12 +43,6 @@ See [Browser Support](#browser-support) for details.
 | Symbol                     | <code>WellKnownSymbols (const enum);<br/>getKnownSymbol(); getSymbol(); hasSymbol(); isSymbol(); newSymbol(); symbolFor(); symbolKeyFor();<br/>polyGetKnownSymbol(); polyNewSymbol(); polySymbolFor(); polySymbolKeyFor();</code><br/>Polyfills are used to automatically backfill runtimes that do not support `Symbol`, not all of the Symbol functionality is provided.
 
 > Unless otherwise stated in the functions documentation polyfills are used to automatically backfill unsupported functions in older ES5 runtimes
-
-#### Polyfills
-
-All of the included polyfills are tested against the current native implementation running in `node`, `browser` and `worker` environments to ensure that they conform to the current specification, these polyfills are only internally used for ES5 compatibility and when running in an environment (mostly IE) that does not support the required function.
-
-Some additional polyfills are provided for simple backward compatability to enable the utility functions in older environments (such as ES3 / IE8), however, you don't have to use or include these provided polyfils. If you need to use them you will need to import the pre-packaged "polyfill" bundle (`bundle/ts-polyfills-utils.min.js`) directly by hosting it on your own CDN or all of the non-internal polyfill implementations are exported so you could implement your own version of the [polyfill initializer](https://github.com/nevware21/ts-utils/blob/main/lib/src/polyfills.ts) or more simply provide your own alternatives.
 
 ## Quickstart
 
@@ -90,8 +91,17 @@ function checkString(value: any) {
 General support is currently set to ES5 supported runtimes higher.
 ![Chrome](https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png) | ![Firefox](https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png) | ![IE](https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png) | ![Opera](https://raw.githubusercontent.com/alrra/browser-logos/master/src/opera/opera_48x48.png) | ![Safari](https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png)
 --- | --- | --- | --- | --- |
-Latest ? | Latest ? | 9+ Full ?<br/><sub>8- polyfills<br/>needed</sub> | Latest ? | Latest ? |
+Latest ? | Latest ? | <center>9+</center> | Latest ? | Latest ? |
 > Note: While some polyfills are provided to "somewhat" support ES3/IE8 this library does not intend to become a fully fledged polyfill library. And the polyfills provided (or contributed) are just the minimum set that have been required over time. And should be less necessary are time moves forward.
+
+#### Polyfills
+
+All of the included polyfills are tested against the current native implementation running in `node`, `browser` and `worker` environments to ensure that they conform to the current specification, these polyfills are only internally used for ES5 compatibility and when running in an environment (mostly IE) that does not support the required function.
+
+Some additional polyfills are provided for simple backward compatability to enable the utility functions in older environments (such as ES3 / IE8), however, you don't have to use or include these provided polyfils. If you need to use them you will need to import the pre-packaged "polyfill" bundle (`bundle/ts-polyfills-utils.min.js`) directly by hosting it on your own CDN or all of the non-internal polyfill implementations are exported so you could implement your own version of the [polyfill initializer](https://github.com/nevware21/ts-utils/blob/main/lib/src/polyfills.ts) or more simply provide your own alternatives.
+
+> Note: Several functions use the [Object.defineProperty](https://caniuse.com/?search=Object.defineProperty) and therefore support is limited to runtimes or good polyfills that can correctly implement this functionality. (eg. createIterator; createIterable)
+
 ## Contributing
 
 Read our [contributing guide](./CONTRIBUTING.md) to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes.

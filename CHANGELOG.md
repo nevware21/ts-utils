@@ -1,4 +1,21 @@
 
+# v0.4.2 Aug 15th, 2022
+
+## Changelog
+
+- #72 Add mathMin and mathMax
+  - Add strSubstring; strSubstr; strLeft; strRight
+  - Add getLength
+- #73 Add iterator and iterable creation and processing functions
+  - Add creatorIterator
+  - Add createArrayIterator
+  - Add createIterator; createIterable; makeIterable
+  - Add iterForOf
+  - Add createRangeIterator
+  - Update copyright notices on tests
+  - Update ReadMe
+- #74 Update typedoc groups and readme
+
 # v0.4.1 Aug 12th, 2022
 
 ## Changelog
