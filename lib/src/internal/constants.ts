@@ -9,6 +9,7 @@
 // These constants are currently NOT exported directly, we may export them later associated with a frozen namespace (maybe)
 // For now do NOT expect that we will export these values.
 
+export const UNDEF_VALUE: undefined = undefined;
 
 export const EMPTY = "";
 export const BOOLEAN = "boolean";
@@ -25,6 +26,8 @@ export const POLYFILL_TAG = "_polyfill";
 export const INDEX_OF = "indexOf";
 export const LAST_INDEX_OF = "lastIndexOf";
 export const LENGTH = "length";
+export const DONE = "done";
+export const VALUE = "value";
 
 /**
  * @ignore
@@ -39,7 +42,12 @@ export const ObjProto = ObjClass[PROTOTYPE];
 /**
  * @ignore
  */
-export const StrProto = String[PROTOTYPE];
+export const StrCls = String;
+
+/**
+ * @ignore
+ */
+export const StrProto = StrCls[PROTOTYPE];
 
 /**
  * @ignore

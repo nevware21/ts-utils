@@ -12,7 +12,7 @@ import { isNullOrUndefined, isNumber } from "./base";
  * Helper to obtain the integer value using base 10 conversion from a string,
  * also handles `null`, `undefined` and `Nan` cases which will all return the
  * default value.
- * @group Integer
+ * @group Get Value
  * @param value - The string or numeric value to get the integer value from
  * @param defValue - The default value if unsuccessful
  * @returns The default or parsed value.

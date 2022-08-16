@@ -7,8 +7,8 @@
  */
 
 import { isArray, isUndefined } from "../helpers/base";
-import { isIterator } from "../helpers/iterator";
-import { ArrProto } from "../internal/constants";
+import { isIterator } from "../iterator/iterator";
+import { ArrProto, DONE, VALUE } from "../internal/constants";
 
 /**
  * Appends the `elms` to the `target` where the elms may be an array, a single object
@@ -31,8 +31,8 @@ export function arrAppend<T>(target: T[], elms: T | T[] | Iterator<T>): T[] {
             ArrProto.push.apply(target, elms);
         } else if (isIterator<T>(elms)) {
             let value = elms.next();
-            while(!value.done) {
-                target.push(value.value);
+            while(!value[DONE]) {
+                target.push(value[VALUE]);
                 value = elms.next();
             }
         } else {

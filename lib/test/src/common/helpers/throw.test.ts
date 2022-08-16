@@ -1,3 +1,11 @@
+/*
+ * @nevware21/ts-utils
+ * https://github.com/nevware21/ts-utils
+ *
+ * Copyright (c) 2022 Nevware21
+ * Licensed under the MIT license.
+ */
+
 import { assert } from "chai";
 import { isError, objToString } from "../../../../src/helpers/base";
 import { createCustomError, CustomErrorConstructor, throwUnsupported } from "../../../../src/helpers/customError";

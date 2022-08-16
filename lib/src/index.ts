@@ -26,11 +26,15 @@ export {
 export {
     deepExtend, objExtend
 } from "./helpers/extend";
-export { GetLengthImpl, getLength } from "./helpers/length";
+export { IGetLength as GetLengthImpl, getLength } from "./helpers/length";
 export { getIntValue } from "./helpers/number";
 export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";
 export { hasValue } from "./helpers/value";
-export { isIterable, isIterator} from "./helpers/iterator";
+export { createArrayIterator } from "./iterator/array";
+export { CreateIteratorContext, createIterator, createIterable, makeIterable } from "./iterator/create";
+export { iterForOf } from "./iterator/forOf";
+export { isIterable, isIterator } from "./iterator/iterator";
+export { createRangeIterator } from "./iterator/range";
 export { mathCeil, mathFloor } from "./math/floor";
 export { mathMin, mathMax } from "./math/min_max";
 export { mathToInt } from "./math/to_int";
