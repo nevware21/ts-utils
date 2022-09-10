@@ -30,7 +30,7 @@ See [Browser Support](#browser-support) for details.
 | Type                       | Functions / Helpers / Aliases / Polyfills
 |----------------------------|---------------------------------------------------
 | Runtime Environment Checks | <code>getDocument(); getGlobal(); getHistory(); getInst(); getNavigator(); getWindow(); hasDocument(); hasHistory(); hasNavigator(); hasWindow(); isNode(); isWebWorker();</code>
-| Type Identity              | <code>isArray(); isArrayBuffer(); isBlob(); isBoolean(); isDate(); isError(); isFile(); isFormData(); isFunction(); isIterable(); isIterator(); isNullOrUndefined(); isNumber(); isObject(); isPromise(); isPromiseLike(); isRegExp(); isStrictNullOrUndefined(); isStrictUndefined(); isString(); isTypeof(); isUndefined();</code>
+| Type Identity              | <code>isArray(); isArrayBuffer(); isBlob(); isBoolean(); isDate(); isError(); isFile(); isFormData(); isFunction(); isIterable(); isIterator(); isNullOrUndefined(); isNumber(); isObject(); isPromise(); isPromiseLike(); isThenable(); isRegExp(); isStrictNullOrUndefined(); isStrictUndefined(); isString(); isTypeof(); isUndefined();</code>
 | Value Check                | <code>hasValue(); isDefined(); isNotTruthy(); isNullOrUndefined(); isStrictNullOrUndefined(); isStrictUndefined(); isTruthy(); isUndefined();</code>
 | &nbsp;                     | &nbsp;
 | Array                      | <code>arrAppend(); arrForEach(); arrIndexOf(); arrMap(); arrReduce(); getLength(); isArray();<br/>polyIsArray</code>
@@ -38,8 +38,8 @@ See [Browser Support](#browser-support) for details.
 | Error                      | <code>createCustomError(); isError(); throwError(); throwRangeError(); throwTypeError(); throwUnsupported();</code>
 | Iterator                   | <code>createArrayIterator(); createIterator(); createIterable(); createRangeIterator(); iterForOf(); isIterable(); isIterator(); makeIterable();</code>
 | Math                       | <code>mathCeil(); mathFloor(); mathMax(); mathMin(); mathToInt(); mathTrunc();</code>
-| Object                     | <code>deepExtend(); isObject(); objAssign(); objCopyProps(); objCreate(); objDeepCopy(); objDeepFreeze(); objDefineAccessors(); objDefineGet(); objDefineProp(); objExtend(); objForEachKey(); objFreeze(); objHasOwnProperty(); objKeys(); objSeal(); objSetPrototypeOf(); objToString();<br/>polyObjKeys</code>
-| String                     | <code>getLength(); isString(); strEndsWith(); strIndexOf(); strIsNullOrEmpty(); strIsNullOrWhiteSpace(); strLastIndexOf(); strLeft(); strPadEnd(); strPadStart(); strRepeat(); strRight(); strSlice(); strStartsWith(); strSubstr(); strSubstring(); strTrim(); strTrimEnd(); strTrimLeft(); strTrimRight(); strTrimStart(); toString();<br/>polyStrSubstr(); polyStrTrim(); polyStrTrimEnd(); polyStrTrimStart();</code>
+| Object                     | <code>deepExtend(); isObject(); objAssign(); objCopyProps(); objCreate(); objDeepCopy(); objDeepFreeze(); objDefineAccessors(); objDefineGet(); objDefineProp(); objExtend(); objForEachKey(); objFreeze(); objGetOwnPropertyDescriptor(); objHasOwn(); objHasOwnProperty(); objKeys(); objSeal(); objSetPrototypeOf(); objToString();<br/>polyObjKeys(); polyObjHasOwn()</code>
+| String                     | <code>asString(); getLength(); isString(); strEndsWith(); strIndexOf(); strIsNullOrEmpty(); strIsNullOrWhiteSpace(); strLastIndexOf(); strLeft(); strPadEnd(); strPadStart(); strRepeat(); strRight(); strSlice(); strStartsWith(); strSubstr(); strSubstring(); strTrim(); strTrimEnd(); strTrimLeft(); strTrimRight(); strTrimStart();<br/>polyStrSubstr(); polyStrTrim(); polyStrTrimEnd(); polyStrTrimStart();</code>
 | Symbol                     | <code>WellKnownSymbols (const enum);<br/>getKnownSymbol(); getSymbol(); hasSymbol(); isSymbol(); newSymbol(); symbolFor(); symbolKeyFor();<br/>polyGetKnownSymbol(); polyNewSymbol(); polySymbolFor(); polySymbolKeyFor();</code><br/>Polyfills are used to automatically backfill runtimes that do not support `Symbol`, not all of the Symbol functionality is provided.
 
 > Unless otherwise stated in the functions documentation polyfills are used to automatically backfill unsupported functions in older ES5 runtimes
@@ -91,7 +91,7 @@ function checkString(value: any) {
 General support is currently set to ES5 supported runtimes higher.
 ![Chrome](https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png) | ![Firefox](https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png) | ![IE](https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png) | ![Opera](https://raw.githubusercontent.com/alrra/browser-logos/master/src/opera/opera_48x48.png) | ![Safari](https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png)
 --- | --- | --- | --- | --- |
-Latest ? | Latest ? | <center>9+</center> | Latest ? | Latest ? |
+Latest ? | Latest ? | <center>9+ ?</center> | Latest ? | Latest ? |
 > Note: While some polyfills are provided to "somewhat" support ES3/IE8 this library does not intend to become a fully fledged polyfill library. And the polyfills provided (or contributed) are just the minimum set that have been required over time. And should be less necessary are time moves forward.
 
 #### Polyfills

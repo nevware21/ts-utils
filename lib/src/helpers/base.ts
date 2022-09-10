@@ -316,6 +316,15 @@ export function isPromiseLike<T>(value: any): value is PromiseLike<T> {
 }
 
 /**
+ * Checks if the type of value is a PromiseLike instance (contains a then function).
+ * This is an alias for {@link isPromiseLike}.
+ * @group Type Identity
+ * @param {any} value - Value to be checked.
+ * @return {boolean} True if the value is a PromiseLike, false otherwise.
+ */
+export const isThenable: <T>(value: any) => value is PromiseLike<T> = isPromiseLike;
+
+/**
  * Checks if the type of value is a Promise instance (contains then and catch functions).
  * @group Type Identity
  * @param {any} value - Value to be checked.

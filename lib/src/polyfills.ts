@@ -15,11 +15,13 @@ import { polyStrEndsWith } from "./string/ends_with";
 import { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "./polyfills/trim";
 import { polyStrPadEnd, polyStrPadStart } from "./string/pad";
 import { makePolyFn } from "./internal/poly_helpers";
+import { polyObjHasOwn } from "./object/has_own";
 
 (function () {
 
     const objectPolyfills = {
-        "keys": polyObjKeys
+        "keys": polyObjKeys,
+        "hasOwn": polyObjHasOwn
     };
 
     const stringPolyfills = {

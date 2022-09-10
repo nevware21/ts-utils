@@ -16,6 +16,7 @@ import { objDefineAccessors, objDefineGet } from "../../../../src/object/define"
 import { FUNCTION } from "../../../../src/internal/constants";
 import { objSetPrototypeOf } from "../../../../src/object/set_proto";
 import { objCreate, polyObjCreate } from "../../../../src/object/create";
+import { objHasOwn, polyObjHasOwn } from "../../../../src/object/has_own";
 
 describe("object helpers", () => {
     it("objKeys", () => {
@@ -73,6 +74,15 @@ describe("object helpers", () => {
             c: 3,
             d: 4
         };
+
+        let src3 = {
+            e: 8,
+            get z() {
+                return 42;
+            }
+        };
+
+        objDefineGet(src3, "f", 9, true);
         
         objForEachKey({}, (key) => {
             assert.ok(false, "not expecting any calls");
@@ -98,6 +108,17 @@ describe("object helpers", () => {
             }
         });
         assert.equal(keys.length, 3, "Expected 3 keys - " + dumpObj(keys));
+
+        keys = [];
+        objForEachKey(src3, (key, value) => {
+            keys.push(key);
+            assert.ok(objHasOwn(src3, key));
+            assert.equal(value, src3[key]);
+        });
+        assert.equal(keys.length, 3, "Expected 3 keys - " + dumpObj(keys));
+        assert.ok(keys.indexOf("e") !== -1, "contains e");
+        assert.ok(keys.indexOf("f") !== -1, "contains f");
+        assert.ok(keys.indexOf("z") !== -1, "contains z");
     });
 
     it("objFreeze", () => {
@@ -330,7 +351,7 @@ describe("object helpers", () => {
         objDefineAccessors(value, "test", null, setFunc);
 
         try {
-            // @eslint-disable-next-line @typescript-eslint/no-unused-vars
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             let theValue = value.test;
             assert.ok(false, "Expected an exception when attempting to get with only a setter");
         } catch(e) {
@@ -508,6 +529,68 @@ describe("object helpers", () => {
                 assert.ok(true, "Expected an exception to be thrown");
             }
         });
+
+    });
+
+    describe("objHasOwn", () => {
+
+        it("native hasOwn", () => {
+            let obj1 = {
+                hello: () => "World"
+            };
+
+            assert.equal(objHasOwn(obj1, "hello"), true);
+            assert.equal(objHasOwn(obj1, "Friend"), false);
+
+            let obj2 = {
+                hello: () => "Darkness",
+                get Friend() {
+                    return "...";
+                }
+            };
+
+            objDefineGet(obj2, "My", "...", true);
+
+            assert.equal(objHasOwn(obj1, "hello"), true);
+            assert.equal(objHasOwn(obj2, "Friend"), true, "Expected Friend to be true");
+            assert.equal(objHasOwn(obj2, "My"), true, "Expected My to be true");
+            assert.equal(objHasOwn(obj2, "..."), false, "Expected ... to be false");
+            assert.equal(objHasOwn(obj2, "Darkness"), false, "Expected Darkness to be false");
+        });
+
+        it("polyObjHasOwn", () => {
+            let obj1 = {
+                hello: () => "World"
+            };
+
+            let obj2 = {
+                hello: () => "Darkness",
+                get Friend() {
+                    return "...";
+                }
+            };
+
+            objDefineGet(obj2, "My", "...", true);
+
+            let cnt = 0;
+            objForEachKey(obj1, (key) => {
+                cnt++;
+                _checkPolyHasOwn(obj1, key);
+            });
+
+            assert.equal(cnt, 1, "Expected 1 key");
+
+            assert.ok(objHasOwn(obj2, "Friend"), "Expected Friend to be true");
+            assert.ok(objHasOwn(obj2, "My"), "Expected My to be true");
+
+            cnt = 0;
+            objForEachKey(obj2, (key) => {
+                cnt++;
+                _checkPolyHasOwn(obj2, key);
+            });
+
+            assert.equal(cnt, 3, "Expected 3 key");
+        });
     });
 
     function _checkObjKeys(value: any) {
@@ -538,6 +621,38 @@ describe("object helpers", () => {
             } else {
                 assert.equal(isUndefined(objKeysResult), !!nativeThrew || isUndefined(nativeResult) || !!nativeResult,
                     "Checking whether the Native and objKeys threw or returned undefined [" + dumpObj(objKeysThrew || objKeysResult) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
+            }
+        }
+    }
+
+    function _checkPolyHasOwn(target: any, key: PropertyKey) {
+        let polyResult: any;
+        let nativeResult: any;
+        let polyThrew: any;
+        let nativeThrew: any;
+        try {
+            polyResult = polyObjHasOwn(target, key);
+        } catch (e) {
+            polyThrew = e;
+        }
+        try {
+            nativeResult = Object["hasOwn"](target, key);
+        } catch (e) {
+            nativeThrew = e;
+        }
+
+        if (isObject(target)) {
+            assert.equal(polyResult.length, nativeResult.length, "Checking Native and objKeys result for [" + dumpObj(target) + "]");
+        } else {
+            if (polyThrew) {
+                assert.equal(true, !!nativeThrew || isUndefined(nativeResult) || !!nativeResult,
+                    "Checking whether the Native and poly threw or returned undefined [" + dumpObj(polyThrew || polyResult) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(target) + "]");
+            } else if(nativeThrew) {
+                assert.ok(false,
+                    "Native threw but poly didn't [" + dumpObj(polyThrew) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(target) + "]");
+            } else {
+                assert.equal(isUndefined(polyResult), !!nativeThrew || isUndefined(nativeResult) || !!nativeResult,
+                    "Checking whether the Native and poly threw or returned undefined [" + dumpObj(polyThrew || polyResult) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(target) + "]");
             }
         }
     }

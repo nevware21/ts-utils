@@ -13,7 +13,7 @@ export { ArrMapCallbackFn, arrMap } from "./array/map";
 export { ArrReduceCallbackFn, arrReduce } from "./array/reduce";
 export {
     isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isDate, isNumber, isBoolean,
-    isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isNotTruthy, isTruthy, objToString,
+    isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isThenable, isNotTruthy, isTruthy, objToString,
     isStrictNullOrUndefined, isStrictUndefined, isError
 } from "./helpers/base";
 export { CustomErrorConstructor, createCustomError, throwUnsupported } from "./helpers/customError";
@@ -42,6 +42,8 @@ export { mathTrunc } from "./math/trunc";
 export { objCreate } from "./object/create";
 export { objDefineProp, objDefineGet, objDefineAccessors } from "./object/define";
 export { objForEachKey } from "./object/for_each_key";
+export { objGetOwnPropertyDescriptor } from "./object/get_own_prop_desc";
+export { objHasOwn, polyObjHasOwn } from "./object/has_own";
 export { objHasOwnProperty } from "./object/has_own_prop";
 export {
     objAssign, objKeys, objDeepCopy, objCopyProps, objDeepFreeze, objFreeze, objSeal
@@ -55,6 +57,7 @@ export { strRepeat } from "./string/repeat";
 export { strSlice } from "./string/slice";
 export { strStartsWith } from "./string/starts_with";
 export { strSubstr, strSubstring, strLeft, strRight, polyStrSubstr } from "./string/substring";
+export { asString } from "./string/as_string";
 export { strTrim, strTrimEnd, strTrimLeft, strTrimRight, strTrimStart } from "./string/trim";
 export { isSymbol, getSymbol, getKnownSymbol, hasSymbol, newSymbol, symbolFor, symbolKeyFor } from "./symbol/symbol";
 export { WellKnownSymbols } from "./symbol/well_known";

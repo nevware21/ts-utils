@@ -7,7 +7,7 @@
  */
 
 import { isObject } from "../helpers/base";
-import { objHasOwnProperty } from "../object/has_own_prop";
+import { objHasOwn } from "../object/has_own";
 
 /**
  * Returns the names of the enumerable string properties and methods of an object. This helper exists to avoid adding a polyfil for older browsers
@@ -24,7 +24,7 @@ export function polyObjKeys(obj: any): string[] {
 
     const result: string[] = [];
     for (const prop in obj) {
-        if (objHasOwnProperty(obj, prop)) {
+        if (objHasOwn(obj, prop)) {
             result.push(prop);
         }
     }
