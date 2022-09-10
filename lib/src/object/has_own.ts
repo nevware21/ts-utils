@@ -33,16 +33,16 @@ import { objHasOwnProperty } from "./has_own_prop";
  * @example
  * ```ts
  * let example = {};
- * objHasOwnProperty(example, 'prop');   // false
+ * objHasOwn(example, 'prop');   // false
  *
  * example.prop = 'exists';
- * objHasOwnProperty(example, 'prop');   // true - 'prop' has been defined
+ * objHasOwn(example, 'prop');   // true - 'prop' has been defined
  *
  * example.prop = null;
- * objHasOwnProperty(example, 'prop');   // true - own property exists with value of null
+ * objHasOwn(example, 'prop');   // true - own property exists with value of null
  *
  * example.prop = undefined;
- * objHasOwnProperty(example, 'prop');   // true - own property exists with value of undefined
+ * objHasOwn(example, 'prop');   // true - own property exists with value of undefined
  * ```
  */
 export const objHasOwn: <T = any>(obj: T, prop: PropertyKey) => boolean = (ObjClass as any)["hasOwn"] || polyObjHasOwn;
@@ -71,6 +71,19 @@ export const objHasOwn: <T = any>(obj: T, prop: PropertyKey) => boolean = (ObjCl
  * @param prop - The String or Symbol of the property to test
  * @returns `true` if the object has the specified property as own property; otherwise `false`
  * @example
+ * ```ts
+ * let example = {};
+ * polyObjHasOwn(example, 'prop');   // false
+ *
+ * example.prop = 'exists';
+ * polyObjHasOwn(example, 'prop');   // true - 'prop' has been defined
+ *
+ * example.prop = null;
+ * polyObjHasOwn(example, 'prop');   // true - own property exists with value of null
+ *
+ * example.prop = undefined;
+ * polyObjHasOwn(example, 'prop');   // true - own property exists with value of undefined
+ * ```
  */
 export function polyObjHasOwn<T = any>(obj: T, prop: PropertyKey): boolean {
     return objHasOwnProperty(obj, prop) || !!objGetOwnPropertyDescriptor(obj, prop)

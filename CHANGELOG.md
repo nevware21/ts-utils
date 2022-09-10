@@ -1,4 +1,11 @@
 
+# v0.4.3 Sept 9th, 2022
+
+## Changelog
+
+- #79 [Bug] objForEachKey() is not iterating over defined properties which are enumerable
+- #80 [Bug] toString() added in 0.4.2 is not exported from the main module
+
 # v0.4.2 Aug 15th, 2022
 
 ## Changelog
