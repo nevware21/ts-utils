@@ -35,7 +35,7 @@ export function objDefineProp<T>(target: T, key: PropertyKey, descriptor: Proper
  * @param target - The object on which to define the property.
  * @param key - The name of the property to be defined or modified
  * @param value - The value or a function that returns the value
- * @param configurable - Can the value be changed, defaults to true
+ * @param configurable - Can the value be changed, defaults to true.
  * @returns The object that was passed to the function
  */
 export function objDefineGet<T, V = any>(target: T, key: PropertyKey, value: (() => V) | V, configurable?: boolean): T {

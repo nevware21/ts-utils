@@ -7,7 +7,7 @@
  */
 
 import { isObject } from "../helpers/base";
-import { objHasOwnProperty } from "./has_own_prop";
+import { objHasOwn } from "./has_own";
 
 /**
  * Calls the provided `callbackFn` function once for each key in an object. This is equivelent to `arrForEach(Object.keys(theObject), callbackFn)` or
@@ -35,7 +35,7 @@ import { objHasOwnProperty } from "./has_own_prop";
 export function objForEachKey<T>(theObject: T, callbackfn: (key: string, value: T[keyof T]) => void | number, thisArg?: any): void {
     if (theObject && isObject(theObject)) {
         for (const prop in theObject) {
-            if (objHasOwnProperty(theObject, prop)) {
+            if (objHasOwn(theObject, prop)) {
                 if (callbackfn.call(thisArg || theObject, prop, theObject[prop]) === -1) {
                     break;
                 }

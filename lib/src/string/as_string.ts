@@ -9,20 +9,21 @@
 import { StrCls } from "../internal/constants";
 
 /**
- * The toString() method returns a string representing the value by
+ * The asString() method returns a string representing the value by
  * explicitly using `String(`value`)`.
  *
- * @since 0.4.2
+ * @since 0.4.3
  * @group String
+ * @group Conversion
  * @param value - The value to get a string representation of
  * @example
  * ```ts
  * const arr = [ 1, 2, 3];
- * toString(arr);       // "1,2,3"
- * toString(null);      // "null"
- * toString(undefined); // "undefined"
- * toString(42);        // "42"
- * toString(Symbol.for("Hello"));   // "Symbol(Hello)"
+ * asString(arr);       // "1,2,3"
+ * asString(null);      // "null"
+ * asString(undefined); // "undefined"
+ * asString(42);        // "42"
+ * asString(Symbol.for("Hello"));   // "Symbol(Hello)"
  * ```
  */
-export const toString: (value: any) => string = StrCls;
+export const asString: (value: any) => string = StrCls;

@@ -192,13 +192,4 @@ describe("string polyfills", () => {
                 "Checking whether the Native and polyfill returned the same result [" + dumpObj(polyThrew || polyResult) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
         }
     }
-
-    function _expectThrow(cb: () => void): Error {
-        try {
-            cb();
-        } catch (e) {
-            assert.ok(true, "Expected an exception to be thrown");
-            return e;
-        }
-    }
 });

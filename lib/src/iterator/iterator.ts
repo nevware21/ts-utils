@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { getKnownSymbol, hasSymbol } from "../symbol/symbol";
+import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 import { isFunction, isStrictNullOrUndefined } from "../helpers/base";
 
