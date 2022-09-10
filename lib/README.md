@@ -29,7 +29,7 @@ See [Browser Support](#browser-support) for details.
 
 | Type                       | Functions / Helpers / Aliases / Polyfills
 |----------------------------|---------------------------------------------------
-| Runtime Environment Checks | <code>getDocument(); getGlobal(); getHistory(); getInst(); getNavigator(); getWindow(); hasDocument(); hasHistory(); hasNavigator(); hasWindow(); isNode(); isWebWorker();</code>
+| Runtime Environment Checks | <code>getDocument(); getGlobal(); getHistory(); getInst(); getNavigator(); getPerformance(); getWindow(); hasDocument(); hasHistory(); hasNavigator(); hasPerformance(); hasWindow(); isNode(); isWebWorker(); hasIdleCallback();</code>
 | Type Identity              | <code>isArray(); isArrayBuffer(); isBlob(); isBoolean(); isDate(); isError(); isFile(); isFormData(); isFunction(); isIterable(); isIterator(); isNullOrUndefined(); isNumber(); isObject(); isPlainObject(); isPromise(); isPromiseLike(); isThenable(); isRegExp(); isStrictNullOrUndefined(); isStrictUndefined(); isString(); isTypeof(); isUndefined();</code>
 | Value Check                | <code>hasValue(); isDefined(); isNotTruthy(); isNullOrUndefined(); isStrictNullOrUndefined(); isStrictUndefined(); isTruthy(); isUndefined();</code>
 | &nbsp;                     | &nbsp;
@@ -41,6 +41,8 @@ See [Browser Support](#browser-support) for details.
 | Object                     | <code>deepExtend(); isObject(); objAssign(); objCopyProps(); objCreate(); objDeepCopy(); objDeepFreeze(); objDefineAccessors(); objDefineGet(); objDefineProp(); objExtend(); objForEachKey(); objFreeze(); objGetOwnPropertyDescriptor(); objHasOwn(); objHasOwnProperty(); objKeys(); objSeal(); objGetPrototypeOf(); objSetPrototypeOf(); objToString();<br/>polyObjKeys(); polyObjHasOwn()</code>
 | String                     | <code>asString(); getLength(); isString(); strEndsWith(); strIndexOf(); strIsNullOrEmpty(); strIsNullOrWhiteSpace(); strLastIndexOf(); strLeft(); strPadEnd(); strPadStart(); strRepeat(); strRight(); strSlice(); strStartsWith(); strSubstr(); strSubstring(); strTrim(); strTrimEnd(); strTrimLeft(); strTrimRight(); strTrimStart();<br/>polyStrSubstr(); polyStrTrim(); polyStrTrimEnd(); polyStrTrimStart();</code>
 | Symbol                     | <code>WellKnownSymbols (const enum);<br/>getKnownSymbol(); getSymbol(); hasSymbol(); isSymbol(); newSymbol(); symbolFor(); symbolKeyFor();<br/>polyGetKnownSymbol(); polyNewSymbol(); polySymbolFor(); polySymbolKeyFor();</code><br/>Polyfills are used to automatically backfill runtimes that do not support `Symbol`, not all of the Symbol functionality is provided.
+| Timer                      | <code>elapsedTime(); perfNow(); utcNow(); scheduleIdleCallback(); scheduleInterval(); scheduleTimeout(); hasIdleCallback(); setTimeoutOverride();</code><br/>For runtimes that don't support `requestIdleCallback` normal setTimeout() is used with the values from `setDefaultIdleTimeout()` and `setDefaultMaxExecutionTime()`<br /><code>polyUtcNow();</code>
+| Conversion                 | <code>asString(); getIntValue();</code>
 
 > Unless otherwise stated in the functions documentation polyfills are used to automatically backfill unsupported functions in older ES5 runtimes
 
@@ -91,10 +93,10 @@ function checkString(value: any) {
 General support is currently set to ES5 supported runtimes higher.
 ![Chrome](https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png) | ![Firefox](https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png) | ![IE](https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png) | ![Opera](https://raw.githubusercontent.com/alrra/browser-logos/master/src/opera/opera_48x48.png) | ![Safari](https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png)
 --- | --- | --- | --- | --- |
-Latest ? | Latest ? | <center>9+ ?</center> | Latest ? | Latest ? |
+Latest ✔ | Latest ✔ | <center>9+ ✔</center> | Latest ✔ | Latest ✔ |
 > Note: While some polyfills are provided to "somewhat" support ES3/IE8 this library does not intend to become a fully fledged polyfill library. And the polyfills provided (or contributed) are just the minimum set that have been required over time. And should be less necessary are time moves forward.
 
-#### Polyfills
+### Polyfills
 
 All of the included polyfills are tested against the current native implementation running in `node`, `browser` and `worker` environments to ensure that they conform to the current specification, these polyfills are only internally used for ES5 compatibility and when running in an environment (mostly IE) that does not support the required function.
 

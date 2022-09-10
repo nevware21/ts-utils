@@ -17,6 +17,7 @@ export {
     isStrictNullOrUndefined, isStrictUndefined, isError
 } from "./helpers/base";
 export { CustomErrorConstructor, createCustomError, throwUnsupported } from "./helpers/customError";
+export { utcNow, polyUtcNow } from "./helpers/date";
 export { dumpObj } from "./helpers/diagnostics";
 export { EnumCls, EnumNameMap, EnumValueMap, EnumTypeMap, createEnum, createEnumKeyMap, createEnumValueMap, createSimpleMap, createTypeMap } from "./helpers/enum";
 export {
@@ -28,6 +29,7 @@ export {
 } from "./helpers/extend";
 export { IGetLength as GetLengthImpl, getLength } from "./helpers/length";
 export { getIntValue } from "./helpers/number";
+export { getPerformance, hasPerformance, elapsedTime, perfNow } from "./helpers/perf";
 export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";
 export { hasValue } from "./helpers/value";
 export { createArrayIterator } from "./iterator/array";
@@ -62,6 +64,9 @@ export { asString } from "./string/as_string";
 export { strTrim, strTrimEnd, strTrimLeft, strTrimRight, strTrimStart } from "./string/trim";
 export { isSymbol, getSymbol, getKnownSymbol, hasSymbol, newSymbol, symbolFor, symbolKeyFor } from "./symbol/symbol";
 export { WellKnownSymbols } from "./symbol/well_known";
+export { hasIdleCallback, scheduleIdleCallback, setDefaultIdleTimeout, setDefaultMaxExecutionTime } from "./timer/idle";
+export { scheduleInterval } from "./timer/interval";
+export { ITimerHandler, scheduleTimeout, setTimeoutOverride } from "./timer/timeout";
 
 // Exporting the helpers, but not the "initialization" code to populate any missing values
 // This will enable anyone to "reuse" or create their own polyfills.ts implementation if they want.

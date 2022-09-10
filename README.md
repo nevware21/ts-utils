@@ -29,7 +29,7 @@ See [Browser Support](#browser-support) for details.
 
 | Type                       | Functions / Helpers / Aliases / Polyfills
 |----------------------------|---------------------------------------------------
-| Runtime Environment Checks | <code>getDocument(); getGlobal(); getHistory(); getInst(); getNavigator(); getWindow(); hasDocument(); hasHistory(); hasNavigator(); hasWindow(); isNode(); isWebWorker();</code>
+| Runtime Environment Checks | <code>getDocument(); getGlobal(); getHistory(); getInst(); getNavigator(); getPerformance(); getWindow(); hasDocument(); hasHistory(); hasNavigator(); hasPerformance(); hasWindow(); isNode(); isWebWorker(); hasIdleCallback();</code>
 | Type Identity              | <code>isArray(); isArrayBuffer(); isBlob(); isBoolean(); isDate(); isError(); isFile(); isFormData(); isFunction(); isIterable(); isIterator(); isNullOrUndefined(); isNumber(); isObject(); isPlainObject(); isPromise(); isPromiseLike(); isThenable(); isRegExp(); isStrictNullOrUndefined(); isStrictUndefined(); isString(); isTypeof(); isUndefined();</code>
 | Value Check                | <code>hasValue(); isDefined(); isNotTruthy(); isNullOrUndefined(); isStrictNullOrUndefined(); isStrictUndefined(); isTruthy(); isUndefined();</code>
 | &nbsp;                     | &nbsp;
@@ -41,6 +41,8 @@ See [Browser Support](#browser-support) for details.
 | Object                     | <code>deepExtend(); isObject(); objAssign(); objCopyProps(); objCreate(); objDeepCopy(); objDeepFreeze(); objDefineAccessors(); objDefineGet(); objDefineProp(); objExtend(); objForEachKey(); objFreeze(); objGetOwnPropertyDescriptor(); objHasOwn(); objHasOwnProperty(); objKeys(); objSeal(); objGetPrototypeOf(); objSetPrototypeOf(); objToString();<br/>polyObjKeys(); polyObjHasOwn()</code>
 | String                     | <code>asString(); getLength(); isString(); strEndsWith(); strIndexOf(); strIsNullOrEmpty(); strIsNullOrWhiteSpace(); strLastIndexOf(); strLeft(); strPadEnd(); strPadStart(); strRepeat(); strRight(); strSlice(); strStartsWith(); strSubstr(); strSubstring(); strTrim(); strTrimEnd(); strTrimLeft(); strTrimRight(); strTrimStart();<br/>polyStrSubstr(); polyStrTrim(); polyStrTrimEnd(); polyStrTrimStart();</code>
 | Symbol                     | <code>WellKnownSymbols (const enum);<br/>getKnownSymbol(); getSymbol(); hasSymbol(); isSymbol(); newSymbol(); symbolFor(); symbolKeyFor();<br/>polyGetKnownSymbol(); polyNewSymbol(); polySymbolFor(); polySymbolKeyFor();</code><br/>Polyfills are used to automatically backfill runtimes that do not support `Symbol`, not all of the Symbol functionality is provided.
+| Timer                      | <code>elapsedTime(); perfNow(); utcNow(); scheduleIdleCallback(); scheduleInterval(); scheduleTimeout(); hasIdleCallback(); setTimeoutOverride();</code><br/>For runtimes that don't support `requestIdleCallback` normal setTimeout() is used with the values from `setDefaultIdleTimeout()` and `setDefaultMaxExecutionTime()`<br /><code>polyUtcNow();</code>
+| Conversion                 | <code>asString(); getIntValue();</code>
 
 > Unless otherwise stated in the functions documentation polyfills are used to automatically backfill unsupported functions in older ES5 runtimes
 
