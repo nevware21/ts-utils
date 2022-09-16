@@ -58,8 +58,3 @@ export const MathCls = Math;
  * @ignore
  */
 export const ArrCls = Array;
-
-/**
- * @ignore
- */
-export const ArrProto = ArrCls[PROTOTYPE];
