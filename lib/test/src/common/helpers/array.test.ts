@@ -104,6 +104,26 @@ describe("array helpers", () => {
     
             assert.equal(cnt, 1, "Expecting 1 callback");
         });
+
+        it("Checking all params", () => {
+            let values = [ 1, 2, 3, 4, 5 ];
+            let result: number[] = [];
+            let cnt = 0;
+            arrForEach(values, (value, idx, theArray) => {
+                assert.equal(values, theArray, "Check that the passed array is the actual array");
+                assert.equal(value, values[idx], "Check that the passed value is the expected value");
+                assert.equal(value, idx + 1, "Check the expected value matches");
+                result.push(value);
+                cnt++;
+            });
+
+            assert.equal(cnt, 5, "Check that we iterated the correct number of times");
+            assert.equal(result.length, 5, "Check that the resulting array matches");
+            for (let lp = 0; lp < result.length; lp++) {
+                assert.equal(result[lp], values[lp], "Check that the resulting array matches");
+            }
+
+        });
     });
 
     describe("arrAppend", () => {
