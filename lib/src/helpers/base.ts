@@ -193,7 +193,7 @@ export const isFunction: (value: any) => value is Function = _createIs<Function>
  * @returns
  */
 export function isObject<T>(value: T): value is T {
-    if (isNullOrUndefined(value)) {
+    if (!value && isNullOrUndefined(value)) {
         return false;
     }
 

@@ -17,6 +17,8 @@ import { FUNCTION } from "../../../../src/internal/constants";
 import { objSetPrototypeOf } from "../../../../src/object/set_proto";
 import { objCreate, polyObjCreate } from "../../../../src/object/create";
 import { objHasOwn, polyObjHasOwn } from "../../../../src/object/has_own";
+import { isPlainObject } from "../../../../src/object/is_plain_object";
+import { getWindow } from "../../../../src/helpers/environment";
 
 describe("object helpers", () => {
     it("objKeys", () => {
@@ -593,6 +595,57 @@ describe("object helpers", () => {
         });
     });
 
+    describe("isPlainObject", () => {
+        it("check different types", () => {
+            _checkIsPlainObject(null, false);
+            _checkIsPlainObject(undefined, false);
+            _checkIsPlainObject("null", false);
+            _checkIsPlainObject("undefined", false);
+            _checkIsPlainObject("1", false);
+            _checkIsPlainObject("aa", false);
+            _checkIsPlainObject(new Date(), false);
+            _checkIsPlainObject(1, false);
+            _checkIsPlainObject("", false);
+            _checkIsPlainObject(_dummyFunction, false);
+            _checkIsPlainObject([], false);
+            _checkIsPlainObject(new Array(1), false);
+            _checkIsPlainObject(true, false);
+            _checkIsPlainObject(false, false);
+            _checkIsPlainObject("true", false);
+            _checkIsPlainObject("false", false);
+            _checkIsPlainObject(new Boolean(true), false);
+            _checkIsPlainObject(new Boolean(false), false);
+            _checkIsPlainObject(new Boolean("true"), false);
+            _checkIsPlainObject(new Boolean("false"), false);
+            _checkIsPlainObject(/[a-z]/g, false);
+            _checkIsPlainObject(new RegExp(""), false);
+            _checkIsPlainObject(_getFile(), false);
+            _checkIsPlainObject(_getFormData(), false);
+            _checkIsPlainObject(_getBlob(), false);
+            _checkIsPlainObject(new ArrayBuffer(0), false);
+            _checkIsPlainObject(new Error("Test Error"), false);
+            _checkIsPlainObject(new TypeError("Test TypeError"), false);
+            _checkIsPlainObject(new TestError("Test TestError"), false);
+            _checkIsPlainObject(_dummyError(), true);           // _dummyError just returns an object that looks like an error
+            _checkIsPlainObject(Promise.reject(), false);
+            _checkIsPlainObject(Promise.resolve(), false);
+            _checkIsPlainObject(new Promise(() => {}), false);
+            _checkIsPlainObject(_simplePromise(), true);        // _simplePromise is returning a plain object that looks like a promise
+            _checkIsPlainObject(_simplePromiseLike(), true);    // _simplePromiseLike is returning a plain object that looks PromiseLike
+            // _fakePromise is still returning an object (created as an object)
+            // even though the returned object has a constructor the returned object was still created as an object
+            _checkIsPlainObject(_fakePromise(), true);
+            _checkIsPlainObject(Object.create(null), true);
+            _checkIsPlainObject({
+                hello: "darkness",
+                my: "Old",
+                "friend": "."
+            }, true);
+            _checkIsPlainObject({}, true);
+            _checkIsPlainObject(getWindow(), false);
+        });
+    });
+
     function _checkObjKeys(value: any) {
         let objKeysResult: any;
         let nativeResult: any;
@@ -657,6 +710,10 @@ describe("object helpers", () => {
         }
     }
 
+    function _checkIsPlainObject(value: any, expected: boolean) {
+        assert.equal(isPlainObject(value), expected, "Checking - " + dumpObj(value));
+    }
+
     function _dummyFunction() {
 
     }
@@ -716,6 +773,15 @@ describe("object helpers", () => {
             then: _dummyFunction
         };
     }
+
+    function _fakePromise(): any {
+        return {
+            constructor: Promise,
+            then: _dummyFunction,
+            catch: _dummyFunction
+        };
+    }
+
 
     class TestError extends Error {
         public constructor(message: string) {

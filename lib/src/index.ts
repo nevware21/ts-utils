@@ -39,6 +39,7 @@ export { mathCeil, mathFloor } from "./math/floor";
 export { mathMin, mathMax } from "./math/min_max";
 export { mathToInt } from "./math/to_int";
 export { mathTrunc } from "./math/trunc";
+export { IObjDeepCopyHandlerDetails, ObjDeepCopyHandlerHandler, objDeepCopy, objCopyProps } from "./object/copy";
 export { objCreate } from "./object/create";
 export { objDefineProp, objDefineGet, objDefineAccessors } from "./object/define";
 export { objForEachKey } from "./object/for_each_key";
@@ -46,7 +47,7 @@ export { objGetOwnPropertyDescriptor } from "./object/get_own_prop_desc";
 export { objHasOwn, polyObjHasOwn } from "./object/has_own";
 export { objHasOwnProperty } from "./object/has_own_prop";
 export {
-    objAssign, objKeys, objDeepCopy, objCopyProps, objDeepFreeze, objFreeze, objSeal
+    objAssign, objKeys, objDeepFreeze, objFreeze, objSeal
 } from "./object/object";
 export { objSetPrototypeOf } from "./object/set_proto";
 export { strEndsWith } from "./string/ends_with";
