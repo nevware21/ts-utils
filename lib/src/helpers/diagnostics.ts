@@ -19,14 +19,19 @@ export function dumpObj(object: any, format?: boolean | number): string {
     if (objectTypeDump === "[object Error]") {
         propertyValueDump = "{ stack: '" + object.stack + "', message: '" + object.message + "', name: '" + object.name + "'";
     } else {
-        if (format) {
-            if (isNumber(format)) {
-                propertyValueDump = JSON.stringify(object, null, format);
+        try {
+            if (format) {
+                if (isNumber(format)) {
+                    propertyValueDump = JSON.stringify(object, null, format);
+                } else {
+                    propertyValueDump = JSON.stringify(object, null, 4);
+                }
             } else {
-                propertyValueDump = JSON.stringify(object, null, format ? 4 : 0);
+                propertyValueDump = JSON.stringify(object);
             }
-        } else {
-            propertyValueDump = JSON.stringify(object);
+        } catch(e) {
+            // Unable to convert object (probably circular)
+            propertyValueDump = objToString(object) + " - " + dumpObj(e, format);
         }
     }
 

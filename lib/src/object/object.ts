@@ -7,8 +7,7 @@
  */
 
 import { ObjClass } from "../internal/constants";
-import { arrForEach } from "../array/forEach";
-import { isArray, isNullOrUndefined, isObject } from "../helpers/base";
+import { isArray, isObject } from "../helpers/base";
 import { throwTypeError } from "../helpers/throw";
 import { objForEachKey } from "./for_each_key";
 
@@ -100,49 +99,6 @@ export function objKeys(value: any): string[] {
 }
 
 /**
- * Performs a deep copy of the source object.
- * @group Object
- * @param source - The source object to be copied
- * @return A new object which contains a deep copy of the source properties
- */
-export function objDeepCopy<T>(source: T): T {
-
-    if (isArray(source)) {
-        const result: any[] = [];
-        arrForEach(source, (value) => {
-            result.push(objDeepCopy(value));
-        });
-
-        return <any>result;
-    }
-
-    if (isObject(source)) {
-        return objCopyProps<T>({} as T, source);
-    }
-
-    return source;
-}
-
-/**
- * Object helper to copy all of the enumerable properties from the source object to the target, the
- * properties are copied via {@link objDeepCopy}.
- * @group Object
- * @param target - The target object to populated
- * @param source - The source object to copy the properties from
- * @returns The target object
- */
-export function objCopyProps<T>(target: T, source: any) {
-    if (!isNullOrUndefined(source)) {
-        objForEachKey(source, (key, value) => {
-            // Perform a deep copy of the object
-            target[key] = objDeepCopy(value);
-        });
-    }
-
-    return target;
-}
-
-/**
  * Perform a deep freeze on the object and all of it's contained values / properties by recursively calling
  * `objFreeze()` on all enumerable properties of the object and on each property returned.
  * @group Object
@@ -193,3 +149,12 @@ export const objFreeze: <T>(value: T) => T = _objFreeze || _doNothing;
  * @returns The object being sealed.
  */
 export const objSeal: <T>(value: T) => T = ObjClass["seal"] || _doNothing;
+
+/**
+ * The objGetPrototypeOf() method returns the prototype (i.e. the value of the internal [[Prototype]] property)
+ * of the specified value.
+ * @since 0.4.4
+ * @group Object
+ * @param value = The object whose prototype is to be returned
+ */
+export const objGetPrototypeOf: (value: any) => any = ObjClass["getPrototypeOf"] || _doNothing;

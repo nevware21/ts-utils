@@ -32,6 +32,16 @@ describe("diagnostic helpers", () => {
             assert.equal(dumpObj({ hello: "world" }, 2), "[object Object]: {\n  \"hello\": \"world\"\n}");
         });
 
+        it("Validate circular dump", () => {
+            var ug: any = {};
+            ug.ug = {};
+            ug.ug.ug = ug;
+
+            assert.ok(dumpObj(ug).indexOf("[object Object]: ") === 0);
+            assert.ok(dumpObj(ug, 2).indexOf("[object Object]: ") === 0);
+            assert.ok(dumpObj(ug, true).indexOf("[object Object]: ") === 0);
+        });
+
     });
 });
 

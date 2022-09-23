@@ -7,7 +7,7 @@
  */
 
 import { arrForEach } from "../array/forEach";
-import { objCopyProps, objDeepCopy } from "../object/object";
+import { objCopyProps, objDeepCopy } from "../object/copy";
 
 /**
  * @internal
