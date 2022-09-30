@@ -12,7 +12,7 @@ export function makePolyFn<T extends Function>(poly: T): T {
     return function(): T {
         let theArgs = [ this ];
         for (let lp = 0; lp < arguments[LENGTH]; lp++) {
-            theArgs.push(arguments[lp]);
+            theArgs[lp + 1] = arguments[lp];
         }
         
         return poly.apply(this, theArgs);

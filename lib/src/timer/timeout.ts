@@ -6,7 +6,36 @@
  * Licensed under the MIT license.
  */
 
-let _theTimeout: Function;
+import { _extractArgs } from "../internal/extract_args";
+
+function _scheduleTimeoutWith(self: any, overrideFn: TimeoutOverrideFn, theArgs: any[]): ITimerHandler {
+    let timeoutId = overrideFn.apply(self, theArgs);
+
+    return {
+        cancel: function() {
+            clearTimeout(timeoutId);
+        },
+        refresh: function() {
+            clearTimeout(timeoutId);
+            timeoutId = overrideFn.apply(self, theArgs);
+
+            return this;
+        }
+    };
+}
+
+/**
+ * The signature of the override timeout function, it follows the same signature as the native `setTimeout` API.
+ * @since 0.4.4
+ * @group Timer
+ * @param callback - A function to be executed after the timer expires.
+ * @param ms - The time, in milliseconds that the timer should wait before the specified function or code is executed.
+ * If this parameter is omitted, a value of 0 is used, meaning execute "immediately", or more accurately, the next event cycle.
+ * @param args - Additional arguments which are passed through to the function specified by callback.
+ * @return The returned timeoutID is a positive integer value which identifies the timer created by the call to setTimeout().
+ * This value can be passed to clearTimeout() to cancel the timeout.
+ */
+export type TimeoutOverrideFn = <TArgs extends any[]>(callback: (...args: TArgs) => void, ms?: number, ...args: TArgs) => number;
 
 /**
  * A Timer handler which is returned from {@link scheduleTimeout} which contains functions to
@@ -45,21 +74,9 @@ export interface ITimerHandler {
 }
 
 /**
- * Override the setTimeout function to call the override function instead of the `setTImeout`, if the value
- * of `overrideFn` is null or undefined it will revert back to the native `setTimeout`
- * @param overrideFn - The new setTimeout function to call instead of `setTimeout`
+ * Creates a timer which executes a function or specified piece of code once the timer expires, this is simular
+ * to using `setTimeout` but provides a return object for cancelling and restarting (refresh) the timer.
  *
- * @since 0.4.4
- * @group Timer
- */
-export function setTimeoutOverride(overrideFn: <TArgs extends any[]>(callback: (...args: TArgs) => void, ms?: number, ...args: TArgs) => number) {
-    _theTimeout = overrideFn || setTimeout;
-}
-
-/**
- * Sets a timer which executes a function or specified piece of code once the timer expires.
- * Same as `setTimeout` but provides a return object for cancelling and restarting (refresh) the timer.
- * 
  * The timer may be cancelled (cleared) by calling the `cancel()` function on the returned {@link ITimerHandler}, or
  * you can "reschedule" and/or "restart" the timer by calling the `refresh()` function on the returned {@link ITimerHandler}
  * instance
@@ -90,19 +107,52 @@ export function setTimeoutOverride(overrideFn: <TArgs extends any[]>(callback: (
  * ```
  */
 export function scheduleTimeout<A extends any[]>(callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler {
-    let self = this;
-    let theArguments = arguments;
-    let timeoutId = (_theTimeout || setTimeout).apply(self, theArguments);
+    return _scheduleTimeoutWith(this, setTimeout, _extractArgs(arguments, 0));
+}
 
-    return {
-        cancel: function() {
-            clearTimeout(timeoutId);
-        },
-        refresh: function() {
-            clearTimeout(timeoutId);
-            timeoutId = (_theTimeout || setTimeout).apply(self, theArguments);
-
-            return this;
-        }
-    };
+/**
+ * Creates a timer which executes a function or specified piece of code once the timer expires. The overrideFn will be
+ * used to createthe timer, this is simular to using `setTimeout` but provides a return object for cancelling and restarting
+ * (refresh) the timer.
+ *
+ * The timer may be cancelled (cleared) by calling the `cancel()` function on the returned {@link ITimerHandler}, or
+ * you can "reschedule" and/or "restart" the timer by calling the `refresh()` function on the returned {@link ITimerHandler}
+ * instance
+ *
+ * @since 0.4.4
+ * @group Timer
+ *
+ * @param overrideFn - setTimeout override function this will be called instead of the `setTImeout`, if the value
+ * of `overrideFn` is null or undefined it will revert back to the native `setTimeout`
+ * @param callback - The function to be executed after the timer expires.
+ * @param timeout - The time, in milliseconds that the timer should wait before the specified
+ * function or code is executed. If this parameter is omitted, a value of 0 is used, meaning
+ * execute "immediately", or more accurately, the next event cycle.
+ * @param args - Additional arguments which are passed through to the function specified by `callback`.
+ * @returns A {@link ITimerHandler} instance which can be used to cancel the timeout.
+ * @example
+ * ```ts
+ * let timeoutCalled = false;
+ * // Your own "setTimeout" implementation to allow you to perform additional operations or possible wrap
+ * // the callback to add timings.
+ * function newSetTimeoutFn(callback: TimeoutOverrideFn) {
+ *     overrideCalled ++;
+ *     return setTimeout(callback, timeout);
+ * }
+ *
+ * let theTimeout = scheduleTimeoutWith(newSetTimeoutFn, () => {
+ *     // This callback will be called after 100ms as this uses setTimeout()
+ *     timeoutCalled = true;
+ * }, 100);
+ *
+ * // Instead of calling clearTimeout() with the returned value from setTimeout() the returned
+ * // handler instance can be used instead to cancel the timer
+ * theTimeout.cancel();
+ *
+ * // You can also "restart" the timer, whether it has previously triggered not not via the `refresh()`
+ * theTimeout.refresh();
+ * ```
+ */
+export function scheduleTimeoutWith<A extends any[]>(overrideFn: TimeoutOverrideFn, callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler {
+    return _scheduleTimeoutWith(this, overrideFn || setTimeout, _extractArgs(arguments, 1));
 }

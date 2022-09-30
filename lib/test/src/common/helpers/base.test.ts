@@ -10,10 +10,11 @@ import { assert } from "chai";
 import {
     isArray, isBoolean, isDate, isDefined, isFunction, isNullOrUndefined, isNumber, isObject, isString, isTypeof,
     isUndefined, isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isError, isPromiseLike, isPromise, isNotTruthy,
-    isTruthy, isStrictUndefined, isStrictNullOrUndefined
+    isTruthy, isStrictUndefined, isStrictNullOrUndefined, isPrimitive
 } from "../../../../src/helpers/base";
 import { polyObjCreate } from "../../../../src//object/create";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
+import { isNode } from "../../../../src/helpers/environment";
 
 describe("base helpers", () => {
     describe("isTypeOf", () => {
@@ -320,6 +321,8 @@ describe("base helpers", () => {
             assert.equal(isString(new Date()), false, "Checking Date");
             assert.equal(isString(1), false, "Checking 1");
             assert.equal(isString(""), true, "Checking ''");
+            assert.equal(isString(String("")), true, "Checking String('')");
+            assert.equal(isString(new String("aa")), false, "Checking new String('aa')");
             assert.equal(isString(_dummyFunction), false, "Checking _dummyFunction");
             assert.equal(isString([]), false, "Checking []");
             assert.equal(isString(new Array(1)), false, "Checking new Array(1)");
@@ -448,6 +451,53 @@ describe("base helpers", () => {
 
             assert.equal(isObject(Object.create(null)), true, "Checking Object.create(null)");
             assert.equal(isObject(polyObjCreate(null)), true, "Checking polyObjCreate(null)");
+        });
+    });
+
+    describe("isPrimitive", () => {
+        it("Validate values", () => {
+            assert.equal(isPrimitive(null), true, "Checking null");
+            assert.equal(isPrimitive(undefined), true, "Checking undefined");
+            assert.equal(isPrimitive("null"), true, "Checking 'null'");
+            assert.equal(isPrimitive("undefined"), true, "Checking 'undefined'");
+            assert.equal(isPrimitive("1"), true, "Checking '1'");
+            assert.equal(isPrimitive("aa"), true, "Checking 'aa'");
+            assert.equal(isPrimitive(new Date()), false, "Checking Date");
+            assert.equal(isPrimitive(1), true, "Checking 1");
+            assert.equal(isPrimitive(Number(2)), true, "Checking Number(2)");
+            assert.equal(isPrimitive(""), true, "Checking ''");
+            assert.equal(isPrimitive(String("")), true, "Checking String('')");
+            assert.equal(isPrimitive(new String("aa")), false, "Checking new String('aa')");
+            assert.equal(isPrimitive(_dummyFunction), false, "Checking _dummyFunction");
+            assert.equal(isPrimitive([]), false, "Checking []");
+            assert.equal(isPrimitive(new Array(1)), false, "Checking new Array(1)");
+            assert.equal(isPrimitive(true), true, "Checking true");
+            assert.equal(isPrimitive(false), true, "Checking false");
+            assert.equal(isPrimitive("true"), true, "Checking 'true'");
+            assert.equal(isPrimitive("false"), true, "Checking 'false'");
+            assert.equal(isPrimitive(BigInt(42)), true, "Checking BigInt");
+            assert.equal(isPrimitive(Symbol.for("Hello")), true, "Checking BigInt");
+            assert.equal(isPrimitive(new Boolean(true)), false, "Checking new Boolean(true)");
+            assert.equal(isPrimitive(new Boolean(false)), false, "Checking new Boolean(false)");
+            assert.equal(isPrimitive(new Boolean("true")), false, "Checking new Boolean('true')");
+            assert.equal(isPrimitive(new Boolean("false")), false, "Checking new Boolean('false')");
+            assert.equal(isPrimitive(/[a-z]/g), false, "Checking '/[a-z]/g'");
+            assert.equal(isPrimitive(new RegExp("")), false, "Checking new RegExp('')");
+            _isFileCheck(isPrimitive, false);
+            _isFormDataCheck(isPrimitive, false);
+            _isBlobCheck(isPrimitive, false);
+            assert.equal(isPrimitive(new ArrayBuffer(0)), false, "Checking new ArrayBuffer([])");
+            assert.equal(isPrimitive(new Error("Test Error")), false, "Checking new Error('')");
+            assert.equal(isPrimitive(new TypeError("Test TypeError")), false, "Checking new TypeError('')");
+            assert.equal(isPrimitive(new TestError("Test TestError")), false, "Checking new TestError('')");
+            assert.equal(isPrimitive(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+            assert.equal(isPrimitive(Promise.reject()), false, "Checking Promise.reject");
+            assert.equal(isPrimitive(Promise.resolve()), false, "Checking Promise.reject");
+            assert.equal(isPrimitive(new Promise(() => {})), false, "Checking new Promise(() => {})");
+            assert.equal(isPrimitive(_simplePromise()), false, "Checking _simplePromise");
+            assert.equal(isPrimitive(_simplePromiseLike()), false, "Checking _simplePromiseLike");
+            assert.equal(isPrimitive(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isPrimitive(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 
@@ -1109,8 +1159,9 @@ describe("base helpers", () => {
             assert.equal(e.name, "ReferenceError", "Expecting the error to be a ReferenceError - " + dumpObj(e));
             expected = false;
         }
-
-        assert.equal(chkFn(theFile), expected, "Checking new File([], '')");
+        if (!isNode()) {
+            assert.equal(chkFn(theFile), expected, "Checking new File([], '') - " + (typeof theFile) + dumpObj(theFile));
+        }
     }
 
     function _isFormDataCheck(chkFn: (value: any) => boolean, expected: boolean) {
@@ -1123,7 +1174,9 @@ describe("base helpers", () => {
             expected = false;
         }
 
-        assert.equal(chkFn(formData), expected, "Checking new FormData()");
+        if (!isNode()) {
+            assert.equal(chkFn(formData), expected, "Checking new FormData()");
+        }
     }
 
     function _isBlobCheck(chkFn: (value: any) => boolean, expected: boolean) {
@@ -1136,7 +1189,9 @@ describe("base helpers", () => {
             expected = false;
         }
 
-        assert.equal(chkFn(blob), expected, "Checking new Blob()");
+        if (!isNode()) {
+            assert.equal(chkFn(blob), expected, "Checking new Blob()");
+        }
     }
 
     function _simplePromise(): any {
