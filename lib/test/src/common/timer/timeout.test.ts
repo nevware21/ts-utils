@@ -8,7 +8,7 @@
 
 import * as sinon from "sinon";
 import { assert } from "chai";
-import { scheduleTimeout, setTimeoutOverride } from "../../../../src/timer/timeout";
+import { scheduleTimeout, scheduleTimeoutWith } from "../../../../src/timer/timeout";
 
 describe("timeout tests", () => {
     let clock: sinon.SinonFakeTimers;
@@ -174,17 +174,9 @@ describe("timeout tests", () => {
             return setTimeout(callback, timeout);
         }
 
-        beforeEach(() => {
-            setTimeoutOverride(newSetTimeoutFn);
-        });
-    
-        afterEach(() => {
-            setTimeoutOverride(null);
-        });
-
         it("basic timeout", () => {
             let timeoutCalled = false;
-            scheduleTimeout(() => {
+            scheduleTimeoutWith(newSetTimeoutFn, () => {
                 timeoutCalled = true;
             }, 100);
     
@@ -209,17 +201,9 @@ describe("timeout tests", () => {
             return setTimeout(callback, timeout);
         }
 
-        beforeEach(() => {
-            setTimeoutOverride(newSetTimeoutFn);
-        });
-    
-        afterEach(() => {
-            setTimeoutOverride(null);
-        });
-
         it("basic timeout", () => {
             let timeoutCalled = false;
-            let theTimeout = scheduleTimeout(() => {
+            let theTimeout = scheduleTimeoutWith(newSetTimeoutFn, () => {
                 timeoutCalled = true;
             }, 100);
     
@@ -247,6 +231,23 @@ describe("timeout tests", () => {
             clock.tick(1);
             assert.equal(true, timeoutCalled, "Timeout should have been called yet");
             assert.equal(2, overrideCalled, "The override should have been called");
+        });
+    });
+
+    describe("override timeout with no override", () => {
+        it("basic timeout", () => {
+            let timeoutCalled = false;
+            scheduleTimeoutWith(null as any, () => {
+                timeoutCalled = true;
+            }, 100);
+    
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            for (let lp = 0; lp < 99; lp++) {
+                clock.tick(1);
+                assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            }
+            clock.tick(1);
+            assert.equal(true, timeoutCalled, "Timeout should have been called yet");
         });
     });
 });

@@ -41,7 +41,10 @@ export { mathCeil, mathFloor } from "./math/floor";
 export { mathMin, mathMax } from "./math/min_max";
 export { mathToInt } from "./math/to_int";
 export { mathTrunc } from "./math/trunc";
-export { IObjDeepCopyHandlerDetails, ObjDeepCopyHandlerHandler, objDeepCopy, objCopyProps } from "./object/copy";
+export {
+    IObjDeepCopyHandlerDetails, ObjDeepCopyHandler, objDeepCopy, objCopyProps,
+    arrayDeepCopyHandler, dateDeepCopyHandler, functionDeepCopyHandler, plainObjDeepCopyHandler
+} from "./object/copy";
 export { objCreate } from "./object/create";
 export { objDefineProp, objDefineGet, objDefineAccessors } from "./object/define";
 export { objForEachKey } from "./object/for_each_key";
@@ -66,7 +69,7 @@ export { isSymbol, getSymbol, getKnownSymbol, hasSymbol, newSymbol, symbolFor, s
 export { WellKnownSymbols } from "./symbol/well_known";
 export { hasIdleCallback, scheduleIdleCallback, setDefaultIdleTimeout, setDefaultMaxExecutionTime } from "./timer/idle";
 export { scheduleInterval } from "./timer/interval";
-export { ITimerHandler, scheduleTimeout, setTimeoutOverride } from "./timer/timeout";
+export { ITimerHandler, scheduleTimeout, scheduleTimeoutWith } from "./timer/timeout";
 
 // Exporting the helpers, but not the "initialization" code to populate any missing values
 // This will enable anyone to "reuse" or create their own polyfills.ts implementation if they want.

@@ -11,7 +11,6 @@ import { isArray, isObject } from "../helpers/base";
 import { throwTypeError } from "../helpers/throw";
 import { objForEachKey } from "./for_each_key";
 
-const ObjAssign = ObjClass["assign"];
 const _objFreeze = ObjClass["freeze"];
 
 function _doNothing<T>(value: T): T {
@@ -55,7 +54,7 @@ function _doNothing<T>(value: T): T {
  * console.log(o1);  // { a: 1, b: 2, c: 3 }, target object itself is changed.
  * ```
  */
-export const objAssign = ObjAssign;
+export const objAssign = ObjClass["assign"];
 
 /**
  * The `objKeys()` method returns an array of a given object's own enumerable property names, iterated in

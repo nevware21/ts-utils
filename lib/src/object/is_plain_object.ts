@@ -60,32 +60,32 @@ export function isPlainObject(value: any): value is object {
         _gblWindow = hasWindow() ? getWindow() : (true as any);
     }
 
-    if (value === _gblWindow) {
-        return false;
-    }
+    let result = false;
+    if (value !== _gblWindow) {
 
-    if (!_objCtrFnString) {
-        // Lazily caching what the runtime reports as the object function constructor (as a string)
-        // Using an current function lookup to find what this runtime calls a "native" function
-        _fnToString = Function[PROTOTYPE].toString;
-        _objCtrFnString = _fnToString.call(ObjClass);
-    }
+        if (!_objCtrFnString) {
+            // Lazily caching what the runtime reports as the object function constructor (as a string)
+            // Using an current function lookup to find what this runtime calls a "native" function
+            _fnToString = Function[PROTOTYPE].toString;
+            _objCtrFnString = _fnToString.call(ObjClass);
+        }
 
-    try {
-        let proto = objGetPrototypeOf(value);
-        if (!proto) {
+        try {
+            let proto = objGetPrototypeOf(value);
+
             // No prototype so looks like an object created with Object.create(null)
-            return true;
+            result = !proto;
+            if (!result) {
+                if (objHasOwnProperty(proto, CONSTRUCTOR)) {
+                    proto = proto[CONSTRUCTOR]
+                }
+            
+                result = proto && typeof proto === FUNCTION && _fnToString.call(proto) === _objCtrFnString;
+            }
+        } catch (ex) {
+            // Something went wrong, so it's not an object we are playing with
         }
-    
-        if (objHasOwnProperty(proto, CONSTRUCTOR)) {
-            proto = proto[CONSTRUCTOR]
-        }
-    
-        return proto && typeof proto === FUNCTION && _fnToString.call(proto) === _objCtrFnString;
-    } catch (ex) {
-        // Something went wrong, so it's not an object we are playing with
     }
 
-    return false;
+    return result;
 }
