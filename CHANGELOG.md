@@ -1,4 +1,14 @@
 
+# v0.4.4 Oct 10th, 2022
+
+## Changelog
+
+- #83 [Typing] arrForEach - the signature for the callback is incorrect
+- #84 [Bug] objDeepCopy incorrectly tries to copy classes (like Date)
+  - #87 [Bug] objDeepCopy incorrectly tries to copy classes (like Date) #84
+  - #90 [Bug] objDeepCopy incorrectly tries to copy classes (like Date) #84
+- #88 Add timer support
+
 # v0.4.3 Sept 9th, 2022
 
 ## Changelog
