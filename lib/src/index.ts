@@ -14,7 +14,7 @@ export { ArrReduceCallbackFn, arrReduce } from "./array/reduce";
 export {
     isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isDate, isNumber, isBoolean,
     isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isThenable, isNotTruthy, isTruthy, objToString,
-    isStrictNullOrUndefined, isStrictUndefined, isError
+    isStrictNullOrUndefined, isStrictUndefined, isError, isPrimitive
 } from "./helpers/base";
 export { CustomErrorConstructor, createCustomError, throwUnsupported } from "./helpers/customError";
 export { utcNow, polyUtcNow } from "./helpers/date";
@@ -51,8 +51,9 @@ export { objForEachKey } from "./object/for_each_key";
 export { objGetOwnPropertyDescriptor } from "./object/get_own_prop_desc";
 export { objHasOwn, polyObjHasOwn } from "./object/has_own";
 export { objHasOwnProperty } from "./object/has_own_prop";
+export { isPlainObject } from "./object/is_plain_object";
 export {
-    objAssign, objKeys, objDeepFreeze, objFreeze, objSeal
+    objAssign, objKeys, objDeepFreeze, objFreeze, objSeal, objGetPrototypeOf
 } from "./object/object";
 export { objSetPrototypeOf } from "./object/set_proto";
 export { strEndsWith } from "./string/ends_with";
@@ -69,7 +70,7 @@ export { isSymbol, getSymbol, getKnownSymbol, hasSymbol, newSymbol, symbolFor, s
 export { WellKnownSymbols } from "./symbol/well_known";
 export { hasIdleCallback, scheduleIdleCallback, setDefaultIdleTimeout, setDefaultMaxExecutionTime } from "./timer/idle";
 export { scheduleInterval } from "./timer/interval";
-export { ITimerHandler, scheduleTimeout, scheduleTimeoutWith } from "./timer/timeout";
+export { TimeoutOverrideFn, ITimerHandler, scheduleTimeout, scheduleTimeoutWith } from "./timer/timeout";
 
 // Exporting the helpers, but not the "initialization" code to populate any missing values
 // This will enable anyone to "reuse" or create their own polyfills.ts implementation if they want.
