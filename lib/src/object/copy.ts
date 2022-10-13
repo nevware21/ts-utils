@@ -380,10 +380,9 @@ export function arrayDeepCopyHandler(details: IObjDeepCopyHandlerDetails): boole
         // Assign the "result" value before performing any additional deep Copying, so any recursive object get a reference to this instance
         let target: any[] = details.result = [];
         target.length = value.length;
-        arrForEach(value, (theValue, idx) => {
-            target[idx] = details.copy(theValue, idx);
-        });
 
+        // Copying all properties as arrays can contain non-indexed based properties
+        details.copyTo(target, value);
         return true;
     }
 
