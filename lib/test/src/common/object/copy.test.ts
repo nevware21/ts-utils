@@ -10,6 +10,7 @@ import { assert } from "chai";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isDate, isError, isObject } from "../../../../src/helpers/base";
 import { arrayDeepCopyHandler, IObjDeepCopyHandlerDetails, objCopyProps, objDeepCopy, plainObjDeepCopyHandler } from "../../../../src/object/copy";
+import { arrForEach } from "../../../../src/array/forEach";
 
 describe("object copy helpers", () => {
     describe("objCopyProps", () => {
@@ -317,6 +318,10 @@ describe("object copy helpers", () => {
             a.b = b;        // { a: 1, b: { b: 2} }
             b.a = a;        // { a: 1, b: { b: 2, a: { a: 1, { b: 2, a: ... }}}}
             a.b.f = function testFunc() {};
+            a.b.arr = [];
+            a.b.arr.length = 3;
+            a.b.arr[1] = 42;
+            a.b.arr["Hello"] = "Darkness";
 
             function copyHandler(details: IObjDeepCopyHandlerDetails) {
                 _checkDetails(details, a);
@@ -342,6 +347,15 @@ describe("object copy helpers", () => {
             assert.ok(isObject(c.b.e), "The copied error is now an object");
             assert.equal(42, c.b.e.value, "Expect that the local property was copied");
             assert.equal(c.b.f, a.b.f, "Functions should be the same");
+            
+            // Check incomplete array and with non-indexed property
+            assert.notEqual(a.b.arr, c.b.arr, "The array objects should not be the same");
+            assert.equal(a.b.arr.length, c.b.arr.length, "Check the copied length");
+            arrForEach(a.b.arr, (value, idx) => {
+                assert.equal(c.b.arr[idx], value, "Checking [" + idx + "] value");
+            });
+
+            assert.equal(a.b.arr["Hello"], c.b.arr["Hello"], "Checking that the non-indexed value was copied");
         });
     });
 
