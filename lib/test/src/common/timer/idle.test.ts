@@ -10,7 +10,7 @@ import * as sinon from "sinon";
 import { assert } from "chai";
 import { hasIdleCallback, scheduleIdleCallback, setDefaultMaxExecutionTime, setDefaultIdleTimeout } from "../../../../src/timer/idle";
 import { getGlobal } from "../../../../src/helpers/environment";
-import { elapsedTime, perfNow } from "../../../../src/helpers/perf";
+import { elapsedTime, getPerformance, perfNow } from "../../../../src/helpers/perf";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 function tryCatch(cb: () => void) {
@@ -150,10 +150,14 @@ describe("idle tests", () => {
 
             beforeEach(() => {
                 (<any>getGlobal()).performance = null;
+                // Invalidate any cached value
+                getPerformance(false);
             });
     
             afterEach(() => {
                 (<any>getGlobal()).performance = orgPerformance;
+                // Invalidate any cached value
+                getPerformance(false);
             });
     
             it("basic idle", () => {

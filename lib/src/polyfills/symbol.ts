@@ -12,6 +12,7 @@ import { WellKnownSymbols, _wellKnownSymbolMap } from "../symbol/well_known";
 import { throwTypeError } from "../helpers/throw";
 import { POLYFILL_TAG, SYMBOL } from "../internal/constants";
 import { objHasOwn } from "../object/has_own";
+import { asString } from "../string/as_string";
 
 const POLY_GLOBAL_REGISTORT = "__polySymbols$ts_utils";
 let _polySymbols: {
@@ -43,7 +44,7 @@ let _wellKnownSymbolCache: { [key in keyof typeof WellKnownSymbols ]: symbol } =
  */
 export function polyNewSymbol(description?: string | number): symbol {
     let theSymbol: symbol = {
-        description: "" + description,
+        description: asString(description),
         toString: () => SYMBOL + "(" + description + ")"
     } as symbol;
 
@@ -65,7 +66,7 @@ export function polySymbolFor(key: string): symbol {
     if (!objHasOwn(registry, key)) {
         let newSymbol = polyNewSymbol(key);
         registry.k[key] = newSymbol;
-        registry.s[newSymbol] = "" + key;
+        registry.s[newSymbol] = asString(key);
     }
 
     return registry.k[key];

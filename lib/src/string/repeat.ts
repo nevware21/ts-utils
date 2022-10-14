@@ -12,6 +12,7 @@ import { throwRangeError, throwTypeError } from "../helpers/throw";
 import { EMPTY, StrProto } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 import { mathToInt } from "../math/to_int";
+import { asString } from "./as_string";
 
 const REPEAT = "repeat";
 
@@ -50,7 +51,7 @@ export function polyStrRepeat(value: string, count: number): string {
         throwRangeError("invalid count must be >= 0 && < Infinity");
     }
 
-    let pad = isString(value) ? value : "" + value;
+    let pad = isString(value) ? value : asString(value);
     let result = EMPTY;
 
     for (;count > 0; (count >>>= 1) && (pad += pad)) {

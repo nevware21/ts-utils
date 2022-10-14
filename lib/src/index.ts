@@ -27,6 +27,7 @@ export {
 export {
     deepExtend, objExtend
 } from "./helpers/extend";
+export { ILazyValue, getLazy } from "./helpers/lazy";
 export { IGetLength as GetLengthImpl, getLength } from "./helpers/length";
 export { getIntValue } from "./helpers/number";
 export { getPerformance, hasPerformance, elapsedTime, perfNow } from "./helpers/perf";

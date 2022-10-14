@@ -6,17 +6,17 @@
  * Licensed under the MIT license.
  */
 
-import { SYMBOL } from "../internal/constants";
+import { SYMBOL, UNDEF_VALUE } from "../internal/constants";
 import { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "../polyfills/symbol";
 import { WellKnownSymbols, _wellKnownSymbolMap } from "./well_known";
 import { isDefined, _createIs } from "../helpers/base";
 import { getInst } from "../helpers/environment";
-import { _safeCheck } from "../internal/safe_check";
+import { _lazySafeGet } from "../internal/safe_check";
+import { ILazyValue } from "../helpers/lazy";
 
-const _hasSymbol = _safeCheck(() => isDefined(Symbol), false);
-let _symbol: Symbol = getInst<Symbol>(SYMBOL);
-let _symbolFor: (key: string) => symbol = _symbol && _safeCheck(() => _symbol["for"], null);
-let _symbolKeyFor: (sym: symbol) => string | undefined = _symbol && _safeCheck(() => _symbol["keyFor"], null);
+let _symbol: ILazyValue<Symbol>;
+let _symbolFor: ILazyValue<(key: string) => symbol>;
+let _symbolKeyFor: ILazyValue<(sym: symbol) => string | undefined>;
 
 /**
  * Checks if the type of value is a symbol.
@@ -43,9 +43,12 @@ export function hasSymbol(useCached?: boolean): boolean {
  * @returns The value of the named Symbol (if available)
  */
 export function getSymbol(useCached?: boolean): Symbol {
-    _symbol = useCached === false ? getInst<Symbol>(SYMBOL, useCached) : _symbol;
-
-    return _hasSymbol && _symbol;
+    let resetCache = useCached === false;
+    (!_symbol || resetCache) && (_symbol = _lazySafeGet(() => isDefined(Symbol) ? getInst<Symbol>(SYMBOL, useCached) : UNDEF_VALUE, UNDEF_VALUE));
+    (!_symbolFor || resetCache) && (_symbolFor = _lazySafeGet(() => _symbol.v ? _symbol["for"] : UNDEF_VALUE, UNDEF_VALUE));
+    (!_symbolKeyFor || resetCache) && (_symbolKeyFor = _lazySafeGet(() => _symbol.v ? _symbol["keyFor"] : UNDEF_VALUE, UNDEF_VALUE));
+    
+    return _symbol.v;
 }
 
 /**
@@ -64,7 +67,10 @@ export function getSymbol(useCached?: boolean): Symbol {
  */
 export function getKnownSymbol<T = symbol>(name: string | WellKnownSymbols, noPoly?: boolean): T {
     let knownName = _wellKnownSymbolMap[name];
-    return _symbol ? _symbol[knownName || name] : (!noPoly ? polyGetKnownSymbol(name) : null);
+    // Cause lazy symbol to get initialized
+    !_symbol && getSymbol();
+
+    return _symbol.v ? _symbol.v[knownName || name] : (!noPoly ? polyGetKnownSymbol(name) : UNDEF_VALUE);
 }
 
 /**
@@ -76,7 +82,10 @@ export function getKnownSymbol<T = symbol>(name: string | WellKnownSymbols, noPo
  * @returns The new symbol
  */
 export function newSymbol(description?: string | number, noPoly?: boolean): symbol {
-    return _hasSymbol ? Symbol(description) : (!noPoly ? polyNewSymbol(description) : null);
+    // Cause lazy _symbol to get initialized
+    !_symbol && getSymbol();
+
+    return _symbol.v ? Symbol(description) : (!noPoly ? polyNewSymbol(description) : null);
 }
 
 /**
@@ -86,7 +95,12 @@ export function newSymbol(description?: string | number, noPoly?: boolean): symb
  * @group Symbol
  * @param key key to search for.
  */
-export let symbolFor = _symbolFor || polySymbolFor;
+export function symbolFor(key: string): symbol {
+    // Cause lazy symbol to get initialized
+    !_symbolFor && getSymbol();
+
+    return (_symbolFor.v || polySymbolFor)(key);
+}
 
 /**
  * Returns a key from the global symbol registry matching the given Symbol if found.
@@ -95,4 +109,9 @@ export let symbolFor = _symbolFor || polySymbolFor;
  * @group Symbol
  * @param sym Symbol to find the key for.
  */
-export let symbolKeyFor = _symbolKeyFor || polySymbolKeyFor;
+export function symbolKeyFor(sym: symbol): string | undefined {
+    // Cause lazy symbol to get initialized
+    !_symbolKeyFor && getSymbol();
+
+    return (_symbolKeyFor.v || polySymbolKeyFor)(sym);
+}

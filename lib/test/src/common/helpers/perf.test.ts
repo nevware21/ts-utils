@@ -31,11 +31,17 @@ describe("performance helpers", () => {
 
         beforeEach(() => {
             clock = sinon.useFakeTimers();
+            
+            // Invalidate any cached value
+            getPerformance(false);
         });
 
         afterEach(() => {
             clock.restore();
             (<any>getGlobal()).performance = orgPerformance;
+
+            // Invalidate any cached value
+            getPerformance(false);
         });
 
         it("perfNow fallback", () => {
@@ -54,11 +60,17 @@ describe("performance helpers", () => {
         beforeEach(() => {
             clock = sinon.useFakeTimers();
             (<any>getGlobal()).performance = null;
+
+            // Invalidate any cached value
+            getPerformance(false);
         });
 
         afterEach(() => {
             (<any>getGlobal()).performance = orgPerformance;
             clock.restore();
+
+            // Invalidate any cached value
+            getPerformance(false);
         });
 
         it("check performance", () => {

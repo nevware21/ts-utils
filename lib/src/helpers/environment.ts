@@ -6,9 +6,9 @@
  * Licensed under the MIT license.
  */
 
-import { UNDEFINED } from "../internal/constants";
-import { _safeCheck } from "../internal/safe_check";
-import { isDefined } from "./base";
+import { UNDEFINED, UNDEF_VALUE } from "../internal/constants";
+import { _lazySafeGet } from "../internal/safe_check";
+import { ILazyValue } from "./lazy";
 
 const DOCUMENT = "document";
 const HISTORY = "history";
@@ -20,14 +20,14 @@ declare let globalThis: Window;
 declare let global: Window;
 declare let self: any;
 
-let _cachedGlobal: Window = null;
+let _cachedGlobal: ILazyValue<Window>;
 
-const _hasWindow = _safeCheck(() => isDefined(window), false);
-const _hasDocument = _safeCheck(() => isDefined(document), false);
-const _hasNavigator = _safeCheck(() => isDefined(navigator), false);
-const _hasHistory = _safeCheck(() => isDefined(history), false);
-const _isWebWorker: boolean = _safeCheck(() => !!(self && self instanceof WorkerGlobalScope), false);
-const _isNode: boolean = _safeCheck(() => !!(process && (process.versions||{}).node), false);
+let _cachedWindow: ILazyValue<Window>;
+let _cachedDocument: ILazyValue<Document>;
+let _cachedNavigator: ILazyValue<Navigator>;
+let _cachedHistory: ILazyValue<History>;
+let _isWebWorker: ILazyValue<boolean>;
+let _isNode: ILazyValue<boolean>;
 
 /**
  * Returns the current global scope object, for a normal web page this will be the current
@@ -46,10 +46,9 @@ const _isNode: boolean = _safeCheck(() => !!(process && (process.versions||{}).n
  * cause the cached global to be reset.
  */
 export function getGlobal(useCached?: boolean): Window {
-    let result = useCached === false ? null : _cachedGlobal;
-
-    if (!result) {
-        if (!result && typeof globalThis !== UNDEFINED) {
+    (!_cachedGlobal || useCached === false) && (_cachedGlobal = _lazySafeGet(function () {
+        let result: Window;
+        if (typeof globalThis !== UNDEFINED) {
             result = globalThis;
         }
     
@@ -65,10 +64,10 @@ export function getGlobal(useCached?: boolean): Window {
             result = global;
         }
 
-        _cachedGlobal = result;
-    }
+        return result;
+    }, null));
 
-    return result;
+    return _cachedGlobal.v;
 }
 
 /**
@@ -85,9 +84,9 @@ export function getInst<T>(name: string, useCached?: boolean): T {
     }
 
     // Test workaround, for environments where <global>.window (when global == window) doesn't return the base window
-    if (name === WINDOW && _hasWindow) {
+    if (name === WINDOW && _cachedWindow) {
         // tslint:disable-next-line: no-angle-bracket-type-assertion
-        return <any>window as T;
+        return <any>_cachedWindow.v as T;
     }
 
     return null;
@@ -108,7 +107,9 @@ export function hasDocument(): boolean {
  * @returns
  */
 export function getDocument(): Document {
-    return _hasDocument ? document : getInst(DOCUMENT);
+    !_cachedDocument && (_cachedDocument = _lazySafeGet(() => document || getInst(DOCUMENT), UNDEF_VALUE));
+
+    return _cachedDocument.v;
 }
 
 /**
@@ -126,7 +127,9 @@ export function hasWindow(): boolean {
  * @returns
  */
 export function getWindow(): Window {
-    return _hasWindow ? window : getInst(WINDOW);
+    !_cachedWindow && (_cachedWindow = _lazySafeGet(() => window || getInst(WINDOW), UNDEF_VALUE));
+
+    return _cachedWindow.v;
 }
 
 /**
@@ -144,7 +147,9 @@ export function hasNavigator(): boolean {
  * @returns
  */
 export function getNavigator(): Navigator {
-    return _hasNavigator ? navigator : getInst(NAVIGATOR);
+    !_cachedNavigator && (_cachedNavigator = _lazySafeGet(() => navigator || getInst(NAVIGATOR), UNDEF_VALUE));
+
+    return _cachedNavigator.v;
 }
 
 /**
@@ -162,7 +167,9 @@ export function hasHistory(): boolean {
  * @returns
  */
 export function getHistory(): History | null {
-    return _hasHistory ? history : getInst(HISTORY);
+    !_cachedHistory && (_cachedHistory = _lazySafeGet(() => history || getInst(HISTORY), UNDEF_VALUE));
+
+    return _cachedHistory.v;
 }
 
 /**
@@ -171,7 +178,9 @@ export function getHistory(): History | null {
  * @returns True if you are
  */
 export function isNode(): boolean {
-    return _isNode;
+    !_isNode && (_isNode = _lazySafeGet(() => !!(process && (process.versions||{}).node), false))
+
+    return _isNode.v;
 }
 
 /**
@@ -180,5 +189,7 @@ export function isNode(): boolean {
  * @returns True if the environment you are in looks like a Web Worker
  */
 export function isWebWorker(): boolean {
-    return _isWebWorker;
+    !_isWebWorker && (_isWebWorker = _lazySafeGet(() => !!(self && self instanceof WorkerGlobalScope), false));
+
+    return _isWebWorker.v;
 }

@@ -7,7 +7,7 @@
  */
 
 import { ArrCls, BOOLEAN, FUNCTION, NUMBER, OBJECT, ObjProto, STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
-import { _safeCheck } from "../internal/safe_check";
+import { _safeGet } from "../internal/safe_check";
 
 const PRIMITIVE_TYPES = [ STRING, NUMBER, BOOLEAN, UNDEFINED, "symbol", "bigint" ];
 
@@ -404,7 +404,7 @@ export function isPromise<T>(value: any): value is Promise<T> {
  * @return {boolean} True if the value is not truthy, false otherwise.
  */
 export function isNotTruthy(value: any) {
-    return !value || !_safeCheck(() => (value && (0 + value)), value);
+    return !value || !_safeGet(() => (value && (0 + value)), value);
 }
 
 /**
@@ -418,6 +418,6 @@ export function isTruthy(value: any) {
     // Objects created with no prototype (Object.create(null)) cannot be converted to primitives
     // Which causes this code to throw, additionally just using !! also fails for Boolean objects
     // !!(new Boolean(false)) evaluates to true
-    return !(!value || _safeCheck(() => !(value && (0 + value)), !value));
+    return !(!value || _safeGet(() => !(value && (0 + value)), !value));
     //return !(!value || !(value && (0 + value)));
 }

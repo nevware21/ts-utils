@@ -11,6 +11,7 @@ import { EMPTY, LENGTH, StrProto } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 import { mathCeil } from "../math/floor";
 import { mathToInt } from "../math/to_int";
+import { asString } from "./as_string";
 import { strRepeat } from "./repeat";
 import { strSubstring } from "./substring";
 
@@ -24,7 +25,7 @@ function _padValue(value: string, targetLength: number, padString?: string) {
 
     let len = value[LENGTH];
     if (len < targetLength) {
-        result = isNullOrUndefined(padString) ? " " : "" + padString;
+        result = isNullOrUndefined(padString) ? " " : asString(padString);
         targetLength = targetLength - len;
         if (targetLength > result[LENGTH]) {
             result = strRepeat(result, mathCeil(targetLength / result[LENGTH]));

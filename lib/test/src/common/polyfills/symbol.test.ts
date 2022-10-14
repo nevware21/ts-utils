@@ -9,7 +9,7 @@
 import { assert } from "chai";
 import { isUndefined } from "../../../../src/helpers/base";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
-import { polyGetKnownSymbol, polySymbolFor, polySymbolKeyFor } from "../../../../src/polyfills/symbol";
+import { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "../../../../src/polyfills/symbol";
 import { WellKnownSymbols } from "../../../../src/symbol/well_known";
 
 describe("symbol polyfills", () => {
@@ -94,7 +94,10 @@ describe("symbol polyfills", () => {
         assert.equal(polyGetKnownSymbol(WellKnownSymbols.unscopables), expectedSymbols.unscopables, "Check that the expected symbol is returned");
     });
 
-
+    it("polyNewSymbol", () => {
+        assert.notEqual(polyNewSymbol("Hello"), polyNewSymbol("Hello"), "Always creates a new symbol");
+        assert.equal(polyNewSymbol("Hello").toString(), polyNewSymbol("Hello").toString(), "While different they will look the same");
+    });
 
     function _checkSymbolFor(value: any) {
         let polyResult: any;
