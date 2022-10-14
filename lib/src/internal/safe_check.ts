@@ -6,20 +6,35 @@
  * Licensed under the MIT license.
  */
 
+import { getLazy, ILazyValue } from "../helpers/lazy";
+
 /**
  * @ignore
  * @internal
  * Internal helper for safely checking whether types exist
  * @param cb - Callback function be wrapped with an exception
  * @param defValue - The default value to return when an exception is thrown
- * @returns The value from the `cb` or the default value
+ * @returns The an ILazyValue instance that will call the `cb` when accessed and will return the resulting value or the default value
  */
-export function _safeCheck<T = boolean>(cb: () => T, defValue: T) {
+export function _safeGet<T = boolean>(cb: () => T, defValue: T): T {
     let result = defValue;
     try {
         result = cb();
     } catch (e) {
         // Do nothing
     }
+
     return result;
+}
+
+/**
+ * @ignore
+ * @internal
+ * Internal helper for lazily safely checking whether types exist
+ * @param cb - Callback function be wrapped with an exception
+ * @param defValue - The default value to return when an exception is thrown
+ * @returns The an ILazyValue instance that will call the `cb` when accessed and will return the resulting value or the default value
+ */
+export function _lazySafeGet<T = boolean>(cb: () => T, defValue: T): ILazyValue<T> {
+    return getLazy<T>(() => _safeGet<T>(cb, defValue));
 }

@@ -3,7 +3,7 @@
     "branches": 80,
     "lines": 80,
     "functions": 80,
-    "statements": 80,
+    "statements": 95,
     "all": true,
     "check-coverage": false,
     "reporter": [ "text", "html" ],

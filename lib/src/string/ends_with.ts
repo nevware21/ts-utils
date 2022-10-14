@@ -11,6 +11,7 @@ import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
 import { LENGTH, StrProto } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
+import { asString } from "./as_string";
 import { strSubstring } from "./substring";
 
 const ENDS_WITH = "endsWith";
@@ -37,7 +38,7 @@ export function polyStrEndsWith(value: string, searchString: string, length?: nu
         throwTypeError("'" + dumpObj(value) + "' is not a string");
     }
 
-    let searchValue = isString(searchString) ? searchString : "" + searchString;
+    let searchValue = isString(searchString) ? searchString : asString(searchString);
     let chkLen = searchValue[LENGTH];
     let len = value[LENGTH];
     let end = !isUndefined(length) && length < len ? length : len;
