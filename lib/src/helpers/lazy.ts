@@ -34,17 +34,17 @@ export interface ILazyValue<T> {
  * // This does not cause the evaluation to occur
  * let cachedValue = getLazy(() => callSomeExpensiveFunction());
  * let theValue;
- * 
+ *
  * // Just checking if there is an object still does not cause the evaluation
  * if (cachedValue) {
  *     // This will cause the evaluation to occur and the result will be cached
  *     theValue = cachedValue.v;
  * }
- * 
+ *
  * // Accessing the value again will not cause the re-evaluation to occur, it will just return the same
  * // result value again.
  * theValue === cachedValue.v;  // true
- * 
+ *
  * ```
  */
 export function getLazy<T>(cb: () => T): ILazyValue<T> {
