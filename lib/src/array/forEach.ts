@@ -45,7 +45,7 @@ import { LENGTH } from "../internal/constants";
  * });
  * ```
  */
-export function arrForEach<T>(arr: T[], callbackfn: (value: T, index: number, array: T[]) => void | number, thisArg?: any): void {
+export function arrForEach<T = any>(arr: T[], callbackfn: (value: T, index: number, array: T[]) => void | number, thisArg?: any): void {
     if (arr) {
         const len = arr[LENGTH];
         for (let idx = 0; idx < len; idx++) {
