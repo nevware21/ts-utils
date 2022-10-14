@@ -1,0 +1,9 @@
+#####################################################
+# List of approvers for TS-Utils
+#####################################################
+#
+# Learn about CODEOWNERS file format:
+#  https://help.github.com/en/articles/about-code-owners
+#
+
+* @nevware21/typescript-approvers
