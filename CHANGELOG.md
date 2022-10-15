@@ -1,4 +1,12 @@
 
+# v0.4.5 Oct 14th, 2022
+
+## Changelog
+
+- #99 [Bug] Fix issue where Arrays with non-indexed values are not copied
+- #100 Add lazy initialization of globals to provide better tree-shaking when not used.
+- #101 Add clearTimeout override option for the scheduleTimeoutWith
+
 # v0.4.4 Oct 10th, 2022
 
 ## Changelog
