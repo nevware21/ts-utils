@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { _safeGet } from "../internal/safe_check";
 import { objDefineGet, objDefineProp } from "../object/define";
 
 /**

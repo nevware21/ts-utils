@@ -7,7 +7,7 @@
  */
 
 import { UNDEFINED, UNDEF_VALUE } from "../internal/constants";
-import { _lazySafeGet } from "../internal/safe_check";
+import { _lazySafeGet } from "../internal/lazy_safe_check";
 import { ILazyValue } from "./lazy";
 
 const DOCUMENT = "document";
