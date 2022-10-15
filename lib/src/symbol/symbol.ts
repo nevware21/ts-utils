@@ -11,8 +11,8 @@ import { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } fr
 import { WellKnownSymbols, _wellKnownSymbolMap } from "./well_known";
 import { isDefined, _createIs } from "../helpers/base";
 import { getInst } from "../helpers/environment";
-import { _lazySafeGet } from "../internal/safe_check";
 import { ILazyValue } from "../helpers/lazy";
+import { _lazySafeGet } from "../internal/lazy_safe_check";
 
 let _symbol: ILazyValue<Symbol>;
 let _symbolFor: ILazyValue<(key: string) => symbol>;

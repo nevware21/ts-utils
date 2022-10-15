@@ -9,7 +9,7 @@
 import { isDefined, isUndefined } from "../helpers/base";
 import { ILazyValue } from "../helpers/lazy";
 import { elapsedTime, perfNow } from "../helpers/perf";
-import { _lazySafeGet } from "../internal/safe_check";
+import { _lazySafeGet } from "../internal/lazy_safe_check";
 import { ITimerHandler, scheduleTimeout } from "./timeout";
 
 let _hasIdleCallback: ILazyValue<boolean>;
