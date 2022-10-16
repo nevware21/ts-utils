@@ -1,4 +1,10 @@
 
+# v0.4.6 Oct 15th, 2022
+
+## Changelog
+
+- #106 v0.4.5 has Circular dependencies
+
 # v0.4.5 Oct 14th, 2022
 
 ## Changelog
