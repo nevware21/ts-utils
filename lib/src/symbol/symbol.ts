@@ -11,7 +11,7 @@ import { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } fr
 import { WellKnownSymbols, _wellKnownSymbolMap } from "./well_known";
 import { isDefined, _createIs } from "../helpers/base";
 import { getInst } from "../helpers/environment";
-import { ILazyValue } from "../helpers/lazy";
+import { ILazyValue, _globalLazyTestHooks } from "../helpers/lazy";
 import { _lazySafeGet } from "../internal/lazy_safe_check";
 
 let _symbol: ILazyValue<Symbol>;
@@ -29,12 +29,10 @@ export const isSymbol: (value: any) => value is symbol = _createIs<symbol>("symb
 /**
  * Helper to identify whether the runtime support the Symbols either via native or an installed polyfill
  * @group Symbol
- * @param useCached - [Optional] used for testing to bypass the cached lookup, when `true` this will
- * cause the cached global to be reset, which is also useful if a polyfill is loaded after this library
  * @returns true if Symbol's are support otherwise false
  */
-export function hasSymbol(useCached?: boolean): boolean {
-    return !!getSymbol(useCached);
+export function hasSymbol(): boolean {
+    return !!getSymbol();
 }
 
 /**
@@ -42,9 +40,9 @@ export function hasSymbol(useCached?: boolean): boolean {
  * @group Symbol
  * @returns The value of the named Symbol (if available)
  */
-export function getSymbol(useCached?: boolean): Symbol {
-    let resetCache = useCached === false;
-    (!_symbol || resetCache) && (_symbol = _lazySafeGet(() => isDefined(Symbol) ? getInst<Symbol>(SYMBOL, useCached) : UNDEF_VALUE, UNDEF_VALUE));
+export function getSymbol(): Symbol {
+    let resetCache = !_symbol || (_globalLazyTestHooks && _globalLazyTestHooks.lzy && !_symbol.b);
+    resetCache && (_symbol = _lazySafeGet(() => isDefined(Symbol) ? getInst<Symbol>(SYMBOL) : UNDEF_VALUE, UNDEF_VALUE));
     (!_symbolFor || resetCache) && (_symbolFor = _lazySafeGet(() => _symbol.v ? _symbol["for"] : UNDEF_VALUE, UNDEF_VALUE));
     (!_symbolKeyFor || resetCache) && (_symbolKeyFor = _lazySafeGet(() => _symbol.v ? _symbol["keyFor"] : UNDEF_VALUE, UNDEF_VALUE));
     
@@ -68,7 +66,7 @@ export function getSymbol(useCached?: boolean): Symbol {
 export function getKnownSymbol<T = symbol>(name: string | WellKnownSymbols, noPoly?: boolean): T {
     let knownName = _wellKnownSymbolMap[name];
     // Cause lazy symbol to get initialized
-    !_symbol && getSymbol();
+    (!_symbol || (_globalLazyTestHooks.lzy && !_symbol.b)) && getSymbol();
 
     return _symbol.v ? _symbol.v[knownName || name] : (!noPoly ? polyGetKnownSymbol(name) : UNDEF_VALUE);
 }
@@ -83,9 +81,9 @@ export function getKnownSymbol<T = symbol>(name: string | WellKnownSymbols, noPo
  */
 export function newSymbol(description?: string | number, noPoly?: boolean): symbol {
     // Cause lazy _symbol to get initialized
-    !_symbol && getSymbol();
+    (!_symbol || (_globalLazyTestHooks.lzy && !_symbol.b)) && getSymbol();
 
-    return _symbol.v ? Symbol(description) : (!noPoly ? polyNewSymbol(description) : null);
+    return _symbol.v ? (_symbol.v as any)(description) : (!noPoly ? polyNewSymbol(description) : null);
 }
 
 /**
@@ -97,7 +95,7 @@ export function newSymbol(description?: string | number, noPoly?: boolean): symb
  */
 export function symbolFor(key: string): symbol {
     // Cause lazy symbol to get initialized
-    !_symbolFor && getSymbol();
+    (!_symbolFor || (_globalLazyTestHooks.lzy && !_symbol.b)) && getSymbol();
 
     return (_symbolFor.v || polySymbolFor)(key);
 }
@@ -111,7 +109,7 @@ export function symbolFor(key: string): symbol {
  */
 export function symbolKeyFor(sym: symbol): string | undefined {
     // Cause lazy symbol to get initialized
-    !_symbolKeyFor && getSymbol();
+    (!_symbolKeyFor || (_globalLazyTestHooks.lzy && !_symbol.b)) && getSymbol();
 
     return (_symbolKeyFor.v || polySymbolKeyFor)(sym);
 }

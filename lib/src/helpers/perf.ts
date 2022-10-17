@@ -10,7 +10,7 @@ import { UNDEF_VALUE } from "../internal/constants";
 import { _lazySafeGet } from "../internal/lazy_safe_check";
 import { utcNow } from "./date";
 import { getInst } from "./environment";
-import { ILazyValue } from "./lazy";
+import { ILazyValue, _globalLazyTestHooks } from "./lazy";
 
 let _perf: ILazyValue<Performance>
 
@@ -33,12 +33,10 @@ export function hasPerformance(): boolean {
  *
  * @since 0.4.4
  * @group Environment
- * @param useCached - [Optional] used for testing to bypass the cached lookup, when `true` this will
- * cause the cached global to be reset.
  * @returns The global performance object if available.
  */
-export function getPerformance(useCached?: boolean): Performance {
-    (!_perf || useCached === false) && (_perf = _lazySafeGet(() => performance || getInst("performance"), UNDEF_VALUE));
+export function getPerformance(): Performance {
+    (!_perf || (_globalLazyTestHooks.lzy && !_perf.b)) && (_perf = _lazySafeGet(() => getInst("performance"), UNDEF_VALUE));
     return _perf.v;
 }
 

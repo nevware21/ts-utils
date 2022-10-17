@@ -7,23 +7,19 @@
  */
 
 import { isNullOrUndefined } from "../helpers/base";
-import { getGlobal } from "../helpers/environment";
 import { WellKnownSymbols, _wellKnownSymbolMap } from "../symbol/well_known";
 import { throwTypeError } from "../helpers/throw";
 import { POLYFILL_TAG, SYMBOL } from "../internal/constants";
 import { objHasOwn } from "../object/has_own";
 import { asString } from "../string/as_string";
+import { _GlobalPolySymbols, _getGlobalConfig } from "../internal/global";
 
-const POLY_GLOBAL_REGISTORT = "__polySymbols$ts_utils";
-let _polySymbols: {
-    k: { [key: string ]: symbol },
-    s: { [sym: symbol ]: string },
-};
+let _polySymbols: _GlobalPolySymbols;
 
-function _globalSymbolRegistry() {
+function _globalSymbolRegistry(): _GlobalPolySymbols {
     if (!_polySymbols) {
-        let gbl = getGlobal();
-        _polySymbols = gbl[POLY_GLOBAL_REGISTORT] = gbl[POLY_GLOBAL_REGISTORT] || { k: {}, s:{} };
+        let gblCfg = _getGlobalConfig();
+        _polySymbols = gblCfg.gblSym = gblCfg.gblSym || { k: {}, s:{} };
     }
 
     return _polySymbols;
