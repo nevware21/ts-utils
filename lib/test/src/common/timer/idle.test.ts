@@ -12,6 +12,7 @@ import { hasIdleCallback, scheduleIdleCallback, setDefaultMaxExecutionTime, setD
 import { getGlobal } from "../../../../src/helpers/environment";
 import { elapsedTime, getPerformance, perfNow } from "../../../../src/helpers/perf";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
+import { setBypassLazyCache } from "../../../../src/helpers/lazy";
 
 function tryCatch(cb: () => void) {
     try {
@@ -150,14 +151,14 @@ describe("idle tests", () => {
 
             beforeEach(() => {
                 (<any>getGlobal()).performance = null;
-                // Invalidate any cached value
-                getPerformance(false);
+                // Disable lazy caching
+                setBypassLazyCache(true);
             });
     
             afterEach(() => {
                 (<any>getGlobal()).performance = orgPerformance;
-                // Invalidate any cached value
-                getPerformance(false);
+                // Re-enable lazy caching
+                setBypassLazyCache(false);
             });
     
             it("basic idle", () => {

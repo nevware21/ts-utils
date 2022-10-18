@@ -6,9 +6,10 @@
  * Licensed under the MIT license.
  */
 
-import { UNDEFINED, UNDEF_VALUE } from "../internal/constants";
+import { UNDEF_VALUE } from "../internal/constants";
+import { _getGlobalValue } from "../internal/global";
 import { _lazySafeGet } from "../internal/lazy_safe_check";
-import { ILazyValue } from "./lazy";
+import { ILazyValue, _globalLazyTestHooks } from "./lazy";
 
 const DOCUMENT = "document";
 const HISTORY = "history";
@@ -16,8 +17,6 @@ const NAVIGATOR = "navigator";
 const WINDOW = "window";
 
 declare let WorkerGlobalScope: any;
-declare let globalThis: Window;
-declare let global: Window;
 declare let self: any;
 
 let _cachedGlobal: ILazyValue<Window>;
@@ -46,26 +45,7 @@ let _isNode: ILazyValue<boolean>;
  * cause the cached global to be reset.
  */
 export function getGlobal(useCached?: boolean): Window {
-    (!_cachedGlobal || useCached === false) && (_cachedGlobal = _lazySafeGet(function () {
-        let result: Window;
-        if (typeof globalThis !== UNDEFINED) {
-            result = globalThis;
-        }
-    
-        if (!result && typeof self !== UNDEFINED) {
-            result = self;
-        }
-    
-        if (!result && typeof window !== UNDEFINED) {
-            result = window;
-        }
-    
-        if (!result && typeof global !== UNDEFINED) {
-            result = global;
-        }
-
-        return result;
-    }, null));
+    (!_cachedGlobal || useCached === false || (_globalLazyTestHooks.lzy && !_cachedGlobal.b)) && (_cachedGlobal = _lazySafeGet(_getGlobalValue, null));
 
     return _cachedGlobal.v;
 }
@@ -76,7 +56,7 @@ export function getGlobal(useCached?: boolean): Window {
  * @param name The globally named object
  * @param useCached - [Optional] used for testing to bypass the cached lookup, when `true` this will
  * cause the cached global to be reset.
-*/
+ */
 export function getInst<T>(name: string, useCached?: boolean): T {
     const gbl = getGlobal(useCached);
     if (gbl && gbl[name]) {
@@ -107,7 +87,7 @@ export function hasDocument(): boolean {
  * @returns
  */
 export function getDocument(): Document {
-    !_cachedDocument && (_cachedDocument = _lazySafeGet(() => document || getInst(DOCUMENT), UNDEF_VALUE));
+    (!_cachedDocument || (_globalLazyTestHooks.lzy && !_cachedDocument.b)) && (_cachedDocument = _lazySafeGet(() => getInst(DOCUMENT), UNDEF_VALUE));
 
     return _cachedDocument.v;
 }
@@ -127,7 +107,7 @@ export function hasWindow(): boolean {
  * @returns
  */
 export function getWindow(): Window {
-    !_cachedWindow && (_cachedWindow = _lazySafeGet(() => window || getInst(WINDOW), UNDEF_VALUE));
+    (!_cachedWindow || (_globalLazyTestHooks.lzy && !_cachedWindow.b)) && (_cachedWindow = _lazySafeGet(() => getInst(WINDOW), UNDEF_VALUE));
 
     return _cachedWindow.v;
 }
@@ -147,7 +127,7 @@ export function hasNavigator(): boolean {
  * @returns
  */
 export function getNavigator(): Navigator {
-    !_cachedNavigator && (_cachedNavigator = _lazySafeGet(() => navigator || getInst(NAVIGATOR), UNDEF_VALUE));
+    (!_cachedNavigator || (_globalLazyTestHooks.lzy && !_cachedNavigator.b)) && (_cachedNavigator = _lazySafeGet(() => getInst(NAVIGATOR), UNDEF_VALUE));
 
     return _cachedNavigator.v;
 }
@@ -167,7 +147,7 @@ export function hasHistory(): boolean {
  * @returns
  */
 export function getHistory(): History | null {
-    !_cachedHistory && (_cachedHistory = _lazySafeGet(() => history || getInst(HISTORY), UNDEF_VALUE));
+    (!_cachedHistory || (_globalLazyTestHooks.lzy && !_cachedHistory.b)) && (_cachedHistory = _lazySafeGet(() => getInst(HISTORY), UNDEF_VALUE));
 
     return _cachedHistory.v;
 }

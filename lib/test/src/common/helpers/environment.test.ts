@@ -8,6 +8,7 @@
 
 import { assert } from "chai";
 import { getGlobal, getInst, hasDocument, hasHistory, hasNavigator, hasWindow, isWebWorker } from "../../../../src/helpers/environment";
+import { setBypassLazyCache } from "../../../../src/helpers/lazy";
 
 declare let global: Window;
 declare let self: any;
@@ -36,7 +37,8 @@ describe("environment helpers", () => {
     tryCatch(() => theHistory = history);
 
     it("getGlobal", () => {
-        let gbl = getGlobal(false);
+        setBypassLazyCache(true);
+        let gbl = getGlobal();
         if (hasWindow()) {
             assert.ok(gbl === window, "Global object should be window");
         } else if (isWebWorker()) {

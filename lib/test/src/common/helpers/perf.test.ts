@@ -11,6 +11,7 @@ import { assert } from "chai";
 import { utcNow } from "../../../../src/helpers/date";
 import { elapsedTime, getPerformance, hasPerformance, perfNow } from "../../../../src/helpers/perf";
 import { getGlobal } from "../../../../src/helpers/environment";
+import { setBypassLazyCache } from "../../../../src/helpers/lazy";
 
 describe("performance helpers", () => {
     if (performance) {
@@ -32,16 +33,16 @@ describe("performance helpers", () => {
         beforeEach(() => {
             clock = sinon.useFakeTimers();
             
-            // Invalidate any cached value
-            getPerformance(false);
+            // Disable lazy caching
+            setBypassLazyCache(true);
         });
 
         afterEach(() => {
             clock.restore();
             (<any>getGlobal()).performance = orgPerformance;
 
-            // Invalidate any cached value
-            getPerformance(false);
+            // Re-enable lazy caching
+            setBypassLazyCache(false);
         });
 
         it("perfNow fallback", () => {
@@ -61,16 +62,16 @@ describe("performance helpers", () => {
             clock = sinon.useFakeTimers();
             (<any>getGlobal()).performance = null;
 
-            // Invalidate any cached value
-            getPerformance(false);
+            // Disable lazy caching
+            setBypassLazyCache(true);
         });
 
         afterEach(() => {
             (<any>getGlobal()).performance = orgPerformance;
             clock.restore();
 
-            // Invalidate any cached value
-            getPerformance(false);
+            // Re-enable lazy caching
+            setBypassLazyCache(false);
         });
 
         it("check performance", () => {

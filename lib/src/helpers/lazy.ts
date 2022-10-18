@@ -6,8 +6,20 @@
  * Licensed under the MIT license.
  */
 
+import { _GlobalTestHooks, _getGlobalConfig } from "../internal/global";
 import { _safeGet } from "../internal/safe_check";
 import { objDefineGet, objDefineProp } from "../object/define";
+
+/**
+ * @internal
+ * Internal flag which is set by the public {@link setBypassLazyCache}, should not be externally exported
+ */
+export let _globalLazyTestHooks: _GlobalTestHooks;
+
+let _fetchLazyTestHooks = function() {
+    _globalLazyTestHooks = _getGlobalConfig();
+    _fetchLazyTestHooks = null;
+}
 
 /**
  * Interface of the object returned by the {@link getLazy} instance
@@ -16,10 +28,15 @@ import { objDefineGet, objDefineProp } from "../object/define";
  */
 export interface ILazyValue<T> {
     /**
-     * Returns the current cahced value from the lazy lookup, if the callback function has not yet occurred
+     * Returns the current cached value from the lazy lookup, if the callback function has not yet occurred
      * accessing the value will cause the lazy evaluation to occur and the result will be returned.
      */
-    v: T
+    v: T,
+
+    /**
+     * Identifies if this instance is bypassing the internal caching mechanism which is used for testing
+     */
+    b?: boolean
 }
 
 /**
@@ -50,18 +67,45 @@ export interface ILazyValue<T> {
  */
 export function getLazy<T>(cb: () => T): ILazyValue<T> {
     let lazyValue = { } as ILazyValue<T>;
+    _fetchLazyTestHooks && _fetchLazyTestHooks();
+    lazyValue.b = _globalLazyTestHooks.lzy;
+
     objDefineGet(lazyValue, "v", function () {
         let result = cb();
-        // Just replace the value
-        objDefineProp(lazyValue, "v", {
-            enumerable: true,
-            configurable: true,
-            writable: false,
-            value: result
-        });
+        if (!_globalLazyTestHooks.lzy) {
+            // Just replace the value
+            objDefineProp(lazyValue, "v", {
+                enumerable: true,
+                configurable: true,
+                writable: false,
+                value: result
+            });
+
+            if (lazyValue.b) {
+                delete lazyValue.b;
+            }
+        }
+        
+        if (_globalLazyTestHooks.lzy && lazyValue.b !== _globalLazyTestHooks.lzy) {
+            lazyValue.b = _globalLazyTestHooks.lzy;
+        }
 
         return result;
     }, true);
 
+
     return lazyValue;
+}
+
+/**
+ * Test Hook function used to cause the internal caching of objects to be bypassed, this should never
+ * be enabled for production as it has additional performance impact caused by the repetitive creation
+ * of the lazy wrappers.
+ * @group Lazy
+ * @since 0.5.0
+ * @param newValue - When `true` will cause all new lazy implementations to bypass the cached lookup.
+ */
+export function setBypassLazyCache(newValue: boolean) {
+    _fetchLazyTestHooks && _fetchLazyTestHooks();
+    _globalLazyTestHooks.lzy = newValue;
 }

@@ -10,6 +10,7 @@ import { assert } from "chai";
 import { isUndefined } from "../../../../src/helpers/base";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { getInst } from "../../../../src/helpers/environment";
+import { setBypassLazyCache } from "../../../../src/helpers/lazy";
 import { hasSymbol, getSymbol, getKnownSymbol, symbolKeyFor, symbolFor, newSymbol} from "../../../../src/symbol/symbol";
 import { WellKnownSymbols } from "../../../../src/symbol/well_known";
 
@@ -119,11 +120,19 @@ describe("symbol helpers", () => {
     describe("Remove Native", () => {
 
         it("getSymbol with noPoly", () => {
-            // Get the native Symbol and force it to be cached
-            let orgSymbol = getSymbol(false);
+            // Disable lazy caching so we get the true global version
+            setBypassLazyCache(true);
+
+            // Get the native Symbol
+            let orgSymbol = getSymbol();
             let toStringTag = Symbol.toStringTag;
 
+            // Re-enabling caching and force the symbol to be cached
+            setBypassLazyCache(false);
+            getSymbol();
+
             try {
+
 
                 Symbol = undefined;
                 assert.equal(getSymbol(), theSymbol, "Check that the Symbol is returned");
@@ -131,20 +140,28 @@ describe("symbol helpers", () => {
                 assert.equal(getKnownSymbol(WellKnownSymbols.toStringTag), toStringTag, "Check that the expected symbol is returned");
 
                 // Force the cache Symbol to be dropped
-                assert.equal(getSymbol(false), undefined, "Check that the Symbol is now not available");
+                setBypassLazyCache(true);
+                assert.equal(getSymbol(), undefined, "Check that the Symbol is now not available");
                 assert.equal(getKnownSymbol("toStringTag", true), undefined, "Check that the expected symbol is returned");
                 assert.equal(getKnownSymbol(WellKnownSymbols.toStringTag, true), undefined, "Check that the expected symbol is returned");
             } finally {
                 Symbol = orgSymbol;
-                // Reset the internal cache
-                getSymbol(false);
+                // Re-enable lazy caching
+                setBypassLazyCache(false);
             }
         });
 
         it("getSymbol - default noPoly", () => {
-            // Get the native Symbol and force it to be cached
-            let orgSymbol = getSymbol(false);
+            // Disable lazy caching so we get the true global version
+            setBypassLazyCache(true);
+
+            // Get the native Symbol
+            let orgSymbol = getSymbol();
             let toStringTag = Symbol.toStringTag;
+
+            // Re-enabling caching and force the symbol to be cached
+            setBypassLazyCache(false);
+            getSymbol();
 
             try {
 
@@ -154,20 +171,29 @@ describe("symbol helpers", () => {
                 assert.equal(getKnownSymbol(WellKnownSymbols.toStringTag), toStringTag, "Check that the expected symbol is returned");
 
                 // Force the cache Symbol to be dropped
-                assert.equal(getSymbol(false), undefined, "Check that the Symbol is now not available");
+                setBypassLazyCache(true);
+                assert.equal(getSymbol(), undefined, "Check that the Symbol is now not available");
                 assert.equal(getKnownSymbol<any>("toStringTag", false)._polyfill, true, "Check that the expected symbol is returned");
                 assert.equal(getKnownSymbol<any>(WellKnownSymbols.toStringTag, false)._polyfill, true, "Check that the expected symbol is returned");
             } finally {
                 Symbol = orgSymbol;
-                // Reset the internal cache
-                getSymbol(false);
+
+                // Re-enable lazy caching
+                setBypassLazyCache(false);
             }
         });
 
         it("getSymbol - explicit noPoly false", () => {
-            // Get the native Symbol and force it to be cached
-            let orgSymbol = getSymbol(false);
+            // Disable lazy caching so we get the true global version
+            setBypassLazyCache(true);
+
+            // Get the native Symbol
+            let orgSymbol = getSymbol();
             let toStringTag = Symbol.toStringTag;
+
+            // Re-enabling caching and force the symbol to be cached
+            setBypassLazyCache(false);
+            getSymbol();
 
             try {
 
@@ -177,31 +203,38 @@ describe("symbol helpers", () => {
                 assert.equal(getKnownSymbol(WellKnownSymbols.toStringTag), toStringTag, "Check that the expected symbol is returned");
 
                 // Force the cache Symbol to be dropped
-                assert.equal(getSymbol(false), undefined, "Check that the Symbol is now not available");
+                setBypassLazyCache(true);
+                assert.equal(getSymbol(), undefined, "Check that the Symbol is now not available");
                 assert.equal(getKnownSymbol<any>("toStringTag", false)._polyfill, true, "Check that the expected symbol is returned");
                 assert.equal(getKnownSymbol<any>(WellKnownSymbols.toStringTag, false)._polyfill, true, "Check that the expected symbol is returned");
             } finally {
                 Symbol = orgSymbol;
-                // Reset the internal cache
-                getSymbol(false);
+                // Re-enable lazy caching
+                setBypassLazyCache(false);
             }
         });
 
         it("newSymbol", () => {
-            // Get the native Symbol and force it to be cached
-            let orgSymbol = getSymbol(false);
+            // Disable lazy caching so we get the true global version
+            setBypassLazyCache(true);
+
+            // Get the native Symbol
+            let orgSymbol = getSymbol();
+
+            // Re-enabling caching and force the symbol to be cached
+            setBypassLazyCache(false);
+            getSymbol();
 
             try {
                 assert.notEqual(newSymbol("Hello"), newSymbol("Hello"), "Always creates a new symbol");
                 assert.equal(newSymbol("Hello").toString(), newSymbol("Hello").toString(), "While different they will look the same");
             } finally {
                 Symbol = orgSymbol;
-                // Reset the internal cache
-                getSymbol(false);
+                // Re-enable lazy caching
+                setBypassLazyCache(false);
             }
         });
     });
-
 
     function _checkSymbolFor(value: any) {
         let polyResult: any;
