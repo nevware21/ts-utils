@@ -151,7 +151,7 @@ export const objFreeze: <T>(value: T) => T = _objFreeze || _doNothing;
 export const objSeal: <T>(value: T) => T = ObjClass["seal"] || _doNothing;
 
 /**
- * The objGetPrototypeOf() method returns the prototype (i.e. the value of the internal [[Prototype]] property)
+ * The objGetPrototypeOf() method returns the prototype (i.e. the value of the internal `Prototype` property)
  * of the specified value.
  * @since 0.4.4
  * @group Object

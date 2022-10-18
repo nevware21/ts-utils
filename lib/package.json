@@ -1,7 +1,7 @@
 {
     "name": "@nevware21/ts-utils",
     "description": "Common JavaScript/TypeScript helper functions for better minification",
-    "version": "0.4.6",
+    "version": "0.5.0",
     "homepage": "https://github.com/nevware21/ts-utils",
     "license": "MIT",
     "author": {

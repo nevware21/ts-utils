@@ -1,4 +1,12 @@
 
+# v0.5.0 Oct 18th, 2022
+
+## Changelog
+
+- #110 [Test Hook] Need the ability to clear the new lazy cache values for environment values
+  - Introduces the ability to cause lazy implmentations to bypass cached values
+  - Moved the location of the polyfill global symbol registry
+
 # v0.4.6 Oct 15th, 2022
 
 ## Changelog
