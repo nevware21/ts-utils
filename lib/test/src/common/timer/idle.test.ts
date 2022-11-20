@@ -10,7 +10,7 @@ import * as sinon from "sinon";
 import { assert } from "chai";
 import { hasIdleCallback, scheduleIdleCallback, setDefaultMaxExecutionTime, setDefaultIdleTimeout } from "../../../../src/timer/idle";
 import { getGlobal } from "../../../../src/helpers/environment";
-import { elapsedTime, getPerformance, perfNow } from "../../../../src/helpers/perf";
+import { elapsedTime, perfNow } from "../../../../src/helpers/perf";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { setBypassLazyCache } from "../../../../src/helpers/lazy";
 

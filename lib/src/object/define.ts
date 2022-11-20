@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { ObjClass, VALUE } from "../internal/constants";
+import { EMPTY, ObjClass, VALUE } from "../internal/constants";
 import { isFunction, isUndefined, objToString } from "../helpers/base";
 import { throwUnsupported } from "../helpers/customError";
 import { dumpObj } from "../helpers/diagnostics";
@@ -21,12 +21,19 @@ const _objDefineProperty = ObjClass["defineProperty"];
  * @param descriptor - The descriptor for the property being defined or modified.
  */
 export function objDefineProp<T>(target: T, key: PropertyKey, descriptor: PropertyDescriptor & ThisType<any>): T {
+    let error: string = EMPTY;
     if (_objDefineProperty) {
-        _objDefineProperty(target, key, descriptor);
-        return target;
+        try {
+            _objDefineProperty(target, key, descriptor);
+            return target;
+        } catch (e) {
+            // IE8 Defines a defineProperty on Object but it's only supported for DOM elements so it will throw
+            // We will just ignore this here.
+            error = " - " + dumpObj(e);
+        }
     }
 
-    throwUnsupported("Unable to define property [" + objToString(key) + "] on " + dumpObj(target));
+    throwUnsupported("Unable to define property [" + objToString(key) + "] on " + dumpObj(target) + error);
 }
 
 /**
@@ -36,11 +43,12 @@ export function objDefineProp<T>(target: T, key: PropertyKey, descriptor: Proper
  * @param key - The name of the property to be defined or modified
  * @param value - The value or a function that returns the value
  * @param configurable - Can the value be changed, defaults to true.
+ * @param enumerable - Should this get property be enumerable, defaults to true.
  * @returns The object that was passed to the function
  */
-export function objDefineGet<T, V = any>(target: T, key: PropertyKey, value: (() => V) | V, configurable?: boolean): T {
+export function objDefineGet<T, V = any>(target: T, key: PropertyKey, value: (() => V) | V, configurable?: boolean, enumerable?: boolean): T {
     const desc: PropertyDescriptor = {
-        enumerable: true,
+        enumerable: isUndefined(enumerable) ? true : enumerable,
         configurable: isUndefined(configurable) ? true : configurable
     }
 
@@ -63,28 +71,23 @@ export function objDefineGet<T, V = any>(target: T, key: PropertyKey, value: (()
  * @param getProp - The getter function to wire against the getter.
  * @param setProp - The setter function to wire against the setter.
  * @param configurable - Can the value be changed, defaults to true
+ * @param enumerable - Should this get property be enumerable, defaults to true.
  * @returns The object that was passed to the function
  */
-export function objDefineAccessors<T, V = any>(target: T, prop: PropertyKey, getProp?: (() => V) | null, setProp?: ((v: V) => void) | null, configurable?: boolean): T {
+export function objDefineAccessors<T, V = any>(target: T, prop: PropertyKey, getProp?: (() => V) | null, setProp?: ((v: V) => void) | null, configurable?: boolean, enumerable?: boolean): T {
     if (_objDefineProperty) {
-        try {
-            const descriptor: PropertyDescriptor = {
-                enumerable: true,
-                configurable: isUndefined(configurable) ? true : configurable
-            }
-
-            if (getProp) {
-                descriptor.get = getProp;
-            }
-            if (setProp) {
-                descriptor.set = setProp;
-            }
-
-            return objDefineProp(target, prop, descriptor);
-        } catch (e) {
-            // IE8 Defines a defineProperty on Object but it's only supported for DOM elements so it will throw
-            // We will just ignore this here.
-            throwUnsupported("Unable to define accessors for [" + objToString(prop) + "] on " + dumpObj(target));
+        const descriptor: PropertyDescriptor = {
+            enumerable: isUndefined(enumerable) ? true : enumerable,
+            configurable: isUndefined(configurable) ? true : configurable
         }
+
+        if (getProp) {
+            descriptor.get = getProp;
+        }
+        if (setProp) {
+            descriptor.set = setProp;
+        }
+
+        return objDefineProp(target, prop, descriptor);
     }
 }
