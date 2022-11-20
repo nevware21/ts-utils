@@ -19,6 +19,7 @@ import { objCreate, polyObjCreate } from "../../../../src/object/create";
 import { objHasOwn, polyObjHasOwn } from "../../../../src/object/has_own";
 import { isPlainObject } from "../../../../src/object/is_plain_object";
 import { getWindow } from "../../../../src/helpers/environment";
+import { objGetOwnPropertyDescriptor } from "../../../../src/object/get_own_prop_desc";
 
 describe("object helpers", () => {
     it("objKeys", () => {
@@ -209,10 +210,22 @@ describe("object helpers", () => {
             assert.ok(true, "Expected exception - " + dumpObj(e));
         }
 
+        let desc = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc, "The descriptor must be defined");
+        assert.equal(desc?.configurable, true, "It should be configurable");
+        assert.equal(desc?.enumerable, true, "It should be enumerable");
+        assert.equal(desc?.writable, false, "It should not be writable");
+
         // Redefine
         objDefineGet(value, "test", 64);
 
         assert.equal(value.test, 64, "Expected 64");
+
+        let desc2 = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc2, "The descriptor must be defined");
+        assert.equal(desc2?.configurable, true, "It should be configurable");
+        assert.equal(desc2?.enumerable, true, "It should be enumerable");
+        assert.equal(desc2?.writable, false, "It should not be writable");
     });
 
     it("objDefineGet value - not configurable", () => {
@@ -227,6 +240,12 @@ describe("object helpers", () => {
             assert.ok(true, "Expected exception - " + dumpObj(e));
         }
 
+        let desc = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc, "The descriptor must be defined");
+        assert.equal(desc?.configurable, false, "It should not be configurable");
+        assert.equal(desc?.enumerable, true, "It should be enumerable");
+        assert.equal(desc?.writable, false, "It should not be writable");
+
         // Redefine
         try {
             objDefineGet(value, "test", 64);
@@ -234,6 +253,75 @@ describe("object helpers", () => {
         } catch(e) {
             assert.ok(true, "Expected exception - " + dumpObj(e));
         }
+
+        let desc2 = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc2, "The descriptor must be defined");
+        assert.equal(desc2?.configurable, false, "It should still not be configurable");
+        assert.equal(desc2?.enumerable, true, "It should still be enumerable");
+        assert.equal(desc2?.writable, false, "It should not be writable");
+    });
+
+    it("objDefineGet value - configurable and not enumerable", () => {
+        let value: any = {};
+        objDefineGet(value, "test", 42, undefined, false);
+
+        assert.equal(value.test, 42, "Expected 42");
+        try {
+            value.test = 53;
+            assert.ok(false, "Expected an exception when attempting to set a getter");
+        } catch(e) {
+            assert.ok(true, "Expected exception - " + dumpObj(e));
+        }
+
+        let desc = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc, "The descriptor must be defined");
+        assert.equal(desc?.configurable, true, "It should be configurable");
+        assert.equal(desc?.enumerable, false, "It should not be enumerable");
+        assert.equal(desc?.writable, false, "It should not be writable");
+
+        // Redefine
+        objDefineGet(value, "test", 64);
+
+        assert.equal(value.test, 64, "Expected 64");
+
+        let desc2 = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc2, "The descriptor must be defined");
+        assert.equal(desc2?.configurable, true, "It should be configurable");
+        assert.equal(desc2?.enumerable, true, "It should now be enumerable");
+        assert.equal(desc2?.writable, false, "It should not be writable");
+    });
+
+    it("objDefineGet value - not configurable or enumerable", () => {
+        let value: any = {};
+        objDefineGet(value, "test", 42, false, false);
+
+        assert.equal(value.test, 42, "Expected 42");
+        try {
+            value.test = 53;
+            assert.ok(false, "Expected an exception when attempting to set a getter");
+        } catch(e) {
+            assert.ok(true, "Expected exception - " + dumpObj(e));
+        }
+
+        let desc = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc, "The descriptor must be defined");
+        assert.equal(desc?.configurable, false, "It should not be configurable");
+        assert.equal(desc?.enumerable, false, "It should not be enumerable");
+        assert.equal(desc?.writable, false, "It should not be writable");
+
+        // Redefine
+        try {
+            objDefineGet(value, "test", 64);
+            assert.ok(false, "Expected an exception when attempting to reset a getter");
+        } catch(e) {
+            assert.ok(true, "Expected exception - " + dumpObj(e));
+        }
+
+        let desc2 = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc2, "The descriptor must be defined");
+        assert.equal(desc2?.configurable, false, "It should still not be configurable");
+        assert.equal(desc2?.enumerable, false, "It should still not be enumerable");
+        assert.equal(desc2?.writable, false, "It should not be writable");
     });
 
     it("objDefineGet function", () => {
@@ -257,6 +345,41 @@ describe("object helpers", () => {
 
         result = 64;
         assert.equal(value.test, 64, "Expected 64");
+
+        let desc = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc, "The descriptor must be defined");
+        assert.equal(desc?.configurable, true, "It should be configurable");
+        assert.equal(desc?.enumerable, true, "It should be enumerable");
+        assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
+    });
+
+    it("objDefineGet function - configurable and not enumerable", () => {
+        let value: any = {};
+        let result = 42;
+
+        function getFunc() {
+            return result;
+        }
+
+        objDefineGet(value, "test", getFunc, true, false);
+
+        assert.equal(value.test, 42, "Expected 42");
+
+        try {
+            value.test = 53;
+            assert.ok(false, "Expected an exception when attempting to set a getter");
+        } catch(e) {
+            assert.ok(true, "Expected exception - " + dumpObj(e));
+        }
+
+        result = 64;
+        assert.equal(value.test, 64, "Expected 64");
+
+        let desc = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc, "The descriptor must be defined");
+        assert.equal(desc?.configurable, true, "It should be configurable");
+        assert.equal(desc?.enumerable, false, "It should not be enumerable");
+        assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
     });
 
     it("objDefineGet function - not configurable", () => {
@@ -284,6 +407,45 @@ describe("object helpers", () => {
         } catch(e) {
             assert.ok(true, "Expected exception - " + dumpObj(e));
         }
+
+        let desc = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc, "The descriptor must be defined");
+        assert.equal(desc?.configurable, false, "It should not be configurable");
+        assert.equal(desc?.enumerable, true, "It should be enumerable");
+        assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
+    });
+
+    it("objDefineGet function - not configurable or enumerable", () => {
+        let value: any = {};
+        let result = 42;
+
+        function getFunc() {
+            return result;
+        }
+
+        objDefineGet(value, "test", getFunc, false, false);
+
+        assert.equal(value.test, 42, "Expected 42");
+
+        try {
+            value.test = 53;
+            assert.ok(false, "Expected an exception when attempting to set a getter");
+        } catch(e) {
+            assert.ok(true, "Expected exception - " + dumpObj(e));
+        }
+        // Redefine
+        try {
+            objDefineGet(value, "test", getFunc, true);
+            assert.ok(false, "Expected an exception when attempting to reset a getter");
+        } catch(e) {
+            assert.ok(true, "Expected exception - " + dumpObj(e));
+        }
+
+        let desc = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc, "The descriptor must be defined");
+        assert.equal(desc?.configurable, false, "It should not be configurable");
+        assert.equal(desc?.enumerable, false, "It should not be enumerable");
+        assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
     });
 
     it("objDefineAccessors - getter only", () => {
@@ -305,6 +467,12 @@ describe("object helpers", () => {
 
         result = 64;
         assert.equal(value.test, 64, "Expected 64");
+
+        let desc = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc, "The descriptor must be defined");
+        assert.equal(desc?.configurable, true, "It should be configurable");
+        assert.equal(desc?.enumerable, true, "It should be enumerable");
+        assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
     });
 
     it("objDefineAccessors - getter only - not configurable", () => {
@@ -341,6 +509,12 @@ describe("object helpers", () => {
         }
 
         assert.equal(value.test, 64, "Expected 64");
+
+        let desc = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc, "The descriptor must be defined");
+        assert.equal(desc?.configurable, false, "It should not be configurable");
+        assert.equal(desc?.enumerable, true, "It should be enumerable");
+        assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
     });
 
     it("objDefineAccessors - setter only", () => {
@@ -363,6 +537,12 @@ describe("object helpers", () => {
         assert.equal(result, 42, "Pre-condition");
         value.test = 53;
         assert.equal(result, 53, "Expected the value to have been set");
+
+        let desc = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc, "The descriptor must be defined");
+        assert.equal(desc?.configurable, true, "It should be configurable");
+        assert.equal(desc?.enumerable, true, "It should be enumerable");
+        assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
     });
 
     it("objDefineAccessors - getter and setter", () => {
@@ -385,6 +565,12 @@ describe("object helpers", () => {
 
         result = 64;
         assert.equal(value.test, 64, "Expected a value of ");
+
+        let desc = objGetOwnPropertyDescriptor(value, "test");
+        assert.ok(!!desc, "The descriptor must be defined");
+        assert.equal(desc?.configurable, true, "It should be configurable");
+        assert.equal(desc?.enumerable, true, "It should be enumerable");
+        assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
     });
 
     describe("setPrototypeOf", () => {

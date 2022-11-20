@@ -16,6 +16,7 @@ import { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "./polyfills/trim"
 import { polyStrPadEnd, polyStrPadStart } from "./string/pad";
 import { makePolyFn } from "./internal/poly_helpers";
 import { polyObjHasOwn } from "./object/has_own";
+import { polyStrSubstr } from "./string/substring";
 
 (function () {
 
@@ -33,7 +34,8 @@ import { polyObjHasOwn } from "./object/has_own";
         "trimStart": polyStrTrimStart,
         "trimLeft": polyStrTrimStart,
         "trimEnd": polyStrTrimEnd,
-        "trimRight": polyStrTrimEnd
+        "trimRight": polyStrTrimEnd,
+        "substr": polyStrSubstr
     };
 
     // Add Object polyfills

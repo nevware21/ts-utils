@@ -7,7 +7,6 @@
  */
 
 import { _GlobalTestHooks, _getGlobalConfig } from "../internal/global";
-import { _safeGet } from "../internal/safe_check";
 import { objDefineGet, objDefineProp } from "../object/define";
 
 /**
