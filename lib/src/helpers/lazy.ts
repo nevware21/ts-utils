@@ -7,7 +7,7 @@
  */
 
 import { _GlobalTestHooks, _getGlobalConfig } from "../internal/global";
-import { objDefineGet, objDefineProp } from "../object/define";
+import { objDefine } from "../object/define";
 
 /**
  * @internal
@@ -69,29 +69,25 @@ export function getLazy<T>(cb: () => T): ILazyValue<T> {
     _fetchLazyTestHooks && _fetchLazyTestHooks();
     lazyValue.b = _globalLazyTestHooks.lzy;
 
-    objDefineGet(lazyValue, "v", function () {
-        let result = cb();
-        if (!_globalLazyTestHooks.lzy) {
-            // Just replace the value
-            objDefineProp(lazyValue, "v", {
-                enumerable: true,
-                configurable: true,
-                writable: false,
-                value: result
-            });
+    objDefine(lazyValue, "v", {
+        g: function () {
+            let result = cb();
+            if (!_globalLazyTestHooks.lzy) {
+                // Just replace the value
+                objDefine(lazyValue, "v", { v: result });
 
-            if (lazyValue.b) {
-                delete lazyValue.b;
+                if (lazyValue.b) {
+                    delete lazyValue.b;
+                }
             }
-        }
-        
-        if (_globalLazyTestHooks.lzy && lazyValue.b !== _globalLazyTestHooks.lzy) {
-            lazyValue.b = _globalLazyTestHooks.lzy;
-        }
+            
+            if (_globalLazyTestHooks.lzy && lazyValue.b !== _globalLazyTestHooks.lzy) {
+                lazyValue.b = _globalLazyTestHooks.lzy;
+            }
 
-        return result;
-    }, true);
-
+            return result;
+        }
+    });
 
     return lazyValue;
 }
