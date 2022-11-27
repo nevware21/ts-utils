@@ -47,7 +47,7 @@ export {
     arrayDeepCopyHandler, dateDeepCopyHandler, functionDeepCopyHandler, plainObjDeepCopyHandler
 } from "./object/copy";
 export { objCreate } from "./object/create";
-export { objDefineProp, objDefineGet, objDefineAccessors } from "./object/define";
+export { ObjDefinePropDescriptor, ObjDefinePropDescriptorMap, objDefine, objDefineProp, objDefineGet, objDefineAccessors, objDefineProperties, objDefineProps } from "./object/define";
 export { objForEachKey } from "./object/for_each_key";
 export { objGetOwnPropertyDescriptor } from "./object/get_own_prop_desc";
 export { objHasOwn, polyObjHasOwn } from "./object/has_own";

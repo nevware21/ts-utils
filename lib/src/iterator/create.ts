@@ -7,7 +7,7 @@
  */
 
 import { DONE, VALUE } from "../internal/constants";
-import { objDefineGet } from "../object/define";
+import { objDefine } from "../object/define";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 
@@ -196,12 +196,12 @@ export function createIterator<T>(ctx: CreateIteratorContext<T>): Iterator<T> {
     function _next(...args: unknown[]): IteratorResult<T> {
         isDone = isDone || (ctx.n ? ctx.n(args) : true);
 
-        let result = {
+        let result  = {
             [DONE]: isDone
         };
 
         if (!isDone) {
-            objDefineGet(result, VALUE, _value);
+            objDefine<IteratorResult<T>>(result as any, VALUE, { g: _value });
         }
 
         return result as IteratorResult<T>;

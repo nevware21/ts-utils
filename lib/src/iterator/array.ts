@@ -7,8 +7,8 @@
  */
 
 import { LENGTH } from "../internal/constants";
-import { objDefineAccessors } from "../object/define";
-import { createIterator } from "./create";
+import { objDefine } from "../object/define";
+import { createIterator, CreateIteratorContext } from "./create";
 
 /**
  * Create an iterator which is backed by the provided array, unlike a normal
@@ -48,11 +48,11 @@ export function createArrayIterator<T>(values: T[]): Iterator<T> {
         return idx >= len;
     }
 
-    let ctx = {
+    let ctx: CreateIteratorContext<T> = {
         n: _getNext
     };
 
-    objDefineAccessors(ctx, "v", _value);
+    objDefine(ctx, "v", { g: _value });
 
     return createIterator<T>(ctx);
 }

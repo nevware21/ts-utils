@@ -8,8 +8,8 @@
 
 import { isNullOrUndefined } from "../helpers/base";
 import { UNDEF_VALUE } from "../internal/constants";
-import { objDefineAccessors } from "../object/define";
-import { createIterator } from "./create";
+import { objDefine } from "../object/define";
+import { createIterator, CreateIteratorContext } from "./create";
 
 /**
  * Create a simple range iterator which will return an iterator that increments it's value from
@@ -135,11 +135,11 @@ export function createRangeIterator(start: number, end: number, step?: number): 
         return isDone;
     }
 
-    let ctx = {
+    let ctx: CreateIteratorContext<number> = {
         n: _getNext
     };
 
-    objDefineAccessors(ctx, "v", _value);
+    objDefine(ctx, "v", { g: _value });
 
     return createIterator<number>(ctx);
 }

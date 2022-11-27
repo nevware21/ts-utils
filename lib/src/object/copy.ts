@@ -9,7 +9,7 @@
 import { arrForEach } from "../array/forEach";
 import { isArray, isDate, isNullOrUndefined, isPrimitive } from "../helpers/base";
 import { FUNCTION } from "../internal/constants";
-import { objDefineAccessors } from "./define";
+import { objDefine } from "./define";
 import { isPlainObject } from "./is_plain_object";
 
 /**
@@ -131,14 +131,15 @@ function _deepCopy<T>(visitMap: _RecursiveVisitMap[], value: T, ctx: _DeepCopyCo
         return _getSetVisited(visitMap, value, newPath, (newEntry) => {
 
             // Use an accessor to set the new value onto the new entry
-            objDefineAccessors(details, "result",
-                function () {
+            objDefine(details, "result", {
+                g: function () {
                     return newEntry.v;
                 },
-                function (newValue: any) {
+                s: function (newValue: any) {
                     newEntry.v = newValue;
-                },
-                true);
+                }
+            });
+                
 
             let idx = 0;
             let handler = userHandler;
