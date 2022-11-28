@@ -68,6 +68,7 @@
         "isObject",
         "isPromise",
         "isPromiseLike",
+        "isThenable",
         "isRegExp",
         "isStrictNullOrUndefined",
         "isStrictUndefined",
@@ -82,7 +83,14 @@
         "strLeft",
         "string right",
         "strRight",
-        "custom error"
+        "custom error",
+        "asString",
+        "hasOwn",
+        "defineProperty",
+        "timeout",
+        "idle timer",
+        "timer",
+        "interval"
     ],
     "main": "dist/umd/ts-utils.js",
     "module": "dist-esm/index.js",

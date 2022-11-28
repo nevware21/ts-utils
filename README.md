@@ -15,13 +15,13 @@ This is a collection of general JavaScript functions (written in and for TypeScr
 Support for standard JavaScript functions (ES5+) that are not support in all environments will be backed by internal polyfill implementations when not available.
 
 ### Test Environments 
-- Node (12, 14, 16)
+- Node (12, 14, 16, 18)
 - Browser (Chromium - headless)
 - Web Worker (Chromium - headless)
 
 All of the polyfill functions are tested against the standard native implementations for node, browser and web-worker to ensure compatibility.
 
-### Documentation
+### Documentation and details
 
 See the documentation [generated from source code](https://nevware21.github.io/ts-utils/typedoc/index.html) via typedoc for a full list and details of all of the available types,  functions and interfaces.
 
@@ -38,7 +38,7 @@ See [Browser Support](#browser-support) for details.
 | Error                      | <code>createCustomError(); isError(); throwError(); throwRangeError(); throwTypeError(); throwUnsupported();</code>
 | Iterator                   | <code>createArrayIterator(); createIterator(); createIterable(); createRangeIterator(); iterForOf(); isIterable(); isIterator(); makeIterable();</code>
 | Math                       | <code>mathCeil(); mathFloor(); mathMax(); mathMin(); mathToInt(); mathTrunc();</code>
-| Object                     | <code>deepExtend(); isObject(); objAssign(); objCopyProps(); objCreate(); objDeepCopy(); objDeepFreeze(); objDefineAccessors(); objDefineGet(); objDefineProp(); objExtend(); objForEachKey(); objFreeze(); objGetOwnPropertyDescriptor(); objHasOwn(); objHasOwnProperty(); objKeys(); objSeal(); objGetPrototypeOf(); objSetPrototypeOf(); objToString();<br/>polyObjKeys(); polyObjHasOwn()</code>
+| Object                     | <code>deepExtend(); isObject(); objAssign(); objCopyProps(); objCreate(); objDeepCopy(); objDeepFreeze(); objDefine(); objDefineAccessors(); objDefineGet(); objDefineProp(); objDefineProps(); objDefineProperties(); objExtend(); objForEachKey(); objFreeze(); objGetOwnPropertyDescriptor(); objHasOwn(); objHasOwnProperty(); objKeys(); objSeal(); objGetPrototypeOf(); objSetPrototypeOf(); objToString();<br/>polyObjKeys(); polyObjHasOwn()</code>
 | String                     | <code>asString(); getLength(); isString(); strEndsWith(); strIndexOf(); strIsNullOrEmpty(); strIsNullOrWhiteSpace(); strLastIndexOf(); strLeft(); strPadEnd(); strPadStart(); strRepeat(); strRight(); strSlice(); strStartsWith(); strSubstr(); strSubstring(); strTrim(); strTrimEnd(); strTrimLeft(); strTrimRight(); strTrimStart();<br/>polyStrSubstr(); polyStrTrim(); polyStrTrimEnd(); polyStrTrimStart();</code>
 | Symbol                     | <code>WellKnownSymbols (const enum);<br/>getKnownSymbol(); getSymbol(); hasSymbol(); isSymbol(); newSymbol(); symbolFor(); symbolKeyFor();<br/>polyGetKnownSymbol(); polyNewSymbol(); polySymbolFor(); polySymbolKeyFor();</code><br/>Polyfills are used to automatically backfill runtimes that do not support `Symbol`, not all of the Symbol functionality is provided.
 | Timer                      | <code>elapsedTime(); perfNow(); utcNow(); scheduleIdleCallback(); scheduleInterval(); scheduleTimeout(); scheduleTimeoutWith(); hasIdleCallback(); </code><br/>For runtimes that don't support `requestIdleCallback` normal setTimeout() is used with the values from `setDefaultIdleTimeout()` and `setDefaultMaxExecutionTime()`<br /><code>polyUtcNow();</code>
@@ -81,6 +81,19 @@ export function simpleTest(theValue: any): string[] {
     }
 
     return result;
+}
+```
+
+Or checking if a variable is a string
+
+```TypeScript
+
+import { isString } from "@nevware21/ts-utils";
+
+function checkString(value: any) {
+    let ug = 1;
+
+    return isString(value);
 }
 ```
 

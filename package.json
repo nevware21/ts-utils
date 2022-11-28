@@ -86,7 +86,11 @@
         "custom error",
         "asString",
         "hasOwn",
-        "defineProperty"
+        "defineProperty",
+        "timeout",
+        "idle timer",
+        "timer",
+        "interval"
     ],
     "main": "dist/umd/ts-utils.js",
     "module": "dist-esm/index.js",
@@ -109,7 +113,8 @@
         "codecov": "npm run coverage:report && codecov -f coverage/*.json --disable=gcov",
         "clean": "git clean -xdf && npm install",
         "cleanBuild": "npm run clean && npm run rebuild && npm run docs",
-        "docs": "typedoc"
+        "docs": "typedoc",
+        "prep_release": "npm run cleanBuild && cd lib && npm pack"
     },
     "repository": {
         "type": "git",
