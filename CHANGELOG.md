@@ -1,4 +1,13 @@
 
+# v0.6.0 Nov 28th, 2022
+
+## Changelog
+
+- #115 Add optional enumerable argument to objDefineGet and objDefineAccessors
+- #116 Bump rollup from 2.79.1 to 3.3.0
+- #117 Add objDefine, objDefineProperties and objDefineProps
+- #118 Update package.json and docs for release
+
 # v0.5.0 Oct 18th, 2022
 
 ## Changelog
