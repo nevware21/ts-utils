@@ -142,7 +142,7 @@ export const objDefineProp: <T>(target: T, key: PropertyKey, descriptor: Propert
  * @param target - The object on which to define or modify properties.
  * @param props - An object whose keys represent the names of properties to be defined or modified and whose values are
  * objects describing those properties. Each value in props must be either a data descriptor or an accessor descriptor;
- * it cannot be both (see {@link objDefineProperty} for more details).
+ * it cannot be both (see {@link ObjDefinePropDescriptorMap} for more details).
  * @returns
  */
 export const objDefineProperties: <T>(target: T, props: PropertyDescriptorMap & ThisType<any>) => T = ObjClass.defineProperties;
