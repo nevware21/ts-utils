@@ -10,7 +10,8 @@ import { isDefined, isUndefined } from "../helpers/base";
 import { ILazyValue } from "../helpers/lazy";
 import { elapsedTime, perfNow } from "../helpers/perf";
 import { _lazySafeGet } from "../internal/lazy_safe_check";
-import { ITimerHandler, scheduleTimeout } from "./timeout";
+import { ITimerHandler, _createTimerHandler } from "./handler";
+import { scheduleTimeout } from "./timeout";
 
 let _hasIdleCallback: ILazyValue<boolean>;
 let _defaultIdleTimeout = 100;
@@ -118,8 +119,6 @@ export function setDefaultMaxExecutionTime(maxTime: number) {
  * ```
  */
 export function scheduleIdleCallback(callback: IdleRequestCallback, options?: IdleRequestOptions): ITimerHandler {
-    let idleId: number;
-
     function _createDeadline(timedOut: boolean) {
         let startTime = perfNow();
         return {
@@ -130,25 +129,15 @@ export function scheduleIdleCallback(callback: IdleRequestCallback, options?: Id
         };
     }
 
-    function _doRequestIdleCallback() {
-        idleId = requestIdleCallback((deadline: IdleDeadline) => {
-            callback(deadline || _createDeadline(false));
-        }, options);
-    }
-
     if (hasIdleCallback()) {
-        _doRequestIdleCallback();
-        return {
-            cancel: () => {
-                cancelIdleCallback(idleId);
-            },
-            refresh: function() {
-                cancelIdleCallback(idleId);
-                _doRequestIdleCallback();
-    
-                return this;
-            }
-        }
+        return _createTimerHandler(true, function (idleId: number) {
+            idleId && cancelIdleCallback(idleId);
+            return requestIdleCallback((deadline: IdleDeadline) => {
+                callback(deadline || _createDeadline(false));
+            }, options);
+        }, function(idleId: number) {
+            cancelIdleCallback(idleId);
+        })
     }
 
     let timeout = (options || {}).timeout;

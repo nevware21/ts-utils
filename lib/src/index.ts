@@ -69,9 +69,10 @@ export { asString } from "./string/as_string";
 export { strTrim, strTrimEnd, strTrimLeft, strTrimRight, strTrimStart } from "./string/trim";
 export { isSymbol, getSymbol, getKnownSymbol, hasSymbol, newSymbol, symbolFor, symbolKeyFor } from "./symbol/symbol";
 export { WellKnownSymbols } from "./symbol/well_known";
+export { ITimerHandler } from "./timer/handler";
 export { hasIdleCallback, scheduleIdleCallback, setDefaultIdleTimeout, setDefaultMaxExecutionTime } from "./timer/idle";
 export { scheduleInterval } from "./timer/interval";
-export { TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, ITimerHandler, scheduleTimeout, scheduleTimeoutWith } from "./timer/timeout";
+export { TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, scheduleTimeout, scheduleTimeoutWith, createTimeout, createTimeoutWith } from "./timer/timeout";
 
 // Exporting the helpers, but not the "initialization" code to populate any missing values
 // This will enable anyone to "reuse" or create their own polyfills.ts implementation if they want.

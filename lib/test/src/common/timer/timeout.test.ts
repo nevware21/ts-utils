@@ -8,7 +8,7 @@
 
 import * as sinon from "sinon";
 import { assert } from "chai";
-import { scheduleTimeout, scheduleTimeoutWith, TimeoutOverrideFuncs } from "../../../../src/timer/timeout";
+import { createTimeout, createTimeoutWith, scheduleTimeout, scheduleTimeoutWith, TimeoutOverrideFuncs } from "../../../../src/timer/timeout";
 
 describe("timeout tests", () => {
     let clock: sinon.SinonFakeTimers;
@@ -368,6 +368,226 @@ describe("timeout tests", () => {
             }
             clock.tick(1);
             assert.equal(true, timeoutCalled, "Timeout should have been called yet");
+        });
+
+        it("basic create timeout", () => {
+            let timeoutCalled = false;
+            let timer = createTimeoutWith([null, null], () => {
+                timeoutCalled = true;
+            }, 100);
+
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            clock.tick(500);
+            assert.equal(false, timeoutCalled, "Timeout should still not have been called yet");
+
+            timer.refresh();
+    
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            for (let lp = 0; lp < 99; lp++) {
+                clock.tick(1);
+                assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            }
+            clock.tick(1);
+            assert.equal(true, timeoutCalled, "Timeout should have been called yet");
+        });
+
+        it("basic timeout with empty array", () => {
+            let timeoutCalled = false;
+            let timer = createTimeoutWith([] as unknown as TimeoutOverrideFuncs, () => {
+                timeoutCalled = true;
+            }, 100);
+    
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            clock.tick(500);
+            assert.equal(false, timeoutCalled, "Timeout should still not have been called yet");
+
+            timer.refresh();
+
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            for (let lp = 0; lp < 99; lp++) {
+                clock.tick(1);
+                assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            }
+            clock.tick(1);
+            assert.equal(true, timeoutCalled, "Timeout should have been called yet");
+        });
+    });
+
+    describe("validate ref, unref and hasRef usage", () => {
+        it("basic timeout", () => {
+            let timeoutCalled = false;
+            let timer = scheduleTimeout(() => {
+                timeoutCalled = true;
+            }, 100);
+    
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            assert.equal(timer.hasRef(), true, "Check that the default for creating and scheduling a new timer is referenced");
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that the timer can be unref'd");
+            timer.ref();
+            assert.equal(timer.hasRef(), true, "Check that the timer can be re-ref'd");
+
+            timer.ref();
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that calling ref multiple times has no impact");
+
+            timer.unref();
+            timer.unref();
+            timer.ref();
+            assert.equal(timer.hasRef(), true, "Check that calling unref multiple times has no impact");
+
+            for (let lp = 0; lp < 99; lp++) {
+                clock.tick(1);
+                assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            }
+            clock.tick(1);
+            assert.equal(true, timeoutCalled, "Timeout should have been called yet");
+
+            assert.equal(timer.hasRef(), true, "Check that the timer is still considered referenced even after the timeout function has been called");
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that the timer can be unref'd even after the timeout function has been called");
+            timer.ref();
+            assert.equal(timer.hasRef(), true, "Check that the timer can be re-ref'd even after the timeout function has been called");
+
+            timer.ref();
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that calling ref multiple times has no impact even after the timeout function has been called");
+
+            timer.unref();
+            timer.unref();
+            timer.ref();
+            assert.equal(timer.hasRef(), true, "Check that calling unref multiple times has no impact even after the timeout function has been called");
+        });
+
+        it("basic create timeout", () => {
+            let timeoutCalled = false;
+            let timer = createTimeout(() => {
+                timeoutCalled = true;
+            }, 100);
+    
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            assert.equal(timer.hasRef(), true, "Check that the default for creating and scheduling a new timer is referenced");
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that the timer can be unref'd");
+            timer.ref();
+            assert.equal(timer.hasRef(), true, "Check that the timer can be re-ref'd");
+
+            timer.ref();
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that calling ref multiple times has no impact");
+
+            timer.unref();
+            timer.unref();
+            timer.ref();
+            assert.equal(timer.hasRef(), true, "Check that calling unref multiple times has no impact");
+
+            clock.tick(500);
+            timer.refresh();
+
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            assert.equal(timer.hasRef(), true, "Check that the default for creating and scheduling a new timer is referenced");
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that the timer can be unref'd");
+            timer.ref();
+            assert.equal(timer.hasRef(), true, "Check that the timer can be re-ref'd");
+
+            timer.ref();
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that calling ref multiple times has no impact");
+
+            timer.unref();
+            timer.unref();
+            timer.ref();
+            assert.equal(timer.hasRef(), true, "Check that calling unref multiple times has no impact");
+            
+            clock.tick(99);
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            timer.cancel();
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            assert.equal(timer.hasRef(), true, "Check that the default for creating and scheduling a new timer is referenced");
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that the timer can be unref'd");
+            timer.ref();
+            assert.equal(timer.hasRef(), true, "Check that the timer can be re-ref'd");
+
+            timer.ref();
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that calling ref multiple times has no impact");
+
+            timer.unref();
+            timer.unref();
+            timer.ref();
+            assert.equal(timer.hasRef(), true, "Check that calling unref multiple times has no impact");
+            
+            timer.refresh();
+            clock.tick(99);
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            timer.refresh();
+
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            assert.equal(timer.hasRef(), true, "Check that the default for creating and scheduling a new timer is referenced");
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that the timer can be unref'd");
+            timer.ref();
+            assert.equal(timer.hasRef(), true, "Check that the timer can be re-ref'd");
+
+            timer.ref();
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that calling ref multiple times has no impact");
+
+            timer.unref();
+            timer.unref();
+            timer.ref();
+            assert.equal(timer.hasRef(), true, "Check that calling unref multiple times has no impact");
+
+            for (let lp = 0; lp < 99; lp++) {
+                clock.tick(1);
+                assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            }
+            clock.tick(1);
+            assert.equal(true, timeoutCalled, "Timeout should have been called yet");
+
+            assert.equal(timer.hasRef(), true, "Check that the timer is still considered referenced even after the timeout function has been called");
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that the timer can be unref'd even after the timeout function has been called");
+            timer.ref();
+            assert.equal(timer.hasRef(), true, "Check that the timer can be re-ref'd even after the timeout function has been called");
+
+            timer.ref();
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that calling ref multiple times has no impact even after the timeout function has been called");
+
+            timer.unref();
+            timer.unref();
+            timer.ref();
+            assert.equal(timer.hasRef(), true, "Check that calling unref multiple times has no impact even after the timeout function has been called");
+        });
+
+        it("check ref with create timeout", () => {
+            let timeoutCalled = false;
+            let timer = createTimeout(() => {
+                timeoutCalled = true;
+            }, 100);
+    
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+            assert.equal(timer.hasRef(), true, "Check that the default for creating and scheduling a new timer is referenced");
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that the timer can be unref'd");
+            timer.ref();
+            assert.equal(timer.hasRef(), true, "Check that the timer can be re-ref'd");
+            timer.unref();
+            assert.equal(timer.hasRef(), false, "Check that the timer can be unref'd");
+
+            timer.refresh();
+            assert.equal(timer.hasRef(), false, "Check that the timer is unref'd after refresh");
+
+            timer.cancel();
+            assert.equal(timer.hasRef(), false, "Check that the timer is unref'd after refresh");
+
+            timer.refresh();
+            assert.equal(timer.hasRef(), false, "Check that the timer is unref'd after refresh");
         });
     });
 });
