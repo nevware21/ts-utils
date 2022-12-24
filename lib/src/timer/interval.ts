@@ -6,7 +6,8 @@
  * Licensed under the MIT license.
  */
 
-import { ITimerHandler } from "./timeout";
+import { _extractArgs } from "../internal/extract_args";
+import { ITimerHandler, _createTimerHandler } from "./handler";
 
 /**
  * Repeatedly calls a function or executes a code snippet, with a fixed time delay between each call.
@@ -38,18 +39,12 @@ import { ITimerHandler } from "./timeout";
  */
 export function scheduleInterval<A extends any[]>(callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler {
     let self = this;
-    let theArguments = arguments;
-    let intervalId = setInterval.apply(self, theArguments);
+    let theArguments = _extractArgs(arguments, 0);
 
-    return {
-        cancel: function() {
-            clearInterval(intervalId);
-        },
-        refresh: function() {
-            clearInterval(intervalId);
-            intervalId = setInterval.apply(self, theArguments);
-
-            return this;
-        }
-    };
+    return _createTimerHandler(true, function (intervalId: any) {
+        intervalId && clearInterval(intervalId);
+        return setInterval.apply(self, theArguments);
+    }, function (intervalId: any) {
+        clearInterval(intervalId);
+    });
 }
