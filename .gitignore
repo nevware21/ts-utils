@@ -61,11 +61,10 @@ report.*.json
 # Temp directories
 node_modules/
 out/
-dist-esm/
-bundle/
 /types/
 /lib/types/
 dist/
+dist-es**/
 
 # Misc
 statistics.html

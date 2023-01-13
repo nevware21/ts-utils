@@ -51,7 +51,7 @@ export interface ITimerHandler {
      * @example
      * ```ts
      * let theTimer = createTimeout(...);
-     * 
+     *
      * // Make sure the timer is referenced (the default) so that the runtime (Node) does not terminate
      * // if there is a waiting referenced timer.
      * theTimer.ref();
@@ -69,7 +69,7 @@ export interface ITimerHandler {
      * @example
      * ```ts
      * let theTimer = createTimeout(...);
-     * 
+     *
      * // Unreference the timer so that the runtime (Node) may terminate if nothing else is running.
      * theTimer.unref();
      * ```
@@ -82,11 +82,11 @@ export interface ITimerHandler {
      * @example
      * ```ts
      * let theTimer = createTimeout(...);
-     * 
+     *
      * // Unreference the timer so that the runtime (Node) may terminate if nothing else is running.
      * theTimer.unref();
      * let hasRef = theTimer.hasRef(); // false
-     * 
+     *
      * theTimer.ref();
      * hasRef = theTimer.hasRef(); // true
      * ```

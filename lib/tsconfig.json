@@ -1,26 +1,9 @@
 {
+    "extends": "./tsconfig.base.json",
     "compilerOptions": {
-        "sourceMap": true,
-        "inlineSources": true,
-        "noImplicitAny": true,
-        "module": "es6",
-        "moduleResolution": "node",
         "target": "es5",
-        "forceConsistentCasingInFileNames": true,
-        "importHelpers": true,
-        "noEmitHelpers": false,
-        "alwaysStrict": true,
         "declaration": true,
         "declarationDir": "./types",
-        "outDir": "./dist-esm",
-        "suppressImplicitAnyIndexErrors": true,
-        "allowSyntheticDefaultImports": true,
-        "removeComments": true
-    },
-    "include": [
-        "./src/**/*.ts"
-    ],
-    "exclude": [
-        "node_modules/"
-    ]
+        "outDir": "./dist-es5"
+    }
 }

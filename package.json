@@ -92,9 +92,10 @@
         "timer",
         "interval"
     ],
-    "main": "dist/umd/ts-utils.js",
-    "module": "dist-esm/index.js",
-    "types": "types/index.d.ts",
+    "main": "lib/dist/es5/umd/ts-utils.js",
+    "module": "lib/dist-es5/index.js",
+    "esnext": "lib/dist-es6/index.js",
+    "types": "lib/types/index.d.ts",
     "sideEffects": false,
     "scripts": {
         "build": "grunt ts_utils --verbose && npm run package",
