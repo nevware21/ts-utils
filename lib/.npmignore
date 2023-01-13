@@ -6,10 +6,10 @@
 # ... but these files
 !package.json
 !tsconfig.json
+!tsconfig.**.json
 !/README.md
 !/LICENSE
-!dist-esm/**
+!dist-es**/**
 !dist/**
-!bundle/**
 !src/**
 !types/**

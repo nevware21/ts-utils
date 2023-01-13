@@ -38,12 +38,17 @@ module.exports = function (grunt) {
                 additionalFlags: "--removeComments"
             },
             "ts_utils": {
+                // Default ES5
                 tsconfig: "./lib/tsconfig.json",
-                outDir: "./lib/dist-esm"
+                outDir: "./lib/dist-es5"
+            },
+            "ts_utils_es6": {
+                tsconfig: "./lib/tsconfig.es6.json",
+                outDir: "./lib/dist-es6"
             },
             "ts_utils-test": {
                 tsconfig: "./lib/test/tsconfig.test.json",
-                outDir: "./lib/test/dist-esm"
+                outDir: "./lib/test/dist-es5"
             }
         },
         "lint": {
@@ -79,7 +84,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("@nevware21/grunt-eslint-ts");
 
     grunt.registerTask("rollupuglify", ["ts:rollupuglify" ]);
-    grunt.registerTask("ts_utils", [ "lint:ts_utils-fix", "lint:ts_utils-test-fix", "ts:ts_utils" ]);
+    grunt.registerTask("ts_utils", [ "lint:ts_utils-fix", "lint:ts_utils-test-fix", "ts:ts_utils", "ts:ts_utils_es6" ]);
     grunt.registerTask("ts_utils-lint", [ "lint:ts_utils-fix", "lint:ts_utils-test-fix" ]);
     grunt.registerTask("dolint", [ "lint:ts_utils", "lint:ts_utils-test" ]);
     grunt.registerTask("lint-fix", [ "lint:ts_utils-fix", "lint:ts_utils-test-fix" ]);
