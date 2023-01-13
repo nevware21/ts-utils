@@ -23,7 +23,7 @@ export interface ITimerHandler {
      * theTimer.cancel();
      * ```
      */
-    cancel: () => void;
+    cancel(): void;
 
     /**
      * Reschedules the timer to call its callback at the previously specified duration
@@ -39,7 +39,7 @@ export interface ITimerHandler {
      * theTimer.refresh();
      * ```
      */
-    refresh: () => ITimerHandler;
+    refresh(): ITimerHandler;
 
     /**
      * When called, requests that the event loop not exit so long when the ITimerHandler is active.

@@ -1,4 +1,17 @@
 
+# v0.7.0 Jan 12th, 2023
+
+## Changelog
+
+- #124 [Request] Add/expose additional NodeJS.Timer functions to the timer implementations
+- #132 Add "esnext" (es6) to package.json and available pre-bundle packages
+- #121 Bump sinon from 14.0.2 to 15.0.0
+- #123 Bump karma-spec-reporter from 0.0.34 to 0.0.35
+- #125 Bump karma-spec-reporter from 0.0.35 to 0.0.36
+- #127 Bump @rollup/plugin-json from 5.0.2 to 6.0.0
+- #126 Bump @rollup/plugin-commonjs from 23.0.7 to 24.0.0
+- #130 Bump @rollup/plugin-typescript from 10.0.1 to 11.0.0
+
 # v0.6.0 Nov 28th, 2022
 
 ## Changelog
