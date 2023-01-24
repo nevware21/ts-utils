@@ -104,3 +104,7 @@ temp/
 package-deps.json
 package-lock.json
 **/.nyc_output/**
+
+#ignore lib Readme
+lib/README.md
+lib/LICENSE
