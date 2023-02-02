@@ -13,6 +13,7 @@ import { POLYFILL_TAG, SYMBOL } from "../internal/constants";
 import { objHasOwn } from "../object/has_own";
 import { asString } from "../string/as_string";
 import { _GlobalPolySymbols, _getGlobalConfig } from "../internal/global";
+import { strStartsWith } from "../string/starts_with";
 
 let _polySymbols: _GlobalPolySymbols;
 
@@ -76,7 +77,7 @@ export function polySymbolFor(key: string): symbol {
  * @param sym Symbol to find the key for.
  */
 export function polySymbolKeyFor(sym: symbol): string | undefined {
-    if (isNullOrUndefined(sym) || (sym as any) == "" + null) {
+    if (!sym || !sym.toString || !strStartsWith(sym.toString(), SYMBOL)) {
         throwTypeError((sym as any) + " is not a symbol");
     }
 

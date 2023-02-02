@@ -8,10 +8,10 @@
 
 import { assert } from "chai";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
-import { isObject, isString, isUndefined } from "../../../../src/helpers/base";
+import { isFunction, isObject, isString, isUndefined } from "../../../../src/helpers/base";
 import { objForEachKey } from "../../../../src/object/for_each_key";
 import { objHasOwnProperty } from "../../../../src/object/has_own_prop";
-import { objDeepFreeze, objFreeze, objKeys } from "../../../../src/object/object";
+import { objDeepFreeze, objFreeze, objKeys, objSeal } from "../../../../src/object/object";
 import { objDefine, objDefineAccessors, objDefineGet, objDefineProps } from "../../../../src/object/define";
 import { FUNCTION } from "../../../../src/internal/constants";
 import { objSetPrototypeOf } from "../../../../src/object/set_proto";
@@ -818,6 +818,67 @@ describe("object helpers", () => {
         });
     });
 
+    describe("Object.seal", () => {
+
+        it("native", () => {
+            let testObject: any = {
+                hello: () => "World",
+                friend: "..."
+            }
+
+            assert.equal(testObject.friend, "...", "testing instance property");
+            assert.ok(isFunction(testObject.hello), "hello is still a function");
+            assert.equal(testObject.my, undefined, "Should not have a value");
+
+            let sealed = objSeal(testObject);
+            assert.equal(sealed, testObject, "Sealed object should be the same as he test object");
+            assert.equal(sealed.friend, "...", "testing instance property");
+            assert.ok(isFunction(sealed.hello), "hello is still a function");
+            assert.equal(sealed.my, undefined, "my should not have a value");
+
+            // Try and change / add
+            sealed.hello = "Darkness";
+            _expectThrow(() => {
+                sealed.my = "old";
+            });
+            assert.equal(sealed.hello, "Darkness", "hello is was changed");
+            assert.equal(sealed.my, undefined, "my should not have a value");
+        });
+
+        // This test is commented out because the objSeal caches the result of Object.seal || _doNothing
+        // So to test this would require and additional test hook to un-cache the result during initialization
+        // it("removed native", () => {
+        //     let orgSeal = Object.seal;
+        //     try {
+        //         let testObject: any = {
+        //             hello: () => "World",
+        //             friend: "maybe"
+        //         };
+
+        //         (Object as any)["seal"] = undefined;
+    
+        //         assert.equal(testObject.friend, "...", "testing instance property");
+        //         assert.ok(isFunction(testObject.hello), "hello is still a function");
+        //         assert.equal(testObject.my, undefined, "Should not have a value");
+    
+        //         let sealed = objSeal(testObject);
+        //         assert.equal(sealed, testObject, "Sealed object should be the same as he test object");
+        //         assert.equal(sealed.friend, "...", "testing instance property");
+        //         assert.ok(isFunction(sealed.hello), "hello is still a function");
+        //         assert.equal(sealed.my, undefined, "Should not have a value");
+    
+        //         // Try and change / add
+        //         sealed.hello = "Darkness";
+        //         sealed.my = "old";
+        //         assert.equal(sealed.hello, "Darkness", "hello is was changed");
+        //         assert.equal(sealed.my, "old", "my is was added");
+
+        //     } finally {
+        //         Object.seal = orgSeal;
+        //     }
+        // });
+    });
+
     describe("objCreate", () => {
         it("native objCreate", () => {
             let newProto1 = {
@@ -1134,6 +1195,14 @@ describe("object helpers", () => {
         };
     }
 
+    function _expectThrow(cb: () => void): undefined | Error {
+        try {
+            cb();
+        } catch (e) {
+            assert.ok(true, "Expected an exception to be thrown");
+            return e;
+        }
+    }
 
     class TestError extends Error {
         public constructor(message: string) {

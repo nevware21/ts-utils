@@ -6,10 +6,8 @@
  * Licensed under the MIT license.
  */
 
-import { UNDEF_VALUE } from "../internal/constants";
-import { _lazySafeGet } from "../internal/lazy_safe_check";
 import { utcNow } from "./date";
-import { getInst } from "./environment";
+import { _lazySafeGetInst } from "./environment";
 import { ILazyValue, _globalLazyTestHooks } from "./lazy";
 
 let _perf: ILazyValue<Performance>
@@ -36,7 +34,7 @@ export function hasPerformance(): boolean {
  * @returns The global performance object if available.
  */
 export function getPerformance(): Performance {
-    (!_perf || (_globalLazyTestHooks.lzy && !_perf.b)) && (_perf = _lazySafeGet(() => getInst("performance"), UNDEF_VALUE));
+    (!_perf || (_globalLazyTestHooks.lzy && !_perf.b)) && (_perf = _lazySafeGetInst("performance"));
     return _perf.v;
 }
 

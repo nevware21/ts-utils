@@ -7,9 +7,7 @@
  */
 
 import { ObjClass, VALUE } from "../internal/constants";
-import { isFunction, isUndefined, objToString } from "../helpers/base";
-import { throwUnsupported } from "../helpers/customError";
-import { dumpObj } from "../helpers/diagnostics";
+import { isFunction, isUndefined } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
 
 /**

@@ -85,6 +85,23 @@ describe("timeout tests", () => {
         clock.tick(1);
         assert.equal(true, timeoutCalled, "Timeout should have been called yet");
 
+        // reset
+        theTimeout.refresh();
+        timeoutCalled = false;
+        assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+        for (let lp = 0; lp < 99; lp++) {
+            clock.tick(1);
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+        }
+        theTimeout.refresh();
+        clock.tick(1);
+        assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+        for (let lp = 0; lp < 98; lp++) {
+            clock.tick(1);
+            assert.equal(false, timeoutCalled, "Timeout should not have been called yet");
+        }
+        clock.tick(1);
+        assert.equal(true, timeoutCalled, "Timeout should have been called yet");
     });
 
     describe("pass extra arguments", () => {

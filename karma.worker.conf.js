@@ -1,20 +1,12 @@
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 
-// var tests = [];
-// for (var file in window.__karma__.files) {
-//   if (window.__karma__.files.hasOwnProperty(file)) {          
-//     if (/test\.js$/.test(file)) {
-//       tests.push(file);
-//     }
-//   }
-// }
-
 module.exports = function (config) {
     const typescript = require("@rollup/plugin-typescript");
     const plugin = require("@rollup/plugin-node-resolve");
     const commonjs = require("@rollup/plugin-commonjs");
+    const istanbul = require("rollup-plugin-istanbul");
     config.set({
-        browsers: ["ChromeHeadless"],
+        browsers: [ "ChromeHeadless" ],
         listenAddress: 'localhost',
         hostname: 'localhost',
         frameworks: [ "mocha-webworker" ],
@@ -33,7 +25,10 @@ module.exports = function (config) {
                 plugin.nodeResolve({
                     browser: true
                 }),
-                commonjs()
+                commonjs(),
+                istanbul({
+                    exclude: [ "**/test/**", "**/node_modules/**" ]
+                })
             ],
             output: {
                 format: "iife",
@@ -48,16 +43,17 @@ module.exports = function (config) {
                 ]
             }
         },
-        coverageIstanbulReporter: {
-            reports: ["html", "json"],
-            dir: ".nyc_output"
+        coverageReporter: {
+            dir: "./coverage/worker",
+            includeAllSources: true,
+            reporters: [
+                { type: "text" },
+                { type: "html", subdir: "html" },
+                { type: "json", subdir: "./", file: "coverage-final.json" }
+            ],
         },
+        reporters: ["spec", "coverage" ],
 
-        reporters: [ "spec", "coverage-istanbul" ],
-        evaluate: {
-            //beforeMochaImport: 'self.assert = require("assert")'
-        },
-
-        logLevel: config.LOG_INFO
+        logLevel: config.LOG_DEBUG
     })
 };

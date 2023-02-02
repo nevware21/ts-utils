@@ -9,14 +9,20 @@
 import { SYMBOL, UNDEF_VALUE } from "../internal/constants";
 import { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "../polyfills/symbol";
 import { WellKnownSymbols, _wellKnownSymbolMap } from "./well_known";
-import { isDefined, _createIs } from "../helpers/base";
-import { getInst } from "../helpers/environment";
+import { _createIs } from "../helpers/base";
 import { ILazyValue, _globalLazyTestHooks } from "../helpers/lazy";
 import { _lazySafeGet } from "../internal/lazy_safe_check";
+import { _lazySafeGetInst } from "../helpers/environment";
 
 let _symbol: ILazyValue<Symbol>;
 let _symbolFor: ILazyValue<(key: string) => symbol>;
 let _symbolKeyFor: ILazyValue<(sym: symbol) => string | undefined>;
+
+function _getSymbolValue<T>(name: string): ILazyValue<T> {
+    return _lazySafeGet<T>(function() {
+        return (_symbol.v ? _symbol[name] : UNDEF_VALUE) as T;
+    }, UNDEF_VALUE);
+}
 
 /**
  * Checks if the type of value is a symbol.
@@ -42,9 +48,9 @@ export function hasSymbol(): boolean {
  */
 export function getSymbol(): Symbol {
     let resetCache = !_symbol || (_globalLazyTestHooks && _globalLazyTestHooks.lzy && !_symbol.b);
-    resetCache && (_symbol = _lazySafeGet(() => isDefined(Symbol) ? getInst<Symbol>(SYMBOL) : UNDEF_VALUE, UNDEF_VALUE));
-    (!_symbolFor || resetCache) && (_symbolFor = _lazySafeGet(() => _symbol.v ? _symbol["for"] : UNDEF_VALUE, UNDEF_VALUE));
-    (!_symbolKeyFor || resetCache) && (_symbolKeyFor = _lazySafeGet(() => _symbol.v ? _symbol["keyFor"] : UNDEF_VALUE, UNDEF_VALUE));
+    resetCache && (_symbol = _lazySafeGetInst(SYMBOL));
+    (!_symbolFor || resetCache) && (_symbolFor = _getSymbolValue<typeof Symbol.for>("for"));
+    (!_symbolKeyFor || resetCache) && (_symbolKeyFor = _getSymbolValue<typeof Symbol.keyFor>("keyFor"));
     
     return _symbol.v;
 }
