@@ -37,6 +37,11 @@ describe("symbol polyfills", () => {
         _checkSymbolKeyFor("null");
         _checkSymbolKeyFor("undefined");
         _checkSymbolKeyFor("");
+        _checkSymbolKeyForDirect(null);
+        _checkSymbolKeyForDirect(undefined);
+        _checkSymbolKeyForDirect("null");
+        _checkSymbolKeyForDirect("undefined");
+        _checkSymbolKeyForDirect("");
     });
 
     it("polySymbolKeyFor With values", () => {
@@ -47,6 +52,12 @@ describe("symbol polyfills", () => {
         _checkSymbolKeyFor("zyxyvutsrqponmlkjihgfedcba");
         _checkSymbolKeyFor(0);
         _checkSymbolKeyFor(10000);
+        _checkSymbolKeyForDirect("a");
+        _checkSymbolKeyForDirect("ab");
+        _checkSymbolKeyForDirect("abba");
+        _checkSymbolKeyForDirect("zyxyvutsrqponmlkjihgfedcba");
+        _checkSymbolKeyForDirect(0);
+        _checkSymbolKeyForDirect(10000);
     });
 
     it("polyGetKnownSymbol", () => {
@@ -152,6 +163,32 @@ describe("symbol polyfills", () => {
         } else {
             assert.equal(polyResult, nativeResult, "Checking Symbol.keyFor Native (" + dumpObj(nativeResult) + ") and polyfill result for [" + dumpObj(value) + "]");
         }
+    }
 
+    function _checkSymbolKeyForDirect(value: any) {
+        let polyResult: any;
+        let nativeResult: any;
+        let polyThrew: any;
+        let nativeThrew: any;
+        try {
+            polyResult = polySymbolKeyFor(value);
+        } catch (e) {
+            polyThrew = e;
+        }
+        try {
+            nativeResult = Symbol.keyFor(value);
+        } catch (e) {
+            nativeThrew = e;
+        }
+
+        if (polyThrew) {
+            assert.equal(true, !!nativeThrew || isUndefined(nativeResult) || !!nativeResult,
+                "Checking whether the Native and polyfill threw or returned undefined [" + dumpObj(polyThrew) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
+        } else if(nativeThrew) {
+            assert.ok(false,
+                "Symbol.keyFor threw but polySymbolKeyFor didn't [" + dumpObj(polyResult) + "] - [" + dumpObj(nativeThrew) + "] for [" + dumpObj(value) + "]");
+        } else {
+            assert.equal(polyResult, nativeResult, "Checking Symbol.keyFor Native (" + dumpObj(nativeResult) + ") and polyfill result for [" + dumpObj(value) + "]");
+        }
     }
 });

@@ -18,7 +18,7 @@ const _objCreate = ObjClass["create"];
  * @group Object
  * @param obj Object to use as a prototype. May be null
  */
-export const objCreate = _objCreate ? _objCreate : polyObjCreate;
+export const objCreate = _objCreate || polyObjCreate;
 
 /**
  * Creates an object that has the specified prototype, and that optionally contains specified properties. This helper exists to avoid adding a polyfil

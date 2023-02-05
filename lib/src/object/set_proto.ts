@@ -25,9 +25,7 @@ export function objSetPrototypeOf(obj: any, proto: object) {
         }) ||
         // tslint:disable-next-line: only-arrow-functions
         function (d: any, b: any) {
-            objForEachKey(b, (key: any, value: any) => {
-                d[key] = value;
-            });
+            objForEachKey(b, (key: any, value: any) => d[key] = value );
         };
 
     return fn(obj, proto);

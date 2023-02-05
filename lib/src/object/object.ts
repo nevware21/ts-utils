@@ -12,10 +12,7 @@ import { throwTypeError } from "../helpers/throw";
 import { objForEachKey } from "./for_each_key";
 
 const _objFreeze = ObjClass["freeze"];
-
-function _doNothing<T>(value: T): T {
-    return value;
-}
+const _doNothing = <T>(value: T) => value;
 
 /**
  * The `objAssign()` method copies all enumerable own properties from one or more source objects

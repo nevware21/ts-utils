@@ -28,6 +28,19 @@ let _cachedHistory: ILazyValue<History>;
 let _isWebWorker: ILazyValue<boolean>;
 let _isNode: ILazyValue<boolean>;
 
+
+/**
+ * @ignore
+ * @internal
+ * Internal Helper for lazily safely getting the named global object if available,
+ * will return undefined if the object is not available.
+ * @param name - the global name of the object
+ * @returns The named global instance or undefined if not available
+ */
+export function _lazySafeGetInst<T>(name: string) : ILazyValue<T> {
+    return _lazySafeGet(() => getInst<T>(name) || UNDEF_VALUE, UNDEF_VALUE);
+}
+
 /**
  * Returns the current global scope object, for a normal web page this will be the current
  * window, for a Web Worker this will be current worker global scope via "self". The internal
@@ -87,7 +100,7 @@ export function hasDocument(): boolean {
  * @returns
  */
 export function getDocument(): Document {
-    (!_cachedDocument || (_globalLazyTestHooks.lzy && !_cachedDocument.b)) && (_cachedDocument = _lazySafeGet(() => getInst(DOCUMENT), UNDEF_VALUE));
+    (!_cachedDocument || (_globalLazyTestHooks.lzy && !_cachedDocument.b)) && (_cachedDocument = _lazySafeGetInst(DOCUMENT));
 
     return _cachedDocument.v;
 }
@@ -107,7 +120,7 @@ export function hasWindow(): boolean {
  * @returns
  */
 export function getWindow(): Window {
-    (!_cachedWindow || (_globalLazyTestHooks.lzy && !_cachedWindow.b)) && (_cachedWindow = _lazySafeGet(() => getInst(WINDOW), UNDEF_VALUE));
+    (!_cachedWindow || (_globalLazyTestHooks.lzy && !_cachedWindow.b)) && (_cachedWindow = _lazySafeGetInst(WINDOW));
 
     return _cachedWindow.v;
 }
@@ -127,7 +140,7 @@ export function hasNavigator(): boolean {
  * @returns
  */
 export function getNavigator(): Navigator {
-    (!_cachedNavigator || (_globalLazyTestHooks.lzy && !_cachedNavigator.b)) && (_cachedNavigator = _lazySafeGet(() => getInst(NAVIGATOR), UNDEF_VALUE));
+    (!_cachedNavigator || (_globalLazyTestHooks.lzy && !_cachedNavigator.b)) && (_cachedNavigator = _lazySafeGetInst(NAVIGATOR));
 
     return _cachedNavigator.v;
 }
@@ -147,7 +160,7 @@ export function hasHistory(): boolean {
  * @returns
  */
 export function getHistory(): History | null {
-    (!_cachedHistory || (_globalLazyTestHooks.lzy && !_cachedHistory.b)) && (_cachedHistory = _lazySafeGet(() => getInst(HISTORY), UNDEF_VALUE));
+    (!_cachedHistory || (_globalLazyTestHooks.lzy && !_cachedHistory.b)) && (_cachedHistory = _lazySafeGetInst(HISTORY));
 
     return _cachedHistory.v;
 }
