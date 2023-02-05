@@ -1,0 +1,14 @@
+# NPM Ignore
+
+# ignore everything
+*
+
+# ... but these files
+!package.json
+!tsconfig.json
+!tsconfig.**.json
+!/README.md
+!/LICENSE
+!dist-es**/**
+!dist/**
+!types/**
