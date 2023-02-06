@@ -1,3 +1,8 @@
+# v0.7.2 Feb 5th, 2023
+
+## Changelog
+
+- #139 Apply additional minification for enum, dumpObj, timers
 
 # v0.7.1 Feb 4th, 2023
 
@@ -6,6 +11,7 @@
 - #134 Update build link
 - #135 Update to use root LICENSE and README.md in the npm published package
 - #136 chore: Update coverage reporting to include worker test run
+- #138 Add .npmignore for release
 
 # v0.7.0 Jan 12th, 2023
 
