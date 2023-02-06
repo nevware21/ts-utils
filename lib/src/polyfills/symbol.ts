@@ -6,7 +6,6 @@
  * Licensed under the MIT license.
  */
 
-import { isNullOrUndefined } from "../helpers/base";
 import { WellKnownSymbols, _wellKnownSymbolMap } from "../symbol/well_known";
 import { throwTypeError } from "../helpers/throw";
 import { POLYFILL_TAG, SYMBOL } from "../internal/constants";

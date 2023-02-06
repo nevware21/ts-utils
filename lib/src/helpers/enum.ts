@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { eMapValues, _createKeyValueMap } from "../internal/map";
 import { objForEachKey } from "../object/for_each_key";
 import { objDeepFreeze } from "../object/object";
 
@@ -80,13 +81,7 @@ export declare type EnumTypeMap<E, V> = { readonly [key in keyof E extends strin
  * @returns A new frozen (immutable) object which looks and acts like a TypeScript Enum class.
  */
 export function createEnum<E>(values: { [key in keyof E]: E[keyof E] }): EnumCls<E> {
-    let theEnum: any = {};
-    objForEachKey(values, (field, value) => {
-        theEnum[field] = value;
-        theEnum[value] = field;
-    });
-
-    return objDeepFreeze(theEnum);
+    return _createKeyValueMap(values, eMapValues.Value, eMapValues.Key, objDeepFreeze);
 }
 
 /**
@@ -124,13 +119,7 @@ export function createEnum<E>(values: { [key in keyof E]: E[keyof E] }): EnumCls
  * @returns A new frozen (immutable) object which contains a property for each key and value that returns the value.
  */
 export function createEnumKeyMap<E>(values: { [key in keyof E]: E[keyof E] }): EnumNameMap<E, keyof E> {
-    let mapClass: any = {};
-    objForEachKey(values, (key, value) => {
-        mapClass[key] = key;
-        mapClass[value] = key;
-    });
-
-    return objDeepFreeze(mapClass);
+    return _createKeyValueMap(values, eMapValues.Key, eMapValues.Key, objDeepFreeze);
 }
 
 /**
@@ -170,13 +159,7 @@ export function createEnumKeyMap<E>(values: { [key in keyof E]: E[keyof E] }): E
  * @returns A new frozen (immutable) object which contains a property for each key and value that returns the value.
  */
 export function createEnumValueMap<E>(values: { [key in keyof E]: E[keyof E] }): EnumValueMap<E, E[keyof E]> {
-    let mapClass: any = {};
-    objForEachKey(values, (key, value) => {
-        mapClass[key] = value;
-        mapClass[value] = value;
-    });
-
-    return objDeepFreeze(mapClass);
+    return _createKeyValueMap(values, eMapValues.Value, eMapValues.Value, objDeepFreeze);
 }
 
 /**
@@ -213,8 +196,8 @@ export function createEnumValueMap<E>(values: { [key in keyof E]: E[keyof E] }):
  */
 export function createSimpleMap<E, V>(values: { [key in keyof E]: [ E[keyof E], V] }): EnumTypeMap<E, V> {
     let mapClass: any = {};
-    objForEachKey(values, (field, value) => {
-        mapClass[field] = value[1];
+    objForEachKey(values, (key, value) => {
+        mapClass[key] = value[1];
         mapClass[value[0]] = value[1];
     });
 

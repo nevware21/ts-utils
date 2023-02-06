@@ -97,7 +97,8 @@ export type TimeoutOverrideFuncs = [ TimeoutOverrideFn | null, ClearTimeoutOverr
  * theTimeout.refresh();
  * ```
  */
-export function scheduleTimeout<A extends any[]>(callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler {
+export function scheduleTimeout<A extends any[]>(callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler;
+export function scheduleTimeout<A extends any[]>(callback: (...args: A) => void, timeout: number): ITimerHandler {
     return _createTimeoutWith(this, true, UNDEF_VALUE, _extractArgs(arguments, 0));
 }
 
@@ -174,7 +175,8 @@ export function scheduleTimeout<A extends any[]>(callback: (...args: A) => void,
  * theTimeout.refresh();
  * ```
  */
-export function scheduleTimeoutWith<A extends any[]>(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler {
+export function scheduleTimeoutWith<A extends any[]>(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler;
+export function scheduleTimeoutWith<A extends any[]>(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, callback: (...args: A) => void, timeout: number): ITimerHandler {
     return _createTimeoutWith(this, true, overrideFn, _extractArgs(arguments, 1));
 }
 
@@ -207,7 +209,8 @@ export function scheduleTimeoutWith<A extends any[]>(overrideFn: TimeoutOverride
  * theTimeout.refresh();
  * ```
  */
-export function createTimeout<A extends any[]>(callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler {
+export function createTimeout<A extends any[]>(callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler;
+export function createTimeout<A extends any[]>(callback: (...args: A) => void, timeout: number): ITimerHandler {
     return _createTimeoutWith(this, false, UNDEF_VALUE, _extractArgs(arguments, 0));
 }
 
@@ -276,6 +279,7 @@ export function createTimeout<A extends any[]>(callback: (...args: A) => void, t
  * theTimeout.refresh();
  * ```
  */
-export function createTimeoutWith<A extends any[]>(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler {
+export function createTimeoutWith<A extends any[]>(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler;
+export function createTimeoutWith<A extends any[]>(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, callback: (...args: A) => void, timeout: number): ITimerHandler {
     return _createTimeoutWith(this, false, overrideFn, _extractArgs(arguments, 1));
 }
