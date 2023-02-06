@@ -37,7 +37,8 @@ import { ITimerHandler, _createTimerHandler } from "./handler";
  * theIntervalTimer.refresh();
  * ```
  */
-export function scheduleInterval<A extends any[]>(callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler {
+export function scheduleInterval<A extends any[]>(callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler;
+export function scheduleInterval<A extends any[]>(callback: (...args: A) => void, timeout: number): ITimerHandler {
     let self = this;
     let theArguments = _extractArgs(arguments, 0);
 

@@ -9,6 +9,7 @@
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
 import { EMPTY } from "./constants";
+import { _extractArgs } from "./extract_args";
 
 /**
  * @internal
@@ -18,7 +19,8 @@ import { EMPTY } from "./constants";
  * @returns A function which will call the funcName against the first passed argument and pass on the remaining arguments
  */
 export function _unwrapFunction<T>(funcName: string) {
-    return function(thisArg: any, ...args: any[]): T {
+    return function(thisArg: any): T {
+        let args = _extractArgs(arguments, 1);
         if ((thisArg || thisArg === EMPTY) && thisArg[funcName]) {
             return (thisArg[funcName] as Function).apply(thisArg, args);
         }
