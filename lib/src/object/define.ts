@@ -130,7 +130,7 @@ function _createProp(value: ObjDefinePropDescriptor): PropertyDescriptor {
  * @param key - The name or Symbol of the property to be defined or modified.
  * @param descriptor - The descriptor for the property being defined or modified.
  */
-export const objDefineProp: <T>(target: T, key: PropertyKey, descriptor: PropertyDescriptor & ThisType<any>) => T = ObjClass.defineProperty;
+export const objDefineProp: <T>(target: T, key: PropertyKey, descriptor: PropertyDescriptor & ThisType<any>) => T = ObjClass["defineProperty"];
 
 /**
  * The objDefineProperties() method defines new or modifies existing properties directly on an object, returning the object.
@@ -143,7 +143,7 @@ export const objDefineProp: <T>(target: T, key: PropertyKey, descriptor: Propert
  * it cannot be both (see {@link ObjDefinePropDescriptorMap} for more details).
  * @returns
  */
-export const objDefineProperties: <T>(target: T, props: PropertyDescriptorMap & ThisType<any>) => T = ObjClass.defineProperties;
+export const objDefineProperties: <T>(target: T, props: PropertyDescriptorMap & ThisType<any>) => T = ObjClass["defineProperties"];
 
 /**
  * Try to define a get object property accessor for the target object, if a function is past as the value this will

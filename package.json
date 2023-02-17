@@ -98,7 +98,7 @@
     "types": "lib/types/index.d.ts",
     "sideEffects": false,
     "scripts": {
-        "build": "grunt ts_utils --verbose && npm run package",
+        "build": "grunt ts_utils --verbose && npm run package && npm run dtsgen",
         "rebuild": "npm run build && npm run test",
         "package": "rollup -c lib/rollup.config.js --bundleConfigAsCjs",
         "test": "npm run test:node && npm run test:worker && npm run test:browser && npm run coverage:report",
@@ -116,7 +116,8 @@
         "cleanBuild": "npm run clean && npm run rebuild && npm run docs",
         "docs": "typedoc",
         "prep_release": "npm run cleanBuild && npm run npm_pack",
-        "npm_pack": "copyfiles README.md LICENSE lib && cd lib && npm pack"
+        "npm_pack": "copyfiles README.md LICENSE lib && cd lib && npm pack",
+        "dtsgen": "api-extractor run --local --verbose"
     },
     "repository": {
         "type": "git",
@@ -135,6 +136,7 @@
         "node": ">= 0.8.0"
     },
     "devDependencies": {
+        "@microsoft/api-extractor": "^7.34.4",
         "@istanbuljs/nyc-config-typescript": "^1.0.2",
         "@nevware21/grunt-eslint-ts": "0.2.4",
         "@nevware21/grunt-ts-plugin": "0.4.5",
@@ -173,6 +175,7 @@
         "rollup": "^3.8.1",
         "rollup-plugin-minify-es": "^1.1.1",
         "rollup-plugin-istanbul": "^4.0.0",
+        "rollup-plugin-cleanup": "^3.2.1",
         "sinon": "^15.0.0",
         "ts-mocha": "^10.0.0",
         "typedoc": "^0.23.10",

@@ -11,7 +11,7 @@
         "noEmitHelpers": false,
         "alwaysStrict": true,
         "declaration": false,
-        "outDir": "./dist-esm",
+        "outDir": "./build/base",
         "suppressImplicitAnyIndexErrors": true,
         "allowSyntheticDefaultImports": true,
         "removeComments": true

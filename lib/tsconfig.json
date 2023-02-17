@@ -3,7 +3,9 @@
     "compilerOptions": {
         "target": "es5",
         "declaration": true,
-        "declarationDir": "./types",
-        "outDir": "./dist-es5"
+        "declarationMap": true,
+        "declarationDir": "./build/types",
+        "removeComments": false,
+        "outDir": "./build/es5"
     }
 }
