@@ -63,6 +63,7 @@ node_modules/
 out/
 /types/
 /lib/types/
+build/
 dist/
 dist-es**/
 

@@ -28,7 +28,6 @@ let _cachedHistory: ILazyValue<History>;
 let _isWebWorker: ILazyValue<boolean>;
 let _isNode: ILazyValue<boolean>;
 
-
 /**
  * @ignore
  * @internal
