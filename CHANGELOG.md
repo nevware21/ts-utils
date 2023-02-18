@@ -1,3 +1,11 @@
+# v0.7.3 Feb 17th, 2023
+
+## Changelog
+
+- #141 Update packaging to create single rollup resources
+  - Create single module export
+  - Include comments in the d.ts
+
 # v0.7.2 Feb 5th, 2023
 
 ## Changelog
