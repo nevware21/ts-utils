@@ -14,6 +14,7 @@ import { DONE, VALUE } from "../internal/constants";
  * Appends the `elms` to the `target` where the elms may be an array, a single object
  * or an iterator object
  * @group Array
+ * @group Iterator
  * @example
  * ```ts
  * let theArray = arrAppend([], 1);

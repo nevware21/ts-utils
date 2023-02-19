@@ -43,7 +43,6 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
  */
 export const strIndexOf: (value: string, searchString: string, position?: number) => number = _unwrapFunction(INDEX_OF);
 
-
 /**
  * The `strLastIndexOf()` method, given two arguments: the string and a substring to search for, searches
  * the entire calling string, and returns the index of the last occurrence of the specified substring.

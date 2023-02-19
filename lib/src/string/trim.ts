@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { StrProto } from "../internal/constants";
+import { UNDEF_VALUE } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 import { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "../polyfills/trim";
 
@@ -26,7 +26,7 @@ const TRIM_END = "trimEnd";
  * a copy of str), with no exception being thrown.
  * To return a new string with whitespace trimmed from just one end, use `strTrimStart()` or `strTrimEnd()`.
  */
-export const strTrim: (value: string) => string = StrProto[TRIM] ? _unwrapFunction(TRIM) : polyStrTrim;
+export const strTrim: (value: string) => string = _unwrapFunction(TRIM, UNDEF_VALUE, polyStrTrim);
 
 /**
  * The `strTrimStart()` method removes whitespace from the beginning of a string.
@@ -36,7 +36,7 @@ export const strTrim: (value: string) => string = StrProto[TRIM] ? _unwrapFuncti
  * If the beginning of str has no whitespace, a new string is still returned (essentially a copy of str),
  * with no exception being thrown.
  */
-export const strTrimStart: (value: string) => string = StrProto[TRIM_START] ? _unwrapFunction(TRIM_START) : polyStrTrimStart;
+export const strTrimStart: (value: string) => string = _unwrapFunction(TRIM_START, UNDEF_VALUE, polyStrTrimStart);
 
 /**
  * Alias for `strTrimStart()` method removes whitespace from the beginning of a string.
@@ -56,7 +56,7 @@ export const strTrimLeft = strTrimStart;
  * If the end of str has no whitespace, a new string is still returned (essentially a copy of str),
  * with no exception being thrown.
  */
-export const strTrimEnd: (value: string) => string = StrProto[TRIM_END] ? _unwrapFunction(TRIM_END) : polyStrTrimEnd;
+export const strTrimEnd: (value: string) => string = _unwrapFunction(TRIM_END, UNDEF_VALUE, polyStrTrimEnd);
 
 /**
  * Alias for `strTrimEnd()` method removes whitespace from the end of a string.

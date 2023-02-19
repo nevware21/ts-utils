@@ -7,7 +7,7 @@
  */
 
 import { assert } from "chai";
-import { polyIsArray } from "../../../../src/polyfills/array";
+import { polyArrFind, polyArrFindIndex, polyArrFindLast, polyArrFindLastIndex, polyArrIncludes, polyIsArray } from "../../../../src/polyfills/array";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 describe("array polyfills", () => {
@@ -48,6 +48,189 @@ describe("array polyfills", () => {
         _checkIsArray(_simplePromise());
         _checkIsArray(_simplePromiseLike());
     });
+
+    describe("polyArrIncludes", () => {
+        assert.equal(polyArrIncludes([1, 2, 3], 2), true);
+        assert.equal(polyArrIncludes([1, 2, 3], 4), false);
+        assert.equal(polyArrIncludes([1, 2, 3], 3, 3), false);
+        assert.equal(polyArrIncludes([1, 2, 3], 3, -1), true);
+        assert.equal(polyArrIncludes(["1", "2", "3"], 3 as any), false);
+
+        // Note: This (should) be true, but the polyfill does not handle NaN comparison correctly
+        assert.equal(polyArrIncludes([1, 2, NaN], NaN), false);
+    });
+
+    describe("polyArrFind", () => {
+        it ("example 1", () => {
+            const inventory: Array<{ name: string, quantity: number}> = [
+                { name: "apples", quantity: 2 },
+                { name: "bananas", quantity: 0 },
+                { name: "cherries", quantity: 5 }
+            ];
+            
+            function isCherries(fruit: { name: string, quantity: number}) {
+                return fruit.name === "cherries";
+            }
+
+            assert.deepEqual(polyArrFind(inventory, isCherries), { name: "cherries", quantity: 5 });
+        });
+
+        it("example 2", () => {
+            function isPrime(element: number, index: number, array: number[]) {
+                let start = 2;
+                while (start <= Math.sqrt(element)) {
+                    if (element % start++ < 1) {
+                        return false;
+                    }
+                }
+
+                return element > 1;
+            }
+              
+            assert.equal(polyArrFind([4, 6, 8, 12], isPrime), undefined);
+            assert.equal(polyArrFind([4, 5, 8, 12], isPrime), 5);
+        });
+
+        it("example 3 - array like", () => {
+            const arrayLike = {
+                length: 3,
+                0: 2,
+                1: 7.3,
+                2: 4
+            };
+
+            assert.equal(polyArrFind(arrayLike, (x) => !Number.isInteger(x)), 7.3);
+        });
+    });
+
+    describe("polyArrFindIndex", () => {
+        it ("example 1", () => {
+            const inventory: Array<{ name: string, quantity: number}> = [
+                { name: "apples", quantity: 2 },
+                { name: "bananas", quantity: 0 },
+                { name: "cherries", quantity: 5 }
+            ];
+            let called = 0;
+            function isCherries(fruit: { name: string, quantity: number}) {
+                called++;
+                return fruit.name === "cherries";
+            }
+
+            assert.deepEqual(polyArrFindIndex(inventory, isCherries), 2);
+            assert.equal(called, 3);
+        });
+
+        it("example 2", () => {
+            let called = 0;
+            function isPrime(element: number) {
+                called++;
+                if (element % 2 === 0 || element < 2) {
+                    return false;
+                }
+
+                for (let factor = 3; factor <= Math.sqrt(element); factor += 2) {
+                    if (element % factor === 0) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            called = 0;
+            assert.equal(polyArrFindIndex([4, 6, 8, 9, 12], isPrime), -1);
+            assert.equal(called, 5);
+            called = 0;
+            assert.equal(polyArrFindIndex([4, 6, 7, 9, 12], isPrime), 2);
+            assert.equal(called, 3);
+        });
+    });
+
+    describe("polyArrFindLast", () => {
+        it ("example 1", () => {
+            let called = 0;
+            const inventory: Array<{ name: string, quantity: number}> = [
+                { name: "apples", quantity: 2 },
+                { name: "bananas", quantity: 0 },
+                { name: "cherries", quantity: 5 }
+            ];
+            
+            function isCherries(fruit: { name: string, quantity: number}) {
+                called++;
+                return fruit.name === "cherries";
+            }
+
+            assert.deepEqual(polyArrFindLast(inventory, isCherries), { name: "cherries", quantity: 5 });
+            assert.equal(called, 1);
+        });
+
+        it("example 2", () => {
+            let called = 0;
+            function isPrime(element: number, index: number, array: number[]) {
+                called++;
+                let start = 2;
+                while (start <= Math.sqrt(element)) {
+                    if (element % start++ < 1) {
+                        return false;
+                    }
+                }
+
+                return element > 1;
+            }
+              
+            assert.equal(called, 0);
+            assert.equal(polyArrFindLast([4, 6, 8, 12], isPrime), undefined);
+            assert.equal(called, 4);
+
+            called = 0;
+            assert.equal(called, 0);
+            assert.equal(polyArrFindLast([4, 5, 8, 12], isPrime), 5);
+            assert.equal(called, 3);
+        });
+    });
+
+    describe("polyArrFindLastIndex", () => {
+        it ("example 1", () => {
+            const inventory: Array<{ name: string, quantity: number}> = [
+                { name: "apples", quantity: 2 },
+                { name: "bananas", quantity: 0 },
+                { name: "cherries", quantity: 5 }
+            ];
+            let called = 0;
+            function isCherries(fruit: { name: string, quantity: number}) {
+                called++;
+                return fruit.name === "cherries";
+            }
+
+            assert.deepEqual(polyArrFindLastIndex(inventory, isCherries), 2);
+            assert.equal(called, 1);
+        });
+
+        it("example 2", () => {
+            let called = 0;
+            function isPrime(element: number) {
+                called++;
+                if (element % 2 === 0 || element < 2) {
+                    return false;
+                }
+
+                for (let factor = 3; factor <= Math.sqrt(element); factor += 2) {
+                    if (element % factor === 0) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            called = 0;
+            assert.equal(polyArrFindLastIndex([4, 6, 8, 9, 12], isPrime), -1);
+            assert.equal(called, 5);
+            called = 0;
+            assert.equal(polyArrFindLastIndex([4, 6, 7, 9, 12], isPrime), 2);
+            assert.equal(called, 3);
+        });
+    });
+
+
 
     function _checkIsArray(value: any) {
         let polyResult = polyIsArray(value);

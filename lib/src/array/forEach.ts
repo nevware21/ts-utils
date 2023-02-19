@@ -16,7 +16,9 @@ import { LENGTH } from "../internal/constants";
  * The range (number of elements) processed by arrForEach() is set before the first call to the `callbackFn`. Any elements added beyond the range
  * or elements which as assigned to indexes already processed will not be visited by the `callbackFn`.
  * @group Array
+ * @group ArrayLike
  * @typeParam T - Identifies the element type of the array
+ * @param theArray - The array or array like object of elements to be searched.
  * @param callbackfn A `synchronous` function that accepts up to three arguments. arrForEach calls the callbackfn function one time for each element in the array.
  * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, null or undefined
  * the array will be used as the this value.
@@ -43,14 +45,17 @@ import { LENGTH } from "../internal/constants";
  *   copyItems.push(item);
  *   // May return -1 to abort the iteration
  * });
+ *
+ * // Also supports input as an array like object
+ * const items = { length: 3, 0: 'item1', 1: 'item2', 2: 'item3' };
  * ```
  */
-export function arrForEach<T = any>(arr: T[], callbackfn: (value: T, index: number, array: T[]) => void | number, thisArg?: any): void {
-    if (arr) {
-        const len = arr[LENGTH];
+export function arrForEach<T = any>(theArray: ArrayLike<T>, callbackfn: (value: T, index: number, array: T[]) => void | number, thisArg?: any): void {
+    if (theArray) {
+        const len = theArray[LENGTH] >>> 0;
         for (let idx = 0; idx < len; idx++) {
-            if (idx in arr) {
-                if (callbackfn.call(thisArg || arr, arr[idx], idx, arr) === -1) {
+            if (idx in theArray) {
+                if (callbackfn.call(thisArg || theArray, theArray[idx], idx, theArray) === -1) {
                     break;
                 }
             }

@@ -28,6 +28,7 @@ export const LAST_INDEX_OF = "lastIndexOf";
 export const LENGTH = "length";
 export const DONE = "done";
 export const VALUE = "value";
+export const INCLUDES = "includes";
 
 /**
  * @ignore
@@ -58,3 +59,8 @@ export const MathCls = Math;
  * @ignore
  */
 export const ArrCls = Array;
+
+/**
+ * @ignore
+ */
+export const ArrProto = ArrCls[PROTOTYPE];
