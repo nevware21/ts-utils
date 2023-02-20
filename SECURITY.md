@@ -8,7 +8,7 @@ We intend to support and provide security updates for all major versions.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| <= 1.0  | :white_check_mark: |
+| <= 2.x  | :white_check_mark: |
 
 
 ## Reporting a Vulnerability
