@@ -1,3 +1,12 @@
+# v0.8.0 Feb 21st, 2023
+
+## Changelog
+
+- #143 Add additional Array functions and update to support ArrayLike objects
+  - new Functions: arrEvery, arrFilter, arrFind, arrFindIndex, arrFindLast, arrFindLastIndex, arrIncludes, arrContains, arrLastIndexOf, arrSome
+  - Updated examples and added tests for Array like
+  - some polyfill versions also added
+
 # v0.7.3 Feb 17th, 2023
 
 ## Changelog

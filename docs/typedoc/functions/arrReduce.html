@@ -17,7 +17,7 @@
 <h1>Function arrReduce</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures tsd-kind-function">
-<li class="tsd-signature tsd-anchor-link" id="arrReduce">arr<wbr/>Reduce<span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span>theArray<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">[]</span>, callbackfn<span class="tsd-signature-symbol">: </span><a href="../types/ArrReduceCallbackFn.html" class="tsd-signature-type" data-tsd-kind="Type alias">ArrReduceCallbackFn</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">&gt;</span>, initialValue<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><a href="#arrReduce" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="arrReduce">arr<wbr/>Reduce<span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span>theArray<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ArrayLike</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">&gt;</span>, callbackfn<span class="tsd-signature-symbol">: </span><a href="../types/ArrReduceCallbackFn.html" class="tsd-signature-type" data-tsd-kind="Type alias">ArrReduceCallbackFn</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">&gt;</span>, initialValue<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><a href="#arrReduce" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>The arrReduce() method executes a user-supplied &quot;reducer&quot; callback function on each element of the array,
 in order, passing in the return value from the calculation on the preceding element. The final result of
@@ -25,6 +25,31 @@ running the reducer across all elements of the array is a single value.</p>
 <p>The first time that the callback is run there is no &quot;return value of the previous calculation&quot;. If supplied,
 an initial value may be used in its place. Otherwise the array element at index 0 is used as the initial
 value and iteration starts from the next element (index 1 instead of index 0).</p>
+
+<h3>Returns</h3><p>The value that results from running the &quot;reducer&quot; callback function to completion over the entire array.</p>
+
+<h3>Example</h3><p>```ts
+const getMax = (a: number, b: number) =&gt; Math.max(a, b);</p>
+<p>// callback is invoked for each element in the array starting at index 0
+arrReduce([1, 100], getMax, 50); // 100
+arrReduce([    50], getMax, 10); // 50</p>
+<p>// callback is invoked once for element at index 1
+arrReduce([1, 100], getMax);     // 100</p>
+<p>// callback is not invoked
+arrReduce([    50], getMax);     // 50
+arrReduce([      ], getMax, 1);  // 1</p>
+<p>arrReduce([      ], getMax);     // throws TypeError</p>
+<p>// Also supports Array like objects
+arrReduce({ length: 2, 0: 1, 1: 100 }, getMax, 50); // 100
+arrReduce({ length: 1, 0: 50 }, getMax, 10); // 50</p>
+<p>// callback is invoked once for element at index 1
+arrReduce({ length: 2, 0: 1, 1: 100 }, getMax);     // 100</p>
+<p>// callback is not invoked
+arrReduce({ length: 1, 0: 50 }, getMax);     // 50
+arrReduce({ length: 0 }, getMax, 1);  // 1</p>
+<ul>
+<li>```</li>
+</ul>
 </div>
 <section class="tsd-panel tsd-type-parameters">
 <h4>Type Parameters</h4>
@@ -39,8 +64,8 @@ value and iteration starts from the next element (index 1 instead of index 0).</
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>theArray: <span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">[]</span></h5>
-<div class="tsd-comment tsd-typography"><p>The array of elements to be searched</p>
+<h5>theArray: <span class="tsd-signature-type">ArrayLike</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+<div class="tsd-comment tsd-typography"><p>The array or array like object of elements to be searched.</p>
 </div></li>
 <li>
 <h5>callbackfn: <a href="../types/ArrReduceCallbackFn.html" class="tsd-signature-type" data-tsd-kind="Type alias">ArrReduceCallbackFn</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">&gt;</span></h5>
@@ -52,7 +77,7 @@ value and iteration starts from the next element (index 1 instead of index 0).</
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/array/reduce.ts#L40">lib/src/array/reduce.ts:40</a></li></ul></aside></li></ul></section></div>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/array/reduce.ts#L72">lib/src/array/reduce.ts:72</a></li></ul></aside></li></ul></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -75,6 +100,8 @@ value and iteration starts from the next element (index 1 instead of index 0).</
 <nav class="tsd-navigation secondary menu-sticky">
 <ul>
 <li class="tsd-kind-type-alias"><a href="../types/ArrMapCallbackFn.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-4194304-path"></rect><path d="M11.31 16V8.224H8.91V7.24H14.79V8.224H12.39V16H11.31Z" fill="var(--color-text)" id="icon-4194304-text"></path></svg>Arr<wbr/>Map<wbr/>Callback<wbr/>Fn</a></li>
+<li class="tsd-kind-type-alias"><a href="../types/ArrPredicateCallbackFn.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg>Arr<wbr/>Predicate<wbr/>Callback<wbr/>Fn</a></li>
+<li class="tsd-kind-type-alias"><a href="../types/ArrPredicateCallbackFn2.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg>Arr<wbr/>Predicate<wbr/>Callback<wbr/>Fn2</a></li>
 <li class="tsd-kind-type-alias"><a href="../types/ArrReduceCallbackFn.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg>Arr<wbr/>Reduce<wbr/>Callback<wbr/>Fn</a></li>
 <li class="tsd-kind-type-alias"><a href="../types/ClearTimeoutOverrideFn.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg>Clear<wbr/>Timeout<wbr/>Override<wbr/>Fn</a></li>
 <li class="tsd-kind-interface"><a href="../interfaces/CreateIteratorContext.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-interface)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-256-path"></rect><path d="M9.51 16V15.016H11.298V8.224H9.51V7.24H14.19V8.224H12.402V15.016H14.19V16H9.51Z" fill="var(--color-text)" id="icon-256-text"></path></svg>Create<wbr/>Iterator<wbr/>Context</a></li>
@@ -94,10 +121,20 @@ value and iteration starts from the next element (index 1 instead of index 0).</
 <li class="tsd-kind-type-alias"><a href="../types/TimeoutOverrideFuncs.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg>Timeout<wbr/>Override<wbr/>Funcs</a></li>
 <li class="tsd-kind-enum"><a href="../enums/WellKnownSymbols.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-enum)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-8-path"></rect><path d="M9.45 16V7.24H14.49V8.224H10.518V10.936H14.07V11.908H10.518V15.016H14.49V16H9.45Z" fill="var(--color-text)" id="icon-8-text"></path></svg>Well<wbr/>Known<wbr/>Symbols</a></li>
 <li class="tsd-kind-function"><a href="arrAppend.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-function)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-64-path"></rect><path d="M9.39 16V7.24H14.55V8.224H10.446V11.128H14.238V12.112H10.47V16H9.39Z" fill="var(--color-text)" id="icon-64-text"></path></svg>arr<wbr/>Append</a></li>
+<li class="tsd-kind-function"><a href="arrContains.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Contains</a></li>
+<li class="tsd-kind-function"><a href="arrEvery.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Every</a></li>
+<li class="tsd-kind-function"><a href="arrFilter.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Filter</a></li>
+<li class="tsd-kind-function"><a href="arrFind.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Find</a></li>
+<li class="tsd-kind-function"><a href="arrFindIndex.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Find<wbr/>Index</a></li>
+<li class="tsd-kind-function"><a href="arrFindLast.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Find<wbr/>Last</a></li>
+<li class="tsd-kind-function"><a href="arrFindLastIndex.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Find<wbr/>Last<wbr/>Index</a></li>
 <li class="tsd-kind-function"><a href="arrForEach.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>For<wbr/>Each</a></li>
+<li class="tsd-kind-function"><a href="arrIncludes.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Includes</a></li>
 <li class="tsd-kind-function"><a href="arrIndexOf.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Index<wbr/>Of</a></li>
+<li class="tsd-kind-function"><a href="arrLastIndexOf.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Last<wbr/>Index<wbr/>Of</a></li>
 <li class="tsd-kind-function"><a href="arrMap.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Map</a></li>
 <li class="current tsd-kind-function"><a href="arrReduce.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Reduce</a></li>
+<li class="tsd-kind-function"><a href="arrSome.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Some</a></li>
 <li class="tsd-kind-function"><a href="arrayDeepCopyHandler.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>array<wbr/>Deep<wbr/>Copy<wbr/>Handler</a></li>
 <li class="tsd-kind-function"><a href="asString.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>as<wbr/>String</a></li>
 <li class="tsd-kind-function"><a href="createArrayIterator.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>create<wbr/>Array<wbr/>Iterator</a></li>
@@ -201,6 +238,11 @@ value and iteration starts from the next element (index 1 instead of index 0).</
 <li class="tsd-kind-function"><a href="objToString.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>obj<wbr/>To<wbr/>String</a></li>
 <li class="tsd-kind-function"><a href="perfNow.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>perf<wbr/>Now</a></li>
 <li class="tsd-kind-function"><a href="plainObjDeepCopyHandler.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>plain<wbr/>Obj<wbr/>Deep<wbr/>Copy<wbr/>Handler</a></li>
+<li class="tsd-kind-function"><a href="polyArrFind.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>poly<wbr/>Arr<wbr/>Find</a></li>
+<li class="tsd-kind-function"><a href="polyArrFindIndex.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>poly<wbr/>Arr<wbr/>Find<wbr/>Index</a></li>
+<li class="tsd-kind-function"><a href="polyArrFindLast.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>poly<wbr/>Arr<wbr/>Find<wbr/>Last</a></li>
+<li class="tsd-kind-function"><a href="polyArrFindLastIndex.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>poly<wbr/>Arr<wbr/>Find<wbr/>Last<wbr/>Index</a></li>
+<li class="tsd-kind-function"><a href="polyArrIncludes.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>poly<wbr/>Arr<wbr/>Includes</a></li>
 <li class="tsd-kind-function"><a href="polyGetKnownSymbol.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>poly<wbr/>Get<wbr/>Known<wbr/>Symbol</a></li>
 <li class="tsd-kind-function"><a href="polyIsArray.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>poly<wbr/>Is<wbr/>Array</a></li>
 <li class="tsd-kind-function"><a href="polyNewSymbol.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>poly<wbr/>New<wbr/>Symbol</a></li>
