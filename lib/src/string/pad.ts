@@ -7,7 +7,7 @@
  */
 
 import { isNullOrUndefined } from "../helpers/base";
-import { EMPTY, LENGTH, StrProto } from "../internal/constants";
+import { EMPTY, LENGTH, UNDEF_VALUE } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 import { mathCeil } from "../math/floor";
 import { mathToInt } from "../math/to_int";
@@ -52,7 +52,7 @@ function _padValue(value: string, targetLength: number, padString?: string) {
  * the targetLength, it will be truncated from the end. The default value is the unicode "space"
  * character (U+0020).
  */
-export const strPadStart: (value: string, targetLength: number, padString?: string) => string = StrProto[PAD_START] ? _unwrapFunction(PAD_START) : polyStrPadStart;
+export const strPadStart: (value: string, targetLength: number, padString?: string) => string = _unwrapFunction(PAD_START, UNDEF_VALUE, polyStrPadStart);
 
 /**
  * The `strPadEnd()` method pads the current string with a given string (repeated, if needed) so that
@@ -66,7 +66,7 @@ export const strPadStart: (value: string, targetLength: number, padString?: stri
  * languages the right-most will be applied. The default value for this parameter is " " (U+0020).
  * @returns A String of the specified targetLength with the padString applied at the end of the current str.
  */
-export const strPadEnd: (value: string, targetLength: number, padString?: string) => string = StrProto[PAD_END] ? _unwrapFunction(PAD_END) : polyStrPadEnd;
+export const strPadEnd: (value: string, targetLength: number, padString?: string) => string = _unwrapFunction(PAD_END, UNDEF_VALUE, polyStrPadEnd);
 
 /**
  * The `strPadStart()` method pads the current string with another string (multiple times, if needed)

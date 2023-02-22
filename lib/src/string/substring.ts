@@ -9,7 +9,7 @@
 import { isNullOrUndefined, isUndefined } from "../helpers/base";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
-import { EMPTY, LENGTH, StrProto } from "../internal/constants";
+import { EMPTY, LENGTH, UNDEF_VALUE } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 import { mathMax } from "../math/min_max";
 import { strSlice } from "./slice";
@@ -71,7 +71,7 @@ export const strSubstring: (value: string, indexStart: number, indexEnd?: number
  * @param length - The number of characters to extract.
  * @returns A new string containing the specified part of the given string.
  */
-export const strSubstr: (value: string, indexStart: number, indexEnd?: number) => string = StrProto[SUB_STR] ? _unwrapFunction(SUB_STR) : polyStrSubstr;
+export const strSubstr: (value: string, indexStart: number, indexEnd?: number) => string = _unwrapFunction(SUB_STR, UNDEF_VALUE, polyStrSubstr);
 
 /**
  * The polyStrSubstr() method returns a portion of the string, starting at the specified index and extending for a given

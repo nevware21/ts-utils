@@ -7,10 +7,15 @@
  */
 
 export { arrAppend } from "./array/append";
+export { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "./array/callbacks";
+export { arrEvery, arrFilter } from "./array/every";
+export { arrFind, arrFindIndex, arrFindLast, arrFindLastIndex } from "./array/find";
 export { arrForEach } from "./array/forEach";
-export { arrIndexOf } from "./array/indexOf";
+export { arrContains, arrIncludes } from "./array/includes";
+export { arrIndexOf, arrLastIndexOf } from "./array/indexOf";
 export { ArrMapCallbackFn, arrMap } from "./array/map";
 export { ArrReduceCallbackFn, arrReduce } from "./array/reduce";
+export { arrSome } from "./array/some";
 export {
     isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isDate, isNumber, isBoolean,
     isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isThenable, isNotTruthy, isTruthy, objToString,
@@ -76,7 +81,7 @@ export { TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, schedu
 
 // Exporting the helpers, but not the "initialization" code to populate any missing values
 // This will enable anyone to "reuse" or create their own polyfills.ts implementation if they want.
-export { polyIsArray } from "./polyfills/array";
+export { polyIsArray, polyArrFind, polyArrFindIndex, polyArrFindLast, polyArrFindLastIndex, polyArrIncludes } from "./polyfills/array";
 export { polyObjKeys } from "./polyfills/object";
 export { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "./polyfills/symbol";
 export { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "./polyfills/trim";
