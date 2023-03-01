@@ -23,24 +23,27 @@ describe("interval tests", () => {
 
     it("basic interval", () => {
         let intervalCalled = 0;
-        scheduleInterval(() => {
+        let handler = scheduleInterval(() => {
             intervalCalled++;
         }, 100);
 
-        assert.equal(0, intervalCalled, "Interval should not have been called yet");
+        assert.equal(handler.enabled, true, "Check that the handler is running");
+        assert.equal(intervalCalled, 0, "Interval should not have been called yet");
         for (let lp = 0; lp < 99; lp++) {
             clock.tick(1);
-            assert.equal(0, intervalCalled, "Interval should not have been called yet");
+            assert.equal(intervalCalled, 0, "Interval should not have been called yet");
         }
         clock.tick(1);
-        assert.equal(1, intervalCalled, "Interval should have been called only once");
+        assert.equal(intervalCalled, 1, "Interval should have been called only once");
+        assert.equal(handler.enabled, true, "Check that the handler is running");
 
         for (let lp = 0; lp < 99; lp++) {
             clock.tick(1);
-            assert.equal(1, intervalCalled, "Interval should have been called only once");
+            assert.equal(intervalCalled, 1, "Interval should have been called only once");
         }
         clock.tick(1);
-        assert.equal(2, intervalCalled, "Interval should have been called twice");
+        assert.equal(intervalCalled, 2, "Interval should have been called twice");
+        assert.equal(handler.enabled, true, "Check that the handler is running");
     });
 
     it("cancel interval", () => {
@@ -49,14 +52,17 @@ describe("interval tests", () => {
             intervalCalled ++;
         }, 100);
 
-        assert.equal(0, intervalCalled, "Interval should not have been called yet");
+        assert.equal(theInterval.enabled, true, "Check that the handler is running");
+        assert.equal(intervalCalled, 0, "Interval should not have been called yet");
         for (let lp = 0; lp < 99; lp++) {
             clock.tick(1);
-            assert.equal(0, intervalCalled, "Interval should not have been called yet");
+            assert.equal(intervalCalled, 0, "Interval should not have been called yet");
         }
         theInterval.cancel();
+        assert.equal(theInterval.enabled, false, "Check that the handler is stopped");
+
         clock.tick(1);
-        assert.equal(0, intervalCalled, "Interval should not have been called yet");
+        assert.equal(intervalCalled, 0, "Interval should not have been called yet");
         clock.tick(1000);
     });
 
@@ -66,53 +72,60 @@ describe("interval tests", () => {
             intervalCalled ++;
         }, 100);
 
-        assert.equal(0, intervalCalled, "Interval should not have been called yet");
+        assert.equal(theInterval.enabled, true, "Check that the handler is running");
+        assert.equal(intervalCalled, 0, "Interval should not have been called yet");
         for (let lp = 0; lp < 99; lp++) {
             clock.tick(1);
-            assert.equal(0, intervalCalled, "Interval should not have been called yet");
+            assert.equal(intervalCalled, 0, "Interval should not have been called yet");
         }
         theInterval.refresh();
+        assert.equal(theInterval.enabled, true, "Check that the handler is running");
+
         clock.tick(1);
-        assert.equal(0, intervalCalled, "Interval should not have been called yet");
+        assert.equal(intervalCalled, 0, "Interval should not have been called yet");
 
         for (let lp = 0; lp < 98; lp++) {
             clock.tick(1);
-            assert.equal(0, intervalCalled, "Interval should not have been called yet");
+            assert.equal(intervalCalled, 0, "Interval should not have been called yet");
         }
         clock.tick(1);
-        assert.equal(1, intervalCalled, "Interval should have been called yet");
+        assert.equal(intervalCalled, 1, "Interval should have been called yet");
+        assert.equal(theInterval.enabled, true, "Check that the handler is running");
 
         // reset
         theInterval.refresh();
-        assert.equal(1, intervalCalled, "Interval should not have been called yet");
+        assert.equal(theInterval.enabled, true, "Check that the handler is running");
+        assert.equal(intervalCalled, 1, "Interval should not have been called yet");
         for (let lp = 0; lp < 99; lp++) {
             clock.tick(1);
-            assert.equal(1, intervalCalled, "Interval should not have been called yet");
+            assert.equal(intervalCalled, 1, "Interval should not have been called yet");
         }
         clock.tick(1);
-        assert.equal(2, intervalCalled, "Interval should have been called yet");
-
+        assert.equal(intervalCalled, 2, "Interval should have been called yet");
+        assert.equal(theInterval.enabled, true, "Check that the handler is running");
     });
 
     describe("pass extra arguments", () => {
         it("basic Interval", () => {
             let intervalCalled = 0;
             let theArgs: any = null;
-            scheduleInterval(function (a, b) {
+            let theInterval = scheduleInterval(function (a, b) {
                 intervalCalled ++;
                 theArgs = arguments;
             }, 100, "Hello", "Darkness");
     
-            assert.equal(0, intervalCalled, "Interval should not have been called yet");
+            assert.equal(theInterval.enabled, true, "Check that the handler is running");
+            assert.equal(intervalCalled, 0, "Interval should not have been called yet");
             assert.equal(null, theArgs, "No arguments");
             for (let lp = 0; lp < 99; lp++) {
                 clock.tick(1);
-                assert.equal(0, intervalCalled, "Interval should not have been called yet");
+                assert.equal(intervalCalled, 0, "Interval should not have been called yet");
                 assert.equal(null, theArgs, "No arguments");
             }
             clock.tick(1);
-            assert.equal(1, intervalCalled, "Interval should have been called yet");
-            assert.equal(2, theArgs.length);
+            assert.equal(theInterval.enabled, true, "Check that the handler is running");
+            assert.equal(intervalCalled, 1, "Interval should have been called yet");
+            assert.equal(theArgs.length, 2);
             assert.equal("Hello", theArgs[0], "First Arg");
             assert.equal("Darkness", theArgs[1], "Second Arg");
         });
@@ -125,23 +138,27 @@ describe("interval tests", () => {
                 theArgs = arguments;
             }, 100, "Hello", "Darkness");
     
-            assert.equal(0, intervalCalled, "Interval should not have been called yet");
+            assert.equal(theInterval.enabled, true, "Check that the handler is running");
+            assert.equal(intervalCalled, 0, "Interval should not have been called yet");
             assert.equal(null, theArgs, "No arguments");
             for (let lp = 0; lp < 99; lp++) {
                 clock.tick(1);
-                assert.equal(0, intervalCalled, "Interval should not have been called yet");
+                assert.equal(intervalCalled, 0, "Interval should not have been called yet");
                 assert.equal(null, theArgs, "No arguments");
             }
             theInterval.refresh();
+            assert.equal(theInterval.enabled, true, "Check that the handler is running");
+
             clock.tick(1);
-            assert.equal(0, intervalCalled, "Interval should not have been called yet");
+            assert.equal(intervalCalled, 0, "Interval should not have been called yet");
     
             for (let lp = 0; lp < 98; lp++) {
                 clock.tick(1);
-                assert.equal(0, intervalCalled, "Interval should not have been called yet");
+                assert.equal(intervalCalled, 0, "Interval should not have been called yet");
             }
             clock.tick(1);
-            assert.equal(1, intervalCalled, "Interval should have been called yet");
+            assert.equal(theInterval.enabled, true, "Check that the handler is running");
+            assert.equal(intervalCalled, 1, "Interval should have been called yet");
             assert.equal(2, theArgs.length);
             assert.equal("Hello", theArgs[0], "First Arg");
             assert.equal("Darkness", theArgs[1], "Second Arg");
@@ -153,24 +170,28 @@ describe("interval tests", () => {
                 intervalCalled ++;
             }, 100);
     
-            assert.equal(0, intervalCalled, "Interval should not have been called yet");
+            assert.equal(theInterval.enabled, true, "Check that the handler is running");
+            assert.equal(intervalCalled, 0, "Interval should not have been called yet");
             for (let lp = 0; lp < 99; lp++) {
                 clock.tick(1);
-                assert.equal(0, intervalCalled, "Interval should not have been called yet");
+                assert.equal(intervalCalled, 0, "Interval should not have been called yet");
             }
             theInterval.cancel();
+            assert.equal(theInterval.enabled, false, "Check that the handler is stopped");
+
             clock.tick(1);
-            assert.equal(0, intervalCalled, "Interval should not have been called yet");
+            assert.equal(intervalCalled, 0, "Interval should not have been called yet");
     
             theInterval.refresh();
-            assert.equal(0, intervalCalled, "Interval should not have been called yet");
+            assert.equal(theInterval.enabled, true, "Check that the handler is running");
+            assert.equal(intervalCalled, 0, "Interval should not have been called yet");
             for (let lp = 0; lp < 99; lp++) {
                 clock.tick(1);
-                assert.equal(0, intervalCalled, "Interval should not have been called yet");
+                assert.equal(intervalCalled, 0, "Interval should not have been called yet");
             }
             clock.tick(1);
-            assert.equal(1, intervalCalled, "Interval should have been called yet");
+            assert.equal(intervalCalled, 1, "Interval should have been called yet");
+            assert.equal(theInterval.enabled, true, "Check that the handler is running");
         });
     });
-
 });

@@ -17,7 +17,13 @@ function _createTimeoutWith(self: any, startTimer: boolean, overrideFn: TimeoutO
     let setFn: TimeoutOverrideFn = (len > 0 ? overrideFn[0] : (!isArr ? overrideFn : UNDEF_VALUE)) || setTimeout;
     let clearFn: ClearTimeoutOverrideFn = (len > 1 ? overrideFn[1] : UNDEF_VALUE) || clearTimeout;
 
-    return _createTimerHandler(startTimer, function (timerId?: any) {
+    let timerFn = theArgs[0];
+    theArgs[0] = function () {
+        handler.dn();
+        timerFn.apply(self, arguments);
+    };
+    
+    let handler = _createTimerHandler(startTimer, (timerId?: any) => {
         if (timerId) {
             if (timerId.refresh) {
                 timerId.refresh();
@@ -31,6 +37,8 @@ function _createTimeoutWith(self: any, startTimer: boolean, overrideFn: TimeoutO
     }, function (timerId: any) {
         clearFn.call(self, timerId);
     });
+
+    return handler.h;
 }
 
 /**
@@ -92,7 +100,11 @@ export type TimeoutOverrideFuncs = [ TimeoutOverrideFn | null, ClearTimeoutOverr
  * // Instead of calling clearTimeout() with the returned value from setTimeout() the returned
  * // handler instance can be used instead to cancel the timer
  * theTimeout.cancel();
- *
+ * theTimeout.enabled;    // false
+ * 
+ * // You can start the timer via enabled
+ * theTimeout.enabled = true;
+ * 
  * // You can also "restart" the timer, whether it has previously triggered not not via the `refresh()`
  * theTimeout.refresh();
  * ```
@@ -141,6 +153,10 @@ export function scheduleTimeout<A extends any[]>(callback: (...args: A) => void,
  * // Instead of calling clearTimeout() with the returned value from setTimeout() the returned
  * // handler instance can be used instead to cancel the timer
  * theTimeout.cancel();
+ * theTimeout.enabled;    // false
+ * 
+ * // You can start the timer via enabled
+ * theTimeout.enabled = true;
  *
  * // You can also "restart" the timer, whether it has previously triggered not not via the `refresh()`
  * theTimeout.refresh();
@@ -170,6 +186,10 @@ export function scheduleTimeout<A extends any[]>(callback: (...args: A) => void,
  * // Instead of calling clearTimeout() with the returned value from setTimeout() the returned
  * // handler instance can be used instead to cancel the timer, internally this will call the newClearTimeoutFn
  * theTimeout.cancel();
+ * theTimeout.enabled;    // false
+ * 
+ * // You can start the timer via enabled
+ * theTimeout.enabled = true;
  *
  * // You can also "restart" the timer, whether it has previously triggered not not via the `refresh()`
  * theTimeout.refresh();
@@ -207,6 +227,9 @@ export function scheduleTimeoutWith<A extends any[]>(overrideFn: TimeoutOverride
  *
  * // As the timer is not started you will need to call "refresh" to start the timer
  * theTimeout.refresh();
+ * 
+ * // or set enabled to true
+ * theTimeout.enabled = true;
  * ```
  */
 export function createTimeout<A extends any[]>(callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler;
@@ -252,6 +275,9 @@ export function createTimeout<A extends any[]>(callback: (...args: A) => void, t
  *
  * // As the timer is not started you will need to call "refresh" to start the timer
  * theTimeout.refresh();
+ * 
+ * // or set enabled to true
+ * theTimeout.enabled = true;
  * ```
  * @example
  * ```ts
@@ -277,6 +303,9 @@ export function createTimeout<A extends any[]>(callback: (...args: A) => void, t
  *
  * // As the timer is not started you will need to call "refresh" to start the timer
  * theTimeout.refresh();
+ * 
+ * // or set enabled to true
+ * theTimeout.enabled = true;
  * ```
  */
 export function createTimeoutWith<A extends any[]>(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler;
