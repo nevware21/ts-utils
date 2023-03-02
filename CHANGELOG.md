@@ -1,3 +1,11 @@
+# v0.8.1 Mar 2nd, 2023
+
+## Changelog
+
+- #148 <span style="color:red">__(Priotity 1)__</span> [Bug] Creating more than 1 createCustomError() overwrites the "name" of the error.
+  - Issue was causing the <span style="color:red">Error class name</span> to be reassigned to the last created Custom Error, if no custom error was created (including the UnsupportedError) then the Error class was unaffected
+- #146 [Feature] Add an enabled / running flag to the timers to enable checking current state
+
 # v0.8.0 Feb 21st, 2023
 
 ## Changelog
