@@ -29,6 +29,7 @@ export const LENGTH = "length";
 export const DONE = "done";
 export const VALUE = "value";
 export const INCLUDES = "includes";
+export const NAME = "name";
 
 /**
  * @ignore

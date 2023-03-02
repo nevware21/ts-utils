@@ -114,10 +114,10 @@ export function setDefaultMaxExecutionTime(maxTime: number) {
  * // handler instance can be used instead to cancel the idle timer
  * theIdleTimer.cancel();
  * theIdleTimer.enabled;    // false
- * 
+ *
  * // You can start the timer via enabled
  * theIdleTimer.enabled = true;
- * 
+ *
  * // You can also "restart" the timer, whether it has previously triggered not not via the `refresh()`
  * theIdleTimer.refresh();
  * ```
