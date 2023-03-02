@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { PROTOTYPE } from "../internal/constants";
+import { NAME, PROTOTYPE } from "../internal/constants";
 import { objSetPrototypeOf } from "../object/set_proto";
 
 /**
@@ -24,16 +24,25 @@ export interface CustomErrorConstructor extends Error {
  * @internal
  * @ignore
  */
-function _createCustomError(name: string, d: any, b: any) {
-    objSetPrototypeOf(d, b);
+function _createCustomError(name: string, d: any, baseClass: any) {
+    objSetPrototypeOf(d, baseClass);
     function __() {
         this.constructor = d;
+        this[NAME] = name;
     }
-    __[PROTOTYPE] = b[PROTOTYPE];
-    __[PROTOTYPE].name = name;
+    
+    __[PROTOTYPE] = baseClass[PROTOTYPE];
     d[PROTOTYPE] = new (__ as any)();
 
     return d;
+}
+
+const _safeSetName = (baseClass: any, name: string) => {
+    try {
+        baseClass[PROTOTYPE][NAME] = name;
+    } catch(e) {
+        // Do nothing
+    }
 }
 
 /**
@@ -85,11 +94,21 @@ function _createCustomError(name: string, d: any, b: any) {
  */
 export function createCustomError<T extends CustomErrorConstructor = CustomErrorConstructor>(name: string, constructCb?: (self: any, args: IArguments) => void): T {
     let baseClass = Error;
+    let orgName = baseClass[PROTOTYPE][NAME];
 
     let customError = _createCustomError(name, function (this: any) {
         let _this = this;
-        _this = baseClass.apply(_this, arguments) || _this;
-        constructCb && constructCb(_this, arguments);
+        try {
+            // Set the baseClass (Error) prototype name so that any reported
+            // error by the Error constructor is reported with this name
+            _safeSetName(baseClass, name);
+            _this = baseClass.apply(_this, arguments) || _this;
+            _this[NAME] = name;
+            constructCb && constructCb(_this, arguments);
+        } finally {
+            // Always restore the baseClass (Error) original name
+            _safeSetName(baseClass, orgName);
+        }
 
         return _this;
     }, baseClass);

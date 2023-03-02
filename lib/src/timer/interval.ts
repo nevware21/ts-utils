@@ -33,7 +33,7 @@ import { ITimerHandler, _createTimerHandler } from "./handler";
  * // handler instance can be used instead to cancel the timer
  * theIntervalTimer.cancel();
  * theIntervalTimer.enabled;    // false
- * 
+ *
  * // You can start the timer via enabled
  * theIntervalTimer.enabled = true;
  *

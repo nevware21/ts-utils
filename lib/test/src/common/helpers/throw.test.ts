@@ -164,6 +164,24 @@ describe("throw helpers", () => {
             assert.equal(error.args[3], 100);
             assert.equal(objToString(error), "[object Error]", "Expected the error to resolve as an error");
         });
+
+        it("multiple custom errors", () => {
+            let totalErrors = 0;
+            let myCustomError1 = createCustomError("myCustomError1");
+            assert.equal(new myCustomError1().name, "myCustomError1", "Checking the error1 name");
+
+            let myCustomError2 = createCustomError("myCustomError2");
+            assert.equal(new myCustomError2().name, "myCustomError2", "Checking the error2 name");
+
+            let myCustomError3 = createCustomError("myCustomError3");
+            assert.equal(new myCustomError3().name, "myCustomError3", "Checking the error3 name");
+
+            // Recheck the custom error names
+            assert.equal(new Error().name, "Error", "Checking the base class Error name");
+            assert.equal(new myCustomError1().name, "myCustomError1", "Checking the error1 name");
+            assert.equal(new myCustomError2().name, "myCustomError2", "Checking the error2 name");
+            assert.equal(new myCustomError3().name, "myCustomError3", "Checking the error3 name");
+        });
     });
 });
 
