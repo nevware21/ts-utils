@@ -6,6 +6,13 @@
  * Licensed under the MIT license.
  */
 
+import { objDefineProp } from "../object/define";
+
+const REF = "ref";
+const UNREF = "un" + REF as "unref";
+const HAS_REF = "hasRef";
+const ENABLED = "enabled";
+
 /**
  * A Timer handler which is returned from {@link scheduleTimeout} which contains functions to
  * cancel or restart (refresh) the timeout function.
@@ -92,6 +99,55 @@ export interface ITimerHandler {
      * ```
      */
     hasRef(): boolean;
+
+    /**
+     * Gets or Sets a flag indicating if the underlying timer is currently enabled and running.
+     * Setting the enabled flag to the same as it's current value has no effect, setting to `true`
+     * when already `true` will not {@link ITimerHandler.refresh | refresh}() the timer.
+     * And setting to 'false` will {@link ITimerHandler.cancel | cancel}() the timer.
+     * @since 0.8.1
+        * @example
+     * ```ts
+     * let theTimer = createTimeout(...);
+     *
+     * // Check if enabled
+     * theTimer.enabled; // false
+     *
+     * // Start the timer
+     * theTimer.enabled = true;     // Same as calling refresh()
+     * theTimer.enabled; //true
+     *
+     * // Has no effect as it's already running
+     * theTimer.enabled = true;
+     *
+     * // Will refresh / restart the time
+     * theTimer.refresh()
+     *
+     * let theTimer = scheduleTimeout(...);
+     *
+     * // Check if enabled
+     * theTimer.enabled; // true
+     * ```
+     */
+    enabled: boolean;
+}
+
+/**
+ * @ignore
+ * @internal
+ */
+export interface _TimerHandler {
+    /**
+     * The public handler to return to the caller
+     */
+    h: ITimerHandler,
+
+    /**
+     * The callback function that should be called when the timer operation
+     * has completed and will not automatically rescheduled
+     * @returns
+     */
+    dn: () => void
 }
 
 /**
@@ -101,49 +157,70 @@ export interface ITimerHandler {
  * it directly used / returned by the pulic functions used to create timers (idle, interval and timeout)
  * @param startTimer - Should the timer be started as part of creating the handler
  * @param refreshFn - The function used to create/start or refresh the timer
- * @param cancelFn - The function used to cancel the timer
+ * @param cancelFn - The function used to cancel the timer.
  * @returns The new ITimerHandler instance
  */
-export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId: T) => T, cancelFn: (timerId: T) => void): ITimerHandler {
+export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId: T) => T, cancelFn: (timerId: T) => void): _TimerHandler {
     let ref = true;
     let timerId: T = startTimer ? refreshFn(null) : null;
+    let theTimerHandler: ITimerHandler;
 
-    function _unref() {
+    const _unref = () => {
         ref = false;
-        timerId && timerId["unref"] && timerId["unref"]();
-        return timer;
-    }
-
-    function _ref() {
-        ref = true;
-        timerId && timerId["ref"] && timerId["ref"]();
-        return timer;
-    }
-
-    function _hasRef() {
-        if (timerId && timerId["hasRef"]) {
-            return timerId["hasRef"]();
-        }
-        return ref;
-    }
-
-    let timer: ITimerHandler = {
-        cancel: function() {
-            timerId && cancelFn(timerId);
-            timerId = null;
-        },
-        refresh: function() {
-            timerId = refreshFn(timerId);
-            if (!ref) {
-                _unref();
-            }
-
-            return timer;
-        },
-        hasRef: _hasRef,
-        ref: _ref,
-        unref: _unref
+        timerId && timerId[UNREF] && timerId[UNREF]();
+        return theTimerHandler;
     };
 
-    return timer;
+    const _ref = () => {
+        ref = true;
+        timerId && timerId[REF] && timerId[REF]();
+        return theTimerHandler;
+    };
+
+    const _hasRef = () => {
+        if (timerId && timerId[HAS_REF]) {
+            return timerId[HAS_REF]();
+        }
+        return ref;
+    };
+
+    const _refresh = () => {
+        timerId = refreshFn(timerId);
+        if (!ref) {
+            _unref();
+        }
+
+        return theTimerHandler;
+    };
+
+    const _cancel = () => {
+        timerId && cancelFn(timerId);
+        timerId = null;
+    };
+
+    const _setEnabled = (value: boolean) => {
+        !value && timerId && _cancel();
+        value && !timerId && _refresh();
+    }
+
+    theTimerHandler = {
+        cancel: _cancel,
+        refresh: _refresh,
+        [HAS_REF]: _hasRef,
+        [REF]: _ref,
+        [UNREF]: _unref,
+        [ENABLED]: false
+    };
+
+    objDefineProp(theTimerHandler, ENABLED, {
+        get: () => !!timerId,
+        set: _setEnabled
+    });
+
+    return {
+        h: theTimerHandler,
+        dn: () => {
+            timerId = null;
+        }
+    };
 }

@@ -49,30 +49,33 @@ describe("idle tests", () => {
             let waitTimeout: any;
     
             assert.ok(hasIdleCallback(), "Expected the requestIdleCallback to exist");
-            scheduleIdleCallback((deadline) => {
+            let handler = scheduleIdleCallback((deadline) => {
                 idleCalled++;
-                assert.equal(false, deadline.didTimeout, "Expected the deadline to not be timedout - " + dumpObj(deadline));
+                assert.equal(deadline.didTimeout, false, "Expected the deadline to not be timedout - " + dumpObj(deadline));
                 isDone = true;
                 done();
                 if (waitTimeout) {
                     orgClearTimeout(waitTimeout);
                 }
             });
-    
-            assert.equal(0, idleCalled, "Idle should not have been called yet");
+
+            assert.equal(handler.enabled, true, "Check that the handler is running");
+            assert.equal(idleCalled, 0, "Idle should not have been called yet");
             for (let lp = 0; lp < 99; lp++) {
                 clock.tick(1);
-                assert.equal(0, idleCalled, "Idle should not have been called yet");
+                assert.equal(idleCalled, 0, "Idle should not have been called yet");
             }
             clock.tick(1);
-            assert.equal(0, idleCalled, "Idle should not yet have been called");
+            assert.equal(idleCalled, 0, "Idle should not yet have been called");
 
             waitTimeout = orgTimeout(() => {
                 if (!isDone) {
-                    assert.equal(1, idleCalled, "Idle should have been called only once");
+                    assert.equal(idleCalled, 1, "Idle should have been called only once");
                     done();
                 }
             }, 1000);
+
+            assert.equal(handler.enabled, false, "Check that the handler is stopped");
         });
 
         it("cancel idle with real requestIdleCallback", (done) => {
@@ -83,18 +86,21 @@ describe("idle tests", () => {
                 idleCalled++;
                 assert.ok(false, "should not have been called");
             });
+
+            assert.equal(theIdle.enabled, true, "Check that the handler is running");
             theIdle.cancel();
-    
-            assert.equal(0, idleCalled, "Idle should not have been called yet");
+            assert.equal(theIdle.enabled, false, "Check that the handler is stopped");
+
+            assert.equal(idleCalled, 0, "Idle should not have been called yet");
             for (let lp = 0; lp < 99; lp++) {
                 clock.tick(1);
-                assert.equal(0, idleCalled, "Idle should not have been called yet");
+                assert.equal(idleCalled, 0, "Idle should not have been called yet");
             }
             clock.tick(1);
-            assert.equal(0, idleCalled, "Idle should not have been called");
+            assert.equal(idleCalled, 0, "Idle should not have been called");
 
             orgTimeout(() => {
-                assert.equal(0, idleCalled, "Idle should still not have been called");
+                assert.equal(idleCalled, 0, "Idle should still not have been called");
                 done();
             }, 1000);
         });
@@ -107,28 +113,33 @@ describe("idle tests", () => {
             assert.ok(hasIdleCallback(), "Expected the requestIdleCallback to exist");
             let theIdle = scheduleIdleCallback((deadline) => {
                 idleCalled++;
-                assert.equal(false, deadline.didTimeout, "Expected the deadline to not be timedout - " + dumpObj(deadline));
+                assert.equal(deadline.didTimeout, false, "Expected the deadline to not be timedout - " + dumpObj(deadline));
                 isDone = true;
                 done();
                 if (waitTimeout) {
                     orgClearTimeout(waitTimeout);
                 }
             });
+
+            assert.equal(theIdle.enabled, true, "Check that the handler is running");
             theIdle.cancel();
+            assert.equal(theIdle.enabled, false, "Check that the handler is stopped");
     
-            assert.equal(0, idleCalled, "Idle should not have been called yet");
+            assert.equal(idleCalled, 0, "Idle should not have been called yet");
             for (let lp = 0; lp < 99; lp++) {
                 clock.tick(1);
-                assert.equal(0, idleCalled, "Idle should not have been called yet");
+                assert.equal(idleCalled, 0, "Idle should not have been called yet");
             }
             clock.tick(1);
-            assert.equal(0, idleCalled, "Idle should still not have been called");
+            assert.equal(idleCalled, 0, "Idle should still not have been called");
 
+            assert.equal(theIdle.enabled, false, "Check that the handler is stopped");
             theIdle.refresh();
+            assert.equal(theIdle.enabled, true, "Check that the handler is running");
             clock.tick(99);
             waitTimeout = orgTimeout(() => {
                 if (!isDone) {
-                    assert.equal(1, idleCalled, "Idle should have been called only once");
+                    assert.equal(idleCalled, 0, "Idle should have been called only once");
                     done();
                 }
             }, 1000);
@@ -167,9 +178,9 @@ describe("idle tests", () => {
                 let idleIterations = 0;
 
                 assert.ok(!hasIdleCallback(), "Expected the requestIdleCallback to not exist");
-                scheduleIdleCallback((deadline) => {
+                let handler = scheduleIdleCallback((deadline) => {
                     idleCalled++;
-                    assert.equal(true, deadline.didTimeout, "Expected the timeout to have timed out");
+                    assert.equal(deadline.didTimeout, true, "Expected the timeout to have timed out");
                     while (deadline.timeRemaining() > 0) {
                         idleIterations++;
                         clock.tick(1);
@@ -177,17 +188,19 @@ describe("idle tests", () => {
                 }, {
                     timeout: 100
                 });
-        
-                assert.equal(0, idleCalled, "Idle should not have been called yet");
+
+                assert.equal(handler.enabled, true, "Check that the handler is running");
+                assert.equal(idleCalled, 0, "Idle should not have been called yet");
                 for (let lp = 0; lp < 99; lp++) {
                     clock.tick(1);
-                    assert.equal(0, idleCalled, "Idle should not have been called yet");
+                    assert.equal(idleCalled, 0, "Idle should not have been called yet");
                 }
-                assert.equal(99, elapsedTime(startTime), "Calculated passed time");
+                assert.equal(elapsedTime(startTime), 99, "Calculated passed time");
                 clock.tick(1);
-                assert.equal(1, idleCalled, "Idle should have been called only once");
-                assert.equal(50, idleIterations, "Idle should have been called only once");
-                assert.equal(150, elapsedTime(startTime), "Calculated passed time including the deadline and max execution");
+                assert.equal(idleCalled, 1, "Idle should have been called only once");
+                assert.equal(idleIterations, 50, "Idle should have been called only once");
+                assert.equal(elapsedTime(startTime), 150, "Calculated passed time including the deadline and max execution");
+                assert.equal(handler.enabled, false, "Check that the handler is stopped");
             });
 
             it("set default timeout and execution time", () => {
@@ -198,25 +211,27 @@ describe("idle tests", () => {
                 assert.ok(!hasIdleCallback(), "Expected the requestIdleCallback to not exist");
                 setDefaultIdleTimeout(150);
                 setDefaultMaxExecutionTime(42);
-                scheduleIdleCallback((deadline) => {
+                let handler = scheduleIdleCallback((deadline) => {
                     idleCalled++;
-                    assert.equal(true, deadline.didTimeout, "Expected the timeout to have timed out");
+                    assert.equal(deadline.didTimeout, true, "Expected the timeout to have timed out");
                     while (deadline.timeRemaining() > 0) {
                         idleIterations++;
                         clock.tick(1);
                     }
                 });
-        
-                assert.equal(0, idleCalled, "Idle should not have been called yet");
+
+                assert.equal(handler.enabled, true, "Check that the handler is running");
+                assert.equal(idleCalled, 0, "Idle should not have been called yet");
                 for (let lp = 0; lp < 149; lp++) {
                     clock.tick(1);
-                    assert.equal(0, idleCalled, "Idle should not have been called yet");
+                    assert.equal(idleCalled, 0, "Idle should not have been called yet");
                 }
-                assert.equal(149, elapsedTime(startTime), "Calculated passed time");
+                assert.equal(elapsedTime(startTime), 149, "Calculated passed time");
                 clock.tick(1);
-                assert.equal(1, idleCalled, "Idle should have been called only once");
-                assert.equal(42, idleIterations, "Idle should have been called only once");
-                assert.equal(192, elapsedTime(startTime), "Calculated passed time including the deadline and max execution");
+                assert.equal(idleCalled, 1, "Idle should have been called only once");
+                assert.equal(idleIterations, 42, "Idle should have been called only once");
+                assert.equal(elapsedTime(startTime), 192, "Calculated passed time including the deadline and max execution");
+                assert.equal(handler.enabled, false, "Check that the handler is stopped");
             });
         });
 
@@ -228,14 +243,17 @@ describe("idle tests", () => {
                 timeout: 100
             });
     
-            assert.equal(0, idleCalled, "Idle should not have been called yet");
+            assert.equal(theIdle.enabled, true, "Check that the handler is running");
+            assert.equal(idleCalled, 0, "Idle should not have been called yet");
             for (let lp = 0; lp < 99; lp++) {
                 clock.tick(1);
-                assert.equal(0, idleCalled, "Idle should not have been called yet");
+                assert.equal(idleCalled, 0, "Idle should not have been called yet");
             }
             theIdle.cancel();
+            assert.equal(theIdle.enabled, false, "Check that the handler is stopped");
+
             clock.tick(1);
-            assert.equal(0, idleCalled, "Idle should not have been called yet");
+            assert.equal(idleCalled, 0, "Idle should not have been called yet");
             clock.tick(1000);
         });
     });

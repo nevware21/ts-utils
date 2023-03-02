@@ -32,8 +32,12 @@ import { ITimerHandler, _createTimerHandler } from "./handler";
  * // Instead of calling clearInterval() with the returned value from setInterval() the returned
  * // handler instance can be used instead to cancel the timer
  * theIntervalTimer.cancel();
+ * theIntervalTimer.enabled;    // false
+ * 
+ * // You can start the timer via enabled
+ * theIntervalTimer.enabled = true;
  *
- * // You can also "restart" the timer, whether it has previously triggered not not via the `refresh()`
+ * // Or you can also "restart" the timer, whether it has previously triggered not not via the `refresh()`
  * theIntervalTimer.refresh();
  * ```
  */
@@ -42,10 +46,12 @@ export function scheduleInterval<A extends any[]>(callback: (...args: A) => void
     let self = this;
     let theArguments = _extractArgs(arguments, 0);
 
-    return _createTimerHandler(true, function (intervalId: any) {
+    let handler = _createTimerHandler(true, (intervalId: any) => {
         intervalId && clearInterval(intervalId);
         return setInterval.apply(self, theArguments);
-    }, function (intervalId: any) {
+    }, (intervalId: any) => {
         clearInterval(intervalId);
     });
+
+    return handler.h;
 }

@@ -113,7 +113,11 @@ export function setDefaultMaxExecutionTime(maxTime: number) {
  * // Instead of calling cancelIdleCallback() with the returned value from requestIdleCallback() the returned
  * // handler instance can be used instead to cancel the idle timer
  * theIdleTimer.cancel();
- *
+ * theIdleTimer.enabled;    // false
+ * 
+ * // You can start the timer via enabled
+ * theIdleTimer.enabled = true;
+ * 
  * // You can also "restart" the timer, whether it has previously triggered not not via the `refresh()`
  * theIdleTimer.refresh();
  * ```
@@ -130,14 +134,17 @@ export function scheduleIdleCallback(callback: IdleRequestCallback, options?: Id
     }
 
     if (hasIdleCallback()) {
-        return _createTimerHandler(true, function (idleId: number) {
+        let handler = _createTimerHandler(true, (idleId: number) => {
             idleId && cancelIdleCallback(idleId);
             return requestIdleCallback((deadline: IdleDeadline) => {
+                handler.dn();
                 callback(deadline || _createDeadline(false));
             }, options);
-        }, function(idleId: number) {
+        }, (idleId: number) => {
             cancelIdleCallback(idleId);
-        })
+        });
+
+        return handler.h;
     }
 
     let timeout = (options || {}).timeout;
