@@ -5,9 +5,9 @@ name: "NodeCI"
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, hotfix* ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, hotfix* ]
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ["12", "14", "16"]
+        node-version: ["12", "14", "16", "18"]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
