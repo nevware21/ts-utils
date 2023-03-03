@@ -1,3 +1,11 @@
+# v0.3.5 Mar 2nd, 2023 (Hotfix)
+
+## Changelog
+
+
+- #148 <span style="color:red">__(Priotity 1)__</span> [Bug] Creating more than 1 createCustomError() overwrites the "name" of the error.
+  - Issue was causing the <span style="color:red">Error class name</span> to be reassigned to the last created Custom Error, if no custom error was created (including the UnsupportedError) then the Error class was unaffected
+  - Change was cherry-picked from 0.8.1
 
 # v0.3.4 Aug 8th, 2022
 
