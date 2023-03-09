@@ -9,6 +9,7 @@
 import { isNullOrUndefined } from "../helpers/base";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
+import { EMPTY } from "../internal/constants";
 
 function _createTrimFn(exp: RegExp): (value: string) => string {
     return function _doTrim(value: string): string {
@@ -17,7 +18,7 @@ function _createTrimFn(exp: RegExp): (value: string) => string {
         }
     
         if (value && value.replace) {
-            value = value.replace(exp, "");
+            value = value.replace(exp, EMPTY);
         }
     
         return value;
