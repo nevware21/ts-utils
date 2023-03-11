@@ -8,7 +8,6 @@
 
 import { ArrProto } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
-import { polyArrFind, polyArrFindIndex, polyArrFindLast, polyArrFindLastIndex } from "../polyfills/array";
 import { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "./callbacks";
 
 /**

@@ -29,6 +29,7 @@ export {
     getGlobal, getInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory, getHistory,
     isNode, isWebWorker
 } from "./helpers/environment";
+export { encodeAsHtml, encodeAsJson, normalizeJsName } from "./helpers/encode";
 export {
     deepExtend, objExtend
 } from "./helpers/extend";
@@ -36,6 +37,7 @@ export { ILazyValue, getLazy, setBypassLazyCache } from "./helpers/lazy";
 export { IGetLength as GetLengthImpl, getLength } from "./helpers/length";
 export { getIntValue } from "./helpers/number";
 export { getPerformance, hasPerformance, elapsedTime, perfNow } from "./helpers/perf";
+export { createFilenameRegex, createWildcardRegex, makeGlobRegex } from "./helpers/regexp";
 export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";
 export { hasValue } from "./helpers/value";
 export { createArrayIterator } from "./iterator/array";
@@ -62,6 +64,7 @@ export {
     objAssign, objKeys, objDeepFreeze, objFreeze, objSeal, objGetPrototypeOf
 } from "./object/object";
 export { objSetPrototypeOf } from "./object/set_proto";
+export { strCamelCase, strKebabCase, strLetterCase, strSnakeCase } from "./string/conversion";
 export { strEndsWith } from "./string/ends_with";
 export { strIndexOf, strLastIndexOf } from "./string/index_of";
 export { strIsNullOrWhiteSpace, strIsNullOrEmpty } from "./string/is_null_or";
@@ -72,6 +75,7 @@ export { strStartsWith } from "./string/starts_with";
 export { strSubstr, strSubstring, strLeft, strRight, polyStrSubstr } from "./string/substring";
 export { asString } from "./string/as_string";
 export { strTrim, strTrimEnd, strTrimLeft, strTrimRight, strTrimStart } from "./string/trim";
+export { strLower, strUpper } from "./string/upper_lower";
 export { isSymbol, getSymbol, getKnownSymbol, hasSymbol, newSymbol, symbolFor, symbolKeyFor } from "./symbol/symbol";
 export { WellKnownSymbols } from "./symbol/well_known";
 export { ITimerHandler } from "./timer/handler";

@@ -13,5 +13,6 @@
         "**/src/polyfills.ts", 
         "**/karma*.conf.js" 
     ],
-    "report-dir": "./coverage/nyc"
+    "report-dir": "./coverage/nyc",
+    "source-map": false
 }
