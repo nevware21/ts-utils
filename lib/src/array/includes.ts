@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { ArrProto, INCLUDES } from "../internal/constants";
+import { ArrProto } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 import { polyArrIncludes } from "../polyfills/array";
 
@@ -43,7 +43,7 @@ import { polyArrIncludes } from "../polyfills/array";
  * arrIncludes({ length: 3, 0: "1", 1: "2", 2: "3" }, 3 as any); // false
  * ```
  */
-export const arrIncludes: <T>(theArray: ArrayLike<T>, searchElement: T, fromIndex?: number) => boolean = _unwrapFunction(INCLUDES, ArrProto, polyArrIncludes);
+export const arrIncludes: <T>(theArray: ArrayLike<T>, searchElement: T, fromIndex?: number) => boolean = _unwrapFunction("includes", ArrProto, polyArrIncludes);
 
 /**
  * The arrContains() method determines whether an array contains a certain value among its

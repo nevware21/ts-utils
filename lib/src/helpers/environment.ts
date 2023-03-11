@@ -11,9 +11,6 @@ import { _getGlobalValue } from "../internal/global";
 import { _lazySafeGet } from "../internal/lazy_safe_check";
 import { ILazyValue, _globalLazyTestHooks } from "./lazy";
 
-const DOCUMENT = "document";
-const HISTORY = "history";
-const NAVIGATOR = "navigator";
 const WINDOW = "window";
 
 declare let WorkerGlobalScope: any;
@@ -99,7 +96,7 @@ export function hasDocument(): boolean {
  * @returns
  */
 export function getDocument(): Document {
-    (!_cachedDocument || (_globalLazyTestHooks.lzy && !_cachedDocument.b)) && (_cachedDocument = _lazySafeGetInst(DOCUMENT));
+    (!_cachedDocument || (_globalLazyTestHooks.lzy && !_cachedDocument.b)) && (_cachedDocument = _lazySafeGetInst("document"));
 
     return _cachedDocument.v;
 }
@@ -139,7 +136,7 @@ export function hasNavigator(): boolean {
  * @returns
  */
 export function getNavigator(): Navigator {
-    (!_cachedNavigator || (_globalLazyTestHooks.lzy && !_cachedNavigator.b)) && (_cachedNavigator = _lazySafeGetInst(NAVIGATOR));
+    (!_cachedNavigator || (_globalLazyTestHooks.lzy && !_cachedNavigator.b)) && (_cachedNavigator = _lazySafeGetInst("navigator"));
 
     return _cachedNavigator.v;
 }
@@ -159,7 +156,7 @@ export function hasHistory(): boolean {
  * @returns
  */
 export function getHistory(): History | null {
-    (!_cachedHistory || (_globalLazyTestHooks.lzy && !_cachedHistory.b)) && (_cachedHistory = _lazySafeGetInst(HISTORY));
+    (!_cachedHistory || (_globalLazyTestHooks.lzy && !_cachedHistory.b)) && (_cachedHistory = _lazySafeGetInst("history"));
 
     return _cachedHistory.v;
 }

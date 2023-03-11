@@ -20,7 +20,6 @@ export const PROTOTYPE = "prototype";
 export const STRING = "string";
 export const UNDEFINED = "undefined";
 export const CONSTRUCTOR = "constructor";
-export const HAS_OWN_PROPERTY = "hasOwnProperty";
 export const SYMBOL = "Symbol";
 export const POLYFILL_TAG = "_polyfill";
 export const INDEX_OF = "indexOf";
@@ -28,7 +27,6 @@ export const LAST_INDEX_OF = "lastIndexOf";
 export const LENGTH = "length";
 export const DONE = "done";
 export const VALUE = "value";
-export const INCLUDES = "includes";
 export const NAME = "name";
 
 /**

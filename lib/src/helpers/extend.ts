@@ -7,13 +7,14 @@
  */
 
 import { arrForEach } from "../array/forEach";
+import { _extractArgs } from "../internal/extract_args";
 import { objCopyProps, objDeepCopy } from "../object/copy";
 
 /**
  * @internal
  * @ignore
  */
-function _doExtend<T>(target: T, theArgs: any[]) {
+function _doExtend<T>(target: T, theArgs: any[]): any {
     arrForEach(theArgs, (theArg) => {
         objCopyProps(target, theArg);
     });
@@ -29,9 +30,9 @@ function _doExtend<T>(target: T, theArgs: any[]) {
  * @param theArgs - The optional number of arguments to be copied
  * @returns - A new object or the original
  */
-export function deepExtend<T, T1, T2, T3, T4, T5, T6>(target: T, obj1?: T1, obj2?: T2, obj3?: T3, obj4?: T4, obj5?: T5, obj6?: T6): T & T1 & T2 & T3 & T4 & T5 & T6
-export function deepExtend<T>(target: T, ...theArgs: any): any {
-    return _doExtend(objDeepCopy(target) || {}, theArgs);
+export function deepExtend<T>(target: T, ...theArgs: any): T & any;
+export function deepExtend<T, T1, T2, T3, T4, T5, T6>(target: T, obj1?: T1, obj2?: T2, obj3?: T3, obj4?: T4, obj5?: T5, obj6?: T6): T & T1 & T2 & T3 & T4 & T5 & T6 {
+    return _doExtend(objDeepCopy(target) || {}, _extractArgs(arguments, 0));
 }
  
 /**
@@ -41,9 +42,9 @@ export function deepExtend<T>(target: T, ...theArgs: any): any {
  * @param theArgs - The optional number of arguments to be copied
  * @returns - A new object or the original
  */
-export function objExtend<T, T1, T2, T3, T4, T5, T6>(target: T, obj1?: T1, obj2?: T2, obj3?: T3, obj4?: T4, obj5?: T5, obj6?: T6): T & T1 & T2 & T3 & T4 & T5 & T6
-export function objExtend<T>(target: T, ...theArgs: any): any {
-    return _doExtend(target || {}, theArgs);
+export function objExtend<T>(target: T, ...theArgs: any): T & any;
+export function objExtend<T, T1, T2, T3, T4, T5, T6>(target: T, obj1?: T1, obj2?: T2, obj3?: T3, obj4?: T4, obj5?: T5, obj6?: T6): T & T1 & T2 & T3 & T4 & T5 & T6 {
+    return _doExtend(target || {}, _extractArgs(arguments, 0));
 }
 
  

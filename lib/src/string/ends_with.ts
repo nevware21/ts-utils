@@ -9,12 +9,10 @@
 import { isString, isUndefined } from "../helpers/base";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
-import { LENGTH, UNDEF_VALUE } from "../internal/constants";
+import { LENGTH, StrProto } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 import { asString } from "./as_string";
 import { strSubstring } from "./substring";
-
-const ENDS_WITH = "endsWith";
 
 /**
  * This method lets you determine whether or not a string ends with another string. This method is case-sensitive.
@@ -23,7 +21,7 @@ const ENDS_WITH = "endsWith";
  * @param searchString - The characters to be searched for at the end of `value` string.
  * @param length - If provided, it is used as the length of `value`. Defaults to value.length.
  */
-export const strEndsWith: (value: string, searchString: string, length?: number) => boolean = _unwrapFunction(ENDS_WITH, UNDEF_VALUE, polyStrEndsWith);
+export const strEndsWith: (value: string, searchString: string, length?: number) => boolean = _unwrapFunction("endsWith", StrProto, polyStrEndsWith);
 
 /**
  * This method lets you determine whether or not a string ends with another string. This method is case-sensitive.

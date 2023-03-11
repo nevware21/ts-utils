@@ -10,6 +10,7 @@ import { UNDEF_VALUE } from "../internal/constants";
 import { asString } from "../string/as_string";
 import { strCamelCase } from "../string/conversion";
 import { strPadStart } from "../string/pad";
+import { strUpper } from "../string/upper_lower";
 import { isNumber, isString, isUndefined } from "./base";
 import { dumpObj } from "./diagnostics";
 import { getLazy, ILazyValue } from "./lazy";
@@ -122,7 +123,7 @@ export function encodeAsJson<T>(value: T, format?: boolean | number): string {
             }
 
             var hex = match.charCodeAt(0).toString(16);
-            return "\\u" + strPadStart(hex.toUpperCase(), 4, "0");
+            return "\\u" + strPadStart(strUpper(hex), 4, "0");
         }) + DBL_QUOTE;
     } else {
         try {

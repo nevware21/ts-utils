@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { HAS_OWN_PROPERTY, ObjProto } from "../internal/constants";
+import { ObjProto } from "../internal/constants";
 
 /**
  * The objHasOwnProperty() method returns a boolean indicating whether the object
@@ -41,5 +41,5 @@ import { HAS_OWN_PROPERTY, ObjProto } from "../internal/constants";
  * ```
  */
 export function objHasOwnProperty<T = any>(obj: T, prop: PropertyKey): boolean {
-    return obj && ObjProto[HAS_OWN_PROPERTY].call(obj, prop);
+    return obj && ObjProto.hasOwnProperty.call(obj, prop);
 }
