@@ -13,6 +13,11 @@ const PRIMITIVE_TYPES = [ STRING, NUMBER, BOOLEAN, UNDEFINED, "symbol", "bigint"
 
 /**
  * @ignore
+ * @internal
+ * Create and returns a function that will return `true` if the argument passed
+ * to it matches the provided type.
+ * @param theType - The type to match against the `typeof value`
+ * @returns A function which takes a single argument and returns a boolean
  */
 export function _createIs<T>(theType: string): (value: any) => value is T {
     return function (value: any): value is T {
@@ -22,6 +27,11 @@ export function _createIs<T>(theType: string): (value: any) => value is T {
 
 /**
  * @ignore
+ * @internal
+ * Create and returns a function that will return `true` if the argument passed
+ * to it matches the object type specified based on {@link objToString}.
+ * @param - The object name to match for the `objToString(value)`
+ * @returns A function which takes a single argument and returns a boolean
  */
 export function _createObjIs<T>(theName: string): (value: any) => value is T {
     const theType = "[object " + theName + "]";
@@ -41,6 +51,17 @@ export function _createObjIs<T>(theName: string): (value: any) => value is T {
  * @group Object
  * @param value - The object to be converted into a string
  * @returns A string representation of the object
+ * @example
+ * ```ts
+ * objToString(new Date()); // [object Date]
+ * objToString(new String()); // [object String]
+ *
+ * // Math has its Symbol.toStringTag
+ * objToString(Math); // [object Math]
+ *
+ * objToString(undefined); // [object Undefined]
+ * objToString(null); // [object Null]
+ * ```
  */
 export function objToString(value: any): string {
     return ObjProto.toString.call(value);
@@ -51,7 +72,7 @@ export function objToString(value: any): string {
  * @group Type Identity
  * @param value - The value to check
  * @param theType - The expected type name as a string
- * @returns
+ * @returns `true` if the value matches the provided type
  */
 export function isTypeof(value: any, theType: string): boolean {
     return typeof value === theType;
@@ -141,7 +162,24 @@ export function isStrictUndefined(arg: any): arg is undefined {
  * @group Type Identity
  * @group Value Check
  * @param value - The value to check
- * @returns
+ * @returns `true` if the value is `null` or `undefined`
+ * @example
+ * ```ts
+ * isNullOrUndefined(null);         // true
+ * isNullOrUndefined(undefined);    // true
+ * isNullOrUndefined("undefined");  // true
+ *
+ * let value = null;
+ * isNullOrUndefined(value);        // true
+ * let value = undefined;
+ * isNullOrUndefined(value);        // true
+ *
+ * isNullOrUndefined("");           // false
+ * isNullOrUndefined(0);            // false
+ * isNullOrUndefined(new Date());   // false
+ * isNullOrUndefined(true);         // false
+ * isNullOrUndefined(false);        // false
+ * ```
  */
 export function isNullOrUndefined(value:  any): boolean {
     return value === null || isUndefined(value);
@@ -154,6 +192,23 @@ export function isNullOrUndefined(value:  any): boolean {
  * @group Value Check
  * @param value - The value to check
  * @returns
+ * @example
+ * ```ts
+ * isStrictNullOrUndefined(null);         // true
+ * isStrictNullOrUndefined(undefined);    // true
+ * isStrictNullOrUndefined("undefined");  // false
+ *
+ * let value = null;
+ * isStrictNullOrUndefined(value);        // true
+ * let value = undefined;
+ * isStrictNullOrUndefined(value);        // true
+ *
+ * isStrictNullOrUndefined("");           // false
+ * isStrictNullOrUndefined(0);            // false
+ * isStrictNullOrUndefined(new Date());   // false
+ * isStrictNullOrUndefined(true);         // false
+ * isStrictNullOrUndefined(false);        // false
+ * ```
  */
 export function isStrictNullOrUndefined(value: any): boolean {
     return value === null || !isDefined(value);
@@ -165,6 +220,23 @@ export function isStrictNullOrUndefined(value: any): boolean {
  * @group Value Check
  * @param arg - The value to check
  * @returns true if arg has a value (is not === undefined)
+ * @example
+ * ```ts
+ * isDefined(null);         // false
+ * isDefined(undefined);    // false
+ * isDefined("undefined");  // true
+ *
+ * let value = null;
+ * isDefined(value);        // false
+ * let value = undefined;
+ * isDefined(value);        // false
+ *
+ * isDefined("");           // true
+ * isDefined(0);            // true
+ * isDefined(new Date());   // true
+ * isDefined(true);         // true
+ * isDefined(false);        // true
+ * ```
  */
 export function isDefined(arg: any): boolean {
     return !!arg || arg !== UNDEF_VALUE;
@@ -236,6 +308,17 @@ export function isPrimitive(value: any): value is string | number | bigint | boo
  * @group String
  * @param value - The value to check
  * @returns
+ * @example
+ * ```ts
+ * isString("");            // true
+ * isString("null");        // true
+ * isString("undefined");   // true
+ * isString(String(""));    // true
+ *
+ * isString(null);          // false
+ * isString(undefined);     // false
+ * isString(0);             // false
+ * ```
  */
 export const isString: (value: any) => value is string = _createIs<string>(STRING);
 
@@ -244,6 +327,22 @@ export const isString: (value: any) => value is string = _createIs<string>(STRIN
  * @group Type Identity
  * @param value - The value to check
  * @returns
+ * @example
+ * ```ts
+ * function myFunction() { }
+ * isFunction(null);            // false
+ * isFunction(undefined);       // false
+ * isFunction("null");          // false
+ * isFunction("undefined");     // false
+ * isFunction("1");             // false
+ * isFunction("aa");            // false
+ * isFunction(new Date());      // false
+ * isFunction(1);               // false
+ * isFunction("");              // false
+ * isFunction(myFunction);      // true
+ * isFunction([]);              // false
+ * isFunction(new Array(1));    // false
+ * ```
  */
 export const isFunction: (value: any) => value is Function = _createIs<Function>(FUNCTION);
 

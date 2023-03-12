@@ -9,7 +9,6 @@
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
 import { asString } from "../string/as_string";
-import { EMPTY } from "./constants";
 import { _extractArgs } from "./extract_args";
 
 /**
@@ -21,17 +20,11 @@ import { _extractArgs } from "./extract_args";
  * @param polyFunc - The function to call if not available on the thisArg, act like the polyfill
  * @returns A function which will call the funcName against the first passed argument and pass on the remaining arguments
  */
-export function _unwrapFunction<R, T>(funcName: T extends null | undefined ? string : keyof T, target?: T, polyFunc?: Function) {
+export function _unwrapFunction<R, T>(funcName: keyof T, target: T, polyFunc?: Function) {
     return function(thisArg: any): R {
-        if ((thisArg || thisArg === EMPTY)) {
-            let theFunc = thisArg[funcName] || (target && target[funcName as keyof T]);
-            if (theFunc) {
-                return (theFunc as Function).apply(thisArg, _extractArgs(arguments, 1));
-            }
-
-            if (polyFunc) {
-                return polyFunc.apply(thisArg, arguments);
-            }
+        let theFunc = (thisArg && thisArg[funcName]) || (target && target[funcName]);
+        if (theFunc || polyFunc) {
+            return ((theFunc || polyFunc) as Function).apply(thisArg, _extractArgs(arguments, theFunc ? 1 : 0));
         }
 
         throwTypeError("'" + asString(funcName) + "' not defined for " + dumpObj(thisArg));

@@ -9,12 +9,10 @@
 import { isString } from "../helpers/base";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
-import { LENGTH, UNDEF_VALUE } from "../internal/constants";
+import { LENGTH, StrProto } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 import { asString } from "./as_string";
 import { strSubstring } from "./substring";
-
-const STARTS_WITH = "startsWith";
 
 /**
  * This method lets you determine whether or not a string begins with another string. This method is case-sensitive.
@@ -25,7 +23,7 @@ const STARTS_WITH = "startsWith";
  * Defaults to 0
  * @returns `true` if the given characters are found at the beginning of the string; otherwise, `false`.
  */
-export const strStartsWith: (value: string, searchString: string, length?: number) => boolean = _unwrapFunction(STARTS_WITH, UNDEF_VALUE, polyStrStartsWith);
+export const strStartsWith: (value: string, searchString: string, length?: number) => boolean = _unwrapFunction("startsWith", StrProto, polyStrStartsWith);
 
 /**
  * This method lets you determine whether or not a string begins with another string. This method is case-sensitive.

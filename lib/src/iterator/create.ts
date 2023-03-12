@@ -7,6 +7,7 @@
  */
 
 import { DONE, VALUE } from "../internal/constants";
+import { _extractArgs } from "../internal/extract_args";
 import { objDefine } from "../object/define";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
@@ -193,8 +194,8 @@ export function createIterator<T>(ctx: CreateIteratorContext<T>): Iterator<T> {
         return ctx.v;
     }
 
-    function _next(...args: unknown[]): IteratorResult<T> {
-        isDone = isDone || (ctx.n ? ctx.n(args) : true);
+    function _next(): IteratorResult<T> {
+        isDone = isDone || (ctx.n ? ctx.n(_extractArgs(arguments, 0)) : true);
 
         let result  = {
             [DONE]: isDone
