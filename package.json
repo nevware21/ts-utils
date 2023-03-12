@@ -101,7 +101,10 @@
         "timeout",
         "idle timer",
         "timer",
-        "interval"
+        "interval",
+        "includes",
+        "string contains",
+        "html encode"
     ],
     "main": "lib/dist/es5/umd/ts-utils.js",
     "module": "lib/dist-es5/index.js",

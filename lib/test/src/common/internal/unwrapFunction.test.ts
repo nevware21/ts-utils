@@ -8,6 +8,7 @@
 
 import { assert } from "chai";
 import { _unwrapFunction } from "../../../../src/internal/unwrapFunction";
+import { strIncludes } from "../../../../src/string/includes";
 
 describe("unwrapFunction", () => {
     it("wrapped function with polyfill fallback only", () => {
@@ -205,4 +206,35 @@ describe("unwrapFunction", () => {
         wrappedFn(null);
         assert.equal(targetFnCalled, 1, "The fallback testFn has was called");
     });
+
+    it("test no patching function name for the object or target with no polyfill", () => {
+        let wrappedFn = _unwrapFunction("test", null as any);
+
+        assert.ok(strIncludes(_expectThrow(() => {
+            wrappedFn(null);
+        }).message, "not defined for"));
+
+        assert.ok(strIncludes(_expectThrow(() => {
+            wrappedFn({});
+        }).message, "not defined for"));
+
+        wrappedFn = _unwrapFunction("test", {} as any);
+
+        assert.ok(strIncludes(_expectThrow(() => {
+            wrappedFn(null);
+        }).message, "not defined for"));
+
+        assert.ok(strIncludes(_expectThrow(() => {
+            wrappedFn({});
+        }).message, "not defined for"));
+    });
+
+    function _expectThrow(cb: () => void): Error {
+        try {
+            cb();
+        } catch (e) {
+            assert.ok(true, "Expected an exception to be thrown");
+            return e;
+        }
+    }
 });

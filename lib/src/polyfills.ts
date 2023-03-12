@@ -17,6 +17,7 @@ import { polyStrPadEnd, polyStrPadStart } from "./string/pad";
 import { makePolyFn } from "./internal/poly_helpers";
 import { polyObjHasOwn } from "./object/has_own";
 import { polyStrSubstr } from "./string/substring";
+import { polyStrIncludes } from "./string/includes";
 
 (function () {
 
@@ -35,7 +36,8 @@ import { polyStrSubstr } from "./string/substring";
         "trimLeft": polyStrTrimStart,
         "trimEnd": polyStrTrimEnd,
         "trimRight": polyStrTrimEnd,
-        "substr": polyStrSubstr
+        "substr": polyStrSubstr,
+        "includes": polyStrIncludes
     };
 
     const arrayPolyfills = {

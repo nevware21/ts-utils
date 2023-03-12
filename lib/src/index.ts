@@ -66,6 +66,7 @@ export {
 export { objSetPrototypeOf } from "./object/set_proto";
 export { strCamelCase, strKebabCase, strLetterCase, strSnakeCase } from "./string/conversion";
 export { strEndsWith } from "./string/ends_with";
+export { strContains, strIncludes, polyStrIncludes } from "./string/includes";
 export { strIndexOf, strLastIndexOf } from "./string/index_of";
 export { strIsNullOrWhiteSpace, strIsNullOrEmpty } from "./string/is_null_or";
 export { strPadEnd, strPadStart } from "./string/pad";
