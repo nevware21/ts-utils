@@ -1,3 +1,14 @@
+# v0.9.0 Mar 15th, 2023
+
+## Changelog
+
+- #153 chore: Migrate encoding and conversion functions
+  - strLetterCase(); strCamelCase(); strKebabCase(); strSnakeCase(); strUpper(); strLower();
+  - encodeAsJson(); encodeAsHtml(); normalizeJsName();
+- #154 Minor enhancements for perf and minification and additional examples
+- #155 Add strIncludes, strContains
+  - strContains(); strIncludes();
+
 # v0.8.1 Mar 2nd, 2023
 
 ## Changelog
