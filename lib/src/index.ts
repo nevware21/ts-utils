@@ -64,6 +64,7 @@ export {
     objAssign, objKeys, objDeepFreeze, objFreeze, objSeal, objGetPrototypeOf
 } from "./object/object";
 export { objSetPrototypeOf } from "./object/set_proto";
+export { getValueByKey, setValueByKey, getValueByIter, setValueByIter } from "./helpers/get_set_value";
 export { strCamelCase, strKebabCase, strLetterCase, strSnakeCase } from "./string/conversion";
 export { strEndsWith } from "./string/ends_with";
 export { strContains, strIncludes, polyStrIncludes } from "./string/includes";
@@ -75,6 +76,7 @@ export { strSlice } from "./string/slice";
 export { strStartsWith } from "./string/starts_with";
 export { strSubstr, strSubstring, strLeft, strRight, polyStrSubstr } from "./string/substring";
 export { asString } from "./string/as_string";
+export { strSplit, strSymSplit } from "./string/split";
 export { strTrim, strTrimEnd, strTrimLeft, strTrimRight, strTrimStart } from "./string/trim";
 export { strLower, strUpper } from "./string/upper_lower";
 export { isSymbol, getSymbol, getKnownSymbol, hasSymbol, newSymbol, symbolFor, symbolKeyFor } from "./symbol/symbol";
@@ -88,5 +90,6 @@ export { TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, schedu
 // This will enable anyone to "reuse" or create their own polyfills.ts implementation if they want.
 export { polyIsArray, polyArrFind, polyArrFindIndex, polyArrFindLast, polyArrFindLastIndex, polyArrIncludes } from "./polyfills/array";
 export { polyObjKeys } from "./polyfills/object";
+export { polyStrSymSplit } from "./polyfills/split";
 export { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "./polyfills/symbol";
 export { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "./polyfills/trim";
