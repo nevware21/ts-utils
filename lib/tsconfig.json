@@ -6,6 +6,6 @@
         "declarationMap": true,
         "declarationDir": "./build/types",
         "removeComments": false,
-        "outDir": "./build/es5"
+        "outDir": "./dist-es5"
     }
 }

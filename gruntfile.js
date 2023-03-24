@@ -39,11 +39,11 @@ module.exports = function (grunt) {
             "ts_utils": {
                 // Default ES5
                 tsconfig: "./lib/tsconfig.json",
-                outDir: "./lib/build/es5"
+                outDir: "./lib/dist-es5"
             },
             "ts_utils_es6": {
                 tsconfig: "./lib/tsconfig.es6.json",
-                outDir: "./lib/build/es6"
+                outDir: "./lib/dist-es6"
             },
             "ts_utils-test": {
                 tsconfig: "./lib/test/tsconfig.test.json",
