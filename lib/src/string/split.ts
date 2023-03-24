@@ -48,7 +48,7 @@ export const strSplit: (value: string, separator: string | RegExp, limit?: numbe
  * method from the splitter object to provide custom behavior. If the runtime supports symbols
  * then the default runtime `split` method will be called, It will use {@link getKnownSymbol}
  * to get the {@link WellKnownSymbols.split} symbol which will return the runtime symbol or the
- * polyfill symbol when not supported by the runtime. 
+ * polyfill symbol when not supported by the runtime.
  * @since 0.9.1
  * @group String
  * @param value - The string value to be split into substrings.

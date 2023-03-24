@@ -13,7 +13,7 @@ import { WellKnownSymbols } from "../symbol/well_known";
 /**
  * The `polyStrSymSplit()` splits a string into substrings using the [`Symbol.split`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/split)
  * method from the splitter object to provide custom behavior. It uses {@link getKnownSymbol}
- * to get the {@link WellKnownSymbols.split} symbol which will return the polyfill symbol value. 
+ * to get the {@link WellKnownSymbols.split} symbol which will return the polyfill symbol value.
  * @since 0.9.1
  * @group Polyfill
  * @group String

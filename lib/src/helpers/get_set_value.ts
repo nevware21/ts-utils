@@ -36,16 +36,16 @@ import { iterForOf } from "../iterator/forOf";
  *      }
  *   }
  * };
- * 
+ *
  * let value = getValueByKey(theValue, "Hello.Darkness.my", "friend");
  * // value === "my"
- * 
+ *
  * let value = getValueByKey(theValue, "My.Old", "friend");
  * // value === "friend"
- * 
+ *
  * let value = getValueByKey(theValue, "come.to", "friend");
  * // value === { see: "you" }
- * 
+ *
  * let value = getValueByKey(theValue, "friend", "friend");
  * // value === "I've"
  * ```
@@ -69,7 +69,7 @@ export function getValueByKey<V, T extends object = any>(target: T, path: string
  * Get the named value from the target object where the path is represented by the string iterator
  * or iterable to separate the nested objects of the heirarchy / path to the value. If the target
  * does not contain the full path the iterator will not be completed.
- * 
+ *
  * The order of processing of the iterator is not reset if you add or remove elements to the iterator,
  * the actual behavior will depend on the iterator imeplementation.
  *
@@ -96,16 +96,16 @@ export function getValueByKey<V, T extends object = any>(target: T, path: string
  *      }
  *   }
  * };
- * 
+ *
  * let value = getValueByKey(theValue, ["Hello", "Darkness", "my"], "friend");
  * // value === "my"
- * 
+ *
  * let value = getValueByKey(theValue, ["My", "Old"], "friend");
  * // value === "friend"
- * 
+ *
  * let value = getValueByKey(theValue, ["come", "to"], "friend");
  * // value === { see: "you" }
- * 
+ *
  * let value = getValueByKey(theValue, ["friend"], "friend");
  * // value === "I've"
  * ```

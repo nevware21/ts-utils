@@ -85,13 +85,13 @@ describe("polyfill string split helpers", () => {
                         result.push(strSubstring(str, pos, matchPos));
                         pos = matchPos + String(num).length;
                         num++;
-                        }
-                        return result;
                     }
-                };
+                    return result;
+                }
+            };
                 
-                const myString = "a1bc2c5d3e4f";
-                console.log(polyStrSymSplit(myString, splitByNumber)); // [ "a", "bc", "c5d", "e", "f" ]
+            const myString = "a1bc2c5d3e4f";
+            console.log(polyStrSymSplit(myString, splitByNumber)); // [ "a", "bc", "c5d", "e", "f" ]
 
             const spaceSplitObj = {
                 [getKnownSymbol<typeof Symbol.split>(WellKnownSymbols.split)](str: string, limit?: number) {

@@ -54,19 +54,19 @@ describe("setValueByKey", () => {
     it("example", () => {
         let theValue = { };
         setValueByKey(theValue, "Hello.Darkness.my", "old");
-        assert.equal(encodeAsJson(theValue), 
+        assert.equal(encodeAsJson(theValue),
             "{\"Hello\":{\"Darkness\":{\"my\":\"old\"}}}");
 
         setValueByKey(theValue, "friend", "I've");
-        assert.equal(encodeAsJson(theValue), 
+        assert.equal(encodeAsJson(theValue),
             "{\"Hello\":{\"Darkness\":{\"my\":\"old\"}},\"friend\":\"I've\"}");
 
         setValueByKey(theValue, "come.to.see", "you");
-        assert.equal(encodeAsJson(theValue), 
+        assert.equal(encodeAsJson(theValue),
             "{\"Hello\":{\"Darkness\":{\"my\":\"old\"}},\"friend\":\"I've\",\"come\":{\"to\":{\"see\":\"you\"}}}");
 
         setValueByKey(theValue, "come.to.see", "again");
-        assert.equal(encodeAsJson(theValue), 
+        assert.equal(encodeAsJson(theValue),
             "{\"Hello\":{\"Darkness\":{\"my\":\"old\"}},\"friend\":\"I've\",\"come\":{\"to\":{\"see\":\"again\"}}}");
     });
 });
@@ -115,19 +115,19 @@ describe("setValueByIter", () => {
     it("example", () => {
         let theValue = { };
         setValueByIter(theValue, ["Hello", "Darkness", "my"], "old");
-        assert.equal(encodeAsJson(theValue), 
+        assert.equal(encodeAsJson(theValue),
             "{\"Hello\":{\"Darkness\":{\"my\":\"old\"}}}");
 
         setValueByIter(theValue, ["friend"], "I've");
-        assert.equal(encodeAsJson(theValue), 
+        assert.equal(encodeAsJson(theValue),
             "{\"Hello\":{\"Darkness\":{\"my\":\"old\"}},\"friend\":\"I've\"}");
 
         setValueByIter(theValue, ["come", "to", "see"], "you");
-        assert.equal(encodeAsJson(theValue), 
+        assert.equal(encodeAsJson(theValue),
             "{\"Hello\":{\"Darkness\":{\"my\":\"old\"}},\"friend\":\"I've\",\"come\":{\"to\":{\"see\":\"you\"}}}");
 
         setValueByIter(theValue, ["come", "to", "see"], "again");
-        assert.equal(encodeAsJson(theValue), 
+        assert.equal(encodeAsJson(theValue),
             "{\"Hello\":{\"Darkness\":{\"my\":\"old\"}},\"friend\":\"I've\",\"come\":{\"to\":{\"see\":\"again\"}}}");
     });
 });

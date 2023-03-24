@@ -1,3 +1,10 @@
+# v0.9.1 Mar 23rd, 2023
+
+## Changelog
+
+- #158 Migrate get/set value by key and strSplit
+- #159 [Packaging] The single module file is causing some packagere issues
+
 # v0.9.0 Mar 15th, 2023
 
 ## Changelog
