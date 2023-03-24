@@ -140,13 +140,13 @@ describe("string split helpers", () => {
                         result.push(strSubstring(str, pos, matchPos));
                         pos = matchPos + String(num).length;
                         num++;
-                        }
-                        return result;
                     }
-                };
+                    return result;
+                }
+            };
                 
-                const myString = "a1bc2c5d3e4f";
-                console.log(strSymSplit(myString, splitByNumber)); // [ "a", "bc", "c5d", "e", "f" ]
+            const myString = "a1bc2c5d3e4f";
+            console.log(strSymSplit(myString, splitByNumber)); // [ "a", "bc", "c5d", "e", "f" ]
 
             const spaceSplitObj = {
                 [Symbol.split](str: string, limit?: number) {
