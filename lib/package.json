@@ -107,8 +107,8 @@
         "html encode"
     ],
     "main": "dist/es5/umd/ts-utils.js",
-    "module": "dist-es5/ts-utils.js",
-    "esnext": "dist-es6/ts-utils.js",
+    "module": "dist-es5/index.js",
+    "esnext": "dist-es6/index.js",
     "types": "types/ts-utils.d.ts",    
     "sideEffects": false,
     "repository": {

@@ -2,6 +2,6 @@
     "extends": "./tsconfig.base.json",
     "compilerOptions": {
         "target": "es6",
-        "outDir": "./build/es6"
+        "outDir": "./dist-es6"
     }
 }
