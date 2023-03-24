@@ -25,6 +25,7 @@ let _htmlEntityCache: ILazyValue<{ [key: string]: string}>;
  * meaning that if you pass in a known keyword the same value will be returned.
  * @since 0.9.0
  * @group Conversion
+ * @group Value
  * @param jsName - The string value to validate
  * @param camelCase - Optionally (see [1]) convert into CamelCase with the leading character either
  * - `true` => lowercase
@@ -82,6 +83,7 @@ export function normalizeJsName(jsName: string, camelCase?: boolean): string {
  * with JSON.stringify() it will return the exception as a string using {@link dumpObj}().
  * @since 0.9.0
  * @group Conversion
+ * @group Value
  * @param value - The value to be encoded as JSON
  * @param format - Identifies whether the JSON value should be formatted when an object
  * - `true` - Format with 4 spaces
@@ -142,6 +144,7 @@ export function encodeAsJson<T>(value: T, format?: boolean | number): string {
  * characters into their HTML encoded representations
  * @since 0.9.0
  * @group Conversion
+ * @group Value
  * @param value - The string value to be converted into a HTML safe form
  * @returns The converted string as HTML
  * @example

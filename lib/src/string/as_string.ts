@@ -15,6 +15,7 @@ import { StrCls } from "../internal/constants";
  * @since 0.4.3
  * @group String
  * @group Conversion
+ * @group Value
  * @param value - The value to get a string representation of
  * @example
  * ```ts
