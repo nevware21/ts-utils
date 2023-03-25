@@ -1,3 +1,9 @@
+# v0.9.2 Mar 24th, 2023
+
+## Changelog
+
+- #162 Update Lazy implementation to reduce required for getGlobal()
+
 # v0.9.1 Mar 23rd, 2023
 
 ## Changelog
