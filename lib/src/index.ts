@@ -15,6 +15,7 @@ export { arrContains, arrIncludes } from "./array/includes";
 export { arrIndexOf, arrLastIndexOf } from "./array/indexOf";
 export { ArrMapCallbackFn, arrMap } from "./array/map";
 export { ArrReduceCallbackFn, arrReduce } from "./array/reduce";
+export { arrSlice } from "./array/slice";
 export { arrSome } from "./array/some";
 export {
     isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isDate, isNumber, isBoolean,

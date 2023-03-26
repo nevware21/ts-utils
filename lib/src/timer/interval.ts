@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { _extractArgs } from "../internal/extract_args";
+import { arrSlice } from "../array/slice";
 import { ITimerHandler, _createTimerHandler } from "./handler";
 
 /**
@@ -44,7 +44,7 @@ import { ITimerHandler, _createTimerHandler } from "./handler";
 export function scheduleInterval<A extends any[]>(callback: (...args: A) => void, timeout: number, ...args: A): ITimerHandler;
 export function scheduleInterval<A extends any[]>(callback: (...args: A) => void, timeout: number): ITimerHandler {
     let self = this;
-    let theArguments = _extractArgs(arguments, 0);
+    let theArguments = arrSlice(arguments);
 
     let handler = _createTimerHandler(true, (intervalId: any) => {
         intervalId && clearInterval(intervalId);

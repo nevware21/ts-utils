@@ -15,7 +15,7 @@
         "outDir": "./test-esm",
         "suppressImplicitAnyIndexErrors": true,
         "allowSyntheticDefaultImports": true,
-        "removeComments": true
+        "removeComments": false
     },
     "include": [
         "../src/**/*.ts",
