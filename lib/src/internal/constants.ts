@@ -28,6 +28,7 @@ export const LENGTH = "length";
 export const DONE = "done";
 export const VALUE = "value";
 export const NAME = "name";
+export const SLICE = "slice";
 
 /**
  * @ignore

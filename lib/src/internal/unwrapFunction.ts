@@ -9,7 +9,7 @@
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
 import { asString } from "../string/as_string";
-import { _extractArgs } from "./extract_args";
+import { ArrProto, SLICE } from "./constants";
 
 /**
  * @internal
@@ -24,7 +24,8 @@ export function _unwrapFunction<R, T>(funcName: keyof T, target: T, polyFunc?: F
     return function(thisArg: any): R {
         let theFunc = (thisArg && thisArg[funcName]) || (target && target[funcName]);
         if (theFunc || polyFunc) {
-            return ((theFunc || polyFunc) as Function).apply(thisArg, _extractArgs(arguments, theFunc ? 1 : 0));
+            let theArgs = arguments;
+            return ((theFunc || polyFunc) as Function).apply(thisArg, theFunc ? ArrProto[SLICE].call(theArgs, 1) : theArgs);
         }
 
         throwTypeError("'" + asString(funcName) + "' not defined for " + dumpObj(thisArg));

@@ -16,6 +16,7 @@ import { arrIndexOf, arrLastIndexOf } from "../../../../src/array/indexOf";
 import { arrEvery, arrFilter } from "../../../../src/array/every";
 import { arrMap } from "../../../../src/array/map";
 import { arrReduce } from "../../../../src/array/reduce";
+import { arrSlice } from "../../../../src/array/slice";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 describe("array helpers", () => {
@@ -192,6 +193,24 @@ describe("array helpers", () => {
             });
         });
 
+        it("Validate appending a single value", () => {
+            let target: any[] = arrAppend([], undefined);
+            assert.equal(target.length, 0, "Should have no elements");
+
+            target = arrAppend([], 0);
+            assert.equal(target.length, 1, "Should have 1 element");
+            assert.equal(target[0], 0, "Should have value of zero");
+
+            target = arrAppend([1], undefined);
+            assert.equal(target.length, 1, "Should have 1 element");
+            assert.equal(target[0], 1, "Should have value of 1");
+
+            target = arrAppend([1], 2);
+            assert.equal(target.length, 2, "Should have 1 element");
+            assert.equal(target[0], 1, "Should have value of 1");
+            assert.equal(target[1], 2, "Should have value of 2");
+        });
+
         it("Validate appending values", () => {
             let target = arrAppend([], [] as number[]);
             assert.equal(target.length, 0, "Should have no elements");
@@ -232,7 +251,6 @@ describe("array helpers", () => {
             assert.equal(target[0], 1, "Should have value of 1");
             assert.equal(target[1], 0, "Should have value of 0 (the index from the first element)");
         });
-
     });
 
     describe("arrIndexOf", () => {
@@ -891,6 +909,20 @@ describe("array helpers", () => {
             };
 
             assert.equal(arrFindLastIndex(arrayLike, (x) => !Number.isInteger(x)), 1);
+        });
+    });
+
+    describe("arrSlice", () => {
+        it("examples", () => {
+            const lyrics = ["Hello", "Darkness", "my", "old", "friend.", "I've", "come", "to", "talk" ];
+
+            assert.deepEqual(arrSlice(lyrics), [ "Hello", "Darkness", "my", "old", "friend.", "I've", "come", "to", "talk" ]);
+            assert.deepEqual(arrSlice(lyrics, 1, 3), [ "Darkness", "my" ]);
+            assert.deepEqual(arrSlice(lyrics, 2),  [ "my", "old", "friend.", "I've", "come", "to", "talk" ]);
+            assert.deepEqual(arrSlice(lyrics, 2, 4), [ "my", "old" ]);
+            assert.deepEqual(arrSlice(lyrics, 1, 5), [ "Darkness", "my", "old", "friend." ]);
+            assert.deepEqual(arrSlice(lyrics, -2), [ "to", "talk" ]);
+            assert.deepEqual(arrSlice(lyrics, 2, -1), [ "my", "old", "friend.", "I've", "come", "to" ]);
         });
     });
 

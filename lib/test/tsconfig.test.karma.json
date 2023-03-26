@@ -12,7 +12,7 @@
         "alwaysStrict": true,
         "suppressImplicitAnyIndexErrors": true,
         "allowSyntheticDefaultImports": true,
-        "removeComments": true,
+        "removeComments": false,
         "esModuleInterop": true
     },
     "include": [

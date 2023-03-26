@@ -9,6 +9,7 @@
 import * as sinon from "sinon";
 import { assert } from "chai";
 import { createTimeout, createTimeoutWith, scheduleTimeout, scheduleTimeoutWith, TimeoutOverrideFuncs } from "../../../../src/timer/timeout";
+import { isNode } from "../../../../src/helpers/environment";
 
 describe("timeout tests", () => {
     let clock: sinon.SinonFakeTimers;
@@ -343,6 +344,38 @@ describe("timeout tests", () => {
             assert.equal(theTimeout.enabled, false, "Check that the handler is stopped");
             assert.equal(timeoutCalled, true, "Timeout should have been called yet");
             assert.equal(overrideCalled, 1, "The override should have been called");
+
+            clock.tick(200);
+            assert.equal(theTimeout.enabled, false, "Check that the handler is stopped");
+            assert.equal(timeoutCalled, true, "Timeout should have been called yet");
+            assert.equal(overrideCalled, 1, "The override should have been called");
+
+            // Restart the timeout
+            timeoutCalled = false;
+            theTimeout.refresh();
+            clock.tick(99);
+            assert.equal(theTimeout.enabled, true, "Check that the handler is stopped");
+            assert.equal(timeoutCalled, false, "Timeout should have been called yet");
+            assert.equal(overrideCalled, 2, "The override should have been called");
+
+            // Restart it again while still running
+            theTimeout.refresh();
+            clock.tick(1);
+            assert.equal(theTimeout.enabled, true, "Check that the handler is stopped");
+            assert.equal(timeoutCalled, false, "Timeout should have been called yet");
+            assert.equal(overrideCalled, isNode() ? 2 : 3, "The override should have been called");
+
+            clock.tick(98);
+
+            assert.equal(theTimeout.enabled, true, "Check that the handler is stopped");
+            assert.equal(timeoutCalled, false, "Timeout should have been called yet");
+            assert.equal(overrideCalled, isNode() ? 2 : 3, "The override should have been called");
+
+            clock.tick(1);
+
+            assert.equal(theTimeout.enabled, false, "Check that the handler is stopped");
+            assert.equal(timeoutCalled, true, "Timeout should have been called yet");
+            assert.equal(overrideCalled, isNode() ? 2 : 3, "The override should have been called");
         });
     });
 
