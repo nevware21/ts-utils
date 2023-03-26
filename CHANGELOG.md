@@ -1,3 +1,9 @@
+# v0.9.3 Mar 25th, 2023
+
+## Changelog
+
+- #164 Add arrSlice and replace _extractArgs usages
+
 # v0.9.2 Mar 24th, 2023
 
 ## Changelog

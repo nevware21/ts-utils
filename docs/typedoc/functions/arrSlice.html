@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>strRepeat | @nevware21/ts-utils</title><meta name="description" content="Documentation for @nevware21/ts-utils"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script async src="../assets/search.js" id="search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>arrSlice | @nevware21/ts-utils</title><meta name="description" content="Documentation for @nevware21/ts-utils"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script async src="../assets/search.js" id="search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
 <div class="tsd-toolbar-contents container">
 <div class="table-cell" id="tsd-search" data-base="..">
 <div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
@@ -13,36 +13,63 @@
 <div class="tsd-page-title">
 <ul class="tsd-breadcrumb">
 <li><a href="../index.html">@nevware21/ts-utils</a></li>
-<li><a href="strRepeat.html">strRepeat</a></li></ul>
-<h1>Function strRepeat</h1></div>
+<li><a href="arrSlice.html">arrSlice</a></li></ul>
+<h1>Function arrSlice</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures tsd-kind-function">
-<li class="tsd-signature tsd-anchor-link" id="strRepeat">str<wbr/>Repeat<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, count<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><a href="#strRepeat" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="arrSlice">arr<wbr/>Slice<span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span>theArray<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ArrayLike</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">&gt;</span>, start<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, end<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">[]</span><a href="#arrSlice" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>The <code>strRepeat()</code> method constructs and returns a new string which contains the
-specified number of copies of the string on which it was called, concatenated
-together.</p>
+<div class="tsd-comment tsd-typography"><p>The arrSlice() method returns a shallow copy of a portion of an array into a new array object
+selected from start to end (end not included) where start and end represent the index of items
+in that array. The original array will not be modified.</p>
+<p>The <code>arrSlice()</code> method is a copying method. It does not alter this but instead returns a shallow
+copy that contains some of the same elements as the ones from the original array.</p>
+<p>The <code>arrSlice()</code> method preserves empty slots. If the sliced portion is sparse, the returned arra
+is sparse as well.</p>
+<p>The <code>arrSlice()</code> method is generic. It only expects the this value to have a length property and
+integer-keyed properties.</p>
+<p>For both start and end, a negative index can be used to indicate an offset from the end of the array.
+For example, -2 refers to the second to last element of the array.</p>
 
-<h3>Returns</h3><p>A new string containing the specified number of copies of the given string.</p>
+<h3>Since</h3><p>0.9.3</p>
 
-<h3>Throws</h3><p>RangeError: repeat count must be non-negative.</p>
-
-<h3>Throws</h3><p>RangeError: repeat count must be less than infinity and not overflow maximum string size.</p>
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-9">lyrics</span><span class="hl-1"> = [</span><span class="hl-6">&quot;Hello&quot;</span><span class="hl-1">, </span><span class="hl-6">&quot;Darkness&quot;</span><span class="hl-1">, </span><span class="hl-6">&quot;my&quot;</span><span class="hl-1">, </span><span class="hl-6">&quot;old&quot;</span><span class="hl-1">, </span><span class="hl-6">&quot;friend.&quot;</span><span class="hl-1">, </span><span class="hl-6">&quot;I&#39;ve&quot;</span><span class="hl-1">, </span><span class="hl-6">&quot;come&quot;</span><span class="hl-1">, </span><span class="hl-6">&quot;to&quot;</span><span class="hl-1">, </span><span class="hl-6">&quot;talk&quot;</span><span class="hl-1"> ];</span><br/><br/><span class="hl-3">arrSlice</span><span class="hl-1">(</span><span class="hl-2">lyrics</span><span class="hl-1">);        </span><span class="hl-4">// [ &quot;Hello&quot;, &quot;Darkness&quot;, &quot;my&quot;, &quot;old&quot;, &quot;friend.&quot;, &quot;I&#39;ve&quot;, &quot;come&quot;, &quot;to&quot;, &quot;talk&quot; ]</span><br/><span class="hl-3">arrSlice</span><span class="hl-1">(</span><span class="hl-2">lyrics</span><span class="hl-1">, </span><span class="hl-5">1</span><span class="hl-1">, </span><span class="hl-5">3</span><span class="hl-1">);  </span><span class="hl-4">// [ &quot;Darkness&quot;, &quot;my&quot; ]</span><br/><span class="hl-3">arrSlicw</span><span class="hl-1">(</span><span class="hl-2">lyrics</span><span class="hl-1">, </span><span class="hl-5">2</span><span class="hl-1">);     </span><span class="hl-4">// [ &quot;my&quot;, &quot;old&quot;, &quot;friend.&quot;, &quot;I&#39;ve&quot;, &quot;come&quot;, &quot;to&quot;, &quot;talk&quot; ]</span><br/><span class="hl-3">arrSlice</span><span class="hl-1">(</span><span class="hl-2">lyrics</span><span class="hl-1">, </span><span class="hl-5">2</span><span class="hl-1">, </span><span class="hl-5">4</span><span class="hl-1">);  </span><span class="hl-4">// [ &quot;my&quot;, &quot;old&quot; ]</span><br/><span class="hl-3">arrSlice</span><span class="hl-1">(</span><span class="hl-2">lyrics</span><span class="hl-1">, </span><span class="hl-5">1</span><span class="hl-1">, </span><span class="hl-5">5</span><span class="hl-1">);  </span><span class="hl-4">// [ &quot;Darkness&quot;, &quot;my&quot;, &quot;old&quot;, &quot;friend.&quot; ]</span><br/><span class="hl-3">arrSlice</span><span class="hl-1">(</span><span class="hl-2">lyrics</span><span class="hl-1">, -</span><span class="hl-5">2</span><span class="hl-1">);    </span><span class="hl-4">// [ &quot;to&quot;, &quot;talk&quot; ]</span><br/><span class="hl-3">arrSlice</span><span class="hl-1">(</span><span class="hl-2">lyrics</span><span class="hl-1">, </span><span class="hl-5">2</span><span class="hl-1">, -</span><span class="hl-5">1</span><span class="hl-1">); </span><span class="hl-4">// [ &quot;my&quot;, &quot;old&quot;, &quot;friend.&quot;, &quot;I&#39;ve&quot;, &quot;come&quot;, &quot;to&quot; ]</span>
+</code></pre>
 </div>
+<section class="tsd-panel tsd-type-parameters">
+<h4>Type Parameters</h4>
+<ul class="tsd-type-parameters">
+<li>
+<h4>T</h4></li></ul></section>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>value: <span class="tsd-signature-type">string</span></h5>
-<div class="tsd-comment tsd-typography"><p>The value to be repeated</p>
+<h5>theArray: <span class="tsd-signature-type">ArrayLike</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">&gt;</span></h5></li>
+<li>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> start: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>Zero-based index at which to start extraction, converted to an integer.</p>
+<ul>
+<li>Negative index counts back from the end of the array — if start &lt; 0, start + array.length is used.</li>
+<li>If start &lt; -array.length or start is omitted, 0 is used.</li>
+<li>If start &gt;= array.length, nothing is extracted.</li>
+</ul>
 </div></li>
 <li>
-<h5>count: <span class="tsd-signature-type">number</span></h5>
-<div class="tsd-comment tsd-typography"><p>An integer between 0 and +Infinity, indicating the number of times to repeat the string.</p>
-</div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> end: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>Zero-based index at which to end extraction, converted to an integer. slice() extracts
+up to but not including end.</p>
 <ul>
-<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/string/repeat.ts#L28">lib/src/string/repeat.ts:28</a></li></ul></aside></li></ul></section></div>
+<li>Negative index counts back from the end of the array — if end &lt; 0, end + array.length is used.</li>
+<li>If end &lt; -array.length, 0 is used.</li>
+<li>If end &gt;= array.length or end is omitted, array.length is used, causing all elements until the
+end to be extracted.</li>
+<li>If end is positioned before or at start after normalization, nothing is extracted.</li>
+</ul>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/array/slice.ts#L55">lib/src/array/slice.ts:55</a></li></ul></aside></li></ul></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -99,7 +126,7 @@ together.</p>
 <li class="tsd-kind-function"><a href="arrLastIndexOf.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Last<wbr/>Index<wbr/>Of</a></li>
 <li class="tsd-kind-function"><a href="arrMap.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Map</a></li>
 <li class="tsd-kind-function"><a href="arrReduce.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Reduce</a></li>
-<li class="tsd-kind-function"><a href="arrSlice.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Slice</a></li>
+<li class="current tsd-kind-function"><a href="arrSlice.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Slice</a></li>
 <li class="tsd-kind-function"><a href="arrSome.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>arr<wbr/>Some</a></li>
 <li class="tsd-kind-function"><a href="arrayDeepCopyHandler.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>array<wbr/>Deep<wbr/>Copy<wbr/>Handler</a></li>
 <li class="tsd-kind-function"><a href="asString.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>as<wbr/>String</a></li>
@@ -254,7 +281,7 @@ together.</p>
 <li class="tsd-kind-function"><a href="strLower.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>str<wbr/>Lower</a></li>
 <li class="tsd-kind-function"><a href="strPadEnd.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>str<wbr/>Pad<wbr/>End</a></li>
 <li class="tsd-kind-function"><a href="strPadStart.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>str<wbr/>Pad<wbr/>Start</a></li>
-<li class="current tsd-kind-function"><a href="strRepeat.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>str<wbr/>Repeat</a></li>
+<li class="tsd-kind-function"><a href="strRepeat.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>str<wbr/>Repeat</a></li>
 <li class="tsd-kind-function"><a href="strRight.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>str<wbr/>Right</a></li>
 <li class="tsd-kind-function"><a href="strSlice.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>str<wbr/>Slice</a></li>
 <li class="tsd-kind-function"><a href="strSnakeCase.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>str<wbr/>Snake<wbr/>Case</a></li>
