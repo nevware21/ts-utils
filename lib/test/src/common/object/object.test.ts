@@ -20,6 +20,7 @@ import { objHasOwn, polyObjHasOwn } from "../../../../src/object/has_own";
 import { isPlainObject } from "../../../../src/object/is_plain_object";
 import { getWindow } from "../../../../src/helpers/environment";
 import { objGetOwnPropertyDescriptor } from "../../../../src/object/get_own_prop_desc";
+import { getLazy, getWritableLazy, ILazyValue } from "../../../../src/helpers/lazy";
 
 describe("object helpers", () => {
     it("objKeys", () => {
@@ -448,41 +449,183 @@ describe("object helpers", () => {
         assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
     });
 
-    it("objDefine", () => {
-        let value: any = {};
-        let result = 42;
+    describe("objDefine", () => {
+        it("objDefine with get/set", () => {
+            let value: any = {};
+            let result = 42;
 
-        function getFunc() {
-            return result;
-        }
+            function getFunc() {
+                return result;
+            }
 
-        objDefine(value, "test", {
-            g: getFunc,
-            s: getFunc
+            objDefine(value, "test", {
+                g: getFunc,
+                s: getFunc
+            });
+
+            result = 64;
+            assert.equal(value.test, 64, "Expected 64");
+
+            let desc = objGetOwnPropertyDescriptor(value, "test");
+            assert.ok(!!desc, "The descriptor must be defined");
+            assert.equal(desc?.configurable, true, "It should be configurable");
+            assert.equal(desc?.enumerable, true, "It should be enumerable");
+            assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
         });
 
-        result = 64;
-        assert.equal(value.test, 64, "Expected 64");
+        it("objDefine with writable value", () => {
+            let value: any = {};
+            let result = 42;
 
-        let desc = objGetOwnPropertyDescriptor(value, "test");
-        assert.ok(!!desc, "The descriptor must be defined");
-        assert.equal(desc?.configurable, true, "It should be configurable");
-        assert.equal(desc?.enumerable, true, "It should be enumerable");
-        assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
+            function getFunc() {
+                return result;
+            }
 
-        objDefine(value, "test", {
-            v: 42,
-            w: true
+            objDefine(value, "test", {
+                g: getFunc,
+                s: getFunc
+            });
+
+            result = 64;
+            assert.equal(value.test, 64, "Expected 64");
+
+            let desc = objGetOwnPropertyDescriptor(value, "test");
+            assert.ok(!!desc, "The descriptor must be defined");
+            assert.equal(desc?.configurable, true, "It should be configurable");
+            assert.equal(desc?.enumerable, true, "It should be enumerable");
+            assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
+
+            objDefine(value, "test", {
+                v: 42,
+                w: true
+            });
+
+            result = 64;
+            assert.equal(value.test, 42, "Expected 42");
+
+            desc = objGetOwnPropertyDescriptor(value, "test");
+            assert.ok(!!desc, "The descriptor must be defined");
+            assert.equal(desc?.configurable, true, "It should be configurable");
+            assert.equal(desc?.enumerable, true, "It should be enumerable");
+            assert.equal(desc?.writable, true, "It should writable");
         });
 
-        result = 64;
-        assert.equal(value.test, 42, "Expected 42");
+        it("objDefine with redonly lazy value", () => {
+            let value: any = {};
+            let lazyCalled = 0;
+            let lazyValue: ILazyValue<any> = getLazy(() => {
+                lazyCalled++;
+                return 64;
+            });
 
-        desc = objGetOwnPropertyDescriptor(value, "test");
-        assert.ok(!!desc, "The descriptor must be defined");
-        assert.equal(desc?.configurable, true, "It should be configurable");
-        assert.equal(desc?.enumerable, true, "It should be enumerable");
-        assert.equal(desc?.writable, true, "It should writable");
+            objDefine(value, "test", {
+                l: lazyValue
+            });
+
+            let desc = objGetOwnPropertyDescriptor(value, "test");
+            assert.ok(!!desc, "The descriptor must be defined");
+            assert.equal(desc?.configurable, true, "It should be configurable");
+            assert.equal(desc?.enumerable, true, "It should be enumerable");
+            assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
+            assert.notEqual(desc?.get, undefined, "A getter should exist");
+            assert.equal(desc?.set, undefined, "A setter should no longer exist");
+            assert.equal(lazyCalled, 0);
+
+            // Cause the value to be evaluated
+            assert.equal(value.test, 64, "Expected 64");
+            assert.equal(lazyCalled, 1);
+
+            desc = objGetOwnPropertyDescriptor(value, "test");
+            assert.ok(!!desc, "The descriptor must be defined");
+            assert.equal(desc?.configurable, true, "It should be configurable");
+            assert.equal(desc?.enumerable, true, "It should be enumerable");
+            assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
+            assert.notEqual(desc?.get, undefined, "A getter should exist");
+
+            _expectThrow(() => {
+                value.test = 42;
+            });
+
+            assert.equal(lazyCalled, 1);
+        });
+
+        it("objDefine with writable lazy value", () => {
+            let value: any = {};
+            let lazyCalled = 0;
+            let lazyValue: ILazyValue<any> = getWritableLazy(() => {
+                lazyCalled++;
+                return 64;
+            });
+
+            objDefine(value, "test", {
+                l: lazyValue
+            });
+
+            let desc = objGetOwnPropertyDescriptor(value, "test");
+            assert.ok(!!desc, "The descriptor must be defined");
+            assert.equal(desc?.configurable, true, "It should be configurable");
+            assert.equal(desc?.enumerable, true, "It should be enumerable");
+            assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
+            assert.notEqual(desc?.get, undefined, "A getter should exist");
+            assert.notEqual(desc?.set, undefined, "A setter should exist");
+            assert.equal(lazyCalled, 0);
+
+            // Cause the value to be evaluated
+            assert.equal(value.test, 64, "Expected 64");
+            assert.equal(lazyCalled, 1);
+
+            desc = objGetOwnPropertyDescriptor(value, "test");
+            assert.ok(!!desc, "The descriptor must be defined");
+            assert.equal(desc?.configurable, true, "It should be configurable");
+            assert.equal(desc?.enumerable, true, "It should be enumerable");
+            assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
+            assert.notEqual(desc?.get, undefined, "A getter should exist");
+            assert.notEqual(desc?.set, undefined, "A setter should exist");
+
+            value.test = 42;
+            assert.equal(value.test, 42, "Expected 42");
+            assert.equal(lazyCalled, 1);
+        });
+
+        it("objDefine with writable lazy value set before read", () => {
+            let value: any = {};
+            let lazyCalled = 0;
+            let lazyValue: ILazyValue<any> = getWritableLazy(() => {
+                lazyCalled++;
+                return 64;
+            });
+
+            objDefine(value, "test", {
+                l: lazyValue
+            });
+
+            let desc = objGetOwnPropertyDescriptor(value, "test");
+            assert.ok(!!desc, "The descriptor must be defined");
+            assert.equal(desc?.configurable, true, "It should be configurable");
+            assert.equal(desc?.enumerable, true, "It should be enumerable");
+            assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
+            assert.notEqual(desc?.get, undefined, "A getter should exist");
+            assert.notEqual(desc?.set, undefined, "A setter should exist");
+            assert.equal(lazyCalled, 0);
+
+            value.test = 53;
+
+            // Cause the value to be evaluated
+            assert.equal(value.test, 53, "Expected 53");
+            assert.equal(lazyCalled, 0);
+
+            desc = objGetOwnPropertyDescriptor(value, "test");
+            assert.ok(!!desc, "The descriptor must be defined");
+            assert.equal(desc?.configurable, true, "It should be configurable");
+            assert.equal(desc?.enumerable, true, "It should be enumerable");
+            assert.equal(desc?.writable, undefined, "It should be undefined with get/set functions");
+            assert.notEqual(desc?.get, undefined, "A getter should exist");
+            assert.notEqual(desc?.set, undefined, "A setter should exist");
+
+            value.test = 42;
+            assert.equal(value.test, 42, "Expected 42");
+            assert.equal(lazyCalled, 0);
+        });
     });
 
     describe("objDefineAccessors", () => {

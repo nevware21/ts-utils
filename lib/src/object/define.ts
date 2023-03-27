@@ -9,6 +9,8 @@
 import { ObjClass, VALUE } from "../internal/constants";
 import { isFunction, isUndefined } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
+import { ILazyValue } from "../helpers/lazy";
+import { objGetOwnPropertyDescriptor } from "./get_own_prop_desc";
 
 /**
  * Definition of the Property Descriptor mappings for the objDefine functions.
@@ -21,7 +23,7 @@ import { objForEachKey } from "./for_each_key";
  * @since 0.6.0
  * @group Object
  */
-export interface ObjDefinePropDescriptor {
+export interface ObjDefinePropDescriptor<V = any> {
     /**
      * Identifies if this property should be configurable (true) when this value is set to false,
      * - the type of this property cannot be changed between data property and accessor property, and
@@ -43,7 +45,13 @@ export interface ObjDefinePropDescriptor {
      * The value associated with the property. Can be any valid JavaScript value (number, object, function, etc.).
      * Defaults to undefined.
      */
-    v?: any;
+    v?: V;
+
+    /**
+     * A Lazy value instance which will be used to return the value, this will be wrapped in a getter function.
+     * @since 0.9.4
+     */
+    l?: ILazyValue<V>;
 
     /**
      * true if the value associated with the property may be changed with an assignment operator. Defaults to false.
@@ -56,7 +64,7 @@ export interface ObjDefinePropDescriptor {
      * property is accessed (this may not be the object on which the property is defined due to inheritance). The
      * return value will be used as the value of the property. Defaults to undefined.
      */
-    g?(): any;
+    g?(): V;
 
     /**
      * A function which serves as a setter for the property, or undefined if there is no setter. When the property
@@ -64,7 +72,7 @@ export interface ObjDefinePropDescriptor {
      * this set to the object through which the property is assigned. Defaults to undefined.
      * @param value
      */
-    s?(value: any): void;
+    s?(value: V): void;
 }
 
 /**
@@ -103,6 +111,19 @@ function _createProp(value: ObjDefinePropDescriptor): PropertyDescriptor {
     let prop: PropertyDescriptor = {};
     prop[propMap["c"]] = true;
     prop[propMap["e"]] = true;
+
+    if (value.l) {
+        // Asign a getter function to return the value when requested
+        prop.get = () => value.l.v;
+
+        // If it has a setter then expose it as well
+        let desc = objGetOwnPropertyDescriptor(value.l, "v");
+        if (desc && desc.set) {
+            prop.set = (newValue: any) => {
+                value.l.v = newValue;
+            }
+        }
+    }
 
     objForEachKey(value, (key, value) => {
         prop[propMap[key]] = isUndefined(value) ? prop[propMap[key]] : value;
