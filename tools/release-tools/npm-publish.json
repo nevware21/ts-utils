@@ -5,7 +5,7 @@
     "repoRoot": "../../..",
     "default": "ts-utils",
     "groups": {
-        "ts-debug": [
+        "ts-utils": [
             "./lib"
         ]
     }
