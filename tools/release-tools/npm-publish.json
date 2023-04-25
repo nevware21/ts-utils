@@ -1,0 +1,12 @@
+// ------------------------------
+// NPM Publish group definitions
+// ------------------------------
+{
+    "repoRoot": "../../..",
+    "default": "ts-utils",
+    "groups": {
+        "ts-debug": [
+            "./lib"
+        ]
+    }
+}
