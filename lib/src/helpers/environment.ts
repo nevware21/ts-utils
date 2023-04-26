@@ -8,7 +8,7 @@
 
 import { UNDEF_VALUE } from "../internal/constants";
 import { _getGlobalValue } from "../internal/global";
-import { _lazySafeGet } from "../internal/lazy_safe_check";
+import { safeGetLazy } from "./safe_lazy";
 import { ILazyValue, _globalLazyTestHooks } from "./lazy";
 
 const WINDOW = "window";
@@ -26,15 +26,35 @@ let _isWebWorker: ILazyValue<boolean>;
 let _isNode: ILazyValue<boolean>;
 
 /**
- * @ignore
- * @internal
- * Internal Helper for lazily safely getting the named global object if available,
- * will return undefined if the object is not available.
- * @param name - the global name of the object
- * @returns The named global instance or undefined if not available
+ * Create and return an readonly {@link ILazyValue} instance which will cache and return the named global
+ * value if available, will return `null` if the named global object is not available or if the runtime
+ * throws an exception when attempting to access the global object.
+ * Unlike {@link getInst} the value is cached after the first access, so if the global value changes after
+ * the initial fetch the original cached value is still returned.
+ * @since 0.9.5
+ * @group Environment
+ * @group Lazy
+ * @group Safe
+ * @param name The name of the global object to get.
+ * @returns A new readonly {@link ILazyValue} instance which will lazily attempt to return the globally
+ * available named instance.
+ * @example
+ * ```ts
+ * // This does not cause the evaluation to occur
+ * window.myGlobal = "Hello";
+ * let cachedValue = lazySafeGetInst("myGlobal");
+ * // cachedValue.v === "Hello"
+ *
+ * window.myGlobal = "Darkness";
+ * // cachedValue.v === "Hello"
+ *
+ * let promiseCls = lazySafeGetInst("Promise");
+ * // null if Promise is not supported in the runtime
+ * // otherwise the Promise class.
+ * ```
  */
-export function _lazySafeGetInst<T>(name: string) : ILazyValue<T> {
-    return _lazySafeGet(() => getInst<T>(name) || UNDEF_VALUE, UNDEF_VALUE);
+export function lazySafeGetInst<T>(name: string) : ILazyValue<T> {
+    return safeGetLazy(() => getInst<T>(name) || UNDEF_VALUE, UNDEF_VALUE);
 }
 
 /**
@@ -54,7 +74,7 @@ export function _lazySafeGetInst<T>(name: string) : ILazyValue<T> {
  * cause the cached global to be reset.
  */
 export function getGlobal(useCached?: boolean): Window {
-    (!_cachedGlobal || useCached === false || (_globalLazyTestHooks.lzy && !_cachedGlobal.b)) && (_cachedGlobal = _lazySafeGet(_getGlobalValue, null));
+    (!_cachedGlobal || useCached === false || (_globalLazyTestHooks.lzy && !_cachedGlobal.b)) && (_cachedGlobal = safeGetLazy(_getGlobalValue, null));
 
     return _cachedGlobal.v;
 }
@@ -65,6 +85,20 @@ export function getGlobal(useCached?: boolean): Window {
  * @param name The globally named object
  * @param useCached - [Optional] used for testing to bypass the cached lookup, when `true` this will
  * cause the cached global to be reset.
+ * @example
+ * ```ts
+ * // This does not cause the evaluation to occur
+ * window.myGlobal = "Hello";
+ * let cachedValue = getInst("myGlobal");
+ * // cachedValue === "Hello"
+ *
+ * window.myGlobal = "Darkness";
+ * // getInst("myGlobal") === "Darkness"
+ *
+ * let promiseCls = getInst("Promise");
+ * // May throw if the global is not supported by the runtime
+ * // otherwise the Promise class.
+ * ```
  */
 export function getInst<T>(name: string, useCached?: boolean): T {
     const gbl = getGlobal(useCached);
@@ -96,7 +130,7 @@ export function hasDocument(): boolean {
  * @returns
  */
 export function getDocument(): Document {
-    (!_cachedDocument || (_globalLazyTestHooks.lzy && !_cachedDocument.b)) && (_cachedDocument = _lazySafeGetInst("document"));
+    (!_cachedDocument || (_globalLazyTestHooks.lzy && !_cachedDocument.b)) && (_cachedDocument = lazySafeGetInst("document"));
 
     return _cachedDocument.v;
 }
@@ -116,7 +150,7 @@ export function hasWindow(): boolean {
  * @returns
  */
 export function getWindow(): Window {
-    (!_cachedWindow || (_globalLazyTestHooks.lzy && !_cachedWindow.b)) && (_cachedWindow = _lazySafeGetInst(WINDOW));
+    (!_cachedWindow || (_globalLazyTestHooks.lzy && !_cachedWindow.b)) && (_cachedWindow = lazySafeGetInst(WINDOW));
 
     return _cachedWindow.v;
 }
@@ -136,7 +170,7 @@ export function hasNavigator(): boolean {
  * @returns
  */
 export function getNavigator(): Navigator {
-    (!_cachedNavigator || (_globalLazyTestHooks.lzy && !_cachedNavigator.b)) && (_cachedNavigator = _lazySafeGetInst("navigator"));
+    (!_cachedNavigator || (_globalLazyTestHooks.lzy && !_cachedNavigator.b)) && (_cachedNavigator = lazySafeGetInst("navigator"));
 
     return _cachedNavigator.v;
 }
@@ -156,7 +190,7 @@ export function hasHistory(): boolean {
  * @returns
  */
 export function getHistory(): History | null {
-    (!_cachedHistory || (_globalLazyTestHooks.lzy && !_cachedHistory.b)) && (_cachedHistory = _lazySafeGetInst("history"));
+    (!_cachedHistory || (_globalLazyTestHooks.lzy && !_cachedHistory.b)) && (_cachedHistory = lazySafeGetInst("history"));
 
     return _cachedHistory.v;
 }
@@ -167,7 +201,7 @@ export function getHistory(): History | null {
  * @returns True if you are
  */
 export function isNode(): boolean {
-    !_isNode && (_isNode = _lazySafeGet(() => !!(process && (process.versions||{}).node), false))
+    !_isNode && (_isNode = safeGetLazy(() => !!(process && (process.versions||{}).node), false))
 
     return _isNode.v;
 }
@@ -178,7 +212,7 @@ export function isNode(): boolean {
  * @returns True if the environment you are in looks like a Web Worker
  */
 export function isWebWorker(): boolean {
-    !_isWebWorker && (_isWebWorker = _lazySafeGet(() => !!(self && self instanceof WorkerGlobalScope), false));
+    !_isWebWorker && (_isWebWorker = safeGetLazy(() => !!(self && self instanceof WorkerGlobalScope), false));
 
     return _isWebWorker.v;
 }

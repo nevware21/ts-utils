@@ -11,15 +11,15 @@ import { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } fr
 import { WellKnownSymbols, _wellKnownSymbolMap } from "./well_known";
 import { _createIs } from "../helpers/base";
 import { ILazyValue, _globalLazyTestHooks } from "../helpers/lazy";
-import { _lazySafeGet } from "../internal/lazy_safe_check";
-import { _lazySafeGetInst } from "../helpers/environment";
+import { safeGetLazy } from "../helpers/safe_lazy";
+import { lazySafeGetInst } from "../helpers/environment";
 
 let _symbol: ILazyValue<Symbol>;
 let _symbolFor: ILazyValue<(key: string) => symbol>;
 let _symbolKeyFor: ILazyValue<(sym: symbol) => string | undefined>;
 
 function _getSymbolValue<T>(name: string): ILazyValue<T> {
-    return _lazySafeGet<T>(function() {
+    return safeGetLazy<T>(function() {
         return (_symbol.v ? _symbol[name] : UNDEF_VALUE) as T;
     }, UNDEF_VALUE);
 }
@@ -48,7 +48,7 @@ export function hasSymbol(): boolean {
  */
 export function getSymbol(): Symbol {
     let resetCache = !_symbol || (_globalLazyTestHooks && _globalLazyTestHooks.lzy && !_symbol.b);
-    resetCache && (_symbol = _lazySafeGetInst(SYMBOL));
+    resetCache && (_symbol = lazySafeGetInst(SYMBOL));
     (!_symbolFor || resetCache) && (_symbolFor = _getSymbolValue<typeof Symbol.for>("for"));
     (!_symbolKeyFor || resetCache) && (_symbolKeyFor = _getSymbolValue<typeof Symbol.keyFor>("keyFor"));
     
