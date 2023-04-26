@@ -9,7 +9,7 @@
 import { isDefined, isUndefined } from "../helpers/base";
 import { ILazyValue } from "../helpers/lazy";
 import { elapsedTime, perfNow } from "../helpers/perf";
-import { _lazySafeGet } from "../internal/lazy_safe_check";
+import { safeGetLazy } from "../helpers/safe_lazy";
 import { ITimerHandler, _createTimerHandler } from "./handler";
 import { scheduleTimeout } from "./timeout";
 
@@ -33,7 +33,7 @@ let _maxExecutionTime = 50;
  * ```
  */
 export function hasIdleCallback(): boolean {
-    !_hasIdleCallback && (_hasIdleCallback = _lazySafeGet(() => isDefined(requestIdleCallback), false));
+    !_hasIdleCallback && (_hasIdleCallback = safeGetLazy(() => isDefined(requestIdleCallback), false));
     return !!(_hasIdleCallback.v ? requestIdleCallback : false);
 }
 

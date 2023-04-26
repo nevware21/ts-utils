@@ -7,7 +7,7 @@
  */
 
 import { utcNow } from "./date";
-import { _lazySafeGetInst } from "./environment";
+import { lazySafeGetInst } from "./environment";
 import { ILazyValue, _globalLazyTestHooks } from "./lazy";
 
 let _perf: ILazyValue<Performance>
@@ -34,7 +34,7 @@ export function hasPerformance(): boolean {
  * @returns The global performance object if available.
  */
 export function getPerformance(): Performance {
-    (!_perf || (_globalLazyTestHooks.lzy && !_perf.b)) && (_perf = _lazySafeGetInst("performance"));
+    (!_perf || (_globalLazyTestHooks.lzy && !_perf.b)) && (_perf = lazySafeGetInst("performance"));
     return _perf.v;
 }
 

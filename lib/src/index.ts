@@ -25,10 +25,12 @@ export {
 export { CustomErrorConstructor, createCustomError, throwUnsupported } from "./helpers/customError";
 export { utcNow, polyUtcNow } from "./helpers/date";
 export { dumpObj } from "./helpers/diagnostics";
-export { EnumCls, EnumNameMap, EnumValueMap, EnumTypeMap, createEnum, createEnumKeyMap, createEnumValueMap, createSimpleMap, createTypeMap } from "./helpers/enum";
 export {
-    getGlobal, getInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory, getHistory,
-    isNode, isWebWorker
+    EnumCls, EnumNameMap, EnumValueMap, EnumTypeMap, createEnum, createEnumKeyMap, createEnumValueMap, createSimpleMap, createTypeMap
+} from "./helpers/enum";
+export {
+    getGlobal, getInst, lazySafeGetInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory,
+    getHistory, isNode, isWebWorker
 } from "./helpers/environment";
 export { encodeAsHtml, encodeAsJson, normalizeJsName } from "./helpers/encode";
 export {
@@ -39,6 +41,8 @@ export { IGetLength as GetLengthImpl, getLength } from "./helpers/length";
 export { getIntValue } from "./helpers/number";
 export { getPerformance, hasPerformance, elapsedTime, perfNow } from "./helpers/perf";
 export { createFilenameRegex, createWildcardRegex, makeGlobRegex } from "./helpers/regexp";
+export { safeGet } from "./helpers/safe_get";
+export { safeGetLazy } from "./helpers/safe_lazy";
 export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";
 export { hasValue } from "./helpers/value";
 export { createArrayIterator } from "./iterator/array";
