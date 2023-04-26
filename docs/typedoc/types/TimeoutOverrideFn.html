@@ -27,13 +27,10 @@
 the native <code>setTimeout</code> API.</p>
 
 <h3>Since</h3><p>0.4.4</p>
-
-<h3>Returns</h3><p>The returned timeoutID is a positive integer value which identifies the timer created by the call to setTimeout().
-This value can be passed to clearTimeout() to cancel the timeout.</p>
 </div>
-<section class="tsd-panel tsd-type-parameters">
+<section class="tsd-panel">
 <h4>Type Parameters</h4>
-<ul class="tsd-type-parameters">
+<ul class="tsd-type-parameter-list">
 <li>
 <h4><span class="tsd-kind-type-parameter">TArgs</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h4></li></ul></section>
 <div class="tsd-parameters">
@@ -63,7 +60,9 @@ If this parameter is omitted, a value of 0 is used, meaning execute &quot;immedi
 <h5><code class="tsd-tag ts-flagRest">Rest</code> <span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span>: <span class="tsd-signature-type tsd-kind-type-parameter">TArgs</span></h5>
 <div class="tsd-comment tsd-typography"><p>Additional arguments which are passed through to the function specified by callback.</p>
 </div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">any</span></h4></li></ul></li></ul></div><aside class="tsd-sources">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">any</span></h4><p>The returned timeoutID is a positive integer value which identifies the timer created by the call to setTimeout().
+This value can be passed to clearTimeout() to cancel the timeout.</p>
+</li></ul></li></ul></div><aside class="tsd-sources">
 <ul>
 <li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/timer/timeout.ts#L56">lib/src/timer/timeout.ts:56</a></li></ul></aside></div>
 <div class="col-sidebar">
@@ -196,6 +195,7 @@ If this parameter is omitted, a value of 0 is used, meaning execute &quot;immedi
 <li><a href="../functions/isUndefined.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Undefined</span></a></li>
 <li><a href="../functions/isWebWorker.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Web<wbr/>Worker</span></a></li>
 <li><a href="../functions/iterForOf.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>iter<wbr/>For<wbr/>Of</span></a></li>
+<li><a href="../functions/lazySafeGetInst.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>lazy<wbr/>Safe<wbr/>Get<wbr/>Inst</span></a></li>
 <li><a href="../functions/makeGlobRegex.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>make<wbr/>Glob<wbr/>Regex</span></a></li>
 <li><a href="../functions/makeIterable.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>make<wbr/>Iterable</span></a></li>
 <li><a href="../functions/mathCeil.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>math<wbr/>Ceil</span></a></li>
@@ -249,6 +249,8 @@ If this parameter is omitted, a value of 0 is used, meaning execute &quot;immedi
 <li><a href="../functions/polySymbolFor.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Symbol<wbr/>For</span></a></li>
 <li><a href="../functions/polySymbolKeyFor.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Symbol<wbr/>Key<wbr/>For</span></a></li>
 <li><a href="../functions/polyUtcNow.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Utc<wbr/>Now</span></a></li>
+<li><a href="../functions/safeGet.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>safe<wbr/>Get</span></a></li>
+<li><a href="../functions/safeGetLazy.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>safe<wbr/>Get<wbr/>Lazy</span></a></li>
 <li><a href="../functions/scheduleIdleCallback.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Idle<wbr/>Callback</span></a></li>
 <li><a href="../functions/scheduleInterval.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Interval</span></a></li>
 <li><a href="../functions/scheduleTimeout.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Timeout</span></a></li>

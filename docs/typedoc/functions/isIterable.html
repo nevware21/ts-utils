@@ -17,20 +17,18 @@
 <h1>Function isIterable</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="isIterable"><span class="tsd-kind-call-signature">is<wbr/>Iterable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">value</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">value</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type ">Iterable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T</span><span class="tsd-signature-symbol">&gt;</span><a href="#isIterable" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="isIterable"><span class="tsd-kind-call-signature">is<wbr/>Iterable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">value</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-kind-parameter">value</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type ">Iterable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T</span><span class="tsd-signature-symbol">&gt;</span><a href="#isIterable" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Checks if the value looks like it is iterable, contains a [symbol.iterator].</p>
 
 <h3>Since</h3><p>0.4.0</p>
 
-<h3>Returns</h3><p>True if the value is an Iterable, otherwise false</p>
-
 <h3>Example</h3><pre><code class="language-ts"><span class="hl-3">isIterable</span><span class="hl-1">(</span><span class="hl-0">null</span><span class="hl-1">);        </span><span class="hl-4">// false</span><br/><span class="hl-3">isIterable</span><span class="hl-1">(</span><span class="hl-0">undefined</span><span class="hl-1">);   </span><span class="hl-4">// false</span><br/><span class="hl-3">isIterable</span><span class="hl-1">(</span><span class="hl-6">&quot;null&quot;</span><span class="hl-1">);      </span><span class="hl-4">// true (Strings are iterable)</span><br/><span class="hl-3">isIterable</span><span class="hl-1">([]);          </span><span class="hl-4">// true (Arrays are iterable)</span>
-</code></pre>
+</code><button>Copy</button></pre>
 </div>
-<section class="tsd-panel tsd-type-parameters">
+<section class="tsd-panel">
 <h4>Type Parameters</h4>
-<ul class="tsd-type-parameters">
+<ul class="tsd-type-parameter-list">
 <li>
 <h4><span class="tsd-kind-type-parameter">T</span> = <span class="tsd-signature-type">any</span></h4>
 <div class="tsd-comment tsd-typography"><p>Identifies the return type of the iterator</p>
@@ -42,7 +40,8 @@
 <h5><span class="tsd-kind-parameter">value</span>: <span class="tsd-signature-type">any</span></h5>
 <div class="tsd-comment tsd-typography"><p>The value to be checked</p>
 </div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">value</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type ">Iterable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<h4 class="tsd-returns-title">Returns <span class="tsd-kind-parameter">value</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type ">Iterable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T</span><span class="tsd-signature-symbol">&gt;</span></h4><p>True if the value is an Iterable, otherwise false</p>
+<aside class="tsd-sources">
 <ul>
 <li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/iterator/iterator.ts#L54">lib/src/iterator/iterator.ts:54</a></li></ul></aside></li></ul></section></div>
 <div class="col-sidebar">
@@ -175,6 +174,7 @@
 <li><a href="isUndefined.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Undefined</span></a></li>
 <li><a href="isWebWorker.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Web<wbr/>Worker</span></a></li>
 <li><a href="iterForOf.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>iter<wbr/>For<wbr/>Of</span></a></li>
+<li><a href="lazySafeGetInst.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>lazy<wbr/>Safe<wbr/>Get<wbr/>Inst</span></a></li>
 <li><a href="makeGlobRegex.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>make<wbr/>Glob<wbr/>Regex</span></a></li>
 <li><a href="makeIterable.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>make<wbr/>Iterable</span></a></li>
 <li><a href="mathCeil.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>math<wbr/>Ceil</span></a></li>
@@ -228,6 +228,8 @@
 <li><a href="polySymbolFor.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Symbol<wbr/>For</span></a></li>
 <li><a href="polySymbolKeyFor.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Symbol<wbr/>Key<wbr/>For</span></a></li>
 <li><a href="polyUtcNow.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Utc<wbr/>Now</span></a></li>
+<li><a href="safeGet.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>safe<wbr/>Get</span></a></li>
+<li><a href="safeGetLazy.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>safe<wbr/>Get<wbr/>Lazy</span></a></li>
 <li><a href="scheduleIdleCallback.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Idle<wbr/>Callback</span></a></li>
 <li><a href="scheduleInterval.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Interval</span></a></li>
 <li><a href="scheduleTimeout.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Timeout</span></a></li>

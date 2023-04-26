@@ -1,3 +1,12 @@
+# v0.9.5 Apr 25th, 2023
+
+## Changelog
+
+- #173 Support: expose the internal safe helpers to allow reuse.
+- #172 Update publishing scripts
+- #171 Update publishing scripts
+- #170 Bump typedoc to ^0.24.4
+
 # v0.9.4 Mar 25th, 2023
 
 ## Changelog
