@@ -30,8 +30,13 @@ Handlers SHOULD assign the &quot;result&quot; value with the new target instance
 so any recursive objects will get a reference to the new instance and not keep attempting to create new copies.</p>
 
 <h3>Since</h3><p>0.4.4</p>
-
-<h3>Returns</h3><p>true if handled and the value in details should be used otherwise false to continue with the default handling
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">details</span>: <a href="../interfaces/IObjDeepCopyHandlerDetails.html" class="tsd-signature-type tsd-kind-interface">IObjDeepCopyHandlerDetails</a></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><p>true if handled and the value in details should be used otherwise false to continue with the default handling
 The library includes several helpers which can be reused by any user provided handler</p>
 <ul>
 <li><a href="../functions/functionDeepCopyHandler.html" class="tsd-kind-function">functionDeepCopyHandler</a> - Used to copy functions</li>
@@ -39,13 +44,7 @@ The library includes several helpers which can be reused by any user provided ha
 <li><a href="../functions/plainObjDeepCopyHandler.html" class="tsd-kind-function">plainObjDeepCopyHandler</a> - Used to copy plain objects</li>
 <li><a href="../functions/dateDeepCopyHandler.html" class="tsd-kind-function">dateDeepCopyHandler</a> - Used to copy date instances</li>
 </ul>
-</div>
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5><span class="tsd-kind-parameter">details</span>: <a href="../interfaces/IObjDeepCopyHandlerDetails.html" class="tsd-signature-type tsd-kind-interface">IObjDeepCopyHandlerDetails</a></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4></li></ul></li></ul></div><aside class="tsd-sources">
+</li></ul></li></ul></div><aside class="tsd-sources">
 <ul>
 <li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L311">lib/src/object/copy.ts:311</a></li></ul></aside></div>
 <div class="col-sidebar">
@@ -178,6 +177,7 @@ The library includes several helpers which can be reused by any user provided ha
 <li><a href="../functions/isUndefined.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Undefined</span></a></li>
 <li><a href="../functions/isWebWorker.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Web<wbr/>Worker</span></a></li>
 <li><a href="../functions/iterForOf.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>iter<wbr/>For<wbr/>Of</span></a></li>
+<li><a href="../functions/lazySafeGetInst.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>lazy<wbr/>Safe<wbr/>Get<wbr/>Inst</span></a></li>
 <li><a href="../functions/makeGlobRegex.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>make<wbr/>Glob<wbr/>Regex</span></a></li>
 <li><a href="../functions/makeIterable.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>make<wbr/>Iterable</span></a></li>
 <li><a href="../functions/mathCeil.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>math<wbr/>Ceil</span></a></li>
@@ -231,6 +231,8 @@ The library includes several helpers which can be reused by any user provided ha
 <li><a href="../functions/polySymbolFor.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Symbol<wbr/>For</span></a></li>
 <li><a href="../functions/polySymbolKeyFor.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Symbol<wbr/>Key<wbr/>For</span></a></li>
 <li><a href="../functions/polyUtcNow.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Utc<wbr/>Now</span></a></li>
+<li><a href="../functions/safeGet.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>safe<wbr/>Get</span></a></li>
+<li><a href="../functions/safeGetLazy.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>safe<wbr/>Get<wbr/>Lazy</span></a></li>
 <li><a href="../functions/scheduleIdleCallback.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Idle<wbr/>Callback</span></a></li>
 <li><a href="../functions/scheduleInterval.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Interval</span></a></li>
 <li><a href="../functions/scheduleTimeout.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Timeout</span></a></li>

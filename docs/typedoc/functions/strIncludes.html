@@ -25,9 +25,6 @@ may be found within another string, returning <code>true</code> or <code>false</
 
 <h3>Since</h3><p>0.9.0</p>
 
-<h3>Returns</h3><p><code>true</code> if the search string is found anywhere within the given string value, including
-when searchString is an empty string; otherwise, <code>false</code>.</p>
-
 <h3>Throws</h3><p>TypeError If searchString is a regex.</p>
 </div>
 <div class="tsd-parameters">
@@ -47,7 +44,9 @@ causes <code>strIncludes()</code> to search for the string &quot;undefined&quot;
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">position</span>: <span class="tsd-signature-type">number</span></h5>
 <div class="tsd-comment tsd-typography"><p>The position within the string at which to begin searching for searchString. (Defaults to 0.)</p>
 </div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><p><code>true</code> if the search string is found anywhere within the given string value, including
+when searchString is an empty string; otherwise, <code>false</code>.</p>
+<aside class="tsd-sources">
 <ul>
 <li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/string/includes.ts#L33">lib/src/string/includes.ts:33</a></li></ul></aside></li></ul></section></div>
 <div class="col-sidebar">
@@ -180,6 +179,7 @@ causes <code>strIncludes()</code> to search for the string &quot;undefined&quot;
 <li><a href="isUndefined.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Undefined</span></a></li>
 <li><a href="isWebWorker.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Web<wbr/>Worker</span></a></li>
 <li><a href="iterForOf.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>iter<wbr/>For<wbr/>Of</span></a></li>
+<li><a href="lazySafeGetInst.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>lazy<wbr/>Safe<wbr/>Get<wbr/>Inst</span></a></li>
 <li><a href="makeGlobRegex.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>make<wbr/>Glob<wbr/>Regex</span></a></li>
 <li><a href="makeIterable.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>make<wbr/>Iterable</span></a></li>
 <li><a href="mathCeil.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>math<wbr/>Ceil</span></a></li>
@@ -233,6 +233,8 @@ causes <code>strIncludes()</code> to search for the string &quot;undefined&quot;
 <li><a href="polySymbolFor.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Symbol<wbr/>For</span></a></li>
 <li><a href="polySymbolKeyFor.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Symbol<wbr/>Key<wbr/>For</span></a></li>
 <li><a href="polyUtcNow.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Utc<wbr/>Now</span></a></li>
+<li><a href="safeGet.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>safe<wbr/>Get</span></a></li>
+<li><a href="safeGetLazy.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>safe<wbr/>Get<wbr/>Lazy</span></a></li>
 <li><a href="scheduleIdleCallback.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Idle<wbr/>Callback</span></a></li>
 <li><a href="scheduleInterval.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Interval</span></a></li>
 <li><a href="scheduleTimeout.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Timeout</span></a></li>

@@ -21,9 +21,9 @@ and provides to the current value <code>v</code>.</p>
 
 <h3>Since</h3><p>0.4.2</p>
 </div></section> 
-<section class="tsd-panel tsd-type-parameters">
+<section class="tsd-panel">
 <h4>Type Parameters</h4>
-<ul class="tsd-type-parameters">
+<ul class="tsd-type-parameter-list">
 <li>
 <h4><span class="tsd-kind-type-parameter">T</span></h4></li></ul></section> 
 <section class="tsd-panel tsd-hierarchy">
@@ -58,8 +58,6 @@ and provides to the current value <code>v</code>.</p>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>A function that returns a boolean to indicate whether it was able to produce
 the next value in the sequence.</p>
-
-<h3>Returns</h3><p><code>true</code> if a new value was produced and assigned to the <code>v</code> of the context, otherwise <code>false</code></p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -68,7 +66,8 @@ the next value in the sequence.</p>
 <h5><code class="tsd-tag ts-flagRest">Rest</code> <span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span>: <span class="tsd-signature-type">any</span></h5>
 <div class="tsd-comment tsd-typography"><p>Optional additional arguments that where passed to the iterator <code>next</code> function.</p>
 </div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4></li></ul></li></ul></div><aside class="tsd-sources">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><p><code>true</code> if a new value was produced and assigned to the <code>v</code> of the context, otherwise <code>false</code></p>
+</li></ul></li></ul></div><aside class="tsd-sources">
 <ul>
 <li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/iterator/create.ts#L28">lib/src/iterator/create.ts:28</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="r" class="tsd-anchor"></a>
@@ -84,15 +83,14 @@ the next value in the sequence.</p>
 <div class="tsd-comment tsd-typography"><p>Optional function that accepts zero or one argument. This function is called via the
 iterator <code>return</code> function when the iterator caller does not intend to make any more
 <code>next()</code> calls so the implementation and can perform any cleanup actions.</p>
-
-<h3>Returns</h3><p>[Optional] value to be included in the final iteration result</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">value</span>: <span class="tsd-signature-type tsd-kind-type-parameter">T</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type tsd-kind-type-parameter">T</span></h4></li></ul></li></ul></div><aside class="tsd-sources">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type tsd-kind-type-parameter">T</span></h4><p>[Optional] value to be included in the final iteration result</p>
+</li></ul></li></ul></div><aside class="tsd-sources">
 <ul>
 <li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/iterator/create.ts#L43">lib/src/iterator/create.ts:43</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="t" class="tsd-anchor"></a>
@@ -108,15 +106,14 @@ iterator <code>return</code> function when the iterator caller does not intend t
 <div class="tsd-comment tsd-typography"><p>A function that accepts zero or one argument. The function is called via the iterator
 <code>throw</code> function when that the iterator caller detects an error condition, and e is
 typically an Error instance.</p>
-
-<h3>Returns</h3><p>[Optional] value to be included in the final iteration result</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">e</span>: <span class="tsd-signature-type">any</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type tsd-kind-type-parameter">T</span></h4></li></ul></li></ul></div><aside class="tsd-sources">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type tsd-kind-type-parameter">T</span></h4><p>[Optional] value to be included in the final iteration result</p>
+</li></ul></li></ul></div><aside class="tsd-sources">
 <ul>
 <li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/iterator/create.ts#L51">lib/src/iterator/create.ts:51</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="v" class="tsd-anchor"></a>
@@ -266,6 +263,7 @@ the next value.</p>
 <li><a href="../functions/isUndefined.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Undefined</span></a></li>
 <li><a href="../functions/isWebWorker.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Web<wbr/>Worker</span></a></li>
 <li><a href="../functions/iterForOf.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>iter<wbr/>For<wbr/>Of</span></a></li>
+<li><a href="../functions/lazySafeGetInst.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>lazy<wbr/>Safe<wbr/>Get<wbr/>Inst</span></a></li>
 <li><a href="../functions/makeGlobRegex.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>make<wbr/>Glob<wbr/>Regex</span></a></li>
 <li><a href="../functions/makeIterable.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>make<wbr/>Iterable</span></a></li>
 <li><a href="../functions/mathCeil.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>math<wbr/>Ceil</span></a></li>
@@ -319,6 +317,8 @@ the next value.</p>
 <li><a href="../functions/polySymbolFor.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Symbol<wbr/>For</span></a></li>
 <li><a href="../functions/polySymbolKeyFor.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Symbol<wbr/>Key<wbr/>For</span></a></li>
 <li><a href="../functions/polyUtcNow.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Utc<wbr/>Now</span></a></li>
+<li><a href="../functions/safeGet.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>safe<wbr/>Get</span></a></li>
+<li><a href="../functions/safeGetLazy.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>safe<wbr/>Get<wbr/>Lazy</span></a></li>
 <li><a href="../functions/scheduleIdleCallback.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Idle<wbr/>Callback</span></a></li>
 <li><a href="../functions/scheduleInterval.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Interval</span></a></li>
 <li><a href="../functions/scheduleTimeout.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Timeout</span></a></li>

@@ -27,14 +27,12 @@ with JSON.stringify() it will return the exception as a string using <a href="du
 
 <h3>Since</h3><p>0.9.0</p>
 
-<h3>Returns</h3><p>A JSON encoded string representation of the value.</p>
-
 <h3>Example</h3><pre><code class="language-ts"><span class="hl-4">// String values</span><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">(</span><span class="hl-6">&quot;abc.123&quot;</span><span class="hl-1">); </span><span class="hl-4">// &quot;\&quot;abc.123\&quot;&quot;</span><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">(</span><span class="hl-6">&quot;321-abc&quot;</span><span class="hl-1">); </span><span class="hl-4">// &quot;\&quot;321-abc\&quot;&quot;</span><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">(</span><span class="hl-6">&quot;Hello darkness, my </span><span class="hl-11">\&quot;</span><span class="hl-6">old</span><span class="hl-11">\&quot;</span><span class="hl-6"> friend...&quot;</span><span class="hl-1">); </span><span class="hl-4">// &quot;\&quot;Hello darkness, my \\\&quot;old\\\&quot; friend...\&quot;&quot;</span><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">(</span><span class="hl-6">&quot;Hello: Darkness&quot;</span><span class="hl-1">); </span><span class="hl-4">// &quot;\&quot;Hello: Darkness\&quot;&quot;</span><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">(</span><span class="hl-6">&quot;Hello</span><span class="hl-11">\\</span><span class="hl-6">u003A Darkness&quot;</span><span class="hl-1">); </span><span class="hl-4">// &quot;\&quot;Hello\\\\u003A Darkness\&quot;&quot;</span><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">(</span><span class="hl-6">&quot;`!@#$%^&amp;*()_-+=[]{}:;&#39;&lt;&gt;?&quot;</span><span class="hl-1">); </span><span class="hl-4">// &quot;\&quot;\\u0060!@#$%^&amp;*()_-+=[]{}:;\\u0027&lt;&gt;?\&quot;&quot;</span><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">(</span><span class="hl-6">&quot;0&quot;</span><span class="hl-1">); </span><span class="hl-4">// &quot;\&quot;0\&quot;&quot;</span><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">(</span><span class="hl-6">&quot;1&quot;</span><span class="hl-1">); </span><span class="hl-4">// &quot;\&quot;1\&quot;&quot;</span><br/><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">([]); </span><span class="hl-4">// &quot;[]&quot;</span><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">([</span><span class="hl-6">&quot;A&quot;</span><span class="hl-1">]); </span><span class="hl-4">// &quot;[\&quot;A\&quot;]&quot;</span><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">([</span><span class="hl-5">0</span><span class="hl-1">]); </span><span class="hl-4">// &quot;[0]&quot;</span><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">([</span><span class="hl-0">false</span><span class="hl-1">]); </span><span class="hl-4">// &quot;[false]&quot;</span><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">(</span><span class="hl-0">new</span><span class="hl-1"> </span><span class="hl-3">Array</span><span class="hl-1">(</span><span class="hl-5">1</span><span class="hl-1">)); </span><span class="hl-4">// &quot;[null]&quot;</span><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">(</span><span class="hl-0">true</span><span class="hl-1">); </span><span class="hl-4">// &quot;true&quot;,</span><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">(</span><span class="hl-0">false</span><span class="hl-1">); </span><span class="hl-4">// &quot;false&quot;</span><br/><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">({}); </span><span class="hl-4">// &quot;{}&quot;</span><br/><span class="hl-3">encodeAsJson</span><span class="hl-1">({ </span><span class="hl-2">Hello:</span><span class="hl-1"> </span><span class="hl-6">&quot;Darkness&quot;</span><span class="hl-1"> }); </span><span class="hl-4">// &quot;{\&quot;Hello\&quot;:\&quot;Darkness\&quot;}&quot;);</span>
-</code></pre>
+</code><button>Copy</button></pre>
 </div>
-<section class="tsd-panel tsd-type-parameters">
+<section class="tsd-panel">
 <h4>Type Parameters</h4>
-<ul class="tsd-type-parameters">
+<ul class="tsd-type-parameter-list">
 <li>
 <h4><span class="tsd-kind-type-parameter">T</span></h4></li></ul></section>
 <div class="tsd-parameters">
@@ -53,7 +51,8 @@ with JSON.stringify() it will return the exception as a string using <a href="du
 <li><code>false</code> (or not Truthy) - Do not format*</li>
 </ul>
 </div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><p>A JSON encoded string representation of the value.</p>
+<aside class="tsd-sources">
 <ul>
 <li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/helpers/encode.ts#L117">lib/src/helpers/encode.ts:117</a></li></ul></aside></li></ul></section></div>
 <div class="col-sidebar">
@@ -186,6 +185,7 @@ with JSON.stringify() it will return the exception as a string using <a href="du
 <li><a href="isUndefined.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Undefined</span></a></li>
 <li><a href="isWebWorker.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Web<wbr/>Worker</span></a></li>
 <li><a href="iterForOf.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>iter<wbr/>For<wbr/>Of</span></a></li>
+<li><a href="lazySafeGetInst.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>lazy<wbr/>Safe<wbr/>Get<wbr/>Inst</span></a></li>
 <li><a href="makeGlobRegex.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>make<wbr/>Glob<wbr/>Regex</span></a></li>
 <li><a href="makeIterable.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>make<wbr/>Iterable</span></a></li>
 <li><a href="mathCeil.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>math<wbr/>Ceil</span></a></li>
@@ -239,6 +239,8 @@ with JSON.stringify() it will return the exception as a string using <a href="du
 <li><a href="polySymbolFor.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Symbol<wbr/>For</span></a></li>
 <li><a href="polySymbolKeyFor.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Symbol<wbr/>Key<wbr/>For</span></a></li>
 <li><a href="polyUtcNow.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>poly<wbr/>Utc<wbr/>Now</span></a></li>
+<li><a href="safeGet.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>safe<wbr/>Get</span></a></li>
+<li><a href="safeGetLazy.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>safe<wbr/>Get<wbr/>Lazy</span></a></li>
 <li><a href="scheduleIdleCallback.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Idle<wbr/>Callback</span></a></li>
 <li><a href="scheduleInterval.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Interval</span></a></li>
 <li><a href="scheduleTimeout.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>schedule<wbr/>Timeout</span></a></li>
