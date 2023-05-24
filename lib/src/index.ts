@@ -20,7 +20,7 @@ export { arrSome } from "./array/some";
 export {
     isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isDate, isNumber, isBoolean,
     isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isThenable, isNotTruthy, isTruthy, objToString,
-    isStrictNullOrUndefined, isStrictUndefined, isError, isPrimitive
+    isStrictNullOrUndefined, isStrictUndefined, isError, isPrimitive, isPrimitiveType
 } from "./helpers/base";
 export { CustomErrorConstructor, createCustomError, throwUnsupported } from "./helpers/customError";
 export { utcNow, polyUtcNow } from "./helpers/date";

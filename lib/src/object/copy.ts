@@ -7,8 +7,8 @@
  */
 
 import { arrForEach } from "../array/forEach";
-import { isArray, isDate, isNullOrUndefined, isPrimitive } from "../helpers/base";
-import { FUNCTION } from "../internal/constants";
+import { isArray, isDate, isNullOrUndefined, isPrimitiveType } from "../helpers/base";
+import { FUNCTION, OBJECT } from "../internal/constants";
 import { objDefine } from "./define";
 import { isPlainObject } from "./is_plain_object";
 
@@ -42,11 +42,13 @@ interface _RecursiveVisitMap {
  * @param details - The details object for the current property being copied
  * @returns true if the handler processed the field.
  */
-function _defaultDeepCopyHandler(details: IObjDeepCopyHandlerDetails): boolean {
-    let target = details.result = {};
-    details.copyTo(target, details.value);
+const _defaultDeepCopyHandler = (details: IObjDeepCopyHandlerDetails): boolean => {
+    // Make sure we at least copy plain objects
+    details.value && plainObjDeepCopyHandler(details);
+
+    // Always return true so that the iteration completes
     return true;
-}
+};
 
 /**
  * @internal
@@ -112,9 +114,19 @@ function _deepCopy<T>(visitMap: _RecursiveVisitMap[], value: T, ctx: _DeepCopyCo
         path: newPath
     };
 
+    const theType = typeof value;
+    let isPlain = false;
+    let isPrim = false;
+    if (value && theType === OBJECT) {
+        isPlain = isPlainObject(value);
+    } else {
+        isPrim = value === null || isPrimitiveType(theType);
+    }
+
     let details: IObjDeepCopyHandlerDetails = {
-        type: typeof value,
-        isPrim: isPrimitive(value),
+        type: theType,
+        isPrim: isPrim,
+        isPlain: isPlain,
         value: value,
         result: value,
         path: newPath,
@@ -139,7 +151,6 @@ function _deepCopy<T>(visitMap: _RecursiveVisitMap[], value: T, ctx: _DeepCopyCo
                     newEntry.v = newValue;
                 }
             });
-                
 
             let idx = 0;
             let handler = userHandler;
@@ -255,6 +266,11 @@ export interface IObjDeepCopyHandlerDetails {
     isPrim: boolean;
 
     /**
+     * Identifies whether the type is a plain object or not
+     */
+    isPlain: boolean;
+
+    /**
      * The current value to be processed, replace this value with the new deep copied value to use when returning
      * true from the handler. Ignored when the handler returns false.
      */
@@ -311,10 +327,11 @@ export interface IObjDeepCopyHandlerDetails {
 export type ObjDeepCopyHandler = (details: IObjDeepCopyHandlerDetails) => boolean;
 
 /**
- * Performs a deep copy of the source object, this is designed to work with base objects, arrays and primitives
- * if the source object contains class objects they should be considered non-operational after performing a deep
- * copy. ie. This is performing a deep copy of the objects properties so that altering the copy will not mutate
- * the source object hierarchy. Automatic handling of recursive properties was added in v0.4.4.
+ * Performs a deep copy of the source object, this is designed to work with base (plain) objects, arrays and primitives
+ * if the source object contains class objects they will either be not cloned or may be considered non-operational after
+ * performing a deep copy. ie. This is performing a deep copy of the objects properties so that altering the copy will
+ * not mutate the source object hierarchy.
+ * Automatic handling of recursive properties was added in v0.4.4.
  * @group Object
  * @group Object - Deep Copy
  * @param source - The source object to be copied
@@ -432,7 +449,7 @@ export function functionDeepCopyHandler(details: IObjDeepCopyHandlerDetails): bo
  */
 export function plainObjDeepCopyHandler(details: IObjDeepCopyHandlerDetails): boolean {
     let value = details.value;
-    if (isPlainObject(value)) {
+    if (value && details.isPlain) {
         // Assign the "result" value before performing any additional deep Copying, so any recursive object get a reference to this instance
         let target = details.result = {};
         details.copyTo(target, value);

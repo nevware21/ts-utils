@@ -6,7 +6,6 @@
  * Licensed under the MIT license.
  */
 
-import { arrSlice } from "../array/slice";
 import { DONE, VALUE } from "../internal/constants";
 import { objDefine } from "../object/define";
 import { getKnownSymbol } from "../symbol/symbol";
