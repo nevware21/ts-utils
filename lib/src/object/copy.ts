@@ -266,7 +266,9 @@ export interface IObjDeepCopyHandlerDetails {
     isPrim: boolean;
 
     /**
-     * Identifies whether the type is a plain object or not
+     * Identifies whether the type is a plain object or not, this also saves each handler from checking
+     * the `type`, currently the type will also be "object" if this is `true`.
+     * @since 0.9.6
      */
     isPlain: boolean;
 
