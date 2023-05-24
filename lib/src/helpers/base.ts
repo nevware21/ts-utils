@@ -292,15 +292,60 @@ export function isDefined(arg: any): boolean {
  * isPrimitive(new Boolean("false"));   // false
  * ```
  */
-export function isPrimitive(value: any): value is string | number | bigint | boolean | undefined | symbol | null {
-    let theType = typeof value;
+export const isPrimitive = (value: any): value is string | number | bigint | boolean | undefined | symbol | null => {
+    return value === null || isPrimitiveType(typeof value);
+};
 
-    if (value && theType === OBJECT) {
-        return false;
-    }
-
-    return value === null || PRIMITIVE_TYPES.indexOf(theType) !== -1;
-}
+/**
+ * Identifies whether the provided value is a JavaScript [primitive](https://developer.mozilla.org/en-US/docs/Glossary/Primitive)
+ * which is when is it not an object and has no methods or properties. There are 6 primitive data types:
+ * - string
+ * - number
+ * - bigint
+ * - boolean
+ * - undefined
+ * - symbol
+ *
+ * Most of the time, a primitive value is represented directly at the lowest level of the language implementation.
+ *
+ * All primitives are immutable; that is, they cannot be altered. It is important not to confuse a primitive itself
+ * with a variable assigned a primitive value. The variable may be reassigned to a new value, but the existing value
+ * can not be changed in the ways that objects, arrays, and functions can be altered. The language does not offer
+ * utilities to mutate primitive values.
+ * @since 0.9.6
+ * @group Type Identity
+ * @param theType - The type as a string value to be checked whther it's a primitive type, this should be the value
+ * returned from `typeof value`.
+ * @example
+ * ```ts
+ * isPrimitiveType(null);                   // false
+ * isPrimitiveType(undefined);              // false
+ * isPrimitiveType("null");                 // false
+ * isPrimitiveType("undefined");            // false
+ * isPrimitiveType("1");                    // false
+ * isPrimitiveType("aa");                   // false
+ * isPrimitiveType(1);                      // false
+ * isPrimitiveType(Number(2));              // false
+ * isPrimitiveType("");                     // false
+ * isPrimitiveType(String(""));             // false
+ * isPrimitiveType(true);                   // false
+ * isPrimitiveType(false);                  // false
+ * isPrimitiveType("true");                 // false
+ * isPrimitiveType("false");                // false
+ * isPrimitiveType(BigInt(42));             // false
+ * isPrimitiveType(Symbol.for("Hello"));    // false
+ *
+ * isPrimitiveType("string");               // true
+ * isPrimitiveType("number");               // true
+ * isPrimitiveType("boolean");              // true
+ * isPrimitiveType("undefined");            // true
+ * isPrimitiveType("symbol");               // true
+ * isPrimitiveType("bigint");               // true
+ * ```
+ */
+export const isPrimitiveType = (theType: string): boolean => {
+    return theType !== OBJECT && PRIMITIVE_TYPES.indexOf(theType) !== -1;
+};
 
 /**
  * Checks to see if the past value is a string value

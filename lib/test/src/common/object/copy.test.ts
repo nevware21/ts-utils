@@ -11,6 +11,7 @@ import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isDate, isError, isObject } from "../../../../src/helpers/base";
 import { arrayDeepCopyHandler, IObjDeepCopyHandlerDetails, objCopyProps, objDeepCopy, plainObjDeepCopyHandler } from "../../../../src/object/copy";
 import { arrForEach } from "../../../../src/array/forEach";
+import { isPlainObject } from "../../../../src/object/is_plain_object";
 
 describe("object copy helpers", () => {
     describe("objCopyProps", () => {
@@ -228,7 +229,7 @@ describe("object copy helpers", () => {
 
         it("recursive and class properties deep Copy", () => {
             let a: any = { a: 1 };
-            let b: any = { b: 2, d: new Date(), e: new TestClass("Hello Darkness") };
+            let b: any = { b: 2, d: new Date(), e: new TestClass("Hello Darkness"), o: { "my": "old friend" } };
             a.b = b;        // { a: 1, b: { b: 2} }
             b.a = a;        // { a: 1, b: { b: 2, a: { a: 1, { b: 2, a: ... }}}}
             a.b.f = function testFunc() {};
@@ -243,15 +244,19 @@ describe("object copy helpers", () => {
             assert.ok(isDate(c.b.d), "The copied date is still a real 'Date' instance");
             assert.notEqual(a.b.d, c.b.d, "The copied date is not the same as the original date");
             assert.equal(a.b.d.getTime(), c.b.d.getTime(), "The copied date has the same value as the original date");
-            assert.ok(!isError(c.b.e), "The copied error is no longer a real 'Error' instance");
-            assert.ok(isObject(c.b.e), "The copied error is now an object");
+            assert.ok(c.b.e === a.b.e, "Should still be the same instance");
+            assert.ok(isError(c.b.e), "The copied error is still the original 'Error' instance");
+            assert.ok(!isPlainObject(c.b.e), "The copied error is not a plain object");
             assert.equal(42, c.b.e.value, "Expect that the local property was copied");
             assert.equal(c.b.f, a.b.f, "Functions should be the same");
+            assert.ok(isPlainObject(c.b.o), "The copied is now an object");
+            assert.ok(c.b.o !== a.b.o, "The copied object should not be the same instance");
+            assert.deepEqual(c.b.o, a.b.o, "Objects should be the same");
         });
 
         it("handler returning false with recursive and class properties deep Copy", () => {
             let a: any = { a: 1 };
-            let b: any = { b: 2, d: new Date(), e: new TestClass("Hello Darkness") };
+            let b: any = { b: 2, d: new Date(), e: new TestClass("Hello Darkness"), o: { "my": "old friend" } };
             a.b = b;        // { a: 1, b: { b: 2} }
             b.a = a;        // { a: 1, b: { b: 2, a: { a: 1, { b: 2, a: ... }}}}
             a.b.f = function testFunc() {};
@@ -271,15 +276,19 @@ describe("object copy helpers", () => {
             assert.notEqual(a.b.d, c.b.d, "The copied date is not the same as the original date");
             assert.equal(a.b.d.getTime(), c.b.d.getTime(), "The copied date has the same value as the original date");
             assert.ok(isObject(c.b.d), "The copied date is now an object");
-            assert.ok(!isError(c.b.e), "The copied error is no longer a real 'Error' instance");
-            assert.ok(isObject(c.b.e), "The copied error is now an object");
+            assert.ok(c.b.e === a.b.e, "Should still be the same instance");
+            assert.ok(isError(c.b.e), "The copied error is still the original 'Error' instance");
+            assert.ok(!isPlainObject(c.b.e), "The copied error is not a plain object");
             assert.equal(42, c.b.e.value, "Expect that the local property was copied");
             assert.equal(c.b.f, a.b.f, "Functions should be the same");
+            assert.ok(isPlainObject(c.b.o), "The copied is now an object");
+            assert.ok(c.b.o !== a.b.o, "The copied object should not be the same instance");
+            assert.deepEqual(c.b.o, a.b.o, "Objects should be the same");
         });
 
         it("handler processing Date with recursive and class properties deep Copy", () => {
             let a: any = { a: 1 };
-            let b: any = { b: 2, d: new Date(), e: new TestClass("Hello Darkness") };
+            let b: any = { b: 2, d: new Date(), e: new TestClass("Hello Darkness"), o: { "my": "old friend" } };
             a.b = b;        // { a: 1, b: { b: 2} }
             b.a = a;        // { a: 1, b: { b: 2, a: { a: 1, { b: 2, a: ... }}}}
             a.b.f = function testFunc() {};
@@ -306,15 +315,19 @@ describe("object copy helpers", () => {
             assert.notEqual(c.b.d, a.b.d, "And the copied date is not the same as the original");
             assert.equal(c.b.d.getTime(), a.b.d.getTime(), "But the dates are the same");
             assert.ok(isObject(c.b.d), "The copied date is now an object");
-            assert.ok(!isError(c.b.e), "The copied error is no longer a real 'Error' instance");
-            assert.ok(isObject(c.b.e), "The copied error is now an object");
+            assert.ok(c.b.e === a.b.e, "Should still be the same instance");
+            assert.ok(isError(c.b.e), "The copied error is still the original 'Error' instance");
+            assert.ok(!isPlainObject(c.b.e), "The copied error is not a plain object");
             assert.equal(42, c.b.e.value, "Expect that the local property was copied");
             assert.equal(c.b.f, a.b.f, "Functions should be the same");
+            assert.ok(isPlainObject(c.b.o), "The copied is now an object");
+            assert.ok(c.b.o !== a.b.o, "The copied object should not be the same instance");
+            assert.deepEqual(c.b.o, a.b.o, "Objects should be the same");
         });
 
         it("handler returning the original Date with recursive and class properties deep Copy", () => {
             let a: any = { a: 1 };
-            let b: any = { b: 2, d: new Date(), e: new TestClass("Hello Darkness") };
+            let b: any = { b: 2, d: new Date(), e: new TestClass("Hello Darkness"), o: { "my": "old friend" } };
             a.b = b;        // { a: 1, b: { b: 2} }
             b.a = a;        // { a: 1, b: { b: 2, a: { a: 1, { b: 2, a: ... }}}}
             a.b.f = function testFunc() {};
@@ -343,10 +356,14 @@ describe("object copy helpers", () => {
             assert.equal(c.b.d, a.b.d, "And the copied date is the original date");
             assert.equal(c.b.d.getTime(), a.b.d.getTime(), "But the dates are the same");
             assert.ok(isObject(c.b.d), "The copied date is now an object");
-            assert.ok(!isError(c.b.e), "The copied error is no longer a real 'Error' instance");
-            assert.ok(isObject(c.b.e), "The copied error is now an object");
+            assert.ok(c.b.e === a.b.e, "Should still be the same instance");
+            assert.ok(isError(c.b.e), "The copied error is still the original 'Error' instance");
+            assert.ok(!isPlainObject(c.b.e), "The copied error is not a plain object");
             assert.equal(42, c.b.e.value, "Expect that the local property was copied");
             assert.equal(c.b.f, a.b.f, "Functions should be the same");
+            assert.ok(isPlainObject(c.b.o), "The copied is now an object");
+            assert.ok(c.b.o !== a.b.o, "The copied object should not be the same instance");
+            assert.deepEqual(c.b.o, a.b.o, "Objects should be the same");
             
             // Check incomplete array and with non-indexed property
             assert.notEqual(a.b.arr, c.b.arr, "The array objects should not be the same");

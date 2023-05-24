@@ -9,8 +9,7 @@
 import { StrProto } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 import { polyStrSymSplit } from "../polyfills/split";
-import { getKnownSymbol, hasSymbol } from "../symbol/symbol";
-import { WellKnownSymbols } from "../symbol/well_known";
+import { hasSymbol } from "../symbol/symbol";
 
 /**
  * The `strSplit()` splits a string into substrings using the pattern and divides a String

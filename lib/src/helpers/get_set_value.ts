@@ -7,7 +7,7 @@
  */
 
 import { arrForEach } from "../array/forEach";
-import { isDefined, isNullOrUndefined } from "./base";
+import { isNullOrUndefined } from "./base";
 import { strSplit } from "../string/split";
 import { iterForOf } from "../iterator/forOf";
 

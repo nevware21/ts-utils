@@ -8,7 +8,6 @@
 
 import { isArray, isUndefined } from "../helpers/base";
 import { isIterable, isIterator } from "../iterator/iterator";
-import { DONE, VALUE } from "../internal/constants";
 import { iterForOf } from "../iterator/forOf";
 
 /**
