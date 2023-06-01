@@ -6,7 +6,10 @@
  * Licensed under the MIT license.
  */
 
-import { NAME, PROTOTYPE } from "../internal/constants";
+import { CONSTRUCTOR, NAME, NULL_VALUE, PROTOTYPE } from "../internal/constants";
+import { objCreate } from "../object/create";
+import { objDefine } from "../object/define";
+import { objGetPrototypeOf } from "../object/object";
 import { objSetPrototypeOf } from "../object/set_proto";
 
 /**
@@ -14,36 +17,45 @@ import { objSetPrototypeOf } from "../object/set_proto";
  * Used by: {@link createCustomError}
  * @group Error
  */
-export interface CustomErrorConstructor extends Error {
-    new(message?: string): Error;
-    (message?: string): Error;
-    readonly prototype: Error;
+export interface CustomErrorConstructor<T extends Error = Error> extends ErrorConstructor {
+    new(message?: string): T;
+    (message?: string): T;
+    readonly prototype: T;
 }
 
 /**
  * @internal
  * @ignore
  */
-function _createCustomError(name: string, d: any, baseClass: any) {
-    objSetPrototypeOf(d, baseClass);
+const _createCustomError = <T>(name: string, d: any, b: any): T => {
+    _safeDefineName(d, name);
+    d = objSetPrototypeOf(d, b);
     function __() {
         this.constructor = d;
-        this[NAME] = name;
+        _safeDefineName(this, name);
     }
-    
-    __[PROTOTYPE] = baseClass[PROTOTYPE];
-    d[PROTOTYPE] = new (__ as any)();
+
+    d[PROTOTYPE] = b === NULL_VALUE ? objCreate(b) : ((__ as any)[PROTOTYPE] = b[PROTOTYPE], new (__ as any)());
 
     return d;
-}
+};
 
 const _safeSetName = (baseClass: any, name: string) => {
     try {
-        baseClass[PROTOTYPE][NAME] = name;
+        name && (baseClass[NAME] = name);
+        //name && (baseClass[PROTOTYPE][NAME] = name);
     } catch(e) {
         // Do nothing
     }
-}
+};
+
+const _safeDefineName = (target: any, name: string) => {
+    try {
+        objDefine(target, NAME, { v: name, c: true, e: false });
+    } catch (e) {
+        // Do nothing
+    }
+};
 
 /**
  * Create a Custom Error class which may be used to throw custom errors.
@@ -51,6 +63,7 @@ const _safeSetName = (baseClass: any, name: string) => {
  * @param name - The name of the Custom Error
  * @param constructCb - [Optional] An optional callback function to call when a
  * new Customer Error instance is being created.
+ * @param errorBase - [Optional] (since v0.9.6) The error class to extend for this class, defaults to Error.
  * @returns A new Error `class`
  * @example
  * ```ts
@@ -68,16 +81,18 @@ const _safeSetName = (baseClass: any, name: string) => {
  * }
  *
  * // Or a more complex error object
- * interface MyCriticalError extends CustomErrorConstructor {
- *     new(message: string, file: string, line: number, col: number): Error;
- *     (message: string, file: string, line: number, col: number): Error;
+ * interface MyCriticalErrorConstructor extends CustomErrorConstructor {
+ *     new(message: string, file: string, line: number, col: number): MyCriticalError;
+ *     (message: string, file: string, line: number, col: number): MyCriticalError;
+ * }
  *
+ * interface MyCriticalError extends Error {
  *     readonly errorId: number;
  *     readonly args: any[];        // Holds all of the arguments passed during construction
  * }
  *
  * let _totalErrors = 0;
- * let myCustomError = createCustomError<MyCriticalError>("CriticalError", (self, args) => {
+ * let myCustomError = createCustomError<MyCriticalErrorConstructor>("CriticalError", (self, args) => {
  *     _totalErrors++;
  *     self.errorId = _totalErrors;
  *     self.args = args;
@@ -90,30 +105,59 @@ const _safeSetName = (baseClass: any, name: string) => {
  *      // isError(e) === true;
  *      // Object.prototype.toString.call(e) === "[object Error]";
  * }
+ *
+ * // ----------------------------------------------------------
+ * // Extending another custom error class
+ * // ----------------------------------------------------------
+ *
+ * let AppError = createCustomError("ApplicationError");
+ * let theAppError = new appError();
+ *
+ * isError(theAppError);                    // true
+ * theAppError instanceof Error;            // true
+ * theAppError instanceof AppError;         // true
+ *
+ * let StartupError = createCustomError("StartupError", null, AppError);
+ * let theStartupError = new StartupError();
+ *
+ * isError(theStartupError);                // true
+ * theStartupError instanceof Error;        // true
+ * theStartupError instanceof AppError;     // true
+ * theStartupError instanceof StartupError; // true
  * ```
  */
-export function createCustomError<T extends CustomErrorConstructor = CustomErrorConstructor>(name: string, constructCb?: (self: any, args: IArguments) => void): T {
-    let baseClass = Error;
-    let orgName = baseClass[PROTOTYPE][NAME];
+export function createCustomError<T extends ErrorConstructor = CustomErrorConstructor, B extends ErrorConstructor = ErrorConstructor>(
+    name: string,
+    constructCb?: ((self: any, args: IArguments) => void) | null,
+    errorBase?: B): T {
 
-    let customError = _createCustomError(name, function (this: any) {
+    let theBaseClass = errorBase || Error;
+    let orgName = theBaseClass[PROTOTYPE][NAME];
+    let captureFn = Error.captureStackTrace;
+    return _createCustomError<T>(name, function (this: any) {
         let _this = this;
         try {
-            // Set the baseClass (Error) prototype name so that any reported
-            // error by the Error constructor is reported with this name
-            _safeSetName(baseClass, name);
-            _this = baseClass.apply(_this, arguments) || _this;
-            _this[NAME] = name;
-            constructCb && constructCb(_this, arguments);
+            _safeSetName(theBaseClass, name);
+            let _self = theBaseClass.apply(_this, arguments) || _this;
+            if (_self !== _this) {
+                // Looks like runtime error constructor reset the prototype chain, so restore it
+                let orgProto = objGetPrototypeOf(_this);
+                if (orgProto !== objGetPrototypeOf(_self)) {
+                    objSetPrototypeOf(_self, orgProto);
+                }
+            }
+
+            // Make sure we only capture our stack details
+            captureFn && captureFn(_self, _this[CONSTRUCTOR]);
+    
+            // Run the provided construction function
+            constructCb && constructCb(_self, arguments);
+    
+            return _self;
         } finally {
-            // Always restore the baseClass (Error) original name
-            _safeSetName(baseClass, orgName);
+            _safeSetName(theBaseClass, orgName);
         }
-
-        return _this;
-    }, baseClass);
-
-    return customError as T;
+    }, theBaseClass);
 }
 
 /**

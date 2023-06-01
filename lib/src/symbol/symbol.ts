@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { SYMBOL, UNDEF_VALUE } from "../internal/constants";
+import { NULL_VALUE, SYMBOL, UNDEF_VALUE } from "../internal/constants";
 import { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "../polyfills/symbol";
 import { WellKnownSymbols, _wellKnownSymbolMap } from "./well_known";
 import { _createIs } from "../helpers/base";
@@ -89,7 +89,7 @@ export function newSymbol(description?: string | number, noPoly?: boolean): symb
     // Cause lazy _symbol to get initialized
     (!_symbol || (_globalLazyTestHooks.lzy && !_symbol.b)) && getSymbol();
 
-    return _symbol.v ? (_symbol.v as any)(description) : (!noPoly ? polyNewSymbol(description) : null);
+    return _symbol.v ? (_symbol.v as any)(description) : (!noPoly ? polyNewSymbol(description) : NULL_VALUE);
 }
 
 /**

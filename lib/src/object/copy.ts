@@ -8,7 +8,7 @@
 
 import { arrForEach } from "../array/forEach";
 import { isArray, isDate, isNullOrUndefined, isPrimitiveType } from "../helpers/base";
-import { FUNCTION, OBJECT } from "../internal/constants";
+import { FUNCTION, NULL_VALUE, OBJECT } from "../internal/constants";
 import { objDefine } from "./define";
 import { isPlainObject } from "./is_plain_object";
 
@@ -120,7 +120,7 @@ function _deepCopy<T>(visitMap: _RecursiveVisitMap[], value: T, ctx: _DeepCopyCo
     if (value && theType === OBJECT) {
         isPlain = isPlainObject(value);
     } else {
-        isPrim = value === null || isPrimitiveType(theType);
+        isPrim = value === NULL_VALUE || isPrimitiveType(theType);
     }
 
     let details: IObjDeepCopyHandlerDetails = {
@@ -155,7 +155,7 @@ function _deepCopy<T>(visitMap: _RecursiveVisitMap[], value: T, ctx: _DeepCopyCo
             let idx = 0;
             let handler = userHandler;
             while (!(handler || (idx < defaultDeepCopyHandlers.length ? defaultDeepCopyHandlers[idx++] : _defaultDeepCopyHandler)).call(ctx, details)) {
-                handler = null;
+                handler = NULL_VALUE;
             }
         });
     }
