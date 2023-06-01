@@ -14,16 +14,34 @@
 <ul class="tsd-breadcrumb">
 <li><a href="../index.html">@nevware21/ts-utils</a></li>
 <li><a href="CustomErrorConstructor.html">CustomErrorConstructor</a></li></ul>
-<h1>Interface CustomErrorConstructor</h1></div>
+<h1>Interface CustomErrorConstructor&lt;T&gt;</h1></div> 
+<section class="tsd-panel">
+<h4>Type Parameters</h4>
+<ul class="tsd-type-parameter-list">
+<li>
+<h4><span class="tsd-kind-type-parameter">T</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-type ">Error</span> = <span class="tsd-signature-type ">Error</span></h4></li></ul></section> 
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
-<li><span class="tsd-signature-type ">Error</span>
+<li><span class="tsd-signature-type ">ErrorConstructor</span>
 <ul class="tsd-hierarchy">
 <li><span class="target">CustomErrorConstructor</span></li></ul></li></ul></section>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="CustomErrorConstructor"><span class="tsd-kind-call-signature">Custom<wbr/>Error<wbr/>Constructor</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">message</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Error</span><a href="#CustomErrorConstructor" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="CustomErrorConstructor"><span class="tsd-kind-call-signature">Custom<wbr/>Error<wbr/>Constructor</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">message</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type tsd-kind-type-parameter">T</span><a href="#CustomErrorConstructor" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Defines the definition of the custom error constructor
+Used by: <a href="../functions/createCustomError.html" class="tsd-kind-function">createCustomError</a></p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">message</span>: <span class="tsd-signature-type">string</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type tsd-kind-type-parameter">T</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/helpers/customError.ts#L22">lib/src/helpers/customError.ts:22</a></li></ul></aside></li>
+<li class="tsd-signature tsd-anchor-link" id="CustomErrorConstructor-1"><span class="tsd-kind-call-signature">Custom<wbr/>Error<wbr/>Constructor</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">message</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Error</span><a href="#CustomErrorConstructor-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Defines the definition of the custom error constructor
 Used by: <a href="../functions/createCustomError.html" class="tsd-kind-function">createCustomError</a></p>
@@ -35,7 +53,7 @@ Used by: <a href="../functions/createCustomError.html" class="tsd-kind-function"
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">message</span>: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Error</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/helpers/customError.ts#L19">lib/src/helpers/customError.ts:19</a></li></ul></aside></li></ul></section>
+<li>Defined in node_modules/typescript/lib/lib.es5.d.ts:1060</li></ul></aside></li></ul></section>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -54,7 +72,18 @@ Used by: <a href="../functions/createCustomError.html" class="tsd-kind-function"
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="constructor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>constructor</span><a href="#constructor" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
-<li class="tsd-signature tsd-anchor-link" id="constructor.new_CustomErrorConstructor"><span class="tsd-kind-constructor-signature">new <wbr/>Custom<wbr/>Error<wbr/>Constructor</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">message</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Error</span><a href="#constructor.new_CustomErrorConstructor" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="constructor.new_CustomErrorConstructor"><span class="tsd-kind-constructor-signature">new <wbr/>Custom<wbr/>Error<wbr/>Constructor</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">message</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type tsd-kind-type-parameter">T</span><a href="#constructor.new_CustomErrorConstructor" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">message</span>: <span class="tsd-signature-type">string</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type tsd-kind-type-parameter">T</span></h4><aside class="tsd-sources">
+<p>Inherited from ErrorConstructor.constructor</p>
+<ul>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/helpers/customError.ts#L21">lib/src/helpers/customError.ts:21</a></li></ul></aside></li>
+<li class="tsd-signature tsd-anchor-link" id="constructor.new_CustomErrorConstructor-1"><span class="tsd-kind-constructor-signature">new <wbr/>Custom<wbr/>Error<wbr/>Constructor</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">message</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Error</span><a href="#constructor.new_CustomErrorConstructor-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -62,16 +91,17 @@ Used by: <a href="../functions/createCustomError.html" class="tsd-kind-function"
 <li>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">message</span>: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Error</span></h4><aside class="tsd-sources">
-<p>Inherited from Error.constructor</p>
+<p>Inherited from ErrorConstructor.constructor</p>
 <ul>
-<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/helpers/customError.ts#L18">lib/src/helpers/customError.ts:18</a></li></ul></aside></li></ul></section></section>
+<li>Defined in node_modules/typescript/lib/lib.es5.d.ts:1059</li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member"><a id="prototype" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>prototype</span><a href="#prototype" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">prototype</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">Error</span></div><aside class="tsd-sources">
+<div class="tsd-signature"><span class="tsd-kind-property">prototype</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type tsd-kind-type-parameter">T</span></div><aside class="tsd-sources">
+<p>Overrides ErrorConstructor.prototype</p>
 <ul>
-<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/helpers/customError.ts#L20">lib/src/helpers/customError.ts:20</a></li></ul></aside></section></section></div>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/helpers/customError.ts#L23">lib/src/helpers/customError.ts:23</a></li></ul></aside></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -195,6 +225,7 @@ Used by: <a href="../functions/createCustomError.html" class="tsd-kind-function"
 <li><a href="../functions/isObject.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Object</span></a></li>
 <li><a href="../functions/isPlainObject.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Plain<wbr/>Object</span></a></li>
 <li><a href="../functions/isPrimitive.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Primitive</span></a></li>
+<li><a href="../functions/isPrimitiveType.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Primitive<wbr/>Type</span></a></li>
 <li><a href="../functions/isPromise.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Promise</span></a></li>
 <li><a href="../functions/isPromiseLike.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Promise<wbr/>Like</span></a></li>
 <li><a href="../functions/isRegExp.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Reg<wbr/>Exp</span></a></li>

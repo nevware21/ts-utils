@@ -1,3 +1,12 @@
+# v0.9.6 May 31st, 2023
+
+## Changelog
+
+- #178 [Bug] objDeepCopy creates copies of classes by default
+- #181 [Bug] customError definition is not correct, it's a mixture of constructor and implmentation
+- #182 [Feature] Allow creation of sub-class custom errors
+  - Set stack trace to the top-most error class
+
 # v0.9.5 Apr 25th, 2023
 
 ## Changelog

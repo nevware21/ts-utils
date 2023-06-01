@@ -27,7 +27,7 @@ new deep copy and will be used when the handler returns true.</p>
 <ul class="tsd-hierarchy">
 <li><span class="target">IObjDeepCopyHandlerDetails</span></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L246">lib/src/object/copy.ts:246</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L257">lib/src/object/copy.ts:257</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -35,7 +35,8 @@ new deep copy and will be used when the handler returns true.</p>
 <div class="tsd-accordion-details">
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Properties</h3>
-<div class="tsd-index-list"><a href="IObjDeepCopyHandlerDetails.html#isPrim" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF984D" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-1024-path"></rect><path d="M9.354 16V7.24H12.174C12.99 7.24 13.638 7.476 14.118 7.948C14.606 8.412 14.85 9.036 14.85 9.82C14.85 10.604 14.606 11.232 14.118 11.704C13.638 12.168 12.99 12.4 12.174 12.4H10.434V16H9.354ZM10.434 11.428H12.174C12.646 11.428 13.022 11.284 13.302 10.996C13.59 10.7 13.734 10.308 13.734 9.82C13.734 9.324 13.59 8.932 13.302 8.644C13.022 8.356 12.646 8.212 12.174 8.212H10.434V11.428Z" fill="var(--color-text)" id="icon-1024-text"></path></svg><span>is<wbr/>Prim</span></a>
+<div class="tsd-index-list"><a href="IObjDeepCopyHandlerDetails.html#isPlain" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF984D" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-1024-path"></rect><path d="M9.354 16V7.24H12.174C12.99 7.24 13.638 7.476 14.118 7.948C14.606 8.412 14.85 9.036 14.85 9.82C14.85 10.604 14.606 11.232 14.118 11.704C13.638 12.168 12.99 12.4 12.174 12.4H10.434V16H9.354ZM10.434 11.428H12.174C12.646 11.428 13.022 11.284 13.302 10.996C13.59 10.7 13.734 10.308 13.734 9.82C13.734 9.324 13.59 8.932 13.302 8.644C13.022 8.356 12.646 8.212 12.174 8.212H10.434V11.428Z" fill="var(--color-text)" id="icon-1024-text"></path></svg><span>is<wbr/>Plain</span></a>
+<a href="IObjDeepCopyHandlerDetails.html#isPrim" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>is<wbr/>Prim</span></a>
 <a href="IObjDeepCopyHandlerDetails.html#origin" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>origin?</span></a>
 <a href="IObjDeepCopyHandlerDetails.html#path" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>path</span></a>
 <a href="IObjDeepCopyHandlerDetails.html#result" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>result</span></a>
@@ -49,27 +50,37 @@ new deep copy and will be used when the handler returns true.</p>
 </div></section></div></details></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
+<section class="tsd-panel tsd-member"><a id="isPlain" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>is<wbr/>Plain</span><a href="#isPlain" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">is<wbr/>Plain</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p>Identifies whether the type is a plain object or not, this also saves each handler from checking
+the <code>type</code>, currently the type will also be &quot;object&quot; if this is <code>true</code>.</p>
+
+<h3>Since</h3><p>0.9.6</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L273">lib/src/object/copy.ts:273</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="isPrim" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>is<wbr/>Prim</span><a href="#isPrim" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></h3>
+<h3 class="tsd-anchor-link"><span>is<wbr/>Prim</span><a href="#isPrim" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">is<wbr/>Prim</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 <div class="tsd-comment tsd-typography"><p>Identifies whether the type of the value is considered to be a primitive value</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L255">lib/src/object/copy.ts:255</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L266">lib/src/object/copy.ts:266</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="origin" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>origin</span><a href="#origin" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">origin</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">any</span></div>
 <div class="tsd-comment tsd-typography"><p>The original source object passed into the <code>objDeepCopy()</code> or <code>objCopyProps()</code> functions.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L277">lib/src/object/copy.ts:277</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L295">lib/src/object/copy.ts:295</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="path" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>path</span><a href="#path" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">path</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span></div>
 <div class="tsd-comment tsd-typography"><p>A array of keys from the orginal source (origin) object which lead to the current value</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L272">lib/src/object/copy.ts:272</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L290">lib/src/object/copy.ts:290</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="result" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>result</span><a href="#result" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">result</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
@@ -77,14 +88,14 @@ new deep copy and will be used when the handler returns true.</p>
 used when returning true from the handler. Ignored when the handler returns false.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L267">lib/src/object/copy.ts:267</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L285">lib/src/object/copy.ts:285</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="type" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>type</span><a href="#type" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">type</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 <div class="tsd-comment tsd-typography"><p>Identifies the type of the value as per <code>typeof value</code>, saves each check having to process this value.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L250">lib/src/object/copy.ts:250</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L261">lib/src/object/copy.ts:261</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="value" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>value</span><a href="#value" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">value</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
@@ -92,7 +103,7 @@ used when returning true from the handler. Ignored when the handler returns fals
 true from the handler. Ignored when the handler returns false.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L261">lib/src/object/copy.ts:261</a></li></ul></aside></section></section>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L279">lib/src/object/copy.ts:279</a></li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member"><a id="copy" class="tsd-anchor"></a>
@@ -119,7 +130,7 @@ but keeps the current context and recursive references.</p>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">key</span>: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type tsd-kind-type-parameter">T</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L284">lib/src/object/copy.ts:284</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L302">lib/src/object/copy.ts:302</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="copyTo" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>copy<wbr/>To</span><a href="#copyTo" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -147,7 +158,7 @@ and recursive references.</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type tsd-kind-type-parameter">T</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L293">lib/src/object/copy.ts:293</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/object/copy.ts#L311">lib/src/object/copy.ts:311</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -165,6 +176,7 @@ and recursive references.</p>
 <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg>On This Page</h3></summary>
 <div class="tsd-accordion-details">
 <ul>
+<li><a href="#isPlain" class=""><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>is<wbr/>Plain</span></a></li>
 <li><a href="#isPrim" class=""><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>is<wbr/>Prim</span></a></li>
 <li><a href="#origin" class=""><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>origin</span></a></li>
 <li><a href="#path" class=""><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>path</span></a></li>
@@ -277,6 +289,7 @@ and recursive references.</p>
 <li><a href="../functions/isObject.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Object</span></a></li>
 <li><a href="../functions/isPlainObject.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Plain<wbr/>Object</span></a></li>
 <li><a href="../functions/isPrimitive.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Primitive</span></a></li>
+<li><a href="../functions/isPrimitiveType.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Primitive<wbr/>Type</span></a></li>
 <li><a href="../functions/isPromise.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Promise</span></a></li>
 <li><a href="../functions/isPromiseLike.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Promise<wbr/>Like</span></a></li>
 <li><a href="../functions/isRegExp.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Reg<wbr/>Exp</span></a></li>
