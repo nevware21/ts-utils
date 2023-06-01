@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { EMPTY, UNDEF_VALUE } from "../internal/constants";
+import { EMPTY, NULL_VALUE, UNDEF_VALUE } from "../internal/constants";
 import { isError, isNumber, objToString } from "./base";
 
 /**
@@ -25,7 +25,7 @@ export function dumpObj(object: any, format?: boolean | number): string {
         propertyValueDump = "{ stack: '" + object.stack + "', message: '" + object.message + "', name: '" + object.name + "'";
     } else {
         try {
-            propertyValueDump = JSON.stringify(object, null, format ? (isNumber(format) ? format : 4) : UNDEF_VALUE);
+            propertyValueDump = JSON.stringify(object, NULL_VALUE, format ? (isNumber(format) ? format : 4) : UNDEF_VALUE);
         } catch(e) {
             // Unable to convert object (probably circular)
             propertyValueDump = " - " + dumpObj(e, format);

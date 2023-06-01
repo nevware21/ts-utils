@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { UNDEF_VALUE } from "../internal/constants";
+import { NULL_VALUE, UNDEF_VALUE } from "../internal/constants";
 import { _getGlobalValue } from "../internal/global";
 import { safeGetLazy } from "./safe_lazy";
 import { ILazyValue, _globalLazyTestHooks } from "./lazy";
@@ -74,7 +74,7 @@ export function lazySafeGetInst<T>(name: string) : ILazyValue<T> {
  * cause the cached global to be reset.
  */
 export function getGlobal(useCached?: boolean): Window {
-    (!_cachedGlobal || useCached === false || (_globalLazyTestHooks.lzy && !_cachedGlobal.b)) && (_cachedGlobal = safeGetLazy(_getGlobalValue, null));
+    (!_cachedGlobal || useCached === false || (_globalLazyTestHooks.lzy && !_cachedGlobal.b)) && (_cachedGlobal = safeGetLazy(_getGlobalValue, NULL_VALUE));
 
     return _cachedGlobal.v;
 }
@@ -112,7 +112,7 @@ export function getInst<T>(name: string, useCached?: boolean): T {
         return <any>_cachedWindow.v as T;
     }
 
-    return null;
+    return NULL_VALUE;
 }
 
 /**

@@ -7,6 +7,7 @@
  */
 
 import { isObject } from "../helpers/base";
+import { NULL_VALUE } from "../internal/constants";
 import { objHasOwn } from "../object/has_own";
 
 /**
@@ -18,7 +19,7 @@ import { objHasOwn } from "../object/has_own";
  * @param obj Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
  */
 export function polyObjKeys(obj: any): string[] {
-    if (!isObject(obj) || obj === null) {
+    if (!isObject(obj) || obj === NULL_VALUE) {
         throw new TypeError("polyObjKeys called on non-object");
     }
 

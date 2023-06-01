@@ -6,13 +6,14 @@
  * Licensed under the MIT license.
  */
 
-import { ObjClass } from "../internal/constants";
+import { NULL_VALUE, ObjClass, __PROTO__ } from "../internal/constants";
 import { isArray, isObject } from "../helpers/base";
 import { throwTypeError } from "../helpers/throw";
 import { objForEachKey } from "./for_each_key";
 
 const _objFreeze = ObjClass["freeze"];
 const _doNothing = <T>(value: T) => value;
+const _getProto = (value: any) => value[__PROTO__] || NULL_VALUE;
 
 /**
  * The `objAssign()` method copies all enumerable own properties from one or more source objects
@@ -88,7 +89,7 @@ export const objAssign = ObjClass["assign"];
  * ```
  */
 export function objKeys(value: any): string[] {
-    if (!isObject(value) || value === null) {
+    if (!isObject(value) || value === NULL_VALUE) {
         throwTypeError("objKeys called on non-object");
     }
 
@@ -154,4 +155,4 @@ export const objSeal: <T>(value: T) => T = ObjClass["seal"] || _doNothing;
  * @group Object
  * @param value = The object whose prototype is to be returned
  */
-export const objGetPrototypeOf: (value: any) => any = ObjClass["getPrototypeOf"] || _doNothing;
+export const objGetPrototypeOf: (value: any) => any = ObjClass["getPrototypeOf"] || _getProto;

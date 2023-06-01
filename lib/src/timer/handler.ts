@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { NULL_VALUE } from "../internal/constants";
 import { objDefineProp } from "../object/define";
 
 const REF = "ref";
@@ -162,7 +163,7 @@ export interface _TimerHandler {
  */
 export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId: T) => T, cancelFn: (timerId: T) => void): _TimerHandler {
     let ref = true;
-    let timerId: T = startTimer ? refreshFn(null) : null;
+    let timerId: T = startTimer ? refreshFn(NULL_VALUE) : NULL_VALUE;
     let theTimerHandler: ITimerHandler;
 
     const _unref = () => {
@@ -195,7 +196,7 @@ export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId:
 
     const _cancel = () => {
         timerId && cancelFn(timerId);
-        timerId = null;
+        timerId = NULL_VALUE;
     };
 
     const _setEnabled = (value: boolean) => {
@@ -220,7 +221,7 @@ export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId:
     return {
         h: theTimerHandler,
         dn: () => {
-            timerId = null;
+            timerId = NULL_VALUE;
         }
     };
 }

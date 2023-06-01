@@ -10,6 +10,7 @@
 // For now do NOT expect that we will export these values.
 
 export const UNDEF_VALUE: undefined = undefined;
+export const NULL_VALUE: null = null;
 
 export const EMPTY = "";
 export const BOOLEAN = "boolean";
@@ -17,6 +18,7 @@ export const FUNCTION = "function";
 export const NUMBER = "number";
 export const OBJECT = "object";
 export const PROTOTYPE = "prototype";
+export const __PROTO__ = "__proto__";
 export const STRING = "string";
 export const UNDEFINED = "undefined";
 export const CONSTRUCTOR = "constructor";

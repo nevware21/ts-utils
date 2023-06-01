@@ -14,7 +14,7 @@
         "outDir": "./build/base",
         "suppressImplicitAnyIndexErrors": true,
         "allowSyntheticDefaultImports": true,
-        "removeComments": true
+        "removeComments": false
     },
     "include": [
         "./src/**/*.ts"

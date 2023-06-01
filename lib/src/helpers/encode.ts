@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { UNDEF_VALUE } from "../internal/constants";
+import { NULL_VALUE, UNDEF_VALUE } from "../internal/constants";
 import { asString } from "../string/as_string";
 import { strCamelCase } from "../string/conversion";
 import { strPadStart } from "../string/pad";
@@ -129,7 +129,7 @@ export function encodeAsJson<T>(value: T, format?: boolean | number): string {
         }) + DBL_QUOTE;
     } else {
         try {
-            result = JSON.stringify(value, null, format ? (isNumber(format) ? format : 4) : UNDEF_VALUE);
+            result = JSON.stringify(value, NULL_VALUE, format ? (isNumber(format) ? format : 4) : UNDEF_VALUE);
         } catch (e) {
             // Unable to convert to JSON
             result = DBL_QUOTE + dumpObj(e) + DBL_QUOTE;

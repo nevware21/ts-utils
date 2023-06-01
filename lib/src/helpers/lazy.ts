@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { NULL_VALUE } from "../internal/constants";
 import { _GlobalTestHooks, _getGlobalConfig } from "../internal/global";
 import { objDefineProp } from "../object/define";
 
@@ -17,7 +18,7 @@ export let _globalLazyTestHooks: _GlobalTestHooks;
 
 let _fetchLazyTestHooks = function() {
     _globalLazyTestHooks = _getGlobalConfig();
-    _fetchLazyTestHooks = null;
+    _fetchLazyTestHooks = NULL_VALUE;
 }
 
 /**

@@ -121,23 +121,25 @@ describe("throw helpers", () => {
 
         it("custom type aith additional args", () => {
             let totalErrors = 0;
-            interface CriticalError extends CustomErrorConstructor {
-                new(message: string, file: string, line: number, col: number): Error;
-                (message: string, file: string, line: number, col: number): Error;
+            interface CriticalErrorConstructor extends CustomErrorConstructor {
+                new(message: string, file: string, line: number, col: number): CriticalError;
+                (message: string, file: string, line: number, col: number): CriticalError;
+            }
 
+            interface CriticalError extends Error {
                 readonly errorId: number;
                 readonly args: any[];
             }
 
-            let myCustomError = createCustomError<CriticalError>("CriticalErrorMessageTest", (self, args) => {
+            let myCustomError = createCustomError<CriticalErrorConstructor>("CriticalErrorMessageTest", (self, args) => {
                 totalErrors++;
                 self.errorId = totalErrors;
                 self.args = args;
             });
 
-            let error = _expectThrow(() => {
+            let error = _expectThrow<CriticalError>(() => {
                 throw new myCustomError("Failed", "test.ts", 1, 32);
-            }, "Failed") as CriticalError;
+            }, "Failed");
 
             assert.ok(error instanceof Error, "The custom error is an error");
             assert.ok(isError(error), "Validating an error was returned");
@@ -181,6 +183,76 @@ describe("throw helpers", () => {
             assert.equal(new myCustomError1().name, "myCustomError1", "Checking the error1 name");
             assert.equal(new myCustomError2().name, "myCustomError2", "Checking the error2 name");
             assert.equal(new myCustomError3().name, "myCustomError3", "Checking the error3 name");
+
+            assert.ok(isError(new myCustomError1()), "Check that the error is an Error");
+            assert.ok(isError(new myCustomError2()), "Check that the error is an Error");
+            assert.ok(isError(new myCustomError3()), "Check that the error is an Error");
+
+            assert.ok(new myCustomError1() instanceof Error, "Check that the error is an Error");
+            assert.ok(new myCustomError2() instanceof Error, "Check that the error is an Error");
+            assert.ok(new myCustomError3() instanceof Error, "Check that the error is an Error");
+        });
+
+        it("MyCriticalError example", () => {
+            // Or a more complex error object
+            interface MyCriticalErrorConstructor extends CustomErrorConstructor {
+                new(message: string, file: string, line: number, col: number): MyCriticalError;
+                (message: string, file: string, line: number, col: number): MyCriticalError;
+            }
+            
+            interface MyCriticalError extends Error {
+                readonly errorId: number;
+                readonly args: any[];        // Holds all of the arguments passed during construction
+            }
+                        
+            let _totalErrors = 0;
+            let myCustomError = createCustomError<MyCriticalErrorConstructor>("CriticalError", (self, args) => {
+                _totalErrors++;
+                self.errorId = _totalErrors;
+                self.args = args;
+            });
+            
+            try {
+                let theError = new myCustomError("Not Again!", "thefile.txt", 42, 21);
+                assert.equal(theError.name, "CriticalError");
+                assert.ok(isError(theError));
+                assert.equal(theError.args[0] , "Not Again!");
+                assert.equal(theError.args[1] , "thefile.txt");
+                assert.equal(theError.args[2] , "42");
+                assert.equal(theError.args[3] , "21");
+                assert.equal(theError.errorId, 1);
+
+                throw theError;
+            } catch(e) {
+                assert.equal(e.name, "CriticalError");
+                assert.ok(isError(e));
+                assert.equal(e.args[0] , "Not Again!");
+                assert.equal(e.args[1] , "thefile.txt");
+                assert.equal(e.args[2] , "42");
+                assert.equal(e.args[3] , "21");
+                assert.equal(e.errorId, 1);
+            }
+        });
+    });
+
+    describe("createCustomErrorWithBase", () => {
+        it("simple heirarchy", () => {
+            let ApplicationError = createCustomError("ApplicationError");
+            let startupError = createCustomError("StartupError", null, ApplicationError);
+
+            let theAppError = new ApplicationError();
+            let theError = new startupError();
+
+            assert.equal(theAppError.name, "ApplicationError", "Checking the appError name");
+            assert.ok(isError(theAppError), "Check that the appError is an Error");
+            assert.ok(theAppError instanceof Error, "Check that the appError is an Error");
+
+            
+            assert.equal(theError.name, "StartupError", "Checking the startupError name");
+            assert.ok(isError(theError), "Check that the startupError is an Error");
+            assert.ok(theError instanceof Error, "Check that the startupError is an Error");
+            assert.ok(theError instanceof startupError, "Check that the startupError is an startupError");
+            assert.ok(theError instanceof ApplicationError, "Check that the startupError is an ApplicationError");
         });
     });
 });

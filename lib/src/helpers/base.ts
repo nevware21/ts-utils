@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { ArrCls, BOOLEAN, FUNCTION, NUMBER, OBJECT, ObjProto, STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
+import { ArrCls, BOOLEAN, FUNCTION, NULL_VALUE, NUMBER, OBJECT, ObjProto, STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
 import { safeGet } from "./safe_get";
 
 const PRIMITIVE_TYPES = [ STRING, NUMBER, BOOLEAN, UNDEFINED, "symbol", "bigint" ];
@@ -182,7 +182,7 @@ export function isStrictUndefined(arg: any): arg is undefined {
  * ```
  */
 export function isNullOrUndefined(value:  any): boolean {
-    return value === null || isUndefined(value);
+    return value === NULL_VALUE || isUndefined(value);
 }
 
 /**
@@ -211,7 +211,7 @@ export function isNullOrUndefined(value:  any): boolean {
  * ```
  */
 export function isStrictNullOrUndefined(value: any): boolean {
-    return value === null || !isDefined(value);
+    return value === NULL_VALUE || !isDefined(value);
 }
 
 /**
@@ -293,7 +293,7 @@ export function isDefined(arg: any): boolean {
  * ```
  */
 export const isPrimitive = (value: any): value is string | number | bigint | boolean | undefined | symbol | null => {
-    return value === null || isPrimitiveType(typeof value);
+    return value === NULL_VALUE || isPrimitiveType(typeof value);
 };
 
 /**
