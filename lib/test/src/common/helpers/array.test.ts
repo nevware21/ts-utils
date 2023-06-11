@@ -9,6 +9,7 @@
 import { assert } from "chai";
 import { arrAppend } from "../../../../src/array/append";
 import { arrFind, arrFindIndex, arrFindLast, arrFindLastIndex } from "../../../../src/array/find";
+import { arrFrom } from "../../../../src/array/from";
 import { arrSome } from "../../../../src/array/some";
 import { arrForEach } from "../../../../src/array/forEach";
 import { arrContains, arrIncludes } from "../../../../src/array/includes";
@@ -909,6 +910,58 @@ describe("array helpers", () => {
             };
 
             assert.equal(arrFindLastIndex(arrayLike, (x) => !Number.isInteger(x)), 1);
+        });
+    });
+
+    describe("arrFrom", () => {
+        it("examples", () => {
+            const map = new Map([
+                [ 1, "Hello" ],
+                [ 2, "Darkness" ],
+                [ 3, "my" ],
+                [ 4, "old" ],
+                [ 5, "friend"]
+            ]);
+
+            assert.deepEqual(arrFrom("Hello"), [ "H", "e", "l", "l", "o" ]);
+            assert.deepEqual(arrFrom(new Set(["Hello", "Darkness", "my", "old", "friend"])), ["Hello", "Darkness", "my", "old", "friend"]);
+            assert.deepEqual(arrFrom(map.values()), ["Hello", "Darkness", "my", "old", "friend"]);
+            assert.deepEqual(arrFrom(map.keys()), [ 1, 2, 3, 4, 5 ]);
+            assert.deepEqual(arrFrom(map.entries()), [ [ 1, "Hello" ], [ 2, "Darkness" ], [ 3, "my" ], [ 4, "old" ], [ 5, "friend"] ]);
+        });
+
+        it("with mapFn", () => {
+            const kvArray = [
+                { key: 1, value: 10 },
+                { key: 2, value: 20 },
+                { key: 3, value: 30 }
+            ];
+
+            const reformattedArray = arrFrom(kvArray, ({ key, value}) => ({ [key]: value }));
+
+            assert.equal(reformattedArray.length, 3);
+            assert.equal(JSON.stringify(reformattedArray), "[{\"1\":10},{\"2\":20},{\"3\":30}]");
+            assert.equal(JSON.stringify(kvArray), "[{\"key\":1,\"value\":10},{\"key\":2,\"value\":20},{\"key\":3,\"value\":30}]");
+
+            // kvArray is still:
+            // [{key: 1, value: 10},
+            //  {key: 2, value: 20},
+            //  {key: 3, value: 30}]
+        });
+
+        it("with mapFn using a map", () => {
+            const map = new Map([
+                [ 1, "Hello" ],
+                [ 2, "Darkness" ],
+                [ 3, "my" ],
+                [ 4, "old" ],
+                [ 5, "friend"]
+            ]);
+
+            const reformattedArray = arrFrom(map, ([ key, value ]) => ({ [key]: value }));
+
+            assert.equal(reformattedArray.length, 5);
+            assert.equal(JSON.stringify(reformattedArray), "[{\"1\":\"Hello\"},{\"2\":\"Darkness\"},{\"3\":\"my\"},{\"4\":\"old\"},{\"5\":\"friend\"}]");
         });
     });
 

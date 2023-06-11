@@ -8,7 +8,7 @@
 
 import { arrForEach } from "./array/forEach";
 import { ArrCls, ArrProto, ObjClass, StrProto } from "./internal/constants";
-import { polyIsArray, polyArrIncludes, polyArrFind, polyArrFindIndex, polyArrFindLastIndex, polyArrFindLast } from "./polyfills/array";
+import { polyIsArray, polyArrIncludes, polyArrFind, polyArrFindIndex, polyArrFindLastIndex, polyArrFindLast, polyArrFrom } from "./polyfills/array";
 import { polyObjKeys } from "./polyfills/object";
 import { polyStrStartsWith } from "./string/starts_with";
 import { polyStrEndsWith } from "./string/ends_with";
@@ -40,6 +40,11 @@ import { polyStrIncludes } from "./string/includes";
         "includes": polyStrIncludes
     };
 
+    const arrayClsPolyfills = {
+        "isArray": polyIsArray,
+        "from": polyArrFrom
+    };
+
     const arrayPolyfills = {
         "includes": polyArrIncludes,
         "find": polyArrFind,
@@ -55,9 +60,11 @@ import { polyStrIncludes } from "./string/includes";
         }
     });
     
-    if (!ArrCls.isArray) {
-        ArrCls.isArray = makePolyFn(polyIsArray);
-    }
+    arrForEach(polyObjKeys(arrayClsPolyfills), (key) => {
+        if (!ArrCls[key]) {
+            ArrCls[key] = makePolyFn(arrayClsPolyfills[key]);
+        }
+    });
 
     // Add Array polyfills
     arrForEach(polyObjKeys(arrayPolyfills), (key) => {

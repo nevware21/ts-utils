@@ -8,6 +8,7 @@
 
 import { isObject } from "../helpers/base";
 import { NULL_VALUE } from "../internal/constants";
+import { objForEachKey } from "../object/for_each_key";
 import { objHasOwn } from "../object/has_own";
 
 /**
@@ -29,6 +30,36 @@ export function polyObjKeys(obj: any): string[] {
             result.push(prop);
         }
     }
+
+    return result;
+}
+
+/**
+ * Returns an array of key/values of the enumerable properties of an object
+ * @since 0.9.7
+ * @group Object
+ * @group ArrayLike
+ * @param value Object that contains the properties and methods.
+ * @example
+ * ```ts
+ * polyObjEntries({ Hello: "Darkness", my: "old", friend: "." });
+ * // [ [ "Hello", "Darkness" ], [ "my", "old"], [ "friend", "." ] ]
+ *
+ * // Array-like object
+ * polyObjEntries({ 0: "a", 1: "b", 2: "c" }));
+ * // [ ['0', 'a'], ['1', 'b'], ['2', 'c'] ]
+ *
+ * // Array-like object with random key ordering
+ * polyObjEntries({ 100: "a", 2: "b", 7: "c" });
+ * // [ ['2', 'b'], ['7', 'c'], ['100', 'a'] ]*
+ * ```
+ */
+export function polyObjEntries<T = any>(value: {} | { [s: string]: T } | ArrayLike<T>): [string, T][] {
+    let result: [string, T][] = [];
+
+    objForEachKey(value, (key, value) => {
+        result.push([key, value]);
+    });
 
     return result;
 }

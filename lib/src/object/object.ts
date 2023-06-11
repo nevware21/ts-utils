@@ -10,6 +10,7 @@ import { NULL_VALUE, ObjClass, __PROTO__ } from "../internal/constants";
 import { isArray, isObject } from "../helpers/base";
 import { throwTypeError } from "../helpers/throw";
 import { objForEachKey } from "./for_each_key";
+import { polyObjEntries } from "../polyfills/object";
 
 const _objFreeze = ObjClass["freeze"];
 const _doNothing = <T>(value: T) => value;
@@ -156,3 +157,25 @@ export const objSeal: <T>(value: T) => T = ObjClass["seal"] || _doNothing;
  * @param value = The object whose prototype is to be returned
  */
 export const objGetPrototypeOf: (value: any) => any = ObjClass["getPrototypeOf"] || _getProto;
+
+/**
+ * Returns an array of key/values of the enumerable properties of an object
+ * @since 0.9.7
+ * @group Object
+ * @group ArrayLike
+ * @param value Object that contains the properties and methods.
+ * @example
+ * ```ts
+ * objEntries({ Hello: "Darkness", my: "old", friend: "." });
+ * // [ [ "Hello", "Darkness" ], [ "my", "old"], [ "friend", "." ] ]
+ *
+ * // Array-like object
+ * objEntries({ 0: "a", 1: "b", 2: "c" }));
+ * // [ ['0', 'a'], ['1', 'b'], ['2', 'c'] ]
+ *
+ * // Array-like object with random key ordering
+ * objEntries({ 100: "a", 2: "b", 7: "c" });
+ * // [ ['2', 'b'], ['7', 'c'], ['100', 'a'] ]*
+ * ```
+ */
+export const objEntries: <T = any>(value: {} | { [s: string]: T } | ArrayLike<T>) => [string, T][] = ObjClass.entries || polyObjEntries;
