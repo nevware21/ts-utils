@@ -1,3 +1,11 @@
+# v0.9.7 June 11th, 2023
+
+## Changelog
+
+- #185 [Feature] Add Object.entries and Array.from alias / implementations
+- #187 [Feature] Add Object.values alias / implementation
+- #189 [Feature] Update issue templates
+
 # v0.9.6 May 31st, 2023
 
 ## Changelog
