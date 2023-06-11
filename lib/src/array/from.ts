@@ -48,7 +48,7 @@ import { ArrFromMapFn } from "./callbacks";
  *
  * arrFrom(map.entries());
  * // [ [ 1, "Hello" ], [ 2, "Darkness" ], [ 3, "my" ], [ 4, "old" ], [ 5, "friend"] ]
- * 
+ *
  * // With a Mapping function
  * const map = new Map([
  *   [ 1, "Hello" ],
