@@ -7,7 +7,7 @@
  */
 
 import { assert } from "chai";
-import { polyArrFind, polyArrFindIndex, polyArrFindLast, polyArrFindLastIndex, polyArrIncludes, polyIsArray } from "../../../../src/polyfills/array";
+import { polyArrFind, polyArrFindIndex, polyArrFindLast, polyArrFindLastIndex, polyArrFrom, polyArrIncludes, polyIsArray } from "../../../../src/polyfills/array";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 describe("array polyfills", () => {
@@ -230,7 +230,58 @@ describe("array polyfills", () => {
         });
     });
 
+    describe("polyArrFrom", () => {
+        it("examples", () => {
+            const map = new Map([
+                [ 1, "Hello" ],
+                [ 2, "Darkness" ],
+                [ 3, "my" ],
+                [ 4, "old" ],
+                [ 5, "friend"]
+            ]);
 
+            assert.deepEqual(polyArrFrom("Hello"), [ "H", "e", "l", "l", "o" ]);
+            assert.deepEqual(polyArrFrom(new Set(["Hello", "Darkness", "my", "old", "friend"])), ["Hello", "Darkness", "my", "old", "friend"]);
+            assert.deepEqual(polyArrFrom(map.values()), ["Hello", "Darkness", "my", "old", "friend"]);
+            assert.deepEqual(polyArrFrom(map.keys()), [ 1, 2, 3, 4, 5 ]);
+            assert.deepEqual(polyArrFrom(map.entries()), [ [ 1, "Hello" ], [ 2, "Darkness" ], [ 3, "my" ], [ 4, "old" ], [ 5, "friend"] ]);
+        });
+
+
+        it("with mapFn", () => {
+            const kvArray = [
+                { key: 1, value: 10 },
+                { key: 2, value: 20 },
+                { key: 3, value: 30 }
+            ];
+
+            const reformattedArray = polyArrFrom(kvArray, ({ key, value}) => ({ [key]: value }));
+
+            assert.equal(reformattedArray.length, 3);
+            assert.equal(JSON.stringify(reformattedArray), "[{\"1\":10},{\"2\":20},{\"3\":30}]");
+            assert.equal(JSON.stringify(kvArray), "[{\"key\":1,\"value\":10},{\"key\":2,\"value\":20},{\"key\":3,\"value\":30}]");
+
+            // kvArray is still:
+            // [{key: 1, value: 10},
+            //  {key: 2, value: 20},
+            //  {key: 3, value: 30}]
+        });
+
+        it("with mapFn using a map", () => {
+            const map = new Map([
+                [ 1, "Hello" ],
+                [ 2, "Darkness" ],
+                [ 3, "my" ],
+                [ 4, "old" ],
+                [ 5, "friend"]
+            ]);
+
+            const reformattedArray = polyArrFrom(map, ([ key, value ]) => ({ [key]: value }));
+
+            assert.equal(reformattedArray.length, 5);
+            assert.equal(JSON.stringify(reformattedArray), "[{\"1\":\"Hello\"},{\"2\":\"Darkness\"},{\"3\":\"my\"},{\"4\":\"old\"},{\"5\":\"friend\"}]");
+        });
+    });
 
     function _checkIsArray(value: any) {
         let polyResult = polyIsArray(value);

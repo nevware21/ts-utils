@@ -8,21 +8,7 @@
 
 import { ArrProto } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
-
-/**
- * Callback signature for {@link arrMap} that is called for every element of array. Each time callbackFn
- * executes, the returned value is added to newArray.
- *
- * @since 0.3.3
- * @group Array
- * @group ArrayLike
- * @typeParam T - Identifies the type of the array elements
- * @typeParam R - Identifies the type of the elements returned by the callback function, defaults to T.
- * @param value - The current element being processed in the array.
- * @param index - The index of the current element being processed in the array.
- * @param array - The array that the `map` function was called on.
- */
-export type ArrMapCallbackFn<T, R = T> = (value: T, index?: number, array?: T[]) => R;
+import { ArrMapCallbackFn } from "./callbacks";
 
 /**
  * The arrMap() method creates a new array populated with the results of calling a provided function on every

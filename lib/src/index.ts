@@ -7,13 +7,14 @@
  */
 
 export { arrAppend } from "./array/append";
-export { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "./array/callbacks";
+export { ArrPredicateCallbackFn, ArrPredicateCallbackFn2, ArrMapCallbackFn, ArrFromMapFn } from "./array/callbacks";
 export { arrEvery, arrFilter } from "./array/every";
 export { arrFind, arrFindIndex, arrFindLast, arrFindLastIndex } from "./array/find";
 export { arrForEach } from "./array/forEach";
+export { arrFrom } from "./array/from";
 export { arrContains, arrIncludes } from "./array/includes";
 export { arrIndexOf, arrLastIndexOf } from "./array/indexOf";
-export { ArrMapCallbackFn, arrMap } from "./array/map";
+export { arrMap } from "./array/map";
 export { ArrReduceCallbackFn, arrReduce } from "./array/reduce";
 export { arrSlice } from "./array/slice";
 export { arrSome } from "./array/some";
@@ -66,7 +67,7 @@ export { objHasOwn, polyObjHasOwn } from "./object/has_own";
 export { objHasOwnProperty } from "./object/has_own_prop";
 export { isPlainObject } from "./object/is_plain_object";
 export {
-    objAssign, objKeys, objDeepFreeze, objFreeze, objSeal, objGetPrototypeOf
+    objAssign, objKeys, objDeepFreeze, objFreeze, objSeal, objGetPrototypeOf, objEntries
 } from "./object/object";
 export { objSetPrototypeOf } from "./object/set_proto";
 export { getValueByKey, setValueByKey, getValueByIter, setValueByIter } from "./helpers/get_set_value";
@@ -93,8 +94,8 @@ export { TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, schedu
 
 // Exporting the helpers, but not the "initialization" code to populate any missing values
 // This will enable anyone to "reuse" or create their own polyfills.ts implementation if they want.
-export { polyIsArray, polyArrFind, polyArrFindIndex, polyArrFindLast, polyArrFindLastIndex, polyArrIncludes } from "./polyfills/array";
-export { polyObjKeys } from "./polyfills/object";
+export { polyIsArray, polyArrFind, polyArrFindIndex, polyArrFindLast, polyArrFindLastIndex, polyArrIncludes, polyArrFrom } from "./polyfills/array";
+export { polyObjKeys, polyObjEntries } from "./polyfills/object";
 export { polyStrSymSplit } from "./polyfills/split";
 export { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "./polyfills/symbol";
 export { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "./polyfills/trim";

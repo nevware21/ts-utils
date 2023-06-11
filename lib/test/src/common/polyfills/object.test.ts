@@ -7,7 +7,7 @@
  */
 
 import { assert } from "chai";
-import { polyObjKeys } from "../../../../src/polyfills/object";
+import { polyObjEntries, polyObjKeys } from "../../../../src/polyfills/object";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isObject, isUndefined } from "../../../../src/helpers/base";
 
@@ -54,6 +54,13 @@ describe("object polyfills", () => {
             "friend": "."
         });
     });
+
+    describe("polyObjEntries", () => {
+        it("examples", () => {
+            assert.deepEqual(polyObjEntries({ Hello: "Darkness", my: "old", friend: "." }), [ [ "Hello", "Darkness" ], [ "my", "old"], [ "friend", "." ] ]);
+        });
+    });
+
 
     function _checkObjKeys(value: any) {
         let polyResult: any;

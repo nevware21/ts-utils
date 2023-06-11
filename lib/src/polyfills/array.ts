@@ -6,11 +6,14 @@
  * Licensed under the MIT license.
  */
 
-import { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "../array/callbacks";
+import { ArrFromMapFn, ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "../array/callbacks";
 import { arrForEach } from "../array/forEach";
 import { arrIndexOf } from "../array/indexOf";
-import { isNullOrUndefined, objToString } from "../helpers/base";
+import { arrMap } from "../array/map";
+import { arrSlice } from "../array/slice";
+import { isArray, isNullOrUndefined, objToString } from "../helpers/base";
 import { LENGTH } from "../internal/constants";
+import { iterForOf } from "../iterator/forOf";
 
 /**
  * Polyfill support function for Array.isArray
@@ -275,6 +278,63 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
             break;
         }
     }
+
+    return result;
+}
+
+/**
+ * The polyArrFrom creates an new shallow-copied array from an array-like object or an iterable.
+ * @since 0.9.7
+ * @group Polyfill
+ * @group ArrayLike
+ * @group Array
+ * @group Iterator
+ * @typeParam T - Identifies the element type of the array-like or iterable.
+ * @typeParam U - Identifies returned type of the array
+ * @param theValue - An array-like object or iterable to convert to an array.
+ * @param mapfn - A {@link ArrFromMapFn | mapping function} to call on every element of the array. If provided, every
+ * value to be added to the array is first passed through this map function, and the return
+ * value is added to the array instead. The function is called with the following arguments:
+ * @param thisArg Value of 'this' used to invoke the mapfn.
+ * @example
+ * ```ts
+ * polyArrFrom("Hello");
+ * // [ "H", "e", "l", "l", "o" ]
+ *
+ * polyArrFrom(new Set(["Hello", "Darkness", "my", "old", "friend"]));
+ * // ["Hello", "Darkness", "my", "old", "friend"]
+ *
+ * let map = new Map([
+ *   [ 1, "Hello" ],
+ *   [ 2, "Darkness" ],
+ *   [ 3, "my" ],
+ *   [ 4, "old" ],
+ *   [ 5, "friend"]
+ * ]);
+ *
+ * polyArrFrom(map.values());
+ * // ["Hello", "Darkness", "my", "old", "friend"]
+ *
+ * polyArrFrom(map.keys());
+ * // [ 1, 2, 3, 4, 5 ]
+ *
+ * polyArrFrom(map.entries());
+ * // [ [ 1, "Hello" ], [ 2, "Darkness" ], [ 3, "my" ], [ 4, "old" ], [ 5, "friend"] ]
+ * 
+ * polyArrFrom(map, ([ key, value ]) => ({ [key]: value }));
+ * // [ {"1": "Hello"}, {"2": "Darkness"}, {"3": "my"}, {"4": "old"}, {"5": "friend"} ]
+ * ```
+ */
+export function polyArrFrom<T, U = T>(theValue: ArrayLike<T> | Iterable<T>, mapFn?: ArrFromMapFn<T, U>, thisArg?: any): U[] {
+    if (isArray(theValue)) {
+        let result = arrSlice(theValue);
+        return mapFn ? arrMap<T, U>(result, mapFn, thisArg) : result;
+    }
+
+    let result: U[] = [];
+    iterForOf(theValue as any, (value, cnt) => {
+        result.push(mapFn ? mapFn.call(thisArg, value, cnt) : value);
+    });
 
     return result;
 }
