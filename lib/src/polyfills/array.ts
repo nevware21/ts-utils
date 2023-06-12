@@ -320,7 +320,7 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
  *
  * polyArrFrom(map.entries());
  * // [ [ 1, "Hello" ], [ 2, "Darkness" ], [ 3, "my" ], [ 4, "old" ], [ 5, "friend"] ]
- * 
+ *
  * polyArrFrom(map, ([ key, value ]) => ({ [key]: value }));
  * // [ {"1": "Hello"}, {"2": "Darkness"}, {"3": "my"}, {"4": "old"}, {"5": "friend"} ]
  * ```

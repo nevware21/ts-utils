@@ -37,6 +37,7 @@ export function polyObjKeys(obj: any): string[] {
 /**
  * Returns an array of key/values of the enumerable properties of an object
  * @since 0.9.7
+ * @group Polyfill
  * @group Object
  * @group ArrayLike
  * @param value Object that contains the properties and methods.
@@ -59,6 +60,37 @@ export function polyObjEntries<T = any>(value: {} | { [s: string]: T } | ArrayLi
 
     objForEachKey(value, (key, value) => {
         result.push([key, value]);
+    });
+
+    return result;
+}
+
+/**
+ * Returns an array of key/values of the enumerable properties of an object
+ * @since 0.9.7
+ * @group Polyfill
+ * @group Object
+ * @group ArrayLike
+ * @param value Object that contains the properties and methods.
+ * @example
+ * ```ts
+ * polyObjValues({ Hello: "Darkness", my: "old", friend: "." });
+ * // [ "Darkness", "old", "." ]
+ *
+ * // Array-like object
+ * polyObjValues({ 0: "a", 1: "b", 2: "c" }));
+ * // [ 'a', 'b', 'c']
+ *
+ * // Array-like object with random key ordering
+ * polyObjValues({ 100: "a", 2: "b", 7: "c" });
+ * // [ 'b', 'c', 'a']
+ * ```
+ */
+export function polyObjValues<T = any>(value: {} | { [s: string]: T } | ArrayLike<T>): T[] {
+    let result: T[] = [];
+
+    objForEachKey(value, (key, value) => {
+        result.push(value);
     });
 
     return result;

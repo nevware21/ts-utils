@@ -11,7 +11,7 @@ import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isFunction, isObject, isString, isUndefined } from "../../../../src/helpers/base";
 import { objForEachKey } from "../../../../src/object/for_each_key";
 import { objHasOwnProperty } from "../../../../src/object/has_own_prop";
-import { objDeepFreeze, objEntries, objFreeze, objKeys, objSeal } from "../../../../src/object/object";
+import { objDeepFreeze, objEntries, objFreeze, objKeys, objSeal, objValues } from "../../../../src/object/object";
 import { objDefine, objDefineAccessors, objDefineGet, objDefineProps } from "../../../../src/object/define";
 import { FUNCTION } from "../../../../src/internal/constants";
 import { objSetPrototypeOf } from "../../../../src/object/set_proto";
@@ -1211,6 +1211,18 @@ describe("object helpers", () => {
 
             // Array-like object with random key ordering
             assert.deepEqual(objEntries({ 100: "a", 2: "b", 7: "c" }), [ ["2", "b"], ["7", "c"], ["100", "a"] ]);
+        });
+    });
+
+    describe("objValues", () => {
+        it("examples", () => {
+            assert.deepEqual(objValues({ Hello: "Darkness", my: "old", friend: "." }), [ "Darkness", "old", "." ]);
+
+            // Array-like object
+            assert.deepEqual(objValues({ 0: "a", 1: "b", 2: "c" }), [ "a", "b", "c"]);
+
+            // Array-like object with random key ordering
+            assert.deepEqual(objValues({ 100: "a", 2: "b", 7: "c" }), [ "b", "c", "a"]);
         });
     });
 

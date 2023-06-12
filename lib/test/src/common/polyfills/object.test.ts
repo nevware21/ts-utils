@@ -7,7 +7,7 @@
  */
 
 import { assert } from "chai";
-import { polyObjEntries, polyObjKeys } from "../../../../src/polyfills/object";
+import { polyObjEntries, polyObjKeys, polyObjValues } from "../../../../src/polyfills/object";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isObject, isUndefined } from "../../../../src/helpers/base";
 
@@ -58,9 +58,26 @@ describe("object polyfills", () => {
     describe("polyObjEntries", () => {
         it("examples", () => {
             assert.deepEqual(polyObjEntries({ Hello: "Darkness", my: "old", friend: "." }), [ [ "Hello", "Darkness" ], [ "my", "old"], [ "friend", "." ] ]);
+
+            // Array-like object
+            assert.deepEqual(polyObjEntries({ 0: "a", 1: "b", 2: "c" }), [ ["0", "a"], ["1", "b"], ["2", "c"] ]);
+
+            // Array-like object with random key ordering
+            assert.deepEqual(polyObjEntries({ 100: "a", 2: "b", 7: "c" }), [ ["2", "b"], ["7", "c"], ["100", "a"] ]);
         });
     });
 
+    describe("polyObjValues", () => {
+        it("examples", () => {
+            assert.deepEqual(polyObjValues({ Hello: "Darkness", my: "old", friend: "." }), [ "Darkness", "old", "." ]);
+
+            // Array-like object
+            assert.deepEqual(polyObjValues({ 0: "a", 1: "b", 2: "c" }), [ "a", "b", "c"]);
+
+            // Array-like object with random key ordering
+            assert.deepEqual(polyObjValues({ 100: "a", 2: "b", 7: "c" }), [ "b", "c", "a"]);
+        });
+    });
 
     function _checkObjKeys(value: any) {
         let polyResult: any;
