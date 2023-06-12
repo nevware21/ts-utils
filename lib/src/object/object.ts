@@ -10,7 +10,7 @@ import { NULL_VALUE, ObjClass, __PROTO__ } from "../internal/constants";
 import { isArray, isObject } from "../helpers/base";
 import { throwTypeError } from "../helpers/throw";
 import { objForEachKey } from "./for_each_key";
-import { polyObjEntries } from "../polyfills/object";
+import { polyObjEntries, polyObjValues } from "../polyfills/object";
 
 const _objFreeze = ObjClass["freeze"];
 const _doNothing = <T>(value: T) => value;
@@ -154,7 +154,7 @@ export const objSeal: <T>(value: T) => T = ObjClass["seal"] || _doNothing;
  * of the specified value.
  * @since 0.4.4
  * @group Object
- * @param value = The object whose prototype is to be returned
+ * @param value - The object whose prototype is to be returned, which may be null.
  */
 export const objGetPrototypeOf: (value: any) => any = ObjClass["getPrototypeOf"] || _getProto;
 
@@ -179,3 +179,31 @@ export const objGetPrototypeOf: (value: any) => any = ObjClass["getPrototypeOf"]
  * ```
  */
 export const objEntries: <T = any>(value: {} | { [s: string]: T } | ArrayLike<T>) => [string, T][] = ObjClass.entries || polyObjEntries;
+
+/**
+ * The objValues() returns an array whose elements are values of enumerable string-keyed properties found
+ * directly upon object. This is the same as iterating with a for...in loop, except that a for...in loop
+ * enumerates properties in the prototype chain as well. The order of the array returned by objValues()
+ * is the same as that provided by a for...in loop.
+ *
+ * If you need the property keys, use objKeys() instead. If you need both the property keys and values, use objEntries() instead.
+ * @since 0.9.7
+ * @group Object
+ * @group ArrayLike
+ * @param value - The object that contains the properties and methods.
+ * @returns An array containing the given object's own enumerable string-keyed property values.
+ * @example
+ * ```ts
+ * objValues({ Hello: "Darkness", my: "old", friend: "." });
+ * // [ "Darkness", "old", "." ]
+ *
+ * // Array-like object
+ * objValues({ 0: "a", 1: "b", 2: "c" }));
+ * // [ 'a', 'b', 'c']
+ *
+ * // Array-like object with random key ordering
+ * objValues({ 100: "a", 2: "b", 7: "c" });
+ * // [ 'b', 'c', 'a']
+ * ```
+ */
+export const objValues: <T = any>(value: {} | { [s: string]: T } | ArrayLike<T>) => T[] = ObjClass.values || polyObjValues;
