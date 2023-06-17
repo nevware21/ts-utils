@@ -13,10 +13,8 @@ import { strIncludes } from "../../../../src/string/includes";
 describe("unwrapFunction", () => {
     it("wrapped function with polyfill fallback only", () => {
         let testFnCalled = 0;
-        let testFnArgs: IArguments;
 
         function testFn() {
-            testFnArgs = arguments;
             testFnCalled++;
         }
 
@@ -50,10 +48,8 @@ describe("unwrapFunction", () => {
 
     it("no this with wrapped function with polyfill fallback only", () => {
         let testFnCalled = 0;
-        let testFnArgs: IArguments;
 
         function testFn() {
-            testFnArgs = arguments;
             testFnCalled++;
         }
 
@@ -67,18 +63,14 @@ describe("unwrapFunction", () => {
     it("wrapped function with mis-matching target and polyfill fallback", () => {
         let polyFnCalled = 0;
         let targetFnCalled = 0;
-        let testFnArgs: IArguments;
-        let targetFnArgs: IArguments;
 
         function polyTestFn() {
-            testFnArgs = arguments;
             polyFnCalled++;
         }
 
         let wrappedFn = _unwrapFunction("test",
             {
                 myFunc: function() {
-                    targetFnArgs = arguments;
                     targetFnCalled++;
                 }
             } as any, polyTestFn);
@@ -115,7 +107,6 @@ describe("unwrapFunction", () => {
 
     it("wrapped function with matching target container and polyFn", () => {
         let targetFnCalled = 0;
-        let targetFnArgs: IArguments;
 
         function polyTestFn() {
             assert.fail("Should not get called");
@@ -123,7 +114,6 @@ describe("unwrapFunction", () => {
 
         let wrappedFn = _unwrapFunction("test", {
             test: function() {
-                targetFnArgs = arguments;
                 targetFnCalled++;
             }
         }, polyTestFn);
@@ -156,11 +146,9 @@ describe("unwrapFunction", () => {
 
     it("wrapped function with matching target container and no polyFn", () => {
         let targetFnCalled = 0;
-        let targetFnArgs: IArguments;
 
         let wrappedFn = _unwrapFunction("test", {
             test: function() {
-                targetFnArgs = arguments;
                 targetFnCalled++;
             }
         });
@@ -193,11 +181,9 @@ describe("unwrapFunction", () => {
 
     it("no test object with wrapped function with matching target container and no polyFn", () => {
         let targetFnCalled = 0;
-        let targetFnArgs: IArguments;
 
         let wrappedFn = _unwrapFunction("test", {
             test: function() {
-                targetFnArgs = arguments;
                 targetFnCalled++;
             }
         });

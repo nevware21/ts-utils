@@ -11,8 +11,6 @@ import { asString } from "../../../../src/string/as_string";
 import { strIndexOf } from "../../../../src/string/index_of";
 import { strSplit, strSymSplit } from "../../../../src/string/split";
 import { strSubstring } from "../../../../src/string/substring";
-import { getKnownSymbol } from "../../../../src/symbol/symbol";
-import { WellKnownSymbols } from "../../../../src/symbol/well_known";
 
 describe("string split helpers", () => {
 

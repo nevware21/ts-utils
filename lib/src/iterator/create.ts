@@ -208,6 +208,7 @@ export function createIterator<T>(ctx: CreateIteratorContext<T>): Iterator<T> {
     }
 
     function _return(value?: T): IteratorReturnResult<T> {
+        isDone = true;
         return {
             [DONE]: true,
             [VALUE]: ctx.r && ctx.r(value)
@@ -215,6 +216,7 @@ export function createIterator<T>(ctx: CreateIteratorContext<T>): Iterator<T> {
     }
 
     function _throw(e?: any): IteratorResult<T> {
+        isDone = true;
         return {
             [DONE]: true,
             [VALUE]: ctx.t && ctx.t(e)

@@ -61,7 +61,7 @@ describe("create iterator helpers", () => {
                 values.push(value);
             });
 
-            assert.equal(cnt, 4, "No iterators should have occurred");
+            assert.equal(cnt, 4, "4 iterations should have occurred");
             assert.equal(values[0], 10);
             assert.equal(values[1], 20);
             assert.equal(values[2], 5);
@@ -82,11 +82,15 @@ describe("create iterator helpers", () => {
                 item3: "value3"
             };
             
+            let strValues: string[] = [];
             iterForOf(createArrayIterator(objKeys(testObj)), (value) => {
-                assert.ok(false, "There should be no elements")
+                strValues.push(value);
                 cnt++;
             });
-            assert.equal(cnt, 0, "No iterators should have occurred");
+            assert.equal(cnt, 3, "3 iterations should have occurred");
+            assert.equal(strValues[0], "item1");
+            assert.equal(strValues[1], "item2");
+            assert.equal(strValues[2], "item3");
         });
     });
 
@@ -176,7 +180,7 @@ describe("create iterator helpers", () => {
                 assert.ok(false, "Should not be called");
             });
 
-            assert.equal(done, true, "Check that the return was called");
+            assert.equal(done, false, "Check that the return was not called as it doesn't need to be");
         });
 
         it("with throw", () => {
@@ -204,12 +208,17 @@ describe("create iterator helpers", () => {
             };
 
             let values: number[] = [];
-            iterForOf(createIterable(fibCtx), (value) => {
-                values.push(value);
-                if (values.length === 10) {
-                    throwError("Fail!");
-                }
-            });
+            try {
+                iterForOf(createIterable(fibCtx), (value) => {
+                    values.push(value);
+                    if (values.length === 10) {
+                        throwError("Fail!");
+                    }
+                });
+                assert.ok(false, "The exception should have been thrown");
+            } catch (e) {
+                assert.ok(true, "Expected the exception to be thrown");
+            }
     
             assert.equal(done, false, "Check that the return was called");
             assert.equal(thrown, true, "Check that the throw was called");
