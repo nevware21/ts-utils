@@ -460,13 +460,7 @@ describe("array helpers", () => {
 
             const getMax = (a: number, b: number) => Math.max(a, b);
 
-            assert.equal(arrReduce({
-                length: 3,
-                0: 1,
-                1: 50,
-                2: 100,
-                3: 200
-            }, getMax), 100);
+            assert.equal(arrReduce(arrayLike, getMax), 100);
 
             assert.equal(arrReduce({
                 length: 3,

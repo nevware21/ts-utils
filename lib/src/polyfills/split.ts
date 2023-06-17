@@ -6,7 +6,6 @@
  * Licensed under the MIT license.
  */
 
-import { _unwrapFunction } from "../internal/unwrapFunction";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 

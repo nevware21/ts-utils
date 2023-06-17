@@ -168,7 +168,6 @@ describe("throw helpers", () => {
         });
 
         it("multiple custom errors", () => {
-            let totalErrors = 0;
             let myCustomError1 = createCustomError("myCustomError1");
             assert.equal(new myCustomError1().name, "myCustomError1", "Checking the error1 name");
 

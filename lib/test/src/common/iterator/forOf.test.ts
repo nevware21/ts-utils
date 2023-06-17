@@ -80,11 +80,15 @@ describe("create iterator helpers", () => {
                 item3: "value3"
             };
             
+            let strValues: string[] = [];
             iterForOf(objKeys(testObj), (value) => {
-                assert.ok(false, "There should be no elements")
+                strValues.push(value);
                 cnt++;
             });
-            assert.equal(cnt, 0, "No iterations should have occurred");
+            assert.equal(cnt, 3, "3 iterations should have occurred");
+            assert.equal(strValues[0], "item1");
+            assert.equal(strValues[1], "item2");
+            assert.equal(strValues[2], "item3");
 
             cnt = 0;
             iterForOf({} as any, (value) => {

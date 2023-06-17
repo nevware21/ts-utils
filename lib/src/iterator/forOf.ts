@@ -6,10 +6,13 @@
  * Licensed under the MIT license.
  */
 
+import { ILazyValue, getLazy } from "../helpers/lazy";
 import { DONE, VALUE } from "../internal/constants";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 import { isIterator } from "./iterator";
+
+let _iterSymbol: ILazyValue<symbol>;
 
 /**
  * Calls the provided `callbackFn` function once for each element in the iterator or iterator returned by
@@ -36,6 +39,7 @@ import { isIterator } from "./iterator";
  * callbackfn function one time for each element returned by the iterator.
  * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is
  * omitted, null or undefined the iterator will be used as the this value.
+ * @throws Any exception thrown while processing the iterator
  * @example
  * ```ts
  * const items = {
@@ -54,26 +58,39 @@ import { isIterator } from "./iterator";
 export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value: T, count?: number, iter?: Iterator<T>) => void | number, thisArg?: any): void {
     if (iter) {
         if (!isIterator(iter)) {
-            let itSymbol = getKnownSymbol(WellKnownSymbols.iterator);
-            iter = iter[itSymbol] ? iter[itSymbol]() : null;
+            !_iterSymbol && (_iterSymbol = getLazy(() => getKnownSymbol(WellKnownSymbols.iterator)));
+            iter = iter[_iterSymbol.v] ? iter[_iterSymbol.v]() : null;
         }
         
         if (isIterator(iter)) {
+            let err: { e: any };
+            let iterResult: IteratorResult<T>;
             try {
                 let count = 0;
-                let value = iter.next();
-                while(!value[DONE]) {
-                    if (callbackfn.call(thisArg || iter, value[VALUE], count, iter) === -1) {
+                while(!(iterResult = iter.next())[DONE]) {
+                    if (callbackfn.call(thisArg || iter, iterResult[VALUE], count, iter) === -1) {
                         break;
                     }
         
                     count++;
-                    value = iter.next();
                 }
-
-                iter.return && iter.return(value);
-            } catch (e) {
-                iter.throw && iter.throw(e);
+            } catch (failed) {
+                err = { e: failed };
+                if (iter.throw) {
+                    iterResult = null;
+                    iter.throw(err);
+                }
+            } finally {
+                try {
+                    if (iterResult && !iterResult[DONE]) {
+                        iter.return && iter.return(iterResult);
+                    }
+                } finally {
+                    if (err) {
+                        // eslint-disable-next-line no-unsafe-finally
+                        throw err.e;
+                    }
+                }
             }
         }
     }
