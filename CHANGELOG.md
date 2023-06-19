@@ -1,3 +1,13 @@
+# v0.9.8 June 18th, 2023
+
+## Changelog
+
+- #192 [Bug] iterForOf does not always process elements correctly
+- #193 [Bug] Calling return or throw on an iterator does not mark it as done
+- #194 [Bug] iterForOf swallows errors caused during the iteration
+- #196 [Feature] Add aliases for functions apply, bind and call
+- #197 [Feature] Add function proxies
+
 # v0.9.7 June 11th, 2023
 
 ## Changelog
