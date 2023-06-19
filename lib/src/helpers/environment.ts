@@ -53,9 +53,7 @@ let _isNode: ILazyValue<boolean>;
  * // otherwise the Promise class.
  * ```
  */
-export function lazySafeGetInst<T>(name: string) : ILazyValue<T> {
-    return safeGetLazy(() => getInst<T>(name) || UNDEF_VALUE, UNDEF_VALUE);
-}
+export const lazySafeGetInst = <T>(name: string) : ILazyValue<T> => safeGetLazy(() => getInst<T>(name) || UNDEF_VALUE, UNDEF_VALUE);
 
 /**
  * Returns the current global scope object, for a normal web page this will be the current
@@ -73,11 +71,11 @@ export function lazySafeGetInst<T>(name: string) : ILazyValue<T> {
  * @param useCached - [Optional] used for testing to bypass the cached lookup, when `true` this will
  * cause the cached global to be reset.
  */
-export function getGlobal(useCached?: boolean): Window {
-    (!_cachedGlobal || useCached === false || (_globalLazyTestHooks.lzy && !_cachedGlobal.b)) && (_cachedGlobal = safeGetLazy(_getGlobalValue, NULL_VALUE));
+export const getGlobal = (useCached?: boolean): Window => {
+    (!_cachedGlobal || useCached === false || (_globalLazyTestHooks && _globalLazyTestHooks.lzy && !_cachedGlobal.b)) && (_cachedGlobal = safeGetLazy(_getGlobalValue, NULL_VALUE));
 
     return _cachedGlobal.v;
-}
+};
 
 /**
  * Return the named global object if available, will return null if the object is not available.
@@ -100,8 +98,8 @@ export function getGlobal(useCached?: boolean): Window {
  * // otherwise the Promise class.
  * ```
  */
-export function getInst<T>(name: string, useCached?: boolean): T {
-    const gbl = getGlobal(useCached);
+export const getInst = <T>(name: string, useCached?: boolean): T => {
+    const gbl = (!_cachedGlobal || useCached === false) ? getGlobal(useCached) : _cachedGlobal.v;
     if (gbl && gbl[name]) {
         return gbl[name] as T;
     }
@@ -113,64 +111,58 @@ export function getInst<T>(name: string, useCached?: boolean): T {
     }
 
     return NULL_VALUE;
-}
+};
 
 /**
  * Identify whether the runtime contains a `document` object
  * @group Environment
  * @returns - True if a `document` exists
  */
-export function hasDocument(): boolean {
-    return !!getDocument();
-}
+export const hasDocument = (): boolean => !!getDocument();
 
 /**
  * Return the global `document` instance.
  * @group Environment
  * @returns
  */
-export function getDocument(): Document {
-    (!_cachedDocument || (_globalLazyTestHooks.lzy && !_cachedDocument.b)) && (_cachedDocument = lazySafeGetInst("document"));
+export const getDocument = (): Document => {
+    (!_cachedDocument || (_globalLazyTestHooks && _globalLazyTestHooks.lzy && !_cachedDocument.b)) && (_cachedDocument = lazySafeGetInst("document"));
 
     return _cachedDocument.v;
-}
+};
 
 /**
  * Identify whether the runtime contains a `window` object
  * @group Environment
  * @returns
  */
-export function hasWindow(): boolean {
-    return !!getWindow();
-}
+export const hasWindow = (): boolean => !!getWindow();
 
 /**
  * Return the global `window` instance.
  * @group Environment
  * @returns
  */
-export function getWindow(): Window {
-    (!_cachedWindow || (_globalLazyTestHooks.lzy && !_cachedWindow.b)) && (_cachedWindow = lazySafeGetInst(WINDOW));
+export const getWindow = (): Window => {
+    (!_cachedWindow || (_globalLazyTestHooks && _globalLazyTestHooks.lzy && !_cachedWindow.b)) && (_cachedWindow = lazySafeGetInst(WINDOW));
 
     return _cachedWindow.v;
-}
+};
 
 /**
  * Identify whether the runtimne contains a `navigator` object
  * @group Environment
  * @returns
  */
-export function hasNavigator(): boolean {
-    return !!getNavigator();
-}
+export const hasNavigator = (): boolean => !!getNavigator();
 
 /**
  * Returns the global `navigator` instance
  * @group Environment
  * @returns
  */
-export function getNavigator(): Navigator {
-    (!_cachedNavigator || (_globalLazyTestHooks.lzy && !_cachedNavigator.b)) && (_cachedNavigator = lazySafeGetInst("navigator"));
+export const getNavigator = (): Navigator => {
+    (!_cachedNavigator || (_globalLazyTestHooks && _globalLazyTestHooks.lzy && !_cachedNavigator.b)) && (_cachedNavigator = lazySafeGetInst("navigator"));
 
     return _cachedNavigator.v;
 }
@@ -180,39 +172,37 @@ export function getNavigator(): Navigator {
  * @group Environment
  * @returns
  */
-export function hasHistory(): boolean {
-    return !!getHistory();
-}
+export const hasHistory = (): boolean => !!getHistory();
 
 /**
  * Returns the global `history` instance
  * @group Environment
  * @returns
  */
-export function getHistory(): History | null {
-    (!_cachedHistory || (_globalLazyTestHooks.lzy && !_cachedHistory.b)) && (_cachedHistory = lazySafeGetInst("history"));
+export const getHistory = (): History | null => {
+    (!_cachedHistory || (_globalLazyTestHooks && _globalLazyTestHooks.lzy && !_cachedHistory.b)) && (_cachedHistory = lazySafeGetInst("history"));
 
     return _cachedHistory.v;
-}
+};
 
 /**
  * Simple method to determine if we are running in a node environment
  * @group Environment
  * @returns True if you are
  */
-export function isNode(): boolean {
+export const isNode = (): boolean => {
     !_isNode && (_isNode = safeGetLazy(() => !!(process && (process.versions||{}).node), false))
 
     return _isNode.v;
-}
+};
 
 /**
  * Helper to identify if you are running as a Dedicated, Shared or Service worker
  * @group Environment
  * @returns True if the environment you are in looks like a Web Worker
  */
-export function isWebWorker(): boolean {
+export const isWebWorker = (): boolean => {
     !_isWebWorker && (_isWebWorker = safeGetLazy(() => !!(self && self instanceof WorkerGlobalScope), false));
 
     return _isWebWorker.v;
-}
+};

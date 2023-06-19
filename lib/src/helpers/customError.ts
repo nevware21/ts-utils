@@ -6,6 +6,8 @@
  * Licensed under the MIT license.
  */
 
+import { arrSlice } from "../array/slice";
+import { fnApply } from "../funcs/fnApply";
 import { CONSTRUCTOR, NAME, NULL_VALUE, PROTOTYPE } from "../internal/constants";
 import { objCreate } from "../object/create";
 import { objDefine } from "../object/define";
@@ -138,7 +140,7 @@ export function createCustomError<T extends ErrorConstructor = CustomErrorConstr
         let _this = this;
         try {
             _safeSetName(theBaseClass, name);
-            let _self = theBaseClass.apply(_this, arguments) || _this;
+            let _self = fnApply(theBaseClass, _this, arrSlice(arguments)) || _this;
             if (_self !== _this) {
                 // Looks like runtime error constructor reset the prototype chain, so restore it
                 let orgProto = objGetPrototypeOf(_this);

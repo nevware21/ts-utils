@@ -34,7 +34,7 @@ export function hasPerformance(): boolean {
  * @returns The global performance object if available.
  */
 export function getPerformance(): Performance {
-    (!_perf || (_globalLazyTestHooks.lzy && !_perf.b)) && (_perf = lazySafeGetInst("performance"));
+    (!_perf || (!_perf.b && _globalLazyTestHooks && _globalLazyTestHooks.lzy)) && (_perf = lazySafeGetInst("performance"));
     return _perf.v;
 }
 

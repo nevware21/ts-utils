@@ -7,10 +7,168 @@
  */
 
 import { assert } from "chai";
-import { _unwrapFunction } from "../../../../src/internal/unwrapFunction";
+import { _unwrapFunction, _unwrapFunctionWithPoly, _unwrapInstFunction } from "../../../../src/internal/unwrapFunction";
 import { strIncludes } from "../../../../src/string/includes";
+import { dumpObj } from "../../../../src/helpers/diagnostics";
+
+function _expectThrow(cb: () => void, includes: string): Error {
+    try {
+        cb();
+        assert.ok(false, "Expected an exception to be thrown with " + includes);
+    } catch (e) {
+        assert.ok(strIncludes(e.message, includes), "Expected an exception to be thrown - " + dumpObj(e));
+        return e;
+    }
+}
 
 describe("unwrapFunction", () => {
+    it("wrapped function with no target", () => {
+        let wrappedFn = _unwrapFunction("test", null);
+        let testObj1Called = false;
+        let testObj1: any = {
+            test: function() {
+                testObj1Called = true;
+            }
+        }
+
+        assert.equal(testObj1Called, false, "The testObj1 test function has not been called");
+        wrappedFn(testObj1);
+        assert.equal(testObj1Called, true, "The testObj1 test function was called");
+
+        testObj1 = {
+            test2: function() {
+                testObj1Called = true;
+            }
+        }
+
+        testObj1Called = false;
+        assert.equal(testObj1Called, false, "The testObj1 test function has not been called");
+        assert.ok(_expectThrow(() => {
+            wrappedFn(null);
+        }, "not defined for"));
+
+        assert.equal(testObj1Called, false, "The testObj1 test function was not called");
+    });
+
+    it("no this with wrapped function and no target", () => {
+        let wrappedFn = _unwrapFunction("test", null);
+
+        assert.ok(_expectThrow(() => {
+            wrappedFn(null);
+        }, "not defined for"));
+    });
+
+    it("wrapped function with mis-matching target", () => {
+        let targetFnCalled = 0;
+
+        let wrappedFn = _unwrapFunction("test",
+            {
+                myFunc: function() {
+                    targetFnCalled++;
+                }
+            } as any);
+        let testObj1Called = false;
+        let testObj1: any = {
+            test: function() {
+                testObj1Called = true;
+            }
+        }
+
+        assert.equal(testObj1Called, false, "The testObj1 test function has not been called");
+        assert.equal(targetFnCalled, 0, "The target testFn has not been called");
+        wrappedFn(testObj1);
+        assert.equal(testObj1Called, true, "The testObj1 test function was called");
+        assert.equal(targetFnCalled, 0, "The target testFn has not been called");
+
+        testObj1 = {
+            test2: function() {
+                testObj1Called = true;
+            }
+        }
+
+        testObj1Called = false;
+        assert.equal(testObj1Called, false, "The testObj1 test function has not been called");
+        assert.equal(targetFnCalled, 0, "The target testFn has not been called");
+        assert.ok(_expectThrow(() => {
+            wrappedFn(testObj1);
+        }, "not defined for"));
+        assert.equal(testObj1Called, false, "The testObj1 test function was not called");
+        assert.equal(targetFnCalled, 0, "The target testFn has not been called");
+    });
+
+    it("wrapped function with matching target container", () => {
+        let targetFnCalled = 0;
+
+        let wrappedFn = _unwrapFunction("test", {
+            test: function() {
+                targetFnCalled++;
+            }
+        });
+        let testObj1Called = false;
+        let testObj1: any = {
+            test: function() {
+                testObj1Called = true;
+            }
+        }
+
+        assert.equal(testObj1Called, false, "The testObj1 test function has not been called");
+        assert.equal(targetFnCalled, 0, "The fallback testFn has not been called");
+        wrappedFn(testObj1);
+        assert.equal(testObj1Called, true, "The testObj1 test function was called");
+        assert.equal(targetFnCalled, 0, "The fallback testFn has not been called");
+
+        testObj1 = {
+            test2: function() {
+                testObj1Called = true;
+            }
+        }
+
+        testObj1Called = false;
+        assert.equal(testObj1Called, false, "The testObj1 test function has not been called");
+        assert.equal(targetFnCalled, 0, "The fallback testFn has not been called");
+        wrappedFn(testObj1);
+        assert.equal(testObj1Called, false, "The testObj1 test function was not called");
+        assert.equal(targetFnCalled, 1, "The fallback testFn has was called");
+    });
+
+    it("no test object with wrapped function with matching target container", () => {
+        let targetFnCalled = 0;
+
+        let wrappedFn = _unwrapFunction("test", {
+            test: function() {
+                targetFnCalled++;
+            }
+        });
+
+        assert.equal(targetFnCalled, 0, "The fallback testFn has not been called");
+        wrappedFn(null);
+        assert.equal(targetFnCalled, 1, "The fallback testFn has was called");
+    });
+
+    it("test no patching function name for the object or target", () => {
+        let wrappedFn = _unwrapFunction("test", null as any);
+
+        assert.ok(_expectThrow(() => {
+            wrappedFn(null);
+        }, "not defined for"));
+
+        assert.ok(_expectThrow(() => {
+            wrappedFn({});
+        }, "not defined for"));
+
+        wrappedFn = _unwrapFunction("test", {} as any);
+
+        assert.ok(_expectThrow(() => {
+            wrappedFn(null);
+        }, "not defined for"));
+
+        assert.ok(_expectThrow(() => {
+            wrappedFn({});
+        }, "not defined for"));
+    });
+});
+
+describe("_unwrapFunctionWithPoly", () => {
     it("wrapped function with polyfill fallback only", () => {
         let testFnCalled = 0;
 
@@ -18,7 +176,7 @@ describe("unwrapFunction", () => {
             testFnCalled++;
         }
 
-        let wrappedFn = _unwrapFunction("test", null, testFn);
+        let wrappedFn = _unwrapFunctionWithPoly("test", null, testFn);
         let testObj1Called = false;
         let testObj1: any = {
             test: function() {
@@ -53,7 +211,7 @@ describe("unwrapFunction", () => {
             testFnCalled++;
         }
 
-        let wrappedFn = _unwrapFunction("test", null, testFn);
+        let wrappedFn = _unwrapFunctionWithPoly("test", null, testFn);
 
         assert.equal(testFnCalled, 0, "The fallback testFn has not been called");
         wrappedFn(null);
@@ -68,7 +226,7 @@ describe("unwrapFunction", () => {
             polyFnCalled++;
         }
 
-        let wrappedFn = _unwrapFunction("test",
+        let wrappedFn = _unwrapFunctionWithPoly("test",
             {
                 myFunc: function() {
                     targetFnCalled++;
@@ -112,7 +270,7 @@ describe("unwrapFunction", () => {
             assert.fail("Should not get called");
         }
 
-        let wrappedFn = _unwrapFunction("test", {
+        let wrappedFn = _unwrapFunctionWithPoly("test", {
             test: function() {
                 targetFnCalled++;
             }
@@ -147,11 +305,11 @@ describe("unwrapFunction", () => {
     it("wrapped function with matching target container and no polyFn", () => {
         let targetFnCalled = 0;
 
-        let wrappedFn = _unwrapFunction("test", {
+        let wrappedFn = _unwrapFunctionWithPoly("test", {
             test: function() {
                 targetFnCalled++;
             }
-        });
+        }, null as any);
         let testObj1Called = false;
         let testObj1: any = {
             test: function() {
@@ -182,11 +340,11 @@ describe("unwrapFunction", () => {
     it("no test object with wrapped function with matching target container and no polyFn", () => {
         let targetFnCalled = 0;
 
-        let wrappedFn = _unwrapFunction("test", {
+        let wrappedFn = _unwrapFunctionWithPoly("test", {
             test: function() {
                 targetFnCalled++;
             }
-        });
+        }, null as any);
 
         assert.equal(targetFnCalled, 0, "The fallback testFn has not been called");
         wrappedFn(null);
@@ -194,33 +352,74 @@ describe("unwrapFunction", () => {
     });
 
     it("test no patching function name for the object or target with no polyfill", () => {
-        let wrappedFn = _unwrapFunction("test", null as any);
+        let wrappedFn = _unwrapFunctionWithPoly("test", null as any, null as any);
 
-        assert.ok(strIncludes(_expectThrow(() => {
+        assert.ok(_expectThrow(() => {
             wrappedFn(null);
-        }).message, "not defined for"));
+        }, "not defined for"));
 
-        assert.ok(strIncludes(_expectThrow(() => {
+        assert.ok(_expectThrow(() => {
             wrappedFn({});
-        }).message, "not defined for"));
+        }, "not defined for"));
 
-        wrappedFn = _unwrapFunction("test", {} as any);
+        wrappedFn = _unwrapFunctionWithPoly("test", {} as any, null as any);
 
-        assert.ok(strIncludes(_expectThrow(() => {
+        assert.ok(_expectThrow(() => {
             wrappedFn(null);
-        }).message, "not defined for"));
+        }, "not defined for"));
 
-        assert.ok(strIncludes(_expectThrow(() => {
+        assert.ok(_expectThrow(() => {
             wrappedFn({});
-        }).message, "not defined for"));
+        }, "not defined for"));
+    });
+});
+
+describe("unwrapInstFunction", () => {
+    it("wrapped function", () => {
+        let wrappedFn = _unwrapInstFunction("test");
+        let testObj1Called = false;
+        let testObj1: any = {
+            test: function() {
+                testObj1Called = true;
+            }
+        }
+
+        assert.equal(testObj1Called, false, "The testObj1 test function has not been called");
+        wrappedFn(testObj1);
+        assert.equal(testObj1Called, true, "The testObj1 test function was called");
+
+        testObj1 = {
+            test2: function() {
+                testObj1Called = true;
+            }
+        }
+
+        testObj1Called = false;
+        assert.equal(testObj1Called, false, "The testObj1 test function has not been called");
+        assert.ok(_expectThrow(() => {
+            wrappedFn(testObj1);
+        }, "read properties of undefined"));
     });
 
-    function _expectThrow(cb: () => void): Error {
-        try {
-            cb();
-        } catch (e) {
-            assert.ok(true, "Expected an exception to be thrown");
-            return e;
-        }
-    }
+    it("test no matching function name for the object", () => {
+        let wrappedFn = _unwrapInstFunction("test");
+
+        assert.ok(_expectThrow(() => {
+            wrappedFn(null);
+        }, "read properties of null"));
+
+        assert.ok(_expectThrow(() => {
+            wrappedFn({});
+        }, "read properties of undefined"));
+
+        wrappedFn = _unwrapInstFunction("test");
+
+        assert.ok(_expectThrow(() => {
+            wrappedFn(null);
+        }, "read properties of null"));
+
+        assert.ok(_expectThrow(() => {
+            wrappedFn({});
+        }, "read properties of undefined"));
+    });
 });

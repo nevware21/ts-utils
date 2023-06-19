@@ -10,7 +10,7 @@ import { isRegExp } from "../helpers/base";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
 import { StrProto } from "../internal/constants";
-import { _unwrapFunction } from "../internal/unwrapFunction"
+import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction"
 import { asString } from "./as_string";
 import { strIndexOf } from "./index_of";
 
@@ -30,7 +30,7 @@ import { strIndexOf } from "./index_of";
  * when searchString is an empty string; otherwise, `false`.
  * @throws TypeError If searchString is a regex.
  */
-export const strIncludes: (value: string, searchString: string, position?: number) => boolean = _unwrapFunction("includes", StrProto, polyStrIncludes);
+export const strIncludes: (value: string, searchString: string, position?: number) => boolean = _unwrapFunctionWithPoly("includes", StrProto, polyStrIncludes);
 
 /**
  * The strContains() method performs a __case-sensitive__ search to determine whether one string

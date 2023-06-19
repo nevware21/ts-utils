@@ -18,6 +18,12 @@ export { arrMap } from "./array/map";
 export { ArrReduceCallbackFn, arrReduce } from "./array/reduce";
 export { arrSlice } from "./array/slice";
 export { arrSome } from "./array/some";
+export { fnApply } from "./funcs/fnApply";
+export { fnBind } from "./funcs/fnBind";
+export { fnCall } from "./funcs/fnCall";
+export { createFnDeferredProxy, createProxyFuncs } from "./funcs/fnProxy";
+export { readArgs } from "./funcs/readArgs";
+export { ProxyFunctionDef, TypeFuncNames } from "./funcs/types";
 export {
     isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isDate, isNumber, isBoolean,
     isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isThenable, isNotTruthy, isTruthy, objToString,

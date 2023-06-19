@@ -7,7 +7,6 @@
  */
 
 import { ArrCls } from "../internal/constants";
-import { _unwrapFunction } from "../internal/unwrapFunction";
 import { polyArrFrom } from "../polyfills/array";
 import { ArrFromMapFn } from "./callbacks";
 

@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { fnCall } from "../funcs/fnCall";
 import { getWindow, hasWindow } from "../helpers/environment";
 import { CONSTRUCTOR, FUNCTION, ObjClass, OBJECT, PROTOTYPE } from "../internal/constants";
 import { objHasOwnProperty } from "./has_own_prop";
@@ -67,7 +68,7 @@ export function isPlainObject(value: any): value is object {
             // Lazily caching what the runtime reports as the object function constructor (as a string)
             // Using an current function lookup to find what this runtime calls a "native" function
             _fnToString = Function[PROTOTYPE].toString;
-            _objCtrFnString = _fnToString.call(ObjClass);
+            _objCtrFnString = fnCall(_fnToString, ObjClass);
         }
 
         try {

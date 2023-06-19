@@ -7,6 +7,7 @@
  */
 
 import { arrSlice } from "../array/slice";
+import { fnApply } from "../funcs/fnApply";
 import { ITimerHandler, _createTimerHandler } from "./handler";
 
 /**
@@ -48,9 +49,9 @@ export function scheduleInterval<A extends any[]>(callback: (...args: A) => void
 
     let handler = _createTimerHandler(true, (intervalId: any) => {
         intervalId && clearInterval(intervalId);
-        return setInterval.apply(self, theArguments);
+        return fnApply(setInterval, self, theArguments)
     }, (intervalId: any) => {
-        clearInterval(intervalId);
+        fnApply(clearInterval, self, [ intervalId ]);
     });
 
     return handler.h;
