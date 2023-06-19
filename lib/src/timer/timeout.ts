@@ -7,6 +7,7 @@
  */
 
 import { arrSlice } from "../array/slice";
+import { fnApply } from "../funcs/fnApply";
 import { isArray } from "../helpers/base";
 import { UNDEF_VALUE } from "../internal/constants";
 import { ITimerHandler, _createTimerHandler } from "./handler";
@@ -20,7 +21,7 @@ function _createTimeoutWith(self: any, startTimer: boolean, overrideFn: TimeoutO
     let timerFn = theArgs[0];
     theArgs[0] = function () {
         handler.dn();
-        timerFn.apply(self, arguments);
+        fnApply(timerFn, self, arrSlice(arguments));
     };
     
     let handler = _createTimerHandler(startTimer, (timerId?: any) => {
@@ -30,12 +31,12 @@ function _createTimeoutWith(self: any, startTimer: boolean, overrideFn: TimeoutO
                 return timerId;
             }
 
-            clearFn.call(self, timerId);
+            fnApply(clearFn, self, [ timerId ]);
         }
 
-        return setFn.apply(self, theArgs);
+        return fnApply(setFn, self, theArgs);
     }, function (timerId: any) {
-        clearFn.call(self, timerId);
+        fnApply(clearFn, self, [ timerId ]);
     });
 
     return handler.h;

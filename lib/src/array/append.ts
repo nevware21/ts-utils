@@ -9,6 +9,7 @@
 import { isArray, isUndefined } from "../helpers/base";
 import { isIterable, isIterator } from "../iterator/iterator";
 import { iterForOf } from "../iterator/forOf";
+import { fnApply } from "../funcs/fnApply";
 
 /**
  * Appends the `elms` to the `target` where the elms may be an array, a single object
@@ -51,7 +52,7 @@ export function arrAppend<T>(target: T[], elms: T | T[] | Iterator<T>): T[] {
     if (!isUndefined(elms) && target) {
         if (isArray(elms)) {
             // This is not just "target.push(elms)" but becomes effectively "target.push(elms[0], elms[1], ...)"
-            target.push.apply(target, elms);
+            fnApply(target.push, target, elms);
         } else if (isIterator<T>(elms) || isIterable<T>(elms)) {
             iterForOf(elms, (elm) => {
                 target.push(elm);

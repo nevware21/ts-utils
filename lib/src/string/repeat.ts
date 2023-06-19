@@ -10,7 +10,7 @@ import { isNullOrUndefined, isString } from "../helpers/base";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwRangeError, throwTypeError } from "../helpers/throw";
 import { EMPTY, StrProto } from "../internal/constants";
-import { _unwrapFunction } from "../internal/unwrapFunction";
+import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { mathToInt } from "../math/to_int";
 import { asString } from "./as_string";
 
@@ -25,7 +25,7 @@ import { asString } from "./as_string";
  * @throws RangeError: repeat count must be non-negative.
  * @throws RangeError: repeat count must be less than infinity and not overflow maximum string size.
  */
-export const strRepeat: (value: string, count: number) => string = _unwrapFunction("repeat", StrProto, polyStrRepeat);
+export const strRepeat: (value: string, count: number) => string = _unwrapFunctionWithPoly("repeat", StrProto, polyStrRepeat);
 
 /**
  * The `strRepeat()` method constructs and returns a new string which contains the
