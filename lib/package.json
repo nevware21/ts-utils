@@ -125,8 +125,5 @@
         }
     ],
     "dependencies": {
-    },
-    "peerDependencies": {
-        "typescript": ">=1"
     }
 }
