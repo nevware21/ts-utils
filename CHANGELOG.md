@@ -1,3 +1,12 @@
+# v0.10.1 Aug 18th, 2023
+
+> This is a critical bug fix if you are using `symbolKeyFor` and/or `symbolFor`, as the current implementations will always
+> return a new polyfill version rather than using the native `Symbol.keyFor` and `Symbol.for` methods
+
+## Changelog
+
+- #208 [Bug] symbolFor and symbolKeyFor are not caching / returning the underlying instance
+
 # v0.10.0 Aug 17th, 2023
 
 ## Changelog
