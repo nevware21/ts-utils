@@ -17,37 +17,46 @@ import { objDeepFreeze } from "../object/object";
  *
  * Returned from {@link createEnum}
  */
-export declare type EnumCls<E = any> = { readonly [key in keyof E extends string | number | symbol ? keyof E : never]: key extends string ? E[key] : key };
+export declare type EnumCls<E = any> = {
+    readonly [key in keyof E extends string | number | symbol ? keyof E : never]: key extends string ? E[key] : key
+} & { readonly [key in keyof E]: E[key] };
 
 /**
  * A type that identifies an object whose property values are generally mapped to the key of the source type.
  * @group Enum
- * @typeParam E - The source constant enum type which isendifies the keys and values
- * @typeParam I - The resulting set of keys from the source type.
+ * @typeParam E - The source constant enum type which identifies the keys and values
+ * @typeParam T - The resulting type with the keys from the source type.
  *
  * Returned from {@link createEnumKeyMap}
  */
-export declare type EnumNameMap<E = any, I = keyof E> = { readonly [key in keyof E extends string | number | symbol ? keyof E : never]: key extends string ? key : keyof E } & I;
+export declare type EnumNameMap<E = any, T = { readonly [key in keyof E]: key extends string ? key : keyof E }> = {
+    readonly [key in keyof E extends string | number | symbol ? keyof E : never]: key extends string ? key : keyof E
+} & T;
 
 /**
  * A type that identifies an object whose property values are mapped to the resulting values of the source objects keys.
  * @group Enum
  * @typeParam E - The source type which identifies the keys.
- * @typeParam V - The resulting set of keys from the source type.
+ * @typeParam T - The resulting type with the keys from the source type.
  *
  * Returned from {@link createEnumValueMap}
  */
-export declare type EnumValueMap<E = any, V = E[keyof E]> = { readonly [key in keyof E extends string | number | symbol ? keyof E : never]: key extends string ? E[key] : E[key] } & V;
+export declare type EnumValueMap<E = any, T = { readonly [key in keyof E]: E[keyof E] }> = {
+    readonly [key in keyof E extends string | number | symbol ? keyof E : never]: key extends string ? E[key] : E[key]
+} & T;
 
 /**
  * A type that maps the keys of E to the type of V.
  * @group Enum
  * @typeParam E - The type of object that defines the Key (typically a constant enum)
  * @typeParam V - The value type, typically `string`, `number` but may also be a complex type.
+ * @typeParam T - The resulting type with the keys from the source type.
  *
  * Returned from {@link createSimpleMap}
  */
-export declare type EnumTypeMap<E, V> = { readonly [key in keyof E extends string ? keyof E : never]: V };
+export declare type EnumTypeMap<E, V, T = { readonly [key in keyof E]: V }> = {
+    readonly [key in keyof E extends string ? keyof E : never]: V
+} & T;
 
 /**
  * Create a TypeScript style enum class which is a mapping that maps from the key -> value and the value -> key.
@@ -118,7 +127,7 @@ export function createEnum<E>(values: { [key in keyof E]: E[keyof E] }): EnumCls
  * @typeParam E - Identifies the const enum type being mapped
  * @returns A new frozen (immutable) object which contains a property for each key and value that returns the value.
  */
-export function createEnumKeyMap<E>(values: { [key in keyof E]: E[keyof E] }): EnumNameMap<E, keyof E> {
+export function createEnumKeyMap<E>(values: { [key in keyof E]: E[keyof E] }): EnumNameMap<E> {
     return _createKeyValueMap(values, eMapValues.Key, eMapValues.Key, objDeepFreeze);
 }
 
@@ -158,7 +167,7 @@ export function createEnumKeyMap<E>(values: { [key in keyof E]: E[keyof E] }): E
  * @typeParam E - Identifies the const enum type being mapped
  * @returns A new frozen (immutable) object which contains a property for each key and value that returns the value.
  */
-export function createEnumValueMap<E>(values: { [key in keyof E]: E[keyof E] }): EnumValueMap<E, E[keyof E]> {
+export function createEnumValueMap<E>(values: { [key in keyof E]: E[keyof E] }): EnumValueMap<E> {
     return _createKeyValueMap(values, eMapValues.Value, eMapValues.Value, objDeepFreeze);
 }
 
@@ -274,7 +283,7 @@ export function createSimpleMap<E, V>(values: { [key in keyof E]: [ E[keyof E], 
  * @param values - The values to populate on the new object
  * @typeParam E - Identifies the enum type
  * @typeParam T - Identifies the return type that is being created via the mapping.
- * @returns A new frozen (immutable) object which contains a property for each key and value that returns the defiend mapped value.
+ * @returns A new frozen (immutable) object which contains a property for each key and value that returns the defined mapped value.
  */
 export function createTypeMap<E, T>(values: { [key in keyof E]: [ E[keyof E], T[keyof T] ] }): T {
     return createSimpleMap<E, T>(values as any) as unknown as T;
