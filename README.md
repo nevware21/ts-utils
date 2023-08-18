@@ -51,7 +51,6 @@ See [Browser Support](#browser-support) for details.
 
 > Unless otherwise stated in the functions documentation polyfills are used to automatically backfill unsupported functions in older ES5 runtimes
 
-
 ## Language ECMAScript Support
 
 ### ES5
@@ -74,7 +73,6 @@ Install the npm packare: `npm install @nevware21/ts-utils --save`
 > ```json
 > "@nevware21/ts-utils": ">= 0.10.0 < 2.x"
 > ```
-
 
 And then just import the helpers and use them.
 

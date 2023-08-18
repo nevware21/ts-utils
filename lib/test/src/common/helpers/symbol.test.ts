@@ -13,6 +13,7 @@ import { getInst } from "../../../../src/helpers/environment";
 import { setBypassLazyCache } from "../../../../src/helpers/lazy";
 import { hasSymbol, getSymbol, getKnownSymbol, symbolKeyFor, symbolFor, newSymbol} from "../../../../src/symbol/symbol";
 import { WellKnownSymbols } from "../../../../src/symbol/well_known";
+import { asString } from "../../../../src/string/as_string";
 
 declare var Symbol: any;
 
@@ -110,6 +111,16 @@ describe("symbol helpers", () => {
         assert.equal(getKnownSymbol(WellKnownSymbols.toPrimitive), Symbol.toPrimitive, "Check that the expected symbol is returned");
         assert.equal(getKnownSymbol(WellKnownSymbols.toStringTag), Symbol.toStringTag, "Check that the expected symbol is returned");
         assert.equal(getKnownSymbol(WellKnownSymbols.unscopables), Symbol.unscopables, "Check that the expected symbol is returned");
+    });
+
+    it("check same instance returned", () => {
+        assert.equal(symbolFor("Hello"), symbolFor("Hello"));
+    });
+
+    it("symbolKeyFor check does not return the same instance", () => {
+        let theSymbol = symbolFor("Hello");
+        assert.equal(symbolKeyFor(theSymbol), theSymbol.description);
+        assert.equal(symbolKeyFor(newSymbol("Hello")), undefined);
     });
 
     it("newSymbol", () => {
