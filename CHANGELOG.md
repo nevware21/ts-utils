@@ -1,3 +1,12 @@
+# v0.10.0 Aug 17th, 2023
+
+## Changelog
+
+- #204 [Bug] Remove typescript as a peer dependency
+- #206 Update enum type definitions to provide better validation and auto code completion
+- #202 Bump @typescript-eslint/eslint-plugin from 5.62.0 to 6.1.0
+- #203 Bump puppeteer from 19.11.1 to 21.0.0
+
 # v0.9.8 June 18th, 2023
 
 ## Changelog

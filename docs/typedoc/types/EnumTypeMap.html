@@ -14,8 +14,8 @@
 <ul class="tsd-breadcrumb">
 <li><a href="../index.html">@nevware21/ts-utils</a></li>
 <li><a href="EnumTypeMap.html">EnumTypeMap</a></li></ul>
-<h1>Type alias EnumTypeMap&lt;E, V&gt;</h1></div>
-<div class="tsd-signature"><span class="tsd-kind-type-alias">Enum<wbr/>Type<wbr/>Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">E</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{</span><br/><span>    </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-kind-type-parameter">key</span><span class="tsd-signature-symbol"> in </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type tsd-kind-type-parameter">E</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-type">string</span><br/><span>        </span><span class="tsd-signature-symbol">? </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type tsd-kind-type-parameter">E</span><br/><span>        </span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><br/><span class="tsd-signature-symbol">}</span></div>
+<h1>Type alias EnumTypeMap&lt;E, V, T&gt;</h1></div>
+<div class="tsd-signature"><span class="tsd-kind-type-alias">Enum<wbr/>Type<wbr/>Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">E</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type tsd-kind-type-parameter">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{</span><br/><span>    </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-kind-type-parameter">key</span><span class="tsd-signature-symbol"> in </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type tsd-kind-type-parameter">E</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-type">string</span><br/><span>        </span><span class="tsd-signature-symbol">? </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type tsd-kind-type-parameter">E</span><br/><span>        </span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type tsd-kind-type-parameter">T</span></div>
 <div class="tsd-comment tsd-typography"><p>A type that maps the keys of E to the type of V.</p>
 </div>
 <section class="tsd-panel">
@@ -29,12 +29,17 @@
 <li>
 <h4><span class="tsd-kind-type-parameter">V</span></h4>
 <div class="tsd-comment tsd-typography"><p>The value type, typically <code>string</code>, <code>number</code> but may also be a complex type.</p>
+</div>
+<div class="tsd-comment tsd-typography"></div></li>
+<li>
+<h4><span class="tsd-kind-type-parameter">T</span> = <span class="tsd-signature-symbol">{</span><br/><span>    </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-kind-type-parameter">key</span><span class="tsd-signature-symbol"> in </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type tsd-kind-type-parameter">E</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><br/><span class="tsd-signature-symbol">}</span></h4>
+<div class="tsd-comment tsd-typography"><p>The resulting type with the keys from the source type.</p>
 <p>Returned from <a href="../functions/createSimpleMap.html" class="tsd-kind-function">createSimpleMap</a></p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></section>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/helpers/enum.ts#L50">lib/src/helpers/enum.ts:50</a></li></ul></aside></div>
+<li>Defined in <a href="https://github.com/nevware21/ts-utils/blob/main/lib/src/helpers/enum.ts#L57">lib/src/helpers/enum.ts:57</a></li></ul></aside></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

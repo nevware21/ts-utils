@@ -51,9 +51,30 @@ See [Browser Support](#browser-support) for details.
 
 > Unless otherwise stated in the functions documentation polyfills are used to automatically backfill unsupported functions in older ES5 runtimes
 
+
+## Language ECMAScript Support
+
+### ES5
+
+This library plans to maintain ES5 compatibility for all versions of v0.x and v1.x releases
+
+### ES(future [6 next, etc])
+
+Future versions of this library starting at version 2.x are planned to lift and remove the internal polyfills to support the new targetted baseline once it is defined.
+ie. It may or may not be ES6 depending on the runtime landscape and requests received.
+
+When we release v2.x the supported browser matrix will also shift as required to match the defined language level supported at that time. 
+
 ## Quickstart
 
 Install the npm packare: `npm install @nevware21/ts-utils --save`
+
+> It is suggested / recommended that you use the following definition in your `package.json` so that you are compatible with any future releases as they become available
+> we do not intend to make ANY known breaking changes moving forward until v2.x 
+> ```json
+> "@nevware21/ts-utils": ">= 0.10.0 < 2.x"
+> ```
+
 
 And then just import the helpers and use them.
 
@@ -167,7 +188,7 @@ Could you do all of this yourself and create your own "helper" function -- Yes. 
 
 ## Browser Support
 
-General support is currently set to ES5 supported runtimes higher.
+General support is currently set to ES5 supported runtimes and higher.
 
 Internal polyfills are used to backfill ES5 functionality which is not provided by older browsers.
 
