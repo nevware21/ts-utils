@@ -11,6 +11,8 @@ import { isUndefined } from "../../../../src/helpers/base";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "../../../../src/polyfills/symbol";
 import { WellKnownSymbols } from "../../../../src/symbol/well_known";
+import { newSymbol, symbolFor } from "../../../../src/symbol/symbol";
+import { asString } from "../../../../src/string/as_string";
 
 describe("symbol polyfills", () => {
     it("polySymbolFor null / undefined", () => {
@@ -103,6 +105,19 @@ describe("symbol polyfills", () => {
         assert.equal(polyGetKnownSymbol(WellKnownSymbols.toPrimitive), expectedSymbols.toPrimitive, "Check that the expected symbol is returned");
         assert.equal(polyGetKnownSymbol(WellKnownSymbols.toStringTag), expectedSymbols.toStringTag, "Check that the expected symbol is returned");
         assert.equal(polyGetKnownSymbol(WellKnownSymbols.unscopables), expectedSymbols.unscopables, "Check that the expected symbol is returned");
+    });
+
+    it("polySymbolFor check same instance returned", () => {
+        assert.equal(polySymbolFor("Hello"), polySymbolFor("Hello"));
+    });
+
+    it("polySymbolKeyFor check does not return the same instance", () => {
+        let theSymbol = polySymbolFor("Hello");
+        let keyFor = polySymbolKeyFor(theSymbol);
+        assert.equal(keyFor, theSymbol.description);
+
+        let newSymbol = polyNewSymbol("Hello");
+        assert.equal(polySymbolKeyFor(newSymbol), undefined);
     });
 
     it("polyNewSymbol", () => {

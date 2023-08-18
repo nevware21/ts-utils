@@ -13,7 +13,9 @@ import { objHasOwn } from "../object/has_own";
 import { asString } from "../string/as_string";
 import { _GlobalPolySymbols, _getGlobalConfig } from "../internal/global";
 import { strStartsWith } from "../string/starts_with";
+import { objKeys } from "../object/object";
 
+const UNIQUE_REGISTRY_ID = "_urid";
 let _polySymbols: _GlobalPolySymbols;
 
 function _globalSymbolRegistry(): _GlobalPolySymbols {
@@ -59,10 +61,12 @@ export function polyNewSymbol(description?: string | number): symbol {
  */
 export function polySymbolFor(key: string): symbol {
     let registry = _globalSymbolRegistry();
-    if (!objHasOwn(registry, key)) {
+    if (!objHasOwn(registry.k, key)) {
         let newSymbol = polyNewSymbol(key);
+        let regId = objKeys(registry.s).length;
+        newSymbol[UNIQUE_REGISTRY_ID] = () => regId + "_" + newSymbol.toString();
         registry.k[key] = newSymbol;
-        registry.s[newSymbol] = asString(key);
+        registry.s[newSymbol[UNIQUE_REGISTRY_ID]()] = asString(key);
     }
 
     return registry.k[key];
@@ -80,7 +84,9 @@ export function polySymbolKeyFor(sym: symbol): string | undefined {
         throwTypeError((sym as any) + " is not a symbol");
     }
 
-    return _globalSymbolRegistry().s[sym];
+    const regId = sym[POLYFILL_TAG] && sym[UNIQUE_REGISTRY_ID] && sym[UNIQUE_REGISTRY_ID]();
+
+    return regId ? _globalSymbolRegistry().s[regId] : undefined;
 }
 
 /**

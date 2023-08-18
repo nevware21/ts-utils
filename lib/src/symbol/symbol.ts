@@ -20,7 +20,7 @@ let _symbolKeyFor: ILazyValue<(sym: symbol) => string | undefined>;
 
 function _getSymbolValue<T>(name: string): ILazyValue<T> {
     return safeGetLazy<T>(function() {
-        return (_symbol.v ? _symbol[name] : UNDEF_VALUE) as T;
+        return (_symbol.v ? _symbol.v[name] : UNDEF_VALUE) as T;
     }, UNDEF_VALUE);
 }
 
