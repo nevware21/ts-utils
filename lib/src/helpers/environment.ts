@@ -35,7 +35,7 @@ let _isNode: ILazyValue<boolean>;
  * @group Environment
  * @group Lazy
  * @group Safe
- * @param name The name of the global object to get.
+ * @param name The name of the global object to get, may be any valid PropertyKey (string, number or symbol)
  * @returns A new readonly {@link ILazyValue} instance which will lazily attempt to return the globally
  * available named instance.
  * @example
@@ -53,7 +53,7 @@ let _isNode: ILazyValue<boolean>;
  * // otherwise the Promise class.
  * ```
  */
-export const lazySafeGetInst = <T>(name: string) : ILazyValue<T> => safeGetLazy(() => getInst<T>(name) || UNDEF_VALUE, UNDEF_VALUE);
+export const lazySafeGetInst = <T>(name: string | number | symbol) : ILazyValue<T> => safeGetLazy(() => getInst<T>(name) || UNDEF_VALUE, UNDEF_VALUE);
 
 /**
  * Returns the current global scope object, for a normal web page this will be the current
@@ -80,7 +80,7 @@ export const getGlobal = (useCached?: boolean): Window => {
 /**
  * Return the named global object if available, will return null if the object is not available.
  * @group Environment
- * @param name The globally named object
+ * @param name The globally named object, may be any valid property key (string, number or symbol)
  * @param useCached - [Optional] used for testing to bypass the cached lookup, when `true` this will
  * cause the cached global to be reset.
  * @example
@@ -98,7 +98,7 @@ export const getGlobal = (useCached?: boolean): Window => {
  * // otherwise the Promise class.
  * ```
  */
-export const getInst = <T>(name: string, useCached?: boolean): T => {
+export const getInst = <T>(name: string | number | symbol, useCached?: boolean): T => {
     const gbl = (!_cachedGlobal || useCached === false) ? getGlobal(useCached) : _cachedGlobal.v;
     if (gbl && gbl[name]) {
         return gbl[name] as T;
