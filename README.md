@@ -15,7 +15,7 @@ This is a collection of general JavaScript functions (written in and for TypeScr
 Support for standard JavaScript functions (ES5+) that are not support in all environments will be backed by internal polyfill implementations when not available.
 
 ### Test Environments 
-- Node (12, 14, 16, 18)
+- Node (16, 18, 20)
 - Browser (Chromium - headless)
 - Web Worker (Chromium - headless)
 
