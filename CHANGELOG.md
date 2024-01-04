@@ -1,3 +1,17 @@
+# v0.10.2 Jan 4th, 2024
+
+## Changelog
+
+- #211 Update signature of getInst and lazySafeGetInst to support any PropertyKey type
+- #228 Minor Performance updates
+
+### Dependencies
+- #212 Bump typedoc from 0.24.8 to 0.25.0
+- #218 Bump rollup-plugin-istanbul from 4.0.0 to 5.0.0 #218
+- #220 Fix issue with node version in ci.yml
+- #217 Bump rollup from 3.29.4 to 4.1.4
+- #223 Bump @types/sinon from 10.0.20 to 17.0.1
+
 # v0.10.1 Aug 18th, 2023
 
 > This is a critical bug fix if you are using `symbolKeyFor` and/or `symbolFor`, as the current implementations will always
