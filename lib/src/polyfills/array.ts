@@ -11,9 +11,8 @@ import { arrForEach } from "../array/forEach";
 import { arrIndexOf } from "../array/indexOf";
 import { arrMap } from "../array/map";
 import { arrSlice } from "../array/slice";
-import { fnCall } from "../funcs/fnCall";
 import { isArray, isNullOrUndefined, objToString } from "../helpers/base";
-import { LENGTH } from "../internal/constants";
+import { CALL, LENGTH } from "../internal/constants";
 import { iterForOf } from "../iterator/forOf";
 
 /**
@@ -160,7 +159,7 @@ export function polyArrFind<T, E extends T>(theArray: ArrayLike<T>, callbackFn: 
 export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
     let result = -1;
     arrForEach(theArray, (value, index) => {
-        if (fnCall(callbackFn, thisArg | theArray as any, value, index, theArray)) {
+        if (callbackFn[CALL](thisArg | theArray as any, value, index, theArray)) {
             result = index;
             return -1;
         }
@@ -274,7 +273,7 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
     let result = -1;
     let len = theArray[LENGTH] >>> 0;
     for (let idx = len - 1; idx >= 0; idx--) {
-        if (idx in theArray && fnCall(callbackFn, thisArg | theArray as any, theArray[idx], idx, theArray)) {
+        if (idx in theArray && callbackFn[CALL](thisArg | theArray as any, theArray[idx], idx, theArray)) {
             result = idx;
             break;
         }
@@ -334,7 +333,7 @@ export function polyArrFrom<T, U = T>(theValue: ArrayLike<T> | Iterable<T>, mapF
 
     let result: U[] = [];
     iterForOf(theValue as any, (value: U, cnt) => {
-        return result.push(mapFn ? fnCall(mapFn, thisArg, value, cnt) : value);
+        return result.push(mapFn ? mapFn[CALL](thisArg, value, cnt) : value);
     });
 
     return result;

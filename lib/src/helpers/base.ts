@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { ArrCls, BOOLEAN, FUNCTION, NULL_VALUE, NUMBER, OBJECT, ObjProto, STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
+import { ArrCls, BOOLEAN, CALL, FUNCTION, NULL_VALUE, NUMBER, OBJECT, ObjProto, STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
 import { safeGet } from "./safe_get";
 
 const PRIMITIVE_TYPES = [ STRING, NUMBER, BOOLEAN, UNDEFINED, "symbol", "bigint" ];
@@ -64,7 +64,7 @@ export function _createObjIs<T>(theName: string): (value: any) => value is T {
  * ```
  */
 export function objToString(value: any): string {
-    return ObjProto.toString.call(value);
+    return ObjProto.toString[CALL](value);
 }
 
 /**
@@ -519,7 +519,7 @@ export const isError: (value: any) => value is Error = _createObjIs<Error>("Erro
  * @return {boolean} True if the value is a PromiseLike, false otherwise.
  */
 export function isPromiseLike<T>(value: any): value is PromiseLike<T> {
-    return !!value && isFunction(value.then);
+    return !!(value && value.then && isFunction(value.then));
 }
 
 /**
@@ -538,7 +538,7 @@ export const isThenable: <T>(value: any) => value is PromiseLike<T> = isPromiseL
  * @return {boolean} True if the value is a Promise, false otherwise.
  */
 export function isPromise<T>(value: any): value is Promise<T> {
-    return isPromiseLike(value) && isFunction((value as any).catch);
+    return !!(value && value.then && value.catch && isFunction(value.then) && isFunction((value as any).catch));
 }
 
 /**

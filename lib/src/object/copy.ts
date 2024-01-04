@@ -9,7 +9,7 @@
 import { arrForEach } from "../array/forEach";
 import { fnCall } from "../funcs/fnCall";
 import { isArray, isDate, isNullOrUndefined, isPrimitiveType } from "../helpers/base";
-import { FUNCTION, NULL_VALUE, OBJECT } from "../internal/constants";
+import { CALL, FUNCTION, NULL_VALUE, OBJECT } from "../internal/constants";
 import { objDefine } from "./define";
 import { isPlainObject } from "./is_plain_object";
 
@@ -155,14 +155,14 @@ function _deepCopy<T>(visitMap: _RecursiveVisitMap[], value: T, ctx: _DeepCopyCo
 
             let idx = 0;
             let handler = userHandler;
-            while (!fnCall(handler || (idx < defaultDeepCopyHandlers.length ? defaultDeepCopyHandlers[idx++] : _defaultDeepCopyHandler), ctx, details)) {
+            while (!(handler || (idx < defaultDeepCopyHandlers.length ? defaultDeepCopyHandlers[idx++] : _defaultDeepCopyHandler))[CALL](ctx, details)) {
                 handler = NULL_VALUE;
             }
         });
     }
 
     // Allow the user handler to override the provided value
-    if (userHandler && fnCall(userHandler, ctx, details)) {
+    if (userHandler && userHandler[CALL](ctx, details)) {
         return details.result;
     }
 

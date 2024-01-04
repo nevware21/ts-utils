@@ -31,6 +31,7 @@ export const DONE = "done";
 export const VALUE = "value";
 export const NAME = "name";
 export const SLICE = "slice";
+export const CALL = "call";
 
 /**
  * @ignore

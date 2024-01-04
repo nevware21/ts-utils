@@ -7,6 +7,7 @@
  */
 
 import { isObject } from "../helpers/base";
+import { CALL } from "../internal/constants";
 import { objHasOwn } from "./has_own";
 
 /**
@@ -36,7 +37,7 @@ export function objForEachKey<T>(theObject: T, callbackfn: (key: string, value: 
     if (theObject && isObject(theObject)) {
         for (const prop in theObject) {
             if (objHasOwn(theObject, prop)) {
-                if (callbackfn.call(thisArg || theObject, prop, theObject[prop]) === -1) {
+                if (callbackfn[CALL](thisArg || theObject, prop, theObject[prop]) === -1) {
                     break;
                 }
             }

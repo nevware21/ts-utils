@@ -11,6 +11,7 @@ import {
     strEndsWith
 } from "../../../../src/string/ends_with";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
+import { CALL } from "../../../../src/internal/constants";
 
 describe("string helpers", () => {
     describe("strEndsWith null / undefined", () => {
@@ -112,7 +113,7 @@ describe("string helpers", () => {
 
     function _checkEndsWith(value: any, search: any, length?: number) {
         let helperResult = strEndsWith(value, search, length);
-        let nativeResult = String.prototype.endsWith.call(value, search, length);
+        let nativeResult = String.prototype.endsWith[CALL](value, search, length);
 
         assert.equal(helperResult, nativeResult, "Checking endsWith Native (" + nativeResult + ") and result for [" + dumpObj(value) + "] for [" + search + "] len:" + (length || 0));
     }
