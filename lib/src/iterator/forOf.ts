@@ -7,7 +7,7 @@
  */
 
 import { ILazyValue, getLazy } from "../helpers/lazy";
-import { DONE, VALUE } from "../internal/constants";
+import { CALL, DONE, VALUE } from "../internal/constants";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 import { isIterator } from "./iterator";
@@ -68,7 +68,7 @@ export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value
             try {
                 let count = 0;
                 while(!(iterResult = iter.next())[DONE]) {
-                    if (callbackfn.call(thisArg || iter, iterResult[VALUE], count, iter) === -1) {
+                    if (callbackfn[CALL](thisArg || iter, iterResult[VALUE], count, iter) === -1) {
                         break;
                     }
         

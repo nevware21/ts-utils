@@ -7,7 +7,7 @@
  */
 
 import { arrSlice } from "../array/slice";
-import { LENGTH, UNDEF_VALUE } from "../internal/constants";
+import { CALL, LENGTH, UNDEF_VALUE } from "../internal/constants";
 import { iterForOf } from "../iterator/forOf";
 import { objHasOwn } from "../object/has_own";
 import { getKnownSymbol, hasSymbol } from "../symbol/symbol";
@@ -97,7 +97,7 @@ export const readArgs = <T = any>(theArgs: ArrayLike<T> | Iterable<T>, start?: n
             let values: T[] = [];
             let from = (start === UNDEF_VALUE || start < 0) ? 0 : start;
             let to = end < 0 || start < 0 ? UNDEF_VALUE : end;
-            iterForOf<T>(iterFn.call(theArgs), (value, cnt) => {
+            iterForOf<T>(iterFn[CALL](theArgs), (value, cnt) => {
                 if (to !== UNDEF_VALUE && cnt >= to) {
                     return -1;
                 }

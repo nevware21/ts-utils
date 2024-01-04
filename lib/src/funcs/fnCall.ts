@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { CALL } from "../internal/constants";
 import { _unwrapInstFunction } from "../internal/unwrapFunction";
 
 /**
@@ -63,4 +64,4 @@ import { _unwrapInstFunction } from "../internal/unwrapFunction";
  * fnCall(module1.log, module2, "friend"); // my friend : 42
  * ```
  */
-export const fnCall: <F extends (...args: any) => any, T>(fn: F, thisArg: T, ..._args: any[]) => ReturnType<F> = _unwrapInstFunction("call");
+export const fnCall: <F extends (...args: any) => any, T>(fn: F, thisArg: T, ..._args: any[]) => ReturnType<F> = _unwrapInstFunction(CALL);

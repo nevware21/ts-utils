@@ -6,9 +6,8 @@
  * Licensed under the MIT license.
  */
 
-import { fnCall } from "../funcs/fnCall";
 import { getWindow, hasWindow } from "../helpers/environment";
-import { CONSTRUCTOR, FUNCTION, ObjClass, OBJECT, PROTOTYPE } from "../internal/constants";
+import { CALL, CONSTRUCTOR, FUNCTION, ObjClass, OBJECT, PROTOTYPE } from "../internal/constants";
 import { objHasOwnProperty } from "./has_own_prop";
 import { objGetPrototypeOf } from "./object";
 
@@ -68,7 +67,7 @@ export function isPlainObject(value: any): value is object {
             // Lazily caching what the runtime reports as the object function constructor (as a string)
             // Using an current function lookup to find what this runtime calls a "native" function
             _fnToString = Function[PROTOTYPE].toString;
-            _objCtrFnString = fnCall(_fnToString, ObjClass);
+            _objCtrFnString = _fnToString[CALL](ObjClass);
         }
 
         try {
@@ -81,7 +80,7 @@ export function isPlainObject(value: any): value is object {
                     proto = proto[CONSTRUCTOR]
                 }
             
-                result = proto && typeof proto === FUNCTION && _fnToString.call(proto) === _objCtrFnString;
+                result = proto && typeof proto === FUNCTION && _fnToString[CALL](proto) === _objCtrFnString;
             }
         } catch (ex) {
             // Something went wrong, so it's not an object we are playing with

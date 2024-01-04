@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { LENGTH } from "../internal/constants";
+import { CALL, LENGTH } from "../internal/constants";
 
 /**
  * Calls the provided `callbackFn` function once for each element in an array in ascending index order. It is not invoked for index properties
@@ -55,7 +55,7 @@ export function arrForEach<T = any>(theArray: ArrayLike<T>, callbackfn: (value: 
         const len = theArray[LENGTH] >>> 0;
         for (let idx = 0; idx < len; idx++) {
             if (idx in theArray) {
-                if (callbackfn.call(thisArg || theArray, theArray[idx], idx, theArray) === -1) {
+                if (callbackfn[CALL](thisArg || theArray, theArray[idx], idx, theArray) === -1) {
                     break;
                 }
             }
