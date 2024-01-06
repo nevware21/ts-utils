@@ -52,4 +52,4 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
  * arrSlice(lyrics, 2, -1); // [ "my", "old", "friend.", "I've", "come", "to" ]
  * ```
  */
-export const arrSlice: <T>(theArray: ArrayLike<T>, start?: number, end?: number) => T[] = _unwrapFunction(SLICE, ArrProto);
+export const arrSlice: <T>(theArray: ArrayLike<T>, start?: number, end?: number) => T[] = (/*#__PURE__*/_unwrapFunction(SLICE, ArrProto));

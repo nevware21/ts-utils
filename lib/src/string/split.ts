@@ -7,7 +7,7 @@
  */
 
 import { StrProto } from "../internal/constants";
-import { _unwrapFunction } from "../internal/unwrapFunction";
+import { _unwrapFunction, _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { polyStrSymSplit } from "../polyfills/split";
 import { hasSymbol } from "../symbol/symbol";
 
@@ -40,7 +40,7 @@ import { hasSymbol } from "../symbol/symbol";
  * // [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ]
  * ```
  */
-export const strSplit: (value: string, separator: string | RegExp, limit?: number) => string[] = _unwrapFunction("split", StrProto);
+export const strSplit: (value: string, separator: string | RegExp, limit?: number) => string[] = (/*#__PURE__*/_unwrapFunction("split", StrProto));
 
 /**
  * The `strSymSplit()` splits a string into substrings using the [`Symbol.split`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/split)
@@ -87,4 +87,4 @@ export const strSplit: (value: string, separator: string | RegExp, limit?: numbe
  * console.log(strSymSplit(myString, splitByNumber)); // [ "a", "bc", "c5d", "e", "f" ]
  * ```
  */
-export const strSymSplit: (value: string, splitter: { [Symbol.split](string: string, limit?: number): string[]; }, limit?: number) => string[] = hasSymbol() ? _unwrapFunction("split", StrProto) : polyStrSymSplit;
+export const strSymSplit: (value: string, splitter: { [Symbol.split](string: string, limit?: number): string[]; }, limit?: number) => string[] = (/*#__PURE__*/_unwrapFunctionWithPoly("split", StrProto, !hasSymbol() ? polyStrSymSplit : null));

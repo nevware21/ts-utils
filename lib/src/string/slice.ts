@@ -38,4 +38,4 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
  * returns "". (E.g `strSlice("test", 2, -10)`, strSlice("test", -1, -2)` or `strSlice("test", 3, 2)`).
  * @returns A new string containing the extracted section of the string.
  */
-export const strSlice: (value: string, beginIndex: number, endIndex?: number) => string = _unwrapFunction(SLICE, StrProto);
+export const strSlice: (value: string, beginIndex: number, endIndex?: number) => string = (/*#__PURE__*/_unwrapFunction(SLICE, StrProto));

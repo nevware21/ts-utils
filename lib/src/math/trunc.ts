@@ -9,8 +9,6 @@
 import { MathCls } from "../internal/constants";
 import { mathCeil, mathFloor } from "./floor";
 
-const _mathTrunc = MathCls.trunc;
-
 /**
  * The `mathTrunc()` function returns the integer part of a number by removing any fractional digits.
  * Unlike the other three Math methods: Math.floor(), Math.ceil() and Math.round(), the way `mathTrunc()`
@@ -21,7 +19,7 @@ const _mathTrunc = MathCls.trunc;
  * @param value - The value to be truncated
  * @returns The integer path of the given number
  */
-export const mathTrunc = _mathTrunc ? _mathTrunc : polyMathTrunc;
+export const mathTrunc = MathCls.trunc || polyMathTrunc;
 
 /**
  * The `mathTrunc()` function returns the integer part of a number by removing any fractional digits.

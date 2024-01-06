@@ -27,7 +27,7 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
  * strUpper(undefined);     // Throws TypeError
  * ```
  */
-export const strUpper: <T>(value: T) => string = _unwrapFunction("toUpperCase", StrProto);
+export const strUpper: <T>(value: T) => string = (/*#__PURE__*/_unwrapFunction("toUpperCase", StrProto));
 
 /**
  * The strLower() method returns the value of the string converted to lower case.
@@ -46,4 +46,4 @@ export const strUpper: <T>(value: T) => string = _unwrapFunction("toUpperCase", 
  * strLower(undefined);     // Throws TypeError
  * ```
  */
-export const strLower: <T>(value: T) => string = _unwrapFunction("toLowerCase", StrProto);
+export const strLower: <T>(value: T) => string = (/*#__PURE__*/_unwrapFunction("toLowerCase", StrProto));

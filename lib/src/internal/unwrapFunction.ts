@@ -13,7 +13,7 @@ import { ArrProto, CALL, SLICE } from "./constants";
 
 let _slice: typeof ArrProto.slice;
 
-const _throwMissingFunction = <T>(funcName:  keyof T, thisArg: T): never => {
+function _throwMissingFunction<T>(funcName:  keyof T, thisArg: T): never {
     throwTypeError("'" + asString(funcName) + "' not defined for " + dumpObj(thisArg));
 }
 
@@ -27,7 +27,8 @@ const _throwMissingFunction = <T>(funcName:  keyof T, thisArg: T): never => {
  * @param funcName - The function name to call on the first argument passed to the wrapped function
  * @returns A function which will call the funcName against the first passed argument and pass on the remaining arguments
  */
-export const _unwrapInstFunction = <R, T>(funcName: keyof T) => {
+/*#__NO_SIDE_EFFECTS__*/
+export function _unwrapInstFunction<R, T>(funcName: keyof T) {
     _slice = _slice || ArrProto[SLICE];
     return function(thisArg: any): R {
         return (thisArg[funcName] as Function).apply(thisArg, _slice[CALL](arguments, 1));
@@ -42,7 +43,8 @@ export const _unwrapInstFunction = <R, T>(funcName: keyof T) => {
  * @param clsProto - The Class or class prototype to fallback to if the instance doesn't have the function.
  * @returns A function which will call the funcName against the first passed argument and pass on the remaining arguments
  */
-export const _unwrapFunction = <R, T>(funcName: keyof T, clsProto: T) => {
+/*#__NO_SIDE_EFFECTS__*/
+export function _unwrapFunction<R, T>(funcName: keyof T, clsProto?: T) {
     _slice = _slice || ArrProto[SLICE];
     let clsFn = clsProto && clsProto[funcName];
 
@@ -65,7 +67,8 @@ export const _unwrapFunction = <R, T>(funcName: keyof T, clsProto: T) => {
  * @param polyFunc - The function to call if not available on the thisArg, act like the polyfill
  * @returns A function which will call the funcName against the first passed argument and pass on the remaining arguments
  */
-export const _unwrapFunctionWithPoly = <T, P extends (...args: any) => any>(funcName: keyof T, clsProto: T, polyFunc: P) => {
+/*#__NO_SIDE_EFFECTS__*/
+export function _unwrapFunctionWithPoly<T, P extends (...args: any) => any>(funcName: keyof T, clsProto: T, polyFunc: P) {
     _slice = _slice || ArrProto[SLICE];
     let clsFn = clsProto && clsProto[funcName];
 

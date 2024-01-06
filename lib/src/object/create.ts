@@ -9,8 +9,6 @@
 import { FUNCTION, ObjClass, OBJECT, PROTOTYPE } from "../internal/constants";
 import { dumpObj } from "../helpers/diagnostics";
 
-const _objCreate = ObjClass["create"];
-
 /**
  * Creates an object that has the specified prototype, and that optionally contains specified properties. This helper exists to avoid adding a polyfil
  * for older browsers that do not define Object.create eg. ES3 only, IE8 just in case any page checks for presence/absence of the prototype implementation.
@@ -18,7 +16,7 @@ const _objCreate = ObjClass["create"];
  * @group Object
  * @param obj Object to use as a prototype. May be null
  */
-export const objCreate = _objCreate || polyObjCreate;
+export const objCreate = ObjClass["create"] || polyObjCreate;
 
 /**
  * Creates an object that has the specified prototype, and that optionally contains specified properties. This helper exists to avoid adding a polyfil

@@ -42,4 +42,4 @@ import { _unwrapInstFunction } from "../internal/unwrapFunction";
  * module2.getX(); // 21
  * ```
  */
-export const fnBind: <F extends Function, T>(fn: F, thisArg: T) => F = _unwrapInstFunction("bind");
+export const fnBind: <F extends Function, T>(fn: F, thisArg: T) => F = (/*#__PURE__*/_unwrapInstFunction("bind"));

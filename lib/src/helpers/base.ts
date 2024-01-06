@@ -292,9 +292,9 @@ export function isDefined(arg: any): boolean {
  * isPrimitive(new Boolean("false"));   // false
  * ```
  */
-export const isPrimitive = (value: any): value is string | number | bigint | boolean | undefined | symbol | null => {
+export function isPrimitive(value: any): value is string | number | bigint | boolean | undefined | symbol | null {
     return value === NULL_VALUE || isPrimitiveType(typeof value);
-};
+}
 
 /**
  * Identifies whether the provided value is a JavaScript [primitive](https://developer.mozilla.org/en-US/docs/Glossary/Primitive)
@@ -343,9 +343,9 @@ export const isPrimitive = (value: any): value is string | number | bigint | boo
  * isPrimitiveType("bigint");               // true
  * ```
  */
-export const isPrimitiveType = (theType: string): boolean => {
+export function isPrimitiveType(theType: string): boolean {
     return theType !== OBJECT && PRIMITIVE_TYPES.indexOf(theType) !== -1;
-};
+}
 
 /**
  * Checks to see if the past value is a string value
@@ -365,7 +365,7 @@ export const isPrimitiveType = (theType: string): boolean => {
  * isString(0);             // false
  * ```
  */
-export const isString: (value: any) => value is string = _createIs<string>(STRING);
+export const isString: (value: any) => value is string = (/*#__PURE__*/_createIs<string>(STRING));
 
 /**
  * Checks to see if the past value is a function value
@@ -389,7 +389,7 @@ export const isString: (value: any) => value is string = _createIs<string>(STRIN
  * isFunction(new Array(1));    // false
  * ```
  */
-export const isFunction: (value: any) => value is Function = _createIs<Function>(FUNCTION);
+export const isFunction: (value: any) => value is Function = (/*#__PURE__*/_createIs<Function>(FUNCTION));
 
 /**
  * Checks to see if the past value is an object value
@@ -445,7 +445,7 @@ export const isArray: <T = any>(arg: any) => arg is Array<T> = ArrCls.isArray;
  * }
  * ```
  */
-export const isDate: (value: any) => value is Date = _createObjIs<Date>("Date");
+export const isDate: (value: any) => value is Date = (/*#__PURE__*/_createObjIs<Date>("Date"));
 
 /**
  * Checks if the type of value is a number.
@@ -453,7 +453,7 @@ export const isDate: (value: any) => value is Date = _createObjIs<Date>("Date");
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a number, false otherwise.
  */
-export const isNumber: (value: any) => value is number = _createIs<number>(NUMBER);
+export const isNumber: (value: any) => value is number = (/*#__PURE__*/_createIs<number>(NUMBER));
 
 /**
  * Checks if the type of value is a boolean.
@@ -461,7 +461,7 @@ export const isNumber: (value: any) => value is number = _createIs<number>(NUMBE
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a boolean, false otherwise.
  */
-export const isBoolean: (value: any) => value is boolean = _createIs<boolean>(BOOLEAN);
+export const isBoolean: (value: any) => value is boolean = (/*#__PURE__*/_createIs<boolean>(BOOLEAN));
 
 /**
  * Determines if a value is a regular expression object.
@@ -469,7 +469,7 @@ export const isBoolean: (value: any) => value is boolean = _createIs<boolean>(BO
  * @param {*} value Reference to check.
  * @returns {boolean} True if `value` is a `RegExp`.
  */
-export const isRegExp: (value: any) => value is RegExp = _createObjIs<RegExp>("RegExp");
+export const isRegExp: (value: any) => value is RegExp = (/*#__PURE__*/_createObjIs<RegExp>("RegExp"));
 
 /**
  * Checks if the type of value is a File object.
@@ -477,7 +477,7 @@ export const isRegExp: (value: any) => value is RegExp = _createObjIs<RegExp>("R
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a File, false otherwise.
  */
-export const isFile: (value: any) => value is File = _createObjIs<File>("File");
+export const isFile: (value: any) => value is File = (/*#__PURE__*/_createObjIs<File>("File"));
 
 /**
  * Checks if the type of value is a FormData object.
@@ -485,7 +485,7 @@ export const isFile: (value: any) => value is File = _createObjIs<File>("File");
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a FormData, false otherwise.
  */
-export const isFormData: (value: any) => value is FormData = _createObjIs<FormData>("FormData");
+export const isFormData: (value: any) => value is FormData = (/*#__PURE__*/_createObjIs<FormData>("FormData"));
 
 /**
  * Checks if the type of value is a Blob object.
@@ -493,7 +493,7 @@ export const isFormData: (value: any) => value is FormData = _createObjIs<FormDa
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a Blob, false otherwise.
  */
-export const isBlob: (value: any) => value is Blob = _createObjIs<Blob>("Blob");
+export const isBlob: (value: any) => value is Blob = (/*#__PURE__*/_createObjIs<Blob>("Blob"));
 
 /**
  * Checks if the type of value is a ArrayBuffer object.
@@ -501,7 +501,7 @@ export const isBlob: (value: any) => value is Blob = _createObjIs<Blob>("Blob");
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a ArrayBuffer, false otherwise.
  */
-export const isArrayBuffer: (value: any) => value is ArrayBuffer = _createObjIs<ArrayBuffer>("ArrayBuffer");
+export const isArrayBuffer: (value: any) => value is ArrayBuffer = (/*#__PURE__*/_createObjIs<ArrayBuffer>("ArrayBuffer"));
 
 /**
  * Checks if the type of value is a Error object.
@@ -510,7 +510,7 @@ export const isArrayBuffer: (value: any) => value is ArrayBuffer = _createObjIs<
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a Error, false otherwise.
  */
-export const isError: (value: any) => value is Error = _createObjIs<Error>("Error");
+export const isError: (value: any) => value is Error = (/*#__PURE__*/_createObjIs<Error>("Error"));
 
 /**
  * Checks if the type of value is a PromiseLike instance (contains a then function).

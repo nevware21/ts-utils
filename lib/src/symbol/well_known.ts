@@ -149,7 +149,7 @@ export const enum WellKnownSymbols {
  * @ignore
  * @internal
  */
-export const _wellKnownSymbolMap = createEnumKeyMap<typeof WellKnownSymbols>({
+export const _wellKnownSymbolMap = /*#__PURE__*/createEnumKeyMap<typeof WellKnownSymbols>({
     asyncIterator: WellKnownSymbols.asyncIterator,
     hasInstance: WellKnownSymbols.hasInstance,
     isConcatSpreadable: WellKnownSymbols.isConcatSpreadable,
