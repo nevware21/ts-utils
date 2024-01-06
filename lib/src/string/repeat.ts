@@ -25,7 +25,7 @@ import { asString } from "./as_string";
  * @throws RangeError: repeat count must be non-negative.
  * @throws RangeError: repeat count must be less than infinity and not overflow maximum string size.
  */
-export const strRepeat: (value: string, count: number) => string = _unwrapFunctionWithPoly("repeat", StrProto, polyStrRepeat);
+export const strRepeat: (value: string, count: number) => string = (/*#__PURE__*/_unwrapFunctionWithPoly("repeat", StrProto, polyStrRepeat));
 
 /**
  * The `strRepeat()` method constructs and returns a new string which contains the

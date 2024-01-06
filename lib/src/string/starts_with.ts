@@ -23,7 +23,7 @@ import { strSubstring } from "./substring";
  * Defaults to 0
  * @returns `true` if the given characters are found at the beginning of the string; otherwise, `false`.
  */
-export const strStartsWith: (value: string, searchString: string, length?: number) => boolean = _unwrapFunctionWithPoly("startsWith", StrProto, polyStrStartsWith);
+export const strStartsWith: (value: string, searchString: string, length?: number) => boolean = (/*#__PURE__*/_unwrapFunctionWithPoly("startsWith", StrProto, polyStrStartsWith));
 
 /**
  * This method lets you determine whether or not a string begins with another string. This method is case-sensitive.

@@ -62,7 +62,7 @@ import { ProxyFunctionDef, TypeFuncNames } from "./types";
  * module2.defX();  // 21
  * ```
  */
-export const createFnDeferredProxy = <H, F extends (...args:any) => any>(hostFn: () => H, funcName: TypeFuncNames<H>): F => {
+export function createFnDeferredProxy<H, F extends (...args:any) => any>(hostFn: () => H, funcName: TypeFuncNames<H>): F {
 
     return function() {
         // Capture the original arguments passed to the method
@@ -127,7 +127,7 @@ export const createFnDeferredProxy = <H, F extends (...args:any) => any>(hostFn:
  * newTarget.aliasFn();   // 21
  * ```
  */
-export const createProxyFuncs = <T, H>(target: T, host: H | (() => H), funcDefs: ProxyFunctionDef<T, H>[]): T => {
+export function createProxyFuncs<T, H>(target: T, host: H | (() => H), funcDefs: ProxyFunctionDef<T, H>[]): T {
     if (target && host && isArray(funcDefs)) {
         let isDeferred = isFunction(host);
 

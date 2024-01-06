@@ -64,4 +64,4 @@ import { _unwrapInstFunction } from "../internal/unwrapFunction";
  * fnCall(module1.log, module2, "friend"); // my friend : 42
  * ```
  */
-export const fnCall: <F extends (...args: any) => any, T>(fn: F, thisArg: T, ..._args: any[]) => ReturnType<F> = _unwrapInstFunction(CALL);
+export const fnCall: <F extends (...args: any) => any, T>(fn: F, thisArg: T, ..._args: any[]) => ReturnType<F> = (/*#__PURE__*/_unwrapInstFunction(CALL));

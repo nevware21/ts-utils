@@ -29,7 +29,7 @@ export interface CustomErrorConstructor<T extends Error = Error> extends ErrorCo
  * @internal
  * @ignore
  */
-const _createCustomError = <T>(name: string, d: any, b: any): T => {
+function _createCustomError<T>(name: string, d: any, b: any): T {
     _safeDefineName(d, name);
     d = objSetPrototypeOf(d, b);
     function __() {
@@ -40,7 +40,7 @@ const _createCustomError = <T>(name: string, d: any, b: any): T => {
     d[PROTOTYPE] = b === NULL_VALUE ? objCreate(b) : ((__ as any)[PROTOTYPE] = b[PROTOTYPE], new (__ as any)());
 
     return d;
-};
+}
 
 const _safeSetName = (baseClass: any, name: string) => {
     try {

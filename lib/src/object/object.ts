@@ -13,8 +13,14 @@ import { objForEachKey } from "./for_each_key";
 import { polyObjEntries, polyObjValues } from "../polyfills/object";
 
 const _objFreeze = ObjClass["freeze"];
-const _doNothing = <T>(value: T) => value;
-const _getProto = (value: any) => value[__PROTO__] || NULL_VALUE;
+
+function _doNothing<T>(value: T) {
+    return  value;
+}
+
+function _getProto(value: any) {
+    return value[__PROTO__] || NULL_VALUE;
+}
 
 /**
  * The `objAssign()` method copies all enumerable own properties from one or more source objects

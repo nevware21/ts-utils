@@ -106,7 +106,7 @@
         "string contains",
         "html encode"
     ],
-    "main": "dist/es5/umd/ts-utils.js",
+    "main": "dist/es5/main/ts-utils.js",
     "module": "dist-es5/index.js",
     "esnext": "dist-es6/index.js",
     "types": "types/ts-utils.d.ts",    

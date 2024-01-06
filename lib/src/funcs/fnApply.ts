@@ -66,4 +66,4 @@ import { _unwrapInstFunction } from "../internal/unwrapFunction";
  * fnApply(module1.log, module2, [ "friend" ]); // my friend : 42
  * ```
  */
-export const fnApply: <F extends (...args: any) => any, T>(fn: F, thisArg: T, argArray?: ArrayLike<any>) => ReturnType<F> = _unwrapInstFunction("apply");
+export const fnApply: <F extends (...args: any) => any, T>(fn: F, thisArg: T, argArray?: ArrayLike<any>) => ReturnType<F> = (/*#__PURE__*/_unwrapInstFunction("apply"));

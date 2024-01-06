@@ -69,4 +69,4 @@ export type ArrReduceCallbackFn<T, R = T> = (previousValue: T | R, currentValue:
  * arrReduce({ length: 0 }, getMax, 1);  // 1
   * ```
  */
-export const arrReduce: <T, R = T>(theArray: ArrayLike<T>, callbackfn: ArrReduceCallbackFn<T, R>, initialValue?: T | R) => R = _unwrapFunction("reduce", ArrProto);
+export const arrReduce: <T, R = T>(theArray: ArrayLike<T>, callbackfn: ArrReduceCallbackFn<T, R>, initialValue?: T | R) => R = (/*#__PURE__*/_unwrapFunction("reduce", ArrProto));
