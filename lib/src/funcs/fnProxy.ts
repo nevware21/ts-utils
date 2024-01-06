@@ -8,7 +8,7 @@
 
 import { arrForEach } from "../array/forEach";
 import { arrSlice } from "../array/slice";
-import { isArray, isFunction, isObject } from "../helpers/base";
+import { isArray, isFunction } from "../helpers/base";
 import { fnApply } from "./fnApply";
 import { fnBind } from "./fnBind";
 import { ProxyFunctionDef, TypeFuncNames } from "./types";

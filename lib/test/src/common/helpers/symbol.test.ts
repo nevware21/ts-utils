@@ -13,7 +13,6 @@ import { getInst } from "../../../../src/helpers/environment";
 import { setBypassLazyCache } from "../../../../src/helpers/lazy";
 import { hasSymbol, getSymbol, getKnownSymbol, symbolKeyFor, symbolFor, newSymbol} from "../../../../src/symbol/symbol";
 import { WellKnownSymbols } from "../../../../src/symbol/well_known";
-import { asString } from "../../../../src/string/as_string";
 
 declare var Symbol: any;
 
