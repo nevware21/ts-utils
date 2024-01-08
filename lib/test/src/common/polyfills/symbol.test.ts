@@ -11,8 +11,6 @@ import { isUndefined } from "../../../../src/helpers/base";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "../../../../src/polyfills/symbol";
 import { WellKnownSymbols } from "../../../../src/symbol/well_known";
-import { newSymbol, symbolFor } from "../../../../src/symbol/symbol";
-import { asString } from "../../../../src/string/as_string";
 
 describe("symbol polyfills", () => {
     it("polySymbolFor null / undefined", () => {

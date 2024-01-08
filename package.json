@@ -113,7 +113,7 @@
     "types": "lib/types/index.d.ts",
     "sideEffects": false,
     "scripts": {
-        "build": "grunt ts_utils --verbose && npm run package && npm run dtsgen",
+        "build": "grunt ts_utils --verbose && npm run package && npm run dtsgen && npm run size",
         "rebuild": "npm run build && npm run test",
         "package": "rollup -c lib/rollup.config.js --bundleConfigAsCjs",
         "test": "npm run test:node && npm run test:worker && npm run test:browser && npm run coverage:report",
@@ -133,7 +133,8 @@
         "prep-release": "npm run cleanBuild && npm run npm-pack",
         "npm-pack": "copyfiles README.md LICENSE lib && cd lib && npm pack",
         "npm-publish": "cd tools/release-tools/npm-publish && npm install && cd ../../.. && npm run do-npm-publish --prefix tools/release-tools/npm-publish --",
-        "dtsgen": "api-extractor run --local --verbose"
+        "dtsgen": "api-extractor run --local --verbose",
+        "size": "size-limit"
     },
     "repository": {
         "type": "git",
@@ -161,6 +162,9 @@
         "@rollup/plugin-node-resolve": "^15.0.1",
         "@rollup/plugin-strip": "^3.0.2",
         "@rollup/plugin-typescript": "^11.0.0",
+        "@size-limit/preset-small-lib": "^11.0.1",
+        "@size-limit/time": "^11.0.1",
+        "@size-limit/esbuild-why": "^11.0.1",
         "@types/chai": "^4.3.1",
         "@types/eslint": "^8.4.2",
         "@types/estree": "^1.0.0",
@@ -194,11 +198,65 @@
         "rollup-plugin-istanbul": "^5.0.0",
         "rollup-plugin-cleanup": "^3.2.1",
         "sinon": "^15.0.0",
+        "size-limit": "^11.0.1",
         "ts-mocha": "^10.0.0",
         "typedoc": "^0.25.0",
         "typescript": "^4.9.5",
         "tslib": "^2.6.0",
         "uglify-js": "^3.15.5",
         "copyfiles": "^2.4.1"
-    }
+    },
+    "size-limit": [
+        {
+            "name": "es5-full",
+            "path": "lib/dist-es5/index.js",
+            "limit": "19 kb",
+            "brotli": false,
+            "ignore": [
+                "lib/dist-es5/polyfills.js",
+                "lib/dist-es5/polyfills.*.js"
+            ]
+        },
+        {
+            "name": "es6-full",
+            "path": "lib/dist-es6/index.js",
+            "limit": "18 kb",
+            "brotli": false,
+            "ignore": [
+                "lib/dist-es6/polyfills.js",
+                "lib/dist-es6/polyfills.*.js"
+            ]
+        },
+        {
+            "name": "es5-zip",
+            "path": "lib/dist-es5/index.js",
+            "limit": "8 Kb",
+            "gzip": true,
+            "ignore": [
+                "lib/dist-es5/polyfills.js",
+                "lib/dist-es5/polyfills.*.js"
+            ]
+        },
+        {
+            "name": "es6-zip",
+            "path": "lib/dist-es6/index.js",
+            "limit": "8 Kb",
+            "gzip": true,
+            "ignore": [
+                "lib/dist-es6/polyfills.js",
+                "lib/dist-es6/polyfills.*.js"
+            ]
+        },
+        {
+            "name": "es5-env",
+            "path": "lib/dist-es5/index.js",
+            "limit": "2 kb",
+            "import": "{ getGlobal, getInst, lazySafeGetInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory, getHistory, isNode, isWebWorker }",
+            "brotli": false,
+            "ignore": [
+                "lib/dist-es5/polyfills.js",
+                "lib/dist-es5/polyfills.*.js"
+            ]
+        }   
+    ]
 }

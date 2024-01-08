@@ -12,7 +12,6 @@ import { isNumber, isString } from "../../../../src/helpers/base";
 
 type If<E, T, Y, N> = T extends E ? Y : N;
 type Is<E, T> = If<E, T, T, never>;
-type IsNot<E, T> = If<E, T, never, T>;
 
 type IfAny<T, Y, N> = 0 extends (1 & T) ? Y : N;
 type IsAny<T> = IfAny<T, T, never>;
