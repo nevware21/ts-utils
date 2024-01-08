@@ -292,7 +292,7 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
  * @typeParam T - Identifies the element type of the array-like or iterable.
  * @typeParam U - Identifies returned type of the array
  * @param theValue - An array-like object or iterable to convert to an array.
- * @param mapfn - A {@link ArrFromMapFn | mapping function} to call on every element of the array. If provided, every
+ * @param mapFn - A {@link ArrFromMapFn | mapping function} to call on every element of the array. If provided, every
  * value to be added to the array is first passed through this map function, and the return
  * value is added to the array instead. The function is called with the following arguments:
  * @param thisArg Value of 'this' used to invoke the mapfn.

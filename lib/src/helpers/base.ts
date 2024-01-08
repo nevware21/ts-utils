@@ -136,7 +136,7 @@ export function isUndefined(value: any) {
  * to be undefined.
  * @group Type Identity
  * @group Value Check
- * @param value - The value to check
+ * @param arg - The value to check
  * @returns true if the typeof value === UNDEFINED
  * @example
  * ```ts
