@@ -1,3 +1,10 @@
+# v0.10.3 Jan 7th, 2024
+
+## Changelog
+
+- #230 [Bug] Tree-Shaking is not working properly
+- #226 [Feature] Add size tests
+
 # v0.10.2 Jan 4th, 2024
 
 ## Changelog
