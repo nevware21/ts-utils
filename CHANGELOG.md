@@ -1,3 +1,13 @@
+# v0.10.4 Jan 10th, 2024
+
+## Changelog
+
+- #230 [Bug] Tree-Shaking is not working properly
+  - Tags additional (everything else) functions as __NO_SIDE_EFFECTS__ so that rollup (and webpack) can tree-shake
+  - Explicitly did not include all functions like isXXXX (specifically isNode) as this was causing the main entry-points
+    for @nevware21/ts-async to drop the node support code (as it's defined as a browser package) resulting in it not
+    supporting all environments as desired with a single package.
+
 # v0.10.3 Jan 7th, 2024
 
 ## Changelog
