@@ -378,6 +378,7 @@ export type ObjDeepCopyHandler = (details: IObjDeepCopyHandlerDetails) => boolea
  * assert.equal(42, c.b.e.value, "Expect that the local property was copied");
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function objDeepCopy<T>(source: T, handler?: ObjDeepCopyHandler): T {
     let ctx: _DeepCopyContext = {
         handler: handler,

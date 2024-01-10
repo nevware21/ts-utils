@@ -16,6 +16,7 @@ import { EMPTY } from "../internal/constants";
  * @param value - The string value to be checked.
  * @returns `true` if the string is null, undefined an empty string or contains only whitespace characters.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function strIsNullOrWhiteSpace(value: string): boolean {
     if (isString(value)) {
         return value.replace(/[\s\t\r\n\f]+/g, EMPTY) === EMPTY;
@@ -30,6 +31,7 @@ export function strIsNullOrWhiteSpace(value: string): boolean {
  * @param value - The string value to be checked.
  * @returns `true` if the string is null, undefined or an empty string.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function strIsNullOrEmpty(value: string): boolean {
     if (isString(value)) {
         return value === EMPTY;

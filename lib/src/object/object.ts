@@ -18,6 +18,7 @@ function _doNothing<T>(value: T) {
     return  value;
 }
 
+/*#__NO_SIDE_EFFECTS__*/
 function _getProto(value: any) {
     return value[__PROTO__] || NULL_VALUE;
 }
@@ -95,6 +96,7 @@ export const objAssign = ObjClass["assign"];
  * console.log(objKeys(myObj)); // console: ['foo']
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function objKeys(value: any): string[] {
     if (!isObject(value) || value === NULL_VALUE) {
         throwTypeError("objKeys called on non-object");

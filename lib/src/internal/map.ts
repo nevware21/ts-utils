@@ -28,6 +28,7 @@ export const enum eMapValues {
  * @param completeFn - The function to call to complete the map (used to freeze the instance)
  * @returns
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function _createKeyValueMap(values: any, keyType: eMapValues, valueType: eMapValues, completeFn: <T>(value: T) => T) {
     let theMap: any = {};
     objForEachKey(values, (key, value) => {

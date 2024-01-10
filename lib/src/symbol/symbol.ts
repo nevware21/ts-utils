@@ -18,6 +18,7 @@ let _symbol: ILazyValue<Symbol>;
 let _symbolFor: ILazyValue<(key: string) => symbol>;
 let _symbolKeyFor: ILazyValue<(sym: symbol) => string | undefined>;
 
+/*#__NO_SIDE_EFFECTS__*/
 function _getSymbolValue<T>(name: string): ILazyValue<T> {
     return safeGetLazy<T>(function() {
         return (_symbol.v ? _symbol.v[name] : UNDEF_VALUE) as T;
@@ -37,6 +38,7 @@ export const isSymbol: (value: any) => value is symbol = (/*#__PURE__*/_createIs
  * @group Symbol
  * @returns true if Symbol's are support otherwise false
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function hasSymbol(): boolean {
     return !!getSymbol();
 }
@@ -69,6 +71,7 @@ export function getSymbol(): Symbol {
  * getKnownSymbol(WellKnownSymbols.toStringTag) === Symbol.toStringTag; // true
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function getKnownSymbol<T = symbol>(name: string | WellKnownSymbols, noPoly?: boolean): T {
     let knownName = _wellKnownSymbolMap[name];
     // Cause lazy symbol to get initialized
@@ -85,6 +88,7 @@ export function getKnownSymbol<T = symbol>(name: string | WellKnownSymbols, noPo
  * @param noPoly - Flag indicating whether to return a polyfil if symbols are not supported.
  * @returns The new symbol
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function newSymbol(description?: string | number, noPoly?: boolean): symbol {
     // Cause lazy _symbol to get initialized
     (!_symbol || (_globalLazyTestHooks.lzy && !_symbol.b)) && getSymbol();
@@ -99,6 +103,7 @@ export function newSymbol(description?: string | number, noPoly?: boolean): symb
  * @group Symbol
  * @param key key to search for.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function symbolFor(key: string): symbol {
     // Cause lazy symbol to get initialized
     (!_symbolFor || (_globalLazyTestHooks.lzy && !_symbol.b)) && getSymbol();
@@ -113,6 +118,7 @@ export function symbolFor(key: string): symbol {
  * @group Symbol
  * @param sym Symbol to find the key for.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function symbolKeyFor(sym: symbol): string | undefined {
     // Cause lazy symbol to get initialized
     (!_symbolKeyFor || (_globalLazyTestHooks.lzy && !_symbol.b)) && getSymbol();

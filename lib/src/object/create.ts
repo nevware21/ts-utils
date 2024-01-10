@@ -26,6 +26,7 @@ export const objCreate = ObjClass["create"] || polyObjCreate;
  * @group Object
  * @param obj Object to use as a prototype. May be null
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyObjCreate(obj: any): any {
     if (!obj) {
         return {};

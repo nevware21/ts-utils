@@ -93,6 +93,7 @@ export interface CreateIteratorContext<T> {
  * // Values: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function createIterable<T>(ctx: CreateIteratorContext<T>): Iterable<T> {
     return makeIterable({} as Iterable<T>, ctx);
 }
@@ -186,6 +187,7 @@ export function makeIterable<T, I>(target: T, ctx: CreateIteratorContext<I>): T 
  * // Values: [5, 10, 15, 20, 25, 30 ]
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function createIterator<T>(ctx: CreateIteratorContext<T>): Iterator<T> {
     let isDone = false;
 

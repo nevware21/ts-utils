@@ -69,6 +69,7 @@ let _htmlEntityCache: ILazyValue<{ [key: string]: string}>;
  * normalizeJsName("\"hello .,#[]Darkness\"", true); // "helloDarkness"
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function normalizeJsName(jsName: string, camelCase?: boolean): string {
     let result = asString(jsName).replace(INVALID_JS_NAME, "_");
 
@@ -114,6 +115,7 @@ export function normalizeJsName(jsName: string, camelCase?: boolean): string {
  * encodeAsJson({ Hello: "Darkness" }); // "{\"Hello\":\"Darkness\"}");
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function encodeAsJson<T>(value: T, format?: boolean | number): string {
     let result: string;
 
@@ -164,6 +166,7 @@ export function encodeAsJson<T>(value: T, format?: boolean | number): string {
  * encodeAsHtml("<script src=\"javascript:alert('Hello');\"></script>"); // "&lt;script src=&quot;javascript:alert(&#39;Hello&#39;);&quot;&gt;&lt;/script&gt;"
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function encodeAsHtml(value: string) {
     !_htmlEntityCache && (_htmlEntityCache = getLazy(() => {
         return {

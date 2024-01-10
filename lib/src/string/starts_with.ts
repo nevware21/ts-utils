@@ -35,6 +35,7 @@ export const strStartsWith: (value: string, searchString: string, length?: numbe
  * Defaults to 0
  * @returns `true` if the given characters are found at the beginning of the string; otherwise, `false`.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyStrStartsWith(value: string, searchString: string, position?: number): boolean {
     if (!isString(value)) {
         throwTypeError("'" + dumpObj(value) + "' is not a string");

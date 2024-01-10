@@ -50,6 +50,7 @@ import { iterForOf } from "../iterator/forOf";
  * // value === "I've"
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function getValueByKey<V, T extends object = any>(target: T, path: string, defValue?: V): V {
     if (!path || !target) {
         return defValue;
@@ -110,6 +111,7 @@ export function getValueByKey<V, T extends object = any>(target: T, path: string
  * // value === "I've"
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function getValueByIter<V, T extends object = any>(target: T, iter: Iterator<string> | Iterable<string>, defValue?: V): V {
     if (!iter || !target) {
         return defValue;

@@ -11,6 +11,7 @@ import { isArray, isBoolean, isDate, isFunction, isNullOrUndefined, isObject, is
 import { objKeys } from "../object/object";
 import { LENGTH } from "../internal/constants";
 
+/*#__NO_SIDE_EFFECTS__*/
 function _checkLength(value: any, props: string[]) {
     let result: any;
 
@@ -25,6 +26,7 @@ function _checkLength(value: any, props: string[]) {
     return result;
 }
 
+/*#__NO_SIDE_EFFECTS__*/
 function _hasValue(value: any, depth: number): boolean {
     let result = value === false || value === 0;
 
@@ -57,7 +59,6 @@ function _hasValue(value: any, depth: number): boolean {
 
     return result;
 }
-
 
 /**
  * Return whether the value appears to have any `value`, this helper returns true for
@@ -167,6 +168,7 @@ function _hasValue(value: any, depth: number): boolean {
  * hasValue({ valueOf: () => 1 });      // true
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function hasValue(value: any): boolean {
     return _hasValue(value, 0);
 }

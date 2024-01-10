@@ -104,6 +104,7 @@ import { createIterator, CreateIteratorContext } from "./create";
  * // values: [ 1, 0, -1 ]
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function createRangeIterator(start: number, end: number, step?: number): Iterator<number> {
     let nextValue = start;
     let theValue: number = UNDEF_VALUE;

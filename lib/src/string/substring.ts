@@ -83,6 +83,7 @@ export const strSubstr: (value: string, indexStart: number, indexEnd?: number) =
  * @param length - The number of characters to extract.
  * @returns A new string containing the specified part of the given string.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyStrSubstr(value: string, start: number, length?: number): string {
     if (isNullOrUndefined(value)) {
         throwTypeError("'polyStrSubstr called with invalid " + dumpObj(value));
@@ -130,6 +131,7 @@ export function polyStrSubstr(value: string, start: number, length?: number): st
  * strLeft("Nevware21", 21); // "Nevware21"
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function strLeft(value: string, count: number): string {
     return strSubstring(value, 0, count);
 }
@@ -158,6 +160,7 @@ export function strLeft(value: string, count: number): string {
  * strRight("Nevware21", 21); // "Nevware21"
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function strRight(value: string, count: number): string {
     let len = value[LENGTH];
     if (count <= 0) {

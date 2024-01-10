@@ -83,6 +83,7 @@ let _iterSymbol: ILazyValue<symbol>;
 
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function readArgs<T = any>(theArgs: ArrayLike<T> | Iterable<T>, start?: number, end?: number): T[] {
     if (!_iterSymbol) {
         _iterSymbol = getLazy(() => hasSymbol() && getKnownSymbol(WellKnownSymbols.iterator));

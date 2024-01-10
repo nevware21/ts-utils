@@ -19,6 +19,7 @@ let _perf: ILazyValue<Performance>
  * @group Environment
  * @returns
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function hasPerformance(): boolean {
     return !!getPerformance();
 }
@@ -33,6 +34,7 @@ export function hasPerformance(): boolean {
  * @group Environment
  * @returns The global performance object if available.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function getPerformance(): Performance {
     (!_perf || (!_perf.b && _globalLazyTestHooks && _globalLazyTestHooks.lzy)) && (_perf = lazySafeGetInst("performance"));
     return _perf.v;
@@ -53,6 +55,7 @@ export function getPerformance(): Performance {
  * let now = perfNow();
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function perfNow(): number {
     let perf = getPerformance();
     if (perf && perf.now) {
@@ -79,6 +82,7 @@ export function perfNow(): number {
  * let totalTime = elapsedTime(start);
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function elapsedTime(startTime: number): number {
     return perfNow() - startTime;
 }

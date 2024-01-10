@@ -53,6 +53,7 @@ let _isNode: ILazyValue<boolean>;
  * // otherwise the Promise class.
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function lazySafeGetInst<T>(name: string | number | symbol) : ILazyValue<T> {
     return safeGetLazy(() => getInst<T>(name) || UNDEF_VALUE, UNDEF_VALUE);
 }
@@ -73,6 +74,7 @@ export function lazySafeGetInst<T>(name: string | number | symbol) : ILazyValue<
  * @param useCached - [Optional] used for testing to bypass the cached lookup, when `true` this will
  * cause the cached global to be reset.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function getGlobal(useCached?: boolean): Window {
     (!_cachedGlobal || useCached === false || (_globalLazyTestHooks && _globalLazyTestHooks.lzy && !_cachedGlobal.b)) && (_cachedGlobal = safeGetLazy(_getGlobalValue, NULL_VALUE));
 
@@ -100,6 +102,7 @@ export function getGlobal(useCached?: boolean): Window {
  * // otherwise the Promise class.
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function getInst<T>(name: string | number | symbol, useCached?: boolean): T | null {
     const gbl = (!_cachedGlobal || useCached === false) ? getGlobal(useCached) : _cachedGlobal.v;
     if (gbl && gbl[name]) {
@@ -120,6 +123,7 @@ export function getInst<T>(name: string | number | symbol, useCached?: boolean):
  * @group Environment
  * @returns - True if a `document` exists
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function hasDocument(): boolean {
     return !!getDocument();
 }
@@ -129,6 +133,7 @@ export function hasDocument(): boolean {
  * @group Environment
  * @returns
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function getDocument(): Document {
     (!_cachedDocument || (_globalLazyTestHooks && _globalLazyTestHooks.lzy && !_cachedDocument.b)) && (_cachedDocument = lazySafeGetInst("document"));
 
@@ -140,6 +145,7 @@ export function getDocument(): Document {
  * @group Environment
  * @returns
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function hasWindow(): boolean {
     return !!getWindow();
 }
@@ -149,6 +155,7 @@ export function hasWindow(): boolean {
  * @group Environment
  * @returns
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function getWindow(): Window {
     (!_cachedWindow || (_globalLazyTestHooks && _globalLazyTestHooks.lzy && !_cachedWindow.b)) && (_cachedWindow = lazySafeGetInst(WINDOW));
 
@@ -160,6 +167,7 @@ export function getWindow(): Window {
  * @group Environment
  * @returns
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function hasNavigator(): boolean {
     return !!getNavigator();
 }
@@ -169,6 +177,7 @@ export function hasNavigator(): boolean {
  * @group Environment
  * @returns
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function getNavigator(): Navigator {
     (!_cachedNavigator || (_globalLazyTestHooks && _globalLazyTestHooks.lzy && !_cachedNavigator.b)) && (_cachedNavigator = lazySafeGetInst("navigator"));
 
@@ -180,6 +189,7 @@ export function getNavigator(): Navigator {
  * @group Environment
  * @returns
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function hasHistory(): boolean {
     return !!getHistory();
 }
@@ -189,6 +199,7 @@ export function hasHistory(): boolean {
  * @group Environment
  * @returns
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function getHistory(): History | null {
     (!_cachedHistory || (_globalLazyTestHooks && _globalLazyTestHooks.lzy && !_cachedHistory.b)) && (_cachedHistory = lazySafeGetInst("history"));
 
@@ -200,6 +211,7 @@ export function getHistory(): History | null {
  * @group Environment
  * @returns True if you are
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isNode(): boolean {
     !_isNode && (_isNode = safeGetLazy(() => !!(process && (process.versions||{}).node), false))
 

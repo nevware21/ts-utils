@@ -42,22 +42,22 @@ function _createCustomError<T>(name: string, d: any, b: any): T {
     return d;
 }
 
-const _safeSetName = (baseClass: any, name: string) => {
+function  _safeSetName(baseClass: any, name: string) {
     try {
         name && (baseClass[NAME] = name);
         //name && (baseClass[PROTOTYPE][NAME] = name);
     } catch(e) {
         // Do nothing
     }
-};
+}
 
-const _safeDefineName = (target: any, name: string) => {
+function _safeDefineName(target: any, name: string) {
     try {
         objDefine(target, NAME, { v: name, c: true, e: false });
     } catch (e) {
         // Do nothing
     }
-};
+}
 
 /**
  * Create a Custom Error class which may be used to throw custom errors.
@@ -128,6 +128,7 @@ const _safeDefineName = (target: any, name: string) => {
  * theStartupError instanceof StartupError; // true
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function createCustomError<T extends ErrorConstructor = CustomErrorConstructor, B extends ErrorConstructor = ErrorConstructor>(
     name: string,
     constructCb?: ((self: any, args: IArguments) => void) | null,

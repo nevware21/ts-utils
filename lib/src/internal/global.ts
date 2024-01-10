@@ -45,6 +45,7 @@ let _globalCfg: { [key: string ]: any };
  * Helper to get the current global value
  * @returns
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function _getGlobalValue(): Window {
     let result: Window;
     if (typeof globalThis !== UNDEFINED) {
@@ -73,6 +74,7 @@ export function _getGlobalValue(): Window {
  * multiple modules. Primarily used for poly symbol and test hooks.
  * @returns The globally registered value.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function _getGlobalConfig(): TsUtilsGlobalConfig {
     if (!_globalCfg) {
         let gbl = _getGlobalValue() || {};

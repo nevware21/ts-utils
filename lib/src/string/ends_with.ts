@@ -31,6 +31,7 @@ export const strEndsWith: (value: string, searchString: string, length?: number)
  * @param searchString - The characters to be searched for at the end of `value` string.
  * @param length - If provided, it is used as the length of `value`. Defaults to value.length.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyStrEndsWith(value: string, searchString: string, length?: number): boolean {
     if (!isString(value)) {
         throwTypeError("'" + dumpObj(value) + "' is not a string");

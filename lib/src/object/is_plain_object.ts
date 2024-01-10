@@ -50,6 +50,7 @@ let _gblWindow: Window;
  * console.log(isPlainObject("aa"));                    // false
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isPlainObject(value: any): value is object {
     if (!value || typeof value !== OBJECT) {
         return false;

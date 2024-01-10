@@ -19,6 +19,7 @@ import { objHasOwn } from "../object/has_own";
  * @group Object
  * @param obj Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyObjKeys(obj: any): string[] {
     if (!isObject(obj) || obj === NULL_VALUE) {
         throw new TypeError("polyObjKeys called on non-object");
@@ -55,6 +56,7 @@ export function polyObjKeys(obj: any): string[] {
  * // [ ['2', 'b'], ['7', 'c'], ['100', 'a'] ]*
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyObjEntries<T = any>(value: {} | { [s: string]: T } | ArrayLike<T>): [string, T][] {
     let result: [string, T][] = [];
 
@@ -86,6 +88,7 @@ export function polyObjEntries<T = any>(value: {} | { [s: string]: T } | ArrayLi
  * // [ 'b', 'c', 'a']
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyObjValues<T = any>(value: {} | { [s: string]: T } | ArrayLike<T>): T[] {
     let result: T[] = [];
 

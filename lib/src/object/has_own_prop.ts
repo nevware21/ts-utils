@@ -40,6 +40,7 @@ import { CALL, ObjProto } from "../internal/constants";
  * objHasOwnProperty(example, 'prop');   // true - own property exists with value of undefined
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function objHasOwnProperty<T = any>(obj: T, prop: PropertyKey): boolean {
     return obj && ObjProto.hasOwnProperty[CALL](obj, prop);
 }

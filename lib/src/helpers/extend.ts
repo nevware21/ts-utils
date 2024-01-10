@@ -31,6 +31,15 @@ function _doExtend<T>(target: T, theArgs: any[]): any {
  * @returns - A new object or the original
  */
 export function deepExtend<T>(target: T, ...theArgs: any): T & any;
+
+/**
+ * Create a new object by merging the passed arguments, this is effectively the same as calling `objExtend({}, ...theArgs)` where
+ * all of the arguments are added to a new object that is returned.
+ * @group Object
+ * @param target - The original object to be extended.
+ * @param objN - The optional number of arguments to be copied
+ * @returns - A new object or the original
+ */
 export function deepExtend<T, T1, T2, T3, T4, T5, T6>(target: T, obj1?: T1, obj2?: T2, obj3?: T3, obj4?: T4, obj5?: T5, obj6?: T6): T & T1 & T2 & T3 & T4 & T5 & T6 {
     return _doExtend(objDeepCopy(target) || {}, arrSlice(arguments));
 }
@@ -43,6 +52,14 @@ export function deepExtend<T, T1, T2, T3, T4, T5, T6>(target: T, obj1?: T1, obj2
  * @returns - A new object or the original
  */
 export function objExtend<T>(target: T, ...theArgs: any): T & any;
+
+/**
+ * Extend the target object by merging the passed arguments into it
+ * @group Object
+ * @param target - The object to be extended or overwritten
+ * @param objN - The optional number of arguments to be copied
+ * @returns - A new object or the original
+ */
 export function objExtend<T, T1, T2, T3, T4, T5, T6>(target: T, obj1?: T1, obj2?: T2, obj3?: T3, obj4?: T4, obj5?: T5, obj6?: T6): T & T1 & T2 & T3 & T4 & T5 & T6 {
     return _doExtend(target || {}, arrSlice(arguments));
 }
