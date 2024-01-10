@@ -85,6 +85,7 @@ export const objHasOwn: <T = any>(obj: T, prop: PropertyKey) => boolean = (ObjCl
  * polyObjHasOwn(example, 'prop');   // true - own property exists with value of undefined
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyObjHasOwn<T = any>(obj: T, prop: PropertyKey): boolean {
     return objHasOwnProperty(obj, prop) || !!objGetOwnPropertyDescriptor(obj, prop)
 }

@@ -107,6 +107,7 @@ const propMap: { [key in keyof ObjDefinePropDescriptor]: keyof PropertyDescripto
  * @param value - The prop descriptor to convert
  * @returns
  */
+/*#__NO_SIDE_EFFECTS__*/
 function _createProp(value: ObjDefinePropDescriptor): PropertyDescriptor {
     let prop: PropertyDescriptor = {};
     prop[propMap["c"]] = true;

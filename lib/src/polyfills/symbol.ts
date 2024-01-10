@@ -18,6 +18,7 @@ import { objKeys } from "../object/object";
 const UNIQUE_REGISTRY_ID = "_urid";
 let _polySymbols: _GlobalPolySymbols;
 
+/*#__NO_SIDE_EFFECTS__*/
 function _globalSymbolRegistry(): _GlobalPolySymbols {
     if (!_polySymbols) {
         let gblCfg = _getGlobalConfig();
@@ -27,7 +28,7 @@ function _globalSymbolRegistry(): _GlobalPolySymbols {
     return _polySymbols;
 }
 
-let _wellKnownSymbolCache: { [key in keyof typeof WellKnownSymbols ]: symbol } = {} as any;
+let _wellKnownSymbolCache: { [key in keyof typeof WellKnownSymbols ]: symbol };
 
 /**
  * Returns a new (polyfill) Symbol object for the provided description that's guaranteed to be unique.
@@ -40,6 +41,7 @@ let _wellKnownSymbolCache: { [key in keyof typeof WellKnownSymbols ]: symbol } =
  * @param description - The description of the symbol
  * @returns A new polyfill version of a Symbol object
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyNewSymbol(description?: string | number): symbol {
     let theSymbol: symbol = {
         description: asString(description),
@@ -59,6 +61,7 @@ export function polyNewSymbol(description?: string | number): symbol {
  * @group Symbol
  * @param key key to search for.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polySymbolFor(key: string): symbol {
     let registry = _globalSymbolRegistry();
     if (!objHasOwn(registry.k, key)) {
@@ -79,6 +82,7 @@ export function polySymbolFor(key: string): symbol {
  * @group Symbol
  * @param sym Symbol to find the key for.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polySymbolKeyFor(sym: symbol): string | undefined {
     if (!sym || !sym.toString || !strStartsWith(sym.toString(), SYMBOL)) {
         throwTypeError((sym as any) + " is not a symbol");
@@ -109,7 +113,9 @@ export function polySymbolKeyFor(sym: symbol): string | undefined {
  * @param name - The property name to return (if it exists) for Symbol
  * @returns The value of the property if present
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyGetKnownSymbol(name: string | WellKnownSymbols): symbol {
+    !_wellKnownSymbolCache && (_wellKnownSymbolCache = {} as any);
     let result: symbol;
     let knownName = _wellKnownSymbolMap[name];
     if (knownName) {

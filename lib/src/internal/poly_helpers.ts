@@ -8,6 +8,7 @@
 
 import { LENGTH } from "./constants";
 
+/*#__NO_SIDE_EFFECTS__*/
 export function makePolyFn<T extends Function>(poly: T): T {
     return function(): T {
         let theArgs = [ this ];

@@ -39,6 +39,7 @@ export const strRepeat: (value: string, count: number) => string = (/*#__PURE__*
  * @throws RangeError: repeat count must be non-negative.
  * @throws RangeError: repeat count must be less than infinity and not overflow maximum string size.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyStrRepeat(value: string, count: number): string {
     if (isNullOrUndefined(value)) {
         throwTypeError("can't convert [" + dumpObj(value) + "]")

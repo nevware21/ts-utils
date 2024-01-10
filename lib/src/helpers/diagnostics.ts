@@ -19,6 +19,7 @@ import { isError, isNumber, objToString } from "./base";
  * - 'number' - The number of spaces to format with
  * - `false` (or not Truthy) - Do not format
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function dumpObj(object: any, format?: boolean | number): string {
     let propertyValueDump = EMPTY;
     if (isError(object)) {

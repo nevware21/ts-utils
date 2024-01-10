@@ -11,6 +11,7 @@ import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
 import { EMPTY } from "../internal/constants";
 
+/*#__NO_SIDE_EFFECTS__*/
 function _createTrimFn(exp: RegExp): (value: string) => string {
     return function _doTrim(value: string): string {
         if (isNullOrUndefined(value)) {

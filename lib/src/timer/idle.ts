@@ -32,6 +32,7 @@ let _maxExecutionTime = 50;
  * will use `setTimeout` instead.
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function hasIdleCallback(): boolean {
     !_hasIdleCallback && (_hasIdleCallback = safeGetLazy(() => isDefined(requestIdleCallback), false));
     return !!(_hasIdleCallback.v ? requestIdleCallback : false);

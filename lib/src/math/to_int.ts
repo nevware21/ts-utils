@@ -17,6 +17,7 @@ import { mathTrunc } from "./trunc";
  * @param throwInfinity - [Optional] Throws RangeError if value is Infinity, defaults to false
  * @returns The value converted to an integer
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function mathToInt(value: any, throwInfinity?: boolean): number {
     let result = +value;
 

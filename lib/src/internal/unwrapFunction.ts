@@ -93,6 +93,7 @@ export function _unwrapFunctionWithPoly<T, P extends (...args: any) => any>(func
  * @param propName - The property name
  * @returns The value of the property
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function _unwrapProp<T>(propName: keyof T) {
     return function (thisArg: T) {
         return thisArg[propName];

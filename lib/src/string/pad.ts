@@ -15,6 +15,7 @@ import { asString } from "./as_string";
 import { strRepeat } from "./repeat";
 import { strSubstring } from "./substring";
 
+/*#__NO_SIDE_EFFECTS__*/
 function _padValue(value: string, targetLength: number, padString?: string) {
     let result = EMPTY;
     targetLength = mathToInt(targetLength, true);
@@ -78,6 +79,7 @@ export const strPadEnd: (value: string, targetLength: number, padString?: string
  * the targetLength, it will be truncated from the end. The default value is the unicode "space"
  * character (U+0020).
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyStrPadStart(value: string, targetLength: number, padString?: string): string {
     return _padValue(value, targetLength, padString) + value;
 }
@@ -94,6 +96,7 @@ export function polyStrPadStart(value: string, targetLength: number, padString?:
  * `targetLength`, it will be truncated. The default value for this parameter is " " (U+0020).
  * @returns A String of the specified targetLength with the padString applied at the end of the current str.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyStrPadEnd(value: string, targetLength: number, padString?: string): string {
     return value + _padValue(value, targetLength, padString);
 }

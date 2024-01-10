@@ -22,6 +22,7 @@ import { iterForOf } from "../iterator/forOf";
  * @param value - The value to be checked
  * @returns true if the value is an array otherwise false.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyIsArray<T>(value: any): value is T[] {
     if (isNullOrUndefined(value)) {
         return false;
@@ -47,6 +48,7 @@ export function polyIsArray<T>(value: any): value is T[] {
  * @returns A boolean value which is true if the value searchElement is found within the array (or the part of
  * the array indicated by the index fromIndex, if specified).
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyArrIncludes<T>(theArray: ArrayLike<T>, searchElement: T, fromIndex?: number): boolean {
     return arrIndexOf(theArray, searchElement, fromIndex) !== -1;
 }

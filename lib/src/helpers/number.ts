@@ -18,6 +18,7 @@ import { isNullOrUndefined, isNumber } from "./base";
  * @param defValue - The default value if unsuccessful
  * @returns The default or parsed value.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function getIntValue(value?: string | number, defValue?: number): number {
     if (!isNullOrUndefined(value)) {
         if (isNumber(value)) {

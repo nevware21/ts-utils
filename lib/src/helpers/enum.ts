@@ -89,6 +89,7 @@ export declare type EnumTypeMap<E, V, T = { readonly [key in keyof E]: V }> = {
  * @typeParam E - Identifies the const enum type being mapped
  * @returns A new frozen (immutable) object which looks and acts like a TypeScript Enum class.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function createEnum<E>(values: { [key in keyof E]: E[keyof E] }): EnumCls<E> {
     return _createKeyValueMap(values, eMapValues.Value, eMapValues.Key, objDeepFreeze);
 }
@@ -127,6 +128,7 @@ export function createEnum<E>(values: { [key in keyof E]: E[keyof E] }): EnumCls
  * @typeParam E - Identifies the const enum type being mapped
  * @returns A new frozen (immutable) object which contains a property for each key and value that returns the value.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function createEnumKeyMap<E>(values: { [key in keyof E]: E[keyof E] }): EnumNameMap<E> {
     return _createKeyValueMap(values, eMapValues.Key, eMapValues.Key, objDeepFreeze);
 }
@@ -167,6 +169,7 @@ export function createEnumKeyMap<E>(values: { [key in keyof E]: E[keyof E] }): E
  * @typeParam E - Identifies the const enum type being mapped
  * @returns A new frozen (immutable) object which contains a property for each key and value that returns the value.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function createEnumValueMap<E>(values: { [key in keyof E]: E[keyof E] }): EnumValueMap<E> {
     return _createKeyValueMap(values, eMapValues.Value, eMapValues.Value, objDeepFreeze);
 }
@@ -203,6 +206,7 @@ export function createEnumValueMap<E>(values: { [key in keyof E]: E[keyof E] }):
  * @typeParam V - Identifies the type of the mapping `string`; `number`; etc is not restructed to primitive types.
  * @returns A new frozen (immutable) object which contains a property for each key and value that returns the defiend mapped value.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function createSimpleMap<E, V>(values: { [key in keyof E]: [ E[keyof E], V] }): EnumTypeMap<E, V> {
     let mapClass: any = {};
     objForEachKey(values, (key, value) => {
@@ -285,6 +289,7 @@ export function createSimpleMap<E, V>(values: { [key in keyof E]: [ E[keyof E], 
  * @typeParam T - Identifies the return type that is being created via the mapping.
  * @returns A new frozen (immutable) object which contains a property for each key and value that returns the defined mapped value.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function createTypeMap<E, T>(values: { [key in keyof E]: [ E[keyof E], T[keyof T] ] }): T {
     return createSimpleMap<E, T>(values as any) as unknown as T;
 }

@@ -30,6 +30,7 @@ import { isFunction, isStrictNullOrUndefined } from "../helpers/base";
  * });                      // true, iterators must contain a "next" function
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isIterator<T = any>(value: any): value is Iterator<T> {
     return !!value && isFunction(value.next);
 }
@@ -51,6 +52,7 @@ export function isIterator<T = any>(value: any): value is Iterator<T> {
  * isIterable([]);          // true (Arrays are iterable)
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isIterable<T = any>(value: any): value is Iterable<T> {
     return !isStrictNullOrUndefined(value) && isFunction(value[getKnownSymbol(WellKnownSymbols.iterator)]);
 }

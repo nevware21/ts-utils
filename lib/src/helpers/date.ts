@@ -22,6 +22,7 @@
  * let now = utcNow();
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function utcNow() {
     return (Date.now || polyUtcNow)();
 }
@@ -43,6 +44,7 @@ export function utcNow() {
  * let now = polyUtcNow();
  * ```
 */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyUtcNow() {
     return new Date().getTime();
 }

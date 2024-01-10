@@ -32,6 +32,7 @@ export const mathTrunc = MathCls.trunc || polyMathTrunc;
  * @param value - The value to be truncated
  * @returns The integer path of the given number
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyMathTrunc(value: number): number {
     let theValue = +value;
 

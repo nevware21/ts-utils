@@ -19,6 +19,7 @@ const PRIMITIVE_TYPES = [ STRING, NUMBER, BOOLEAN, UNDEFINED, "symbol", "bigint"
  * @param theType - The type to match against the `typeof value`
  * @returns A function which takes a single argument and returns a boolean
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function _createIs<T>(theType: string): (value: any) => value is T {
     return function (value: any): value is T {
         return typeof value === theType;
@@ -33,6 +34,7 @@ export function _createIs<T>(theType: string): (value: any) => value is T {
  * @param - The object name to match for the `objToString(value)`
  * @returns A function which takes a single argument and returns a boolean
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function _createObjIs<T>(theName: string): (value: any) => value is T {
     const theType = "[object " + theName + "]";
     return function (value: any): value is T {
@@ -63,6 +65,7 @@ export function _createObjIs<T>(theName: string): (value: any) => value is T {
  * objToString(null); // [object Null]
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function objToString(value: any): string {
     return ObjProto.toString[CALL](value);
 }
@@ -74,6 +77,7 @@ export function objToString(value: any): string {
  * @param theType - The expected type name as a string
  * @returns `true` if the value matches the provided type
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isTypeof(value: any, theType: string): boolean {
     return typeof value === theType;
 }
@@ -127,6 +131,7 @@ export function isTypeof(value: any, theType: string): boolean {
  * isUndefined(polyObjCreate(null));    // false
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isUndefined(value: any) {
     return typeof value === UNDEFINED || value === UNDEFINED;
 }
@@ -153,6 +158,7 @@ export function isUndefined(value: any) {
  * isStrictUndefined("");           // false
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isStrictUndefined(arg: any): arg is undefined {
     return !isDefined(arg);
 }
@@ -181,6 +187,7 @@ export function isStrictUndefined(arg: any): arg is undefined {
  * isNullOrUndefined(false);        // false
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isNullOrUndefined(value:  any): boolean {
     return value === NULL_VALUE || isUndefined(value);
 }
@@ -210,6 +217,7 @@ export function isNullOrUndefined(value:  any): boolean {
  * isStrictNullOrUndefined(false);        // false
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isStrictNullOrUndefined(value: any): boolean {
     return value === NULL_VALUE || !isDefined(value);
 }
@@ -238,6 +246,7 @@ export function isStrictNullOrUndefined(value: any): boolean {
  * isDefined(false);        // true
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isDefined(arg: any): boolean {
     return !!arg || arg !== UNDEF_VALUE;
 }
@@ -292,6 +301,7 @@ export function isDefined(arg: any): boolean {
  * isPrimitive(new Boolean("false"));   // false
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isPrimitive(value: any): value is string | number | bigint | boolean | undefined | symbol | null {
     return value === NULL_VALUE || isPrimitiveType(typeof value);
 }
@@ -343,6 +353,7 @@ export function isPrimitive(value: any): value is string | number | bigint | boo
  * isPrimitiveType("bigint");               // true
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isPrimitiveType(theType: string): boolean {
     return theType !== OBJECT && PRIMITIVE_TYPES.indexOf(theType) !== -1;
 }
@@ -399,6 +410,7 @@ export const isFunction: (value: any) => value is Function = (/*#__PURE__*/_crea
  * @param value - The value to check
  * @returns
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isObject<T>(value: T): value is T {
     if (!value && isNullOrUndefined(value)) {
         return false;
@@ -518,6 +530,7 @@ export const isError: (value: any) => value is Error = (/*#__PURE__*/_createObjI
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a PromiseLike, false otherwise.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isPromiseLike<T>(value: any): value is PromiseLike<T> {
     return !!(value && value.then && isFunction(value.then));
 }
@@ -537,6 +550,7 @@ export const isThenable: <T>(value: any) => value is PromiseLike<T> = isPromiseL
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a Promise, false otherwise.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isPromise<T>(value: any): value is Promise<T> {
     return !!(value && value.then && value.catch && isFunction(value.then) && isFunction((value as any).catch));
 }
@@ -548,6 +562,7 @@ export function isPromise<T>(value: any): value is Promise<T> {
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is not truthy, false otherwise.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isNotTruthy(value: any) {
     return !value || !safeGet(() => (value && (0 + value)), value);
 }
@@ -559,6 +574,7 @@ export function isNotTruthy(value: any) {
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is not truthy, false otherwise.
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function isTruthy(value: any) {
     // Objects created with no prototype (Object.create(null)) cannot be converted to primitives
     // Which causes this code to throw, additionally just using !! also fails for Boolean objects

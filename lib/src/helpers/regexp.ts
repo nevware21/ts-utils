@@ -67,6 +67,7 @@ function _createRegExp(value: string, escapeRgx: RegExp, replaceFn: (value: stri
  * matches[1]; // "."
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function createWildcardRegex(value: string, ignoreCase?: boolean, fullMatch?: boolean) {
     return _createRegExp(asString(value), /([-+|^$#.\?{}()\[\]\\/\"\'])/g, (value: string) => {
         return value.replace(/\*/g, MATCH_ANY);
@@ -116,6 +117,7 @@ export function createWildcardRegex(value: string, ignoreCase?: boolean, fullMat
  * matches[1]; // "/var/log/ug"
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function createFilenameRegex(value: string, ignoreCase?: boolean, fullMatch?: boolean) {
     return _createRegExp(asString(value), /([-+|^$#.{}()\\\/\[\]\"\'])/g, (value: string) => {
         return value.replace(/(\\\\|\\\/|\*|\?)/g, function (_all, g1) {
@@ -189,6 +191,7 @@ export function createFilenameRegex(value: string, ignoreCase?: boolean, fullMat
  * matches[2]; // "regexp"]);
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function makeGlobRegex(value: string, ignoreCase?: boolean, fullMatch?: boolean) {
     return _createRegExp(asString(value), /([-+|^$#.{}()\\\/\[\]\"\'])/g, (value: string) => {
         //"**\/*\.txt"

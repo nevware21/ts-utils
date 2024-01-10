@@ -32,6 +32,7 @@ import { createIterator, CreateIteratorContext } from "./create";
  * });
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function createArrayIterator<T>(values: T[]): Iterator<T> {
     let idx = -1;
     let theValues = values ? values.slice() : [];

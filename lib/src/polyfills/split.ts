@@ -53,6 +53,7 @@ import { WellKnownSymbols } from "../symbol/well_known";
  * console.log(polyStrSymSplit(myString, splitByNumber)); // [ "a", "bc", "c5d", "e", "f" ]
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function polyStrSymSplit(value: string, splitter: { [Symbol.split](string: string, limit?: number): string[]; }, limit?: number): string[] {
     let splitFn: (string: string, limit?: number) => string[] = splitter && splitter[getKnownSymbol(WellKnownSymbols.split)];
     
