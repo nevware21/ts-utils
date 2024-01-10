@@ -211,7 +211,6 @@ export function getHistory(): History | null {
  * @group Environment
  * @returns True if you are
  */
-/*#__NO_SIDE_EFFECTS__*/
 export function isNode(): boolean {
     !_isNode && (_isNode = safeGetLazy(() => !!(process && (process.versions||{}).node), false))
 
