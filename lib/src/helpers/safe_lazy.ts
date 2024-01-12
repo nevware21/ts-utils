@@ -7,7 +7,7 @@
  */
 
 import { getLazy, ILazyValue } from "./lazy";
-import { safeGet } from "./safe_get";
+import { safe } from "./safe";
 
 /**
  * Create and return an readonly {@link ILazyValue} instance which will cache and return the value returned
@@ -39,6 +39,10 @@ import { safeGet } from "./safe_get";
  *
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function safeGetLazy<T = boolean>(cb: () => T, defValue: T): ILazyValue<T> {
-    return getLazy<T>(() => safeGet<T>(cb, defValue));
+    return getLazy<T>(() => {
+        let result = safe(cb);
+        return result.e ? defValue : result.v;
+    });
 }

@@ -6,13 +6,13 @@
  * Licensed under the MIT license.
  */
 
-import { arrSlice } from "../array/slice";
 import { fnApply } from "../funcs/fnApply";
-import { CONSTRUCTOR, NAME, NULL_VALUE, PROTOTYPE } from "../internal/constants";
+import { ArrProto, CALL, CONSTRUCTOR, NAME, NULL_VALUE, PROTOTYPE, SLICE } from "../internal/constants";
 import { objCreate } from "../object/create";
 import { objDefine } from "../object/define";
 import { objGetPrototypeOf } from "../object/object";
 import { objSetPrototypeOf } from "../object/set_proto";
+import { safe } from "./safe";
 
 /**
  * Defines the definition of the custom error constructor
@@ -30,11 +30,11 @@ export interface CustomErrorConstructor<T extends Error = Error> extends ErrorCo
  * @ignore
  */
 function _createCustomError<T>(name: string, d: any, b: any): T {
-    _safeDefineName(d, name);
+    safe(objDefine, [ d, NAME, { v: name, c: true, e: false }]);
     d = objSetPrototypeOf(d, b);
     function __() {
         this.constructor = d;
-        _safeDefineName(this, name);
+        safe(objDefine, [this, NAME, { v: name, c: true, e: false }]);
     }
 
     d[PROTOTYPE] = b === NULL_VALUE ? objCreate(b) : ((__ as any)[PROTOTYPE] = b[PROTOTYPE], new (__ as any)());
@@ -42,21 +42,9 @@ function _createCustomError<T>(name: string, d: any, b: any): T {
     return d;
 }
 
-function  _safeSetName(baseClass: any, name: string) {
-    try {
-        name && (baseClass[NAME] = name);
-        //name && (baseClass[PROTOTYPE][NAME] = name);
-    } catch(e) {
-        // Do nothing
-    }
-}
-
-function _safeDefineName(target: any, name: string) {
-    try {
-        objDefine(target, NAME, { v: name, c: true, e: false });
-    } catch (e) {
-        // Do nothing
-    }
+function  _setName(baseClass: any, name: string) {
+    name && (baseClass[NAME] = name);
+    //name && (baseClass[PROTOTYPE][NAME] = name);
 }
 
 /**
@@ -139,9 +127,10 @@ export function createCustomError<T extends ErrorConstructor = CustomErrorConstr
     let captureFn = Error.captureStackTrace;
     return _createCustomError<T>(name, function (this: any) {
         let _this = this;
+        let theArgs = arguments;
         try {
-            _safeSetName(theBaseClass, name);
-            let _self = fnApply(theBaseClass, _this, arrSlice(arguments)) || _this;
+            safe(_setName, [theBaseClass, name]);
+            let _self = fnApply(theBaseClass, _this, ArrProto[SLICE][CALL](theArgs)) || _this;
             if (_self !== _this) {
                 // Looks like runtime error constructor reset the prototype chain, so restore it
                 let orgProto = objGetPrototypeOf(_this);
@@ -154,11 +143,11 @@ export function createCustomError<T extends ErrorConstructor = CustomErrorConstr
             captureFn && captureFn(_self, _this[CONSTRUCTOR]);
     
             // Run the provided construction function
-            constructCb && constructCb(_self, arguments);
+            constructCb && constructCb(_self, theArgs);
     
             return _self;
         } finally {
-            _safeSetName(theBaseClass, orgName);
+            safe(_setName, [theBaseClass, orgName]);
         }
     }, theBaseClass);
 }

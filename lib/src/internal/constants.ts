@@ -32,6 +32,7 @@ export const VALUE = "value";
 export const NAME = "name";
 export const SLICE = "slice";
 export const CALL = "call";
+export const TO_STRING = "toString";
 
 /**
  * @ignore

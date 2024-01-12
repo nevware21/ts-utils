@@ -6,8 +6,8 @@
  * Licensed under the MIT license.
  */
 
-import { arrSlice } from "../array/slice";
 import { fnApply } from "../funcs/fnApply";
+import { ArrProto, CALL, SLICE } from "../internal/constants";
 import { ITimerHandler, _createTimerHandler } from "./handler";
 
 /**
@@ -78,7 +78,7 @@ export function scheduleInterval<A extends any[]>(callback: (...args: A) => void
  */
 export function scheduleInterval<A extends any[]>(callback: (...args: A) => void, timeout: number): ITimerHandler {
     let self = this;
-    let theArguments = arrSlice(arguments);
+    let theArguments = ArrProto[SLICE][CALL](arguments);
 
     let handler = _createTimerHandler(true, (intervalId: any) => {
         intervalId && clearInterval(intervalId);

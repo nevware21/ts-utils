@@ -7,7 +7,7 @@
  */
 
 import { arrForEach } from "../array/forEach";
-import { arrSlice } from "../array/slice";
+import { ArrProto, CALL, SLICE } from "../internal/constants";
 import { objCopyProps, objDeepCopy } from "../object/copy";
 
 /**
@@ -41,7 +41,7 @@ export function deepExtend<T>(target: T, ...theArgs: any): T & any;
  * @returns - A new object or the original
  */
 export function deepExtend<T, T1, T2, T3, T4, T5, T6>(target: T, obj1?: T1, obj2?: T2, obj3?: T3, obj4?: T4, obj5?: T5, obj6?: T6): T & T1 & T2 & T3 & T4 & T5 & T6 {
-    return _doExtend(objDeepCopy(target) || {}, arrSlice(arguments));
+    return _doExtend(objDeepCopy(target) || {}, ArrProto[SLICE][CALL](arguments));
 }
  
 /**
@@ -61,7 +61,7 @@ export function objExtend<T>(target: T, ...theArgs: any): T & any;
  * @returns - A new object or the original
  */
 export function objExtend<T, T1, T2, T3, T4, T5, T6>(target: T, obj1?: T1, obj2?: T2, obj3?: T3, obj4?: T4, obj5?: T5, obj6?: T6): T & T1 & T2 & T3 & T4 & T5 & T6 {
-    return _doExtend(target || {}, arrSlice(arguments));
+    return _doExtend(target || {}, ArrProto[SLICE][CALL](arguments));
 }
 
  

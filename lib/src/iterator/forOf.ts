@@ -6,13 +6,13 @@
  * Licensed under the MIT license.
  */
 
-import { ILazyValue, getLazy } from "../helpers/lazy";
+import { ICachedValue, createCachedValue } from "../helpers/cache";
 import { CALL, DONE, VALUE } from "../internal/constants";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 import { isIterator } from "./iterator";
 
-let _iterSymbol: ILazyValue<symbol>;
+let _iterSymbol: ICachedValue<symbol>;
 
 /**
  * Calls the provided `callbackFn` function once for each element in the iterator or iterator returned by
@@ -58,7 +58,7 @@ let _iterSymbol: ILazyValue<symbol>;
 export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value: T, count?: number, iter?: Iterator<T>) => void | number, thisArg?: any): void {
     if (iter) {
         if (!isIterator(iter)) {
-            !_iterSymbol && (_iterSymbol = getLazy(() => getKnownSymbol(WellKnownSymbols.iterator)));
+            !_iterSymbol && (_iterSymbol = createCachedValue(getKnownSymbol(WellKnownSymbols.iterator)));
             iter = iter[_iterSymbol.v] ? iter[_iterSymbol.v]() : null;
         }
         

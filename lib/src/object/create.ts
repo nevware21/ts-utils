@@ -8,6 +8,7 @@
 
 import { FUNCTION, ObjClass, OBJECT, PROTOTYPE } from "../internal/constants";
 import { dumpObj } from "../helpers/diagnostics";
+import { throwTypeError } from "../helpers/throw";
 
 /**
  * Creates an object that has the specified prototype, and that optionally contains specified properties. This helper exists to avoid adding a polyfil
@@ -34,7 +35,7 @@ export function polyObjCreate(obj: any): any {
 
     let type = typeof obj;
     if (type !== OBJECT && type !== FUNCTION) {
-        throw new TypeError("Prototype must be an Object or function: " + dumpObj(obj));
+        throwTypeError("Prototype must be an Object or function: " + dumpObj(obj));
     }
 
     function tempFunc() {}

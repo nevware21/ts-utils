@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { ArrCls, BOOLEAN, CALL, FUNCTION, NULL_VALUE, NUMBER, OBJECT, ObjProto, STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
+import { ArrCls, BOOLEAN, FUNCTION, NULL_VALUE, NUMBER, OBJECT, ObjProto, STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
 import { safeGet } from "./safe_get";
 
 const PRIMITIVE_TYPES = [ STRING, NUMBER, BOOLEAN, UNDEFINED, "symbol", "bigint" ];
@@ -67,7 +67,7 @@ export function _createObjIs<T>(theName: string): (value: any) => value is T {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function objToString(value: any): string {
-    return ObjProto.toString[CALL](value);
+    return ObjProto.toString.call(value);
 }
 
 /**
@@ -564,7 +564,7 @@ export function isPromise<T>(value: any): value is Promise<T> {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function isNotTruthy(value: any) {
-    return !value || !safeGet(() => (value && (0 + value)), value);
+    return !value || !isTruthy(value);
 }
 
 /**

@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { NULL_VALUE, UNDEF_VALUE } from "../internal/constants";
+import { NULL_VALUE, TO_STRING, UNDEF_VALUE } from "../internal/constants";
 import { asString } from "../string/as_string";
 import { strCamelCase } from "../string/conversion";
 import { strPadStart } from "../string/pad";
@@ -126,7 +126,7 @@ export function encodeAsJson<T>(value: T, format?: boolean | number): string {
                 return "\\" + match;
             }
 
-            var hex = match.charCodeAt(0).toString(16);
+            var hex = match.charCodeAt(0)[TO_STRING](16);
             return "\\u" + strPadStart(strUpper(hex), 4, "0");
         }) + DBL_QUOTE;
     } else {

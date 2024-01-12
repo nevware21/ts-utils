@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { safe } from "../helpers/safe";
 import { UNDEFINED } from "./constants";
 
 const GLOBAL_CONFIG_KEY = "__tsUtils$gblCfg";
@@ -45,9 +46,9 @@ let _globalCfg: { [key: string ]: any };
  * Helper to get the current global value
  * @returns
  */
-/*#__NO_SIDE_EFFECTS__*/
 export function _getGlobalValue(): Window {
-    let result: Window;
+    var result: Window;
+
     if (typeof globalThis !== UNDEFINED) {
         result = globalThis;
     }
@@ -77,7 +78,7 @@ export function _getGlobalValue(): Window {
 /*#__NO_SIDE_EFFECTS__*/
 export function _getGlobalConfig(): TsUtilsGlobalConfig {
     if (!_globalCfg) {
-        let gbl = _getGlobalValue() || {};
+        let gbl = safe(_getGlobalValue).v || {};
         _globalCfg = gbl[GLOBAL_CONFIG_KEY] = gbl[GLOBAL_CONFIG_KEY] || {};
     }
 

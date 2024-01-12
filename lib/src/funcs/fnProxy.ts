@@ -7,8 +7,8 @@
  */
 
 import { arrForEach } from "../array/forEach";
-import { arrSlice } from "../array/slice";
 import { isArray, isFunction } from "../helpers/base";
+import { ArrProto, CALL, SLICE } from "../internal/constants";
 import { fnApply } from "./fnApply";
 import { fnBind } from "./fnBind";
 import { ProxyFunctionDef, TypeFuncNames } from "./types";
@@ -66,7 +66,7 @@ export function createFnDeferredProxy<H, F extends (...args:any) => any>(hostFn:
 
     return function() {
         // Capture the original arguments passed to the method
-        var theArgs = arrSlice(arguments);
+        var theArgs = ArrProto[SLICE][CALL](arguments);
         let theHost = hostFn();
 
         return fnApply(theHost[funcName] as (...args: any) => any, theHost, theArgs);

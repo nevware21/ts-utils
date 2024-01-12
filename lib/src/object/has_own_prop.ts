@@ -42,5 +42,5 @@ import { CALL, ObjProto } from "../internal/constants";
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function objHasOwnProperty<T = any>(obj: T, prop: PropertyKey): boolean {
-    return obj && ObjProto.hasOwnProperty[CALL](obj, prop);
+    return !!obj && ObjProto.hasOwnProperty[CALL](obj, prop);
 }

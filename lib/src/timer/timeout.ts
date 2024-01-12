@@ -6,10 +6,9 @@
  * Licensed under the MIT license.
  */
 
-import { arrSlice } from "../array/slice";
 import { fnApply } from "../funcs/fnApply";
 import { isArray } from "../helpers/base";
-import { UNDEF_VALUE } from "../internal/constants";
+import { ArrProto, CALL, SLICE, UNDEF_VALUE } from "../internal/constants";
 import { ITimerHandler, _createTimerHandler } from "./handler";
 
 function _createTimeoutWith(self: any, startTimer: boolean, overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, theArgs: any[]): ITimerHandler {
@@ -21,7 +20,7 @@ function _createTimeoutWith(self: any, startTimer: boolean, overrideFn: TimeoutO
     let timerFn = theArgs[0];
     theArgs[0] = function () {
         handler.dn();
-        fnApply(timerFn, self, arrSlice(arguments));
+        fnApply(timerFn, self, ArrProto[SLICE][CALL](arguments));
     };
     
     let handler = _createTimerHandler(startTimer, (timerId?: any) => {
@@ -150,7 +149,7 @@ export function scheduleTimeout<A extends any[]>(callback: (...args: A) => void,
  * ```
  */
 export function scheduleTimeout<A extends any[]>(callback: (...args: A) => void, timeout: number): ITimerHandler {
-    return _createTimeoutWith(this, true, UNDEF_VALUE, arrSlice(arguments));
+    return _createTimeoutWith(this, true, UNDEF_VALUE, ArrProto[SLICE][CALL](arguments));
 }
 
 /**
@@ -318,7 +317,7 @@ export function scheduleTimeoutWith<A extends any[]>(overrideFn: TimeoutOverride
  * ```
  */
 export function scheduleTimeoutWith<A extends any[]>(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, callback: (...args: A) => void, timeout: number): ITimerHandler {
-    return _createTimeoutWith(this, true, overrideFn, arrSlice(arguments, 1));
+    return _createTimeoutWith(this, true, overrideFn, ArrProto[SLICE][CALL](arguments, 1));
 }
 
 /**
@@ -388,7 +387,7 @@ export function createTimeout<A extends any[]>(callback: (...args: A) => void, t
  * ```
  */
 export function createTimeout<A extends any[]>(callback: (...args: A) => void, timeout: number): ITimerHandler {
-    return _createTimeoutWith(this, false, UNDEF_VALUE, arrSlice(arguments));
+    return _createTimeoutWith(this, false, UNDEF_VALUE, ArrProto[SLICE][CALL](arguments));
 }
 
 /**
@@ -536,5 +535,5 @@ export function createTimeoutWith<A extends any[]>(overrideFn: TimeoutOverrideFn
  * ```
  */
 export function createTimeoutWith<A extends any[]>(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, callback: (...args: A) => void, timeout: number): ITimerHandler {
-    return _createTimeoutWith(this, false, overrideFn, arrSlice(arguments, 1));
+    return _createTimeoutWith(this, false, overrideFn, ArrProto[SLICE][CALL](arguments, 1));
 }

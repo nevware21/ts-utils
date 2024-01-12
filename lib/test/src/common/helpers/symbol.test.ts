@@ -10,8 +10,8 @@ import { assert } from "chai";
 import { isUndefined } from "../../../../src/helpers/base";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { getInst } from "../../../../src/helpers/environment";
-import { setBypassLazyCache } from "../../../../src/helpers/lazy";
-import { hasSymbol, getSymbol, getKnownSymbol, symbolKeyFor, symbolFor, newSymbol} from "../../../../src/symbol/symbol";
+import { _initTestHooks, setBypassLazyCache } from "../../../../src/helpers/lazy";
+import { hasSymbol, getSymbol, getKnownSymbol, symbolKeyFor, symbolFor, newSymbol } from "../../../../src/symbol/symbol";
 import { WellKnownSymbols } from "../../../../src/symbol/well_known";
 
 declare var Symbol: any;
@@ -128,6 +128,15 @@ describe("symbol helpers", () => {
     });
 
     describe("Remove Native", () => {
+        let _orgSymbol = Symbol;
+        beforeEach(() => {
+            _orgSymbol = Symbol;
+            _initTestHooks();
+        });
+
+        afterEach(() => {
+            Symbol = _orgSymbol;
+        });
 
         it("getSymbol with noPoly", () => {
             // Disable lazy caching so we get the true global version
@@ -139,11 +148,9 @@ describe("symbol helpers", () => {
 
             // Re-enabling caching and force the symbol to be cached
             setBypassLazyCache(false);
-            getSymbol();
 
             try {
-
-
+                assert.equal(getSymbol(), _orgSymbol, "Check that the Symbol is returned");
                 Symbol = undefined;
                 assert.equal(getSymbol(), theSymbol, "Check that the Symbol is returned");
                 assert.equal(getKnownSymbol("toStringTag"), toStringTag, "Check that the expected symbol is returned");
@@ -171,10 +178,9 @@ describe("symbol helpers", () => {
 
             // Re-enabling caching and force the symbol to be cached
             setBypassLazyCache(false);
-            getSymbol();
 
             try {
-
+                assert.equal(getSymbol(), _orgSymbol, "Check that the Symbol is returned");
                 Symbol = undefined;
                 assert.equal(getSymbol(), theSymbol, "Check that the Symbol is returned");
                 assert.equal(getKnownSymbol("toStringTag"), toStringTag, "Check that the expected symbol is returned");
@@ -203,10 +209,9 @@ describe("symbol helpers", () => {
 
             // Re-enabling caching and force the symbol to be cached
             setBypassLazyCache(false);
-            getSymbol();
 
             try {
-
+                assert.equal(getSymbol(), _orgSymbol, "Check that the Symbol is returned");
                 Symbol = undefined;
                 assert.equal(getSymbol(), theSymbol, "Check that the Symbol is returned");
                 assert.equal(getKnownSymbol("toStringTag"), toStringTag, "Check that the expected symbol is returned");
@@ -233,9 +238,9 @@ describe("symbol helpers", () => {
 
             // Re-enabling caching and force the symbol to be cached
             setBypassLazyCache(false);
-            getSymbol();
 
             try {
+                assert.equal(getSymbol(), _orgSymbol, "Check that the Symbol is returned");
                 assert.notEqual(newSymbol("Hello"), newSymbol("Hello"), "Always creates a new symbol");
                 assert.equal(newSymbol("Hello").toString(), newSymbol("Hello").toString(), "While different they will look the same");
             } finally {

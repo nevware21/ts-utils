@@ -151,6 +151,7 @@ function _createProp(value: ObjDefinePropDescriptor): PropertyDescriptor {
  * @param target - The object on which to define the property.
  * @param key - The name or Symbol of the property to be defined or modified.
  * @param descriptor - The descriptor for the property being defined or modified.
+ * @returns The object that was passed to the function with the new or updated property.
  */
 export const objDefineProp: <T>(target: T, key: PropertyKey, descriptor: PropertyDescriptor & ThisType<any>) => T = ObjClass["defineProperty"];
 
