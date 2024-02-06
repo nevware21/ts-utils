@@ -192,7 +192,7 @@
         "karma-coverage": "^2.2.0",
         "mocha": "^10.0.0",
         "nyc": "^15.1.0",
-        "puppeteer": "^21.0.0",
+        "puppeteer": "^22.0.0",
         "rollup": "^4.1.4",
         "rollup-plugin-minify-es": "^1.1.1",
         "rollup-plugin-istanbul": "^5.0.0",
