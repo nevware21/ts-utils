@@ -251,12 +251,18 @@
             "name": "es5-env",
             "path": "lib/dist-es5/index.js",
             "limit": "2 kb",
-            "import": "{ getGlobal, getInst, lazySafeGetInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory, getHistory, isNode, isWebWorker }",
+            "import": "{ getGlobal, getInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory, getHistory, isNode, isWebWorker }",
             "brotli": false,
             "ignore": [
                 "lib/dist-es5/polyfills.js",
                 "lib/dist-es5/polyfills.*.js"
             ]
+        },
+        {
+            "name": "es5-poly",
+            "path": "lib/dist-es5/polyfills.js",
+            "limit": "7 kb",
+            "brotli": false
         }   
     ]
 }

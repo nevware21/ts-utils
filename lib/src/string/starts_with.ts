@@ -41,8 +41,7 @@ export function polyStrStartsWith(value: string, searchString: string, position?
         throwTypeError("'" + dumpObj(value) + "' is not a string");
     }
     let searchValue = isString(searchString) ? searchString : asString(searchString);
-    let chkLen = searchValue[LENGTH];
     let pos = position > 0 ? position : 0;
 
-    return strSubstring(value, pos, pos + chkLen) === searchValue;
+    return strSubstring(value, pos, pos + searchValue[LENGTH]) === searchValue;
 }

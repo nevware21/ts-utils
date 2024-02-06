@@ -398,7 +398,7 @@ describe("unwrapInstFunction", () => {
         assert.equal(testObj1Called, false, "The testObj1 test function has not been called");
         assert.ok(_expectThrow(() => {
             wrappedFn(testObj1);
-        }, "read properties of undefined"));
+        }, "\"test\" not defined for"));
     });
 
     it("test no matching function name for the object", () => {
@@ -406,20 +406,20 @@ describe("unwrapInstFunction", () => {
 
         assert.ok(_expectThrow(() => {
             wrappedFn(null);
-        }, "read properties of null"));
+        }, "\"test\" not defined for [object Null]"));
 
         assert.ok(_expectThrow(() => {
             wrappedFn({});
-        }, "read properties of undefined"));
+        }, "\"test\" not defined for [object Object]: {}"));
 
         wrappedFn = _unwrapInstFunction("test");
 
         assert.ok(_expectThrow(() => {
             wrappedFn(null);
-        }, "read properties of null"));
+        }, "\"test\" not defined for [object Null]"));
 
         assert.ok(_expectThrow(() => {
             wrappedFn({});
-        }, "read properties of undefined"));
+        }, "\"test\" not defined for [object Object]: {}"));
     });
 });

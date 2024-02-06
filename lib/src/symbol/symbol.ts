@@ -10,7 +10,7 @@ import { NULL_VALUE, SYMBOL, UNDEF_VALUE } from "../internal/constants";
 import { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "../polyfills/symbol";
 import { WellKnownSymbols, _wellKnownSymbolMap } from "./well_known";
 import { _createIs } from "../helpers/base";
-import { ILazyValue, _globalLazyTestHooks } from "../helpers/lazy";
+import { ILazyValue, _globalLazyTestHooks, _initTestHooks } from "../helpers/lazy";
 import { safeGetLazy } from "../helpers/safe_lazy";
 import { lazySafeGetInst } from "../helpers/environment";
 
@@ -18,11 +18,12 @@ let _symbol: ILazyValue<Symbol>;
 let _symbolFor: ILazyValue<(key: string) => symbol>;
 let _symbolKeyFor: ILazyValue<(sym: symbol) => string | undefined>;
 
-/*#__NO_SIDE_EFFECTS__*/
-function _getSymbolValue<T>(name: string): ILazyValue<T> {
-    return safeGetLazy<T>(function() {
-        return (_symbol.v ? _symbol.v[name] : UNDEF_VALUE) as T;
-    }, UNDEF_VALUE);
+export function _initSymbol() {
+    if (!_symbol || !_symbol.b) {
+        _symbol = lazySafeGetInst<Symbol>(SYMBOL);
+        _symbolFor = safeGetLazy<typeof Symbol.for>(() => (_symbol.v ? _symbol.v["for"] : UNDEF_VALUE), UNDEF_VALUE);
+        _symbolKeyFor = safeGetLazy<typeof Symbol.keyFor>(() => (_symbol.v ? _symbol.v["keyFor"] : UNDEF_VALUE), UNDEF_VALUE);
+    }
 }
 
 /**
@@ -48,11 +49,10 @@ export function hasSymbol(): boolean {
  * @group Symbol
  * @returns The value of the named Symbol (if available)
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function getSymbol(): Symbol {
-    let resetCache = !_symbol || (_globalLazyTestHooks && _globalLazyTestHooks.lzy && !_symbol.b);
-    resetCache && (_symbol = lazySafeGetInst(SYMBOL));
-    (!_symbolFor || resetCache) && (_symbolFor = _getSymbolValue<typeof Symbol.for>("for"));
-    (!_symbolKeyFor || resetCache) && (_symbolKeyFor = _getSymbolValue<typeof Symbol.keyFor>("keyFor"));
+    !_globalLazyTestHooks && _initTestHooks();
+    (!_symbol || _globalLazyTestHooks.lzy) && _initSymbol();
     
     return _symbol.v;
 }
@@ -74,8 +74,9 @@ export function getSymbol(): Symbol {
 /*#__NO_SIDE_EFFECTS__*/
 export function getKnownSymbol<T = symbol>(name: string | WellKnownSymbols, noPoly?: boolean): T {
     let knownName = _wellKnownSymbolMap[name];
+    !_globalLazyTestHooks && _initTestHooks();
     // Cause lazy symbol to get initialized
-    (!_symbol || (_globalLazyTestHooks.lzy && !_symbol.b)) && getSymbol();
+    (!_symbol || _globalLazyTestHooks.lzy) && _initSymbol();
 
     return _symbol.v ? _symbol.v[knownName || name] : (!noPoly ? polyGetKnownSymbol(name) : UNDEF_VALUE);
 }
@@ -90,8 +91,9 @@ export function getKnownSymbol<T = symbol>(name: string | WellKnownSymbols, noPo
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function newSymbol(description?: string | number, noPoly?: boolean): symbol {
+    !_globalLazyTestHooks && _initTestHooks();
     // Cause lazy _symbol to get initialized
-    (!_symbol || (_globalLazyTestHooks.lzy && !_symbol.b)) && getSymbol();
+    (!_symbol || _globalLazyTestHooks.lzy) && _initSymbol();
 
     return _symbol.v ? (_symbol.v as any)(description) : (!noPoly ? polyNewSymbol(description) : NULL_VALUE);
 }
@@ -105,8 +107,9 @@ export function newSymbol(description?: string | number, noPoly?: boolean): symb
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function symbolFor(key: string): symbol {
+    !_globalLazyTestHooks && _initTestHooks();
     // Cause lazy symbol to get initialized
-    (!_symbolFor || (_globalLazyTestHooks.lzy && !_symbol.b)) && getSymbol();
+    (!_symbolFor || !_symbol || _globalLazyTestHooks.lzy) && _initSymbol();
 
     return (_symbolFor.v || polySymbolFor)(key);
 }
@@ -120,8 +123,9 @@ export function symbolFor(key: string): symbol {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function symbolKeyFor(sym: symbol): string | undefined {
+    !_globalLazyTestHooks && _initTestHooks();
     // Cause lazy symbol to get initialized
-    (!_symbolKeyFor || (_globalLazyTestHooks.lzy && !_symbol.b)) && getSymbol();
+    (!_symbolKeyFor || !_symbol || _globalLazyTestHooks.lzy) && _initSymbol();
 
     return (_symbolKeyFor.v || polySymbolKeyFor)(sym);
 }

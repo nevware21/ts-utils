@@ -8,7 +8,6 @@
 
 import { NULL_VALUE, ObjClass, __PROTO__ } from "../internal/constants";
 import { isArray, isObject } from "../helpers/base";
-import { throwTypeError } from "../helpers/throw";
 import { objForEachKey } from "./for_each_key";
 import { polyObjEntries, polyObjValues } from "../polyfills/object";
 
@@ -96,14 +95,7 @@ export const objAssign = ObjClass["assign"];
  * console.log(objKeys(myObj)); // console: ['foo']
  * ```
  */
-/*#__NO_SIDE_EFFECTS__*/
-export function objKeys(value: any): string[] {
-    if (!isObject(value) || value === NULL_VALUE) {
-        throwTypeError("objKeys called on non-object");
-    }
-
-    return ObjClass.keys(value);
-}
+export const objKeys: (value: any) => string[] = ObjClass.keys;
 
 /**
  * Perform a deep freeze on the object and all of it's contained values / properties by recursively calling

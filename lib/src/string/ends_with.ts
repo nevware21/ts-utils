@@ -38,9 +38,7 @@ export function polyStrEndsWith(value: string, searchString: string, length?: nu
     }
 
     let searchValue = isString(searchString) ? searchString : asString(searchString);
-    let chkLen = searchValue[LENGTH];
-    let len = value[LENGTH];
-    let end = !isUndefined(length) && length < len ? length : len;
+    let end = !isUndefined(length) && length < value[LENGTH] ? length : value[LENGTH];
 
-    return strSubstring(value, end - chkLen, end) === searchValue;
+    return strSubstring(value, end - searchValue[LENGTH], end) === searchValue;
 }

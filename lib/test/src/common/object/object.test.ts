@@ -64,6 +64,7 @@ describe("object helpers", () => {
             my: "Old",
             "friend": "."
         });
+        _checkObjKeys(0);
     });
 
     it("objForEachKey", () => {
@@ -1242,19 +1243,17 @@ describe("object helpers", () => {
             nativeThrew = e;
         }
 
-        if (isObject(value)) {
+        if (objKeysThrew) {
+            assert.equal(true, !!nativeThrew || isUndefined(nativeResult) || !!nativeResult,
+                "Checking whether the Native and objKeys threw or returned undefined [" + dumpObj(objKeysThrew || objKeysResult) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
+        } else if(nativeThrew) {
+            assert.ok(false,
+                "Native threw but objKeys didn't [" + dumpObj(objKeysThrew) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
+        } else if (nativeResult) {
             assert.equal(objKeysResult.length, nativeResult.length, "Checking Native and objKeys result for [" + dumpObj(value) + "]");
         } else {
-            if (objKeysThrew) {
-                assert.equal(true, !!nativeThrew || isUndefined(nativeResult) || !!nativeResult,
-                    "Checking whether the Native and objKeys threw or returned undefined [" + dumpObj(objKeysThrew || objKeysResult) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
-            } else if(nativeThrew) {
-                assert.ok(false,
-                    "Native threw but objKeys didn't [" + dumpObj(objKeysThrew) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
-            } else {
-                assert.equal(isUndefined(objKeysResult), !!nativeThrew || isUndefined(nativeResult) || !!nativeResult,
-                    "Checking whether the Native and objKeys threw or returned undefined [" + dumpObj(objKeysThrew || objKeysResult) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
-            }
+            assert.equal(isUndefined(objKeysResult), !!nativeThrew || isUndefined(nativeResult) || !!nativeResult,
+                "Checking whether the Native and objKeys threw or returned undefined [" + dumpObj(objKeysThrew || objKeysResult) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
         }
     }
 

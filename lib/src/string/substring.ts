@@ -162,10 +162,5 @@ export function strLeft(value: string, count: number): string {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function strRight(value: string, count: number): string {
-    let len = value[LENGTH];
-    if (count <= 0) {
-        return EMPTY;
-    }
-
-    return len > count ? strSubstring(value, len - count) : value;
+    return count <= 0 ? EMPTY : (value[LENGTH] > count ? strSlice(value, -count) : value);
 }

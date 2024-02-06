@@ -8,11 +8,11 @@
 
 import { WellKnownSymbols, _wellKnownSymbolMap } from "../symbol/well_known";
 import { throwTypeError } from "../helpers/throw";
-import { POLYFILL_TAG, SYMBOL } from "../internal/constants";
+import { POLYFILL_TAG, SYMBOL, TO_STRING } from "../internal/constants";
 import { objHasOwn } from "../object/has_own";
 import { asString } from "../string/as_string";
 import { _GlobalPolySymbols, _getGlobalConfig } from "../internal/global";
-import { strStartsWith } from "../string/starts_with";
+import { strSubstring } from "../string/substring";
 import { objKeys } from "../object/object";
 
 const UNIQUE_REGISTRY_ID = "_urid";
@@ -67,7 +67,7 @@ export function polySymbolFor(key: string): symbol {
     if (!objHasOwn(registry.k, key)) {
         let newSymbol = polyNewSymbol(key);
         let regId = objKeys(registry.s).length;
-        newSymbol[UNIQUE_REGISTRY_ID] = () => regId + "_" + newSymbol.toString();
+        newSymbol[UNIQUE_REGISTRY_ID] = () => regId + "_" + newSymbol[TO_STRING]();
         registry.k[key] = newSymbol;
         registry.s[newSymbol[UNIQUE_REGISTRY_ID]()] = asString(key);
     }
@@ -84,7 +84,7 @@ export function polySymbolFor(key: string): symbol {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polySymbolKeyFor(sym: symbol): string | undefined {
-    if (!sym || !sym.toString || !strStartsWith(sym.toString(), SYMBOL)) {
+    if (!sym || !sym[TO_STRING] || strSubstring(sym[TO_STRING](), 0, 6) != SYMBOL) {
         throwTypeError((sym as any) + " is not a symbol");
     }
 
@@ -117,7 +117,7 @@ export function polySymbolKeyFor(sym: symbol): string | undefined {
 export function polyGetKnownSymbol(name: string | WellKnownSymbols): symbol {
     !_wellKnownSymbolCache && (_wellKnownSymbolCache = {} as any);
     let result: symbol;
-    let knownName = _wellKnownSymbolMap[name];
+    let knownName: WellKnownSymbols = _wellKnownSymbolMap[name];
     if (knownName) {
         result = _wellKnownSymbolCache[knownName] = _wellKnownSymbolCache[knownName] || polyNewSymbol(SYMBOL + "." + knownName);
     }

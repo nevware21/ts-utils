@@ -29,6 +29,7 @@ export {
     isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isThenable, isNotTruthy, isTruthy, objToString,
     isStrictNullOrUndefined, isStrictUndefined, isError, isPrimitive, isPrimitiveType
 } from "./helpers/base";
+export { ICachedValue, createCachedValue, createDeferredCachedValue } from "./helpers/cache";
 export { CustomErrorConstructor, createCustomError, throwUnsupported } from "./helpers/customError";
 export { utcNow, polyUtcNow } from "./helpers/date";
 export { dumpObj } from "./helpers/diagnostics";
@@ -48,6 +49,7 @@ export { IGetLength as GetLengthImpl, getLength } from "./helpers/length";
 export { getIntValue } from "./helpers/number";
 export { getPerformance, hasPerformance, elapsedTime, perfNow } from "./helpers/perf";
 export { createFilenameRegex, createWildcardRegex, makeGlobRegex } from "./helpers/regexp";
+export { safe, ISafeReturn, SafeReturnType } from "./helpers/safe";
 export { safeGet } from "./helpers/safe_get";
 export { safeGetLazy } from "./helpers/safe_lazy";
 export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";

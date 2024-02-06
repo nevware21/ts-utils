@@ -12,9 +12,9 @@ import { iterForOf } from "../iterator/forOf";
 import { objHasOwn } from "../object/has_own";
 import { getKnownSymbol, hasSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known"
-import { ILazyValue, getLazy } from "../helpers/lazy"
+import { ICachedValue, createCachedValue } from "../helpers/cache";
 
-let _iterSymbol: ILazyValue<symbol>;
+let _iterSymbol: ICachedValue<symbol>;
 
 /**
  * Read the arguments from the provided array, iterator /  or generator function
@@ -85,14 +85,12 @@ let _iterSymbol: ILazyValue<symbol>;
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function readArgs<T = any>(theArgs: ArrayLike<T> | Iterable<T>, start?: number, end?: number): T[] {
-    if (!_iterSymbol) {
-        _iterSymbol = getLazy(() => hasSymbol() && getKnownSymbol(WellKnownSymbols.iterator));
-    }
-
+    
     if (!objHasOwn(theArgs, LENGTH)) {
         // Does not contain a length property so lets check if it's an iterable
         // IArgument is both ArrayLike and an iterable, so prefering to treat it as
         // an array for performance
+        !_iterSymbol && (_iterSymbol = createCachedValue(hasSymbol() && getKnownSymbol(WellKnownSymbols.iterator)));
         let iterFn = _iterSymbol.v && theArgs[_iterSymbol.v];
         if (iterFn) {
             let values: T[] = [];

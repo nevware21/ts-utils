@@ -14,10 +14,23 @@ import { strSplit } from "../../../../src/string/split";
 import { strSubstring } from "../../../../src/string/substring";
 import { getKnownSymbol } from "../../../../src/symbol/symbol";
 import { WellKnownSymbols } from "../../../../src/symbol/well_known";
+import { _initTestHooks } from "../../../../src/helpers/lazy";
 
 describe("polyfill string split helpers", () => {
- 
+  
     describe("strSymSplit", () => {
+
+        let _orgSymbol = Symbol;
+        beforeEach(() => {
+            _orgSymbol = Symbol;
+            _initTestHooks();
+        });
+    
+        afterEach(() => {
+            // eslint-disable-next-line no-global-assign
+            Symbol = _orgSymbol;
+        });
+
         it("null/ undefined", () => {
             _expectThrow(() => {
                 assert.deepEqual(polyStrSymSplit(null as any, null as any), [""]);

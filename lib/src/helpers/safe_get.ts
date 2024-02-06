@@ -6,6 +6,8 @@
  * Licensed under the MIT license.
  */
 
+import { safe } from "./safe";
+
 /**
  * Function to safely execute a callback function, if the function throws the provided default
  * value will be returned.
@@ -27,12 +29,7 @@
  * ```
  */
 export function safeGet<T = boolean>(cb: () => T, defValue: T): T {
-    let result = defValue;
-    try {
-        result = cb();
-    } catch (e) {
-        // Do nothing
-    }
-
-    return result;
+    let result = safe(cb);
+    
+    return result.e ? defValue : result.v;
 }

@@ -7,7 +7,7 @@
  */
 
 import { getWindow, hasWindow } from "../helpers/environment";
-import { CALL, CONSTRUCTOR, FUNCTION, ObjClass, OBJECT, PROTOTYPE } from "../internal/constants";
+import { CALL, CONSTRUCTOR, FUNCTION, ObjClass, OBJECT, PROTOTYPE, TO_STRING } from "../internal/constants";
 import { objHasOwnProperty } from "./has_own_prop";
 import { objGetPrototypeOf } from "./object";
 
@@ -67,7 +67,7 @@ export function isPlainObject(value: any): value is object {
         if (!_objCtrFnString) {
             // Lazily caching what the runtime reports as the object function constructor (as a string)
             // Using an current function lookup to find what this runtime calls a "native" function
-            _fnToString = Function[PROTOTYPE].toString;
+            _fnToString = Function[PROTOTYPE][TO_STRING];
             _objCtrFnString = _fnToString[CALL](ObjClass);
         }
 

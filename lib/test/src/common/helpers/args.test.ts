@@ -8,10 +8,22 @@
 
 import { assert } from "chai";
 import { readArgs }  from "../../../../src/funcs/readArgs";
+import { _initTestHooks } from "../../../../src/helpers/lazy";
 
 describe("args helpers", () => {
     describe("readArgs", () => {
 
+        let _orgSymbol = Symbol;
+        beforeEach(() => {
+            _orgSymbol = Symbol;
+            _initTestHooks();
+        });
+    
+        afterEach(() => {
+            // eslint-disable-next-line no-global-assign
+            Symbol = _orgSymbol;
+        });
+        
         function* myGenerator() {
             yield "Hello";
             yield "Darkness";
