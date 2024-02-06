@@ -1,3 +1,12 @@
+# v0.10.5 Feb 6th, 2024
+
+Minification and minor performance improvements, adds `createcacheValue`, `safe` implementations.
+
+## Changelog
+
+- #239 Stop using internal functions for diagnostic to help with base minification for smaller usages
+- #238 Bump puppeteer from 21.11.0 to 22.0.0
+
 # v0.10.4 Jan 10th, 2024
 
 ## Changelog

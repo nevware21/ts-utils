@@ -85,7 +85,6 @@ export function getGlobal(useCached?: boolean): Window {
 
 /**
  * Return the named global object if available, will return null if the object is not available.
- * Unlike {@link safeGetInst} some environments may throw an exception if the global is not available.
  * @group Environment
  * @param name The globally named object, may be any valid property key (string, number or symbol)
  * @param useCached - [Optional] used for testing to bypass the cached lookup, when `true` this will

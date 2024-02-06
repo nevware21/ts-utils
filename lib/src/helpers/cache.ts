@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { objDefineProp, objDefineProperties } from "../object/define";
+import { objDefineProp } from "../object/define";
 
 /**
  * A generic interface for holding a cached value
