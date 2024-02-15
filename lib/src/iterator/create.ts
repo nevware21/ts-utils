@@ -20,9 +20,10 @@ import { WellKnownSymbols } from "../symbol/well_known";
 export interface CreateIteratorContext<T> {
     /**
      * A function that returns a boolean to indicate whether it was able to produce
-     * the next value in the sequence.
+     * the next value in the sequence. It should return `true` when the sequence is done.
      * @param args - Optional additional arguments that where passed to the iterator `next` function.
-     * @return `true` if a new value was produced and assigned to the `v` of the context, otherwise `false`
+     * @return `false` if a new value was produced and assigned to the `v` of the context, otherwise
+     * `true` to indicate that the sequence is done.
      */
     n: (...args: any) => boolean;
 
