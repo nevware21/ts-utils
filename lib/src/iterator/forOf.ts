@@ -7,7 +7,7 @@
  */
 
 import { ICachedValue, createCachedValue } from "../helpers/cache";
-import { CALL, DONE, VALUE } from "../internal/constants";
+import { CALL } from "../internal/constants";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 import { isIterator } from "./iterator";
@@ -67,8 +67,8 @@ export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value
             let iterResult: IteratorResult<T>;
             try {
                 let count = 0;
-                while(!(iterResult = iter.next())[DONE]) {
-                    if (callbackfn[CALL](thisArg || iter, iterResult[VALUE], count, iter) === -1) {
+                while(!(iterResult = iter.next()).done) {
+                    if (callbackfn[CALL](thisArg || iter, iterResult.value, count, iter) === -1) {
                         break;
                     }
         
@@ -82,7 +82,7 @@ export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value
                 }
             } finally {
                 try {
-                    if (iterResult && !iterResult[DONE]) {
+                    if (iterResult && !iterResult.done) {
                         iter.return && iter.return(iterResult);
                     }
                 } finally {

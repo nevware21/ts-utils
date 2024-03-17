@@ -10,7 +10,7 @@ import { NULL_VALUE } from "../internal/constants";
 import { objDefineProp } from "../object/define";
 
 const REF = "ref";
-const UNREF = "un" + REF as "unref";
+const UNREF = "unref";
 const HAS_REF = "hasRef";
 const ENABLED = "enabled";
 
@@ -161,59 +161,59 @@ export interface _TimerHandler {
  * @param cancelFn - The function used to cancel the timer.
  * @returns The new ITimerHandler instance
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId: T) => T, cancelFn: (timerId: T) => void): _TimerHandler {
     let ref = true;
     let timerId: T = startTimer ? refreshFn(NULL_VALUE) : NULL_VALUE;
     let theTimerHandler: ITimerHandler;
 
-    const _unref = () => {
+    function _unref() {
         ref = false;
         timerId && timerId[UNREF] && timerId[UNREF]();
         return theTimerHandler;
-    };
+    }
 
-    const _ref = () => {
-        ref = true;
-        timerId && timerId[REF] && timerId[REF]();
-        return theTimerHandler;
-    };
+    function _cancel() {
+        timerId && cancelFn(timerId);
+        timerId = NULL_VALUE;
+    }
 
-    const _hasRef = () => {
-        if (timerId && timerId[HAS_REF]) {
-            return timerId[HAS_REF]();
-        }
-        return ref;
-    };
-
-    const _refresh = () => {
+    function _refresh() {
         timerId = refreshFn(timerId);
         if (!ref) {
             _unref();
         }
 
         return theTimerHandler;
-    };
+    }
 
-    const _cancel = () => {
-        timerId && cancelFn(timerId);
-        timerId = NULL_VALUE;
-    };
-
-    const _setEnabled = (value: boolean) => {
+    function _setEnabled(value: boolean) {
         !value && timerId && _cancel();
         value && !timerId && _refresh();
     }
 
     theTimerHandler = {
         cancel: _cancel,
-        refresh: _refresh,
-        [HAS_REF]: _hasRef,
-        [REF]: _ref,
-        [UNREF]: _unref,
-        [ENABLED]: false
+        refresh: _refresh
+    } as any;
+
+    theTimerHandler[HAS_REF] = () => {
+        if (timerId && timerId[HAS_REF]) {
+            return timerId[HAS_REF]();
+        }
+
+        return ref;
     };
 
-    objDefineProp(theTimerHandler, ENABLED, {
+    theTimerHandler[REF] = () => {
+        ref = true;
+        timerId && timerId[REF] && timerId[REF]();
+        return theTimerHandler;
+    };
+
+    theTimerHandler[UNREF] = _unref;
+
+    theTimerHandler = objDefineProp(theTimerHandler, ENABLED, {
         get: () => !!timerId,
         set: _setEnabled
     });

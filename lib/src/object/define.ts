@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { ObjClass, VALUE } from "../internal/constants";
+import { ObjClass } from "../internal/constants";
 import { isFunction, isUndefined } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
 import { ILazyValue } from "../helpers/lazy";
@@ -94,7 +94,7 @@ export type ObjDefinePropDescriptorMap = {
 const propMap: { [key in keyof ObjDefinePropDescriptor]: keyof PropertyDescriptor } = {
     e: "enumerable",
     c: "configurable",
-    v: VALUE,
+    v: "value",
     w: "writable",
     g: "get",
     s: "set"

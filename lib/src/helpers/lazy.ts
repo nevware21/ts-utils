@@ -65,6 +65,7 @@ export interface ILazyValue<T> extends ICachedValue<T> {
  *
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function getLazy<T>(cb: () => T): ILazyValue<T> {
     let lazyValue = { } as ILazyValue<T>;
     !_globalLazyTestHooks && _initTestHooks();

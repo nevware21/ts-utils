@@ -42,13 +42,14 @@ interface _RecursiveVisitMap {
  * @param details - The details object for the current property being copied
  * @returns true if the handler processed the field.
  */
-const _defaultDeepCopyHandler = (details: IObjDeepCopyHandlerDetails): boolean => {
+/*#__NO_SIDE_EFFECTS__*/
+function _defaultDeepCopyHandler(details: IObjDeepCopyHandlerDetails): boolean {
     // Make sure we at least copy plain objects
     details.value && plainObjDeepCopyHandler(details);
 
     // Always return true so that the iteration completes
     return true;
-};
+}
 
 /**
  * @internal
@@ -72,6 +73,7 @@ const defaultDeepCopyHandlers: ObjDeepCopyHandler[] = [
  * @param cb - The callback function to call if the current object has not already been processed.
  * @returns The new deep copied property, may be incomplete as the object is recursive and is still in the process of being copied
  */
+/*#__NO_SIDE_EFFECTS__*/
 function _getSetVisited(visitMap: _RecursiveVisitMap[], source: any, newPath: Array<string | number | symbol>, cb: (newEntry: _RecursiveVisitMap) => void) {
     let theEntry: _RecursiveVisitMap;
     arrForEach(visitMap, (entry) => {

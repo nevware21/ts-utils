@@ -66,6 +66,7 @@ out/
 build/
 dist/
 dist-es**/
+bundle/
 
 # Misc
 statistics.html

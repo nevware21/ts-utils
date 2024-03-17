@@ -28,6 +28,7 @@ import { safe } from "./safe";
  * // result === {};
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function safeGet<T = boolean>(cb: () => T, defValue: T): T {
     let result = safe(cb);
     

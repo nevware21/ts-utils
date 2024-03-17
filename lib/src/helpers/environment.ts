@@ -19,12 +19,23 @@ declare let self: any;
 
 let _cachedGlobal: ICachedValue<Window>;
 
-let _cachedWindow: ICachedValue<Window>;
-let _cachedDocument: ICachedValue<Document>;
-let _cachedNavigator: ICachedValue<Navigator>;
-let _cachedHistory: ICachedValue<History>;
-let _isWebWorker: ICachedValue<boolean>;
-let _isNode: ICachedValue<boolean>;
+/**
+ * @internal
+ * @ignore
+ * Returns a function which will return the named global object if available, will return `null` if the object is not available.
+ * @param getFn - The function to use to get the global object
+ * @param instName - The name of the global object to get, may be any valid PropertyKey (string, number or symbol)
+ * @returns A function which will return the named global object if available, the funcion will return `null` if the object is not available.
+ */
+function _getGlobalInstFn<T>(getFn: (...args: unknown[]) => T, theArgs?: unknown[]): () => T | null | undefined {
+    let cachedValue: ICachedValue<T>;
+    return function() {
+        !_globalLazyTestHooks && _initTestHooks();
+        (!cachedValue || _globalLazyTestHooks.lzy) && (cachedValue = createCachedValue(safe(getFn, theArgs).v));
+        
+        return cachedValue.v;
+    }
+}
 
 /**
  * Create and return an readonly {@link ILazyValue} instance which will cache and return the named global
@@ -112,9 +123,9 @@ export function getInst<T>(name: string | number | symbol, useCached?: boolean):
     }
 
     // Test workaround, for environments where <global>.window (when global == window) doesn't return the base window
-    if (name === WINDOW && _cachedWindow) {
+    if (name === WINDOW) {
         // tslint:disable-next-line: no-angle-bracket-type-assertion
-        return <any>_cachedWindow.v as T;
+        return <any>getWindow() as T;
     }
 
     return NULL_VALUE;
@@ -135,13 +146,7 @@ export function hasDocument(): boolean {
  * @group Environment
  * @returns
  */
-/*#__NO_SIDE_EFFECTS__*/
-export function getDocument(): Document {
-    !_globalLazyTestHooks && _initTestHooks();
-    (!_cachedDocument || _globalLazyTestHooks.lzy) && (_cachedDocument = createCachedValue(safe(getInst<Document>, ["document"]).v));
-
-    return _cachedDocument.v;
-}
+export const getDocument = (/*#__PURE__*/_getGlobalInstFn<Document>(getInst, ["document"]));
 
 /**
  * Identify whether the runtime contains a `window` object
@@ -158,13 +163,7 @@ export function hasWindow(): boolean {
  * @group Environment
  * @returns
  */
-/*#__NO_SIDE_EFFECTS__*/
-export function getWindow(): Window {
-    !_globalLazyTestHooks && _initTestHooks();
-    (!_cachedWindow || _globalLazyTestHooks.lzy) && (_cachedWindow = createCachedValue(safe(getInst<Window>, [WINDOW]).v));
-
-    return _cachedWindow.v;
-}
+export const getWindow = (/*#__PURE__*/_getGlobalInstFn<Window>(getInst, [WINDOW]));
 
 /**
  * Identify whether the runtimne contains a `navigator` object
@@ -181,13 +180,7 @@ export function hasNavigator(): boolean {
  * @group Environment
  * @returns
  */
-/*#__NO_SIDE_EFFECTS__*/
-export function getNavigator(): Navigator {
-    !_globalLazyTestHooks && _initTestHooks();
-    (!_cachedNavigator || _globalLazyTestHooks.lzy) && (_cachedNavigator = createCachedValue(safe(getInst<Navigator>, ["navigator"]).v));
-
-    return _cachedNavigator.v;
-}
+export const getNavigator = (/*#__PURE__*/_getGlobalInstFn<Navigator>(getInst, ["navigator"]));
 
 /**
  * Identifies whether the runtime contains a `history` object
@@ -204,32 +197,22 @@ export function hasHistory(): boolean {
  * @group Environment
  * @returns
  */
-/*#__NO_SIDE_EFFECTS__*/
-export function getHistory(): History | null {
-    !_globalLazyTestHooks && _initTestHooks();
-    (!_cachedHistory || _globalLazyTestHooks.lzy) && (_cachedHistory = createCachedValue(safe(getInst<History>, ["history"]).v));
-
-    return _cachedHistory.v;
-}
+export const getHistory = (/*#__PURE__*/_getGlobalInstFn<History>(getInst, ["history"]));
 
 /**
  * Simple method to determine if we are running in a node environment
  * @group Environment
  * @returns True if you are
  */
-export function isNode(): boolean {
-    !_isNode && (_isNode = createCachedValue(!!safe(() => (process && (process.versions||{}).node)).v));
-
-    return _isNode.v;
-}
+export const isNode = (/*#__PURE__*/_getGlobalInstFn<boolean>(() => {
+    return !!safe(() => (process && (process.versions||{}).node)).v;
+}));
 
 /**
  * Helper to identify if you are running as a Dedicated, Shared or Service worker
  * @group Environment
  * @returns True if the environment you are in looks like a Web Worker
  */
-export function isWebWorker(): boolean {
-    !_isWebWorker && (_isWebWorker = createCachedValue(!!safe(() => self && self instanceof WorkerGlobalScope).v));
-
-    return _isWebWorker.v;
-}
+export const isWebWorker = (/*#__PURE__*/_getGlobalInstFn<boolean>(() => {
+    return !!safe(() => self && self instanceof WorkerGlobalScope).v;
+}));

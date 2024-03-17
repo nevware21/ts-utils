@@ -173,9 +173,9 @@ export function encodeAsHtml(value: string) {
             "&": "amp",
             "<": "lt",
             ">": "gt",
-            [DBL_QUOTE]: "quot",
+            "\"": "quot",
             "'": "#39"
-        }
+        };
     }));
     
     return asString(value).replace(/[&<>"']/g, match => "&" + _htmlEntityCache.v[match] + ";");

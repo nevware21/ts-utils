@@ -107,14 +107,14 @@
         "html encode"
     ],
     "main": "lib/dist/es5/main/ts-utils.js",
-    "esnext:main": "dist/es6/main/ts-utils.js",
-    "module": "lib/dist-es5/index.js",
-    "esnext": "lib/dist-es6/index.js",
-    "types": "lib/types/index.d.ts",
+    "esnext:main": "lib/dist/es6/main/ts-utils.js",
+    "module": "lib/dist/es5/mod/index.js",
+    "esnext:module": "lib/dist/es6/mod/index.js",
+    "types": "lib/dist/types/ts-utils.d.ts",    
     "sideEffects": false,
     "scripts": {
-        "build": "grunt ts_utils --verbose && npm run package && npm run dtsgen && npm run size",
-        "rebuild": "npm run build && npm run test",
+        "build": "grunt ts_utils --verbose && npm run package && npm run dtsgen",
+        "rebuild": "npm run build && npm run test && npm run size",
         "package": "rollup -c lib/rollup.config.js --bundleConfigAsCjs",
         "test": "npm run test:node && npm run test:worker && npm run test:browser && npm run coverage:report",
         "test:node": "nyc ts-mocha -p lib/test/tsconfig.test.json lib/test/src/node/**/*.test.ts lib/test/src/common/**/*.test.ts",
@@ -192,13 +192,13 @@
         "karma-coverage": "^2.2.0",
         "mocha": "^10.0.0",
         "nyc": "^15.1.0",
-        "puppeteer": "^22.0.0",
+        "puppeteer": "^22.5.0",
         "rollup": "^4.1.4",
         "rollup-plugin-minify-es": "^1.1.1",
         "rollup-plugin-istanbul": "^5.0.0",
         "rollup-plugin-cleanup": "^3.2.1",
         "sinon": "^15.0.0",
-        "size-limit": "^11.0.1",
+        "size-limit": "^11.1.1",
         "ts-mocha": "^10.0.0",
         "typedoc": "^0.25.0",
         "typescript": "^4.9.5",
@@ -209,58 +209,58 @@
     "size-limit": [
         {
             "name": "es5-full",
-            "path": "lib/dist-es5/index.js",
+            "path": "lib/dist/es5/mod/index.js",
             "limit": "19 kb",
             "brotli": false,
             "ignore": [
-                "lib/dist-es5/polyfills.js",
-                "lib/dist-es5/polyfills.*.js"
+                "lib/dist/es5/mod/polyfills.js",
+                "lib/dist/es5/mod/polyfills.*.js"
             ]
         },
         {
             "name": "es6-full",
-            "path": "lib/dist-es6/index.js",
+            "path": "lib/dist/es6/mod/index.js",
             "limit": "18 kb",
             "brotli": false,
             "ignore": [
-                "lib/dist-es6/polyfills.js",
-                "lib/dist-es6/polyfills.*.js"
+                "lib/dist/es6/mod/polyfills.js",
+                "lib/dist/es6/mod/polyfills.*.js"
             ]
         },
         {
             "name": "es5-zip",
-            "path": "lib/dist-es5/index.js",
+            "path": "lib/dist/es5/mod/index.js",
             "limit": "8 Kb",
             "gzip": true,
             "ignore": [
-                "lib/dist-es5/polyfills.js",
-                "lib/dist-es5/polyfills.*.js"
+                "lib/dist/es5/mod/polyfills.js",
+                "lib/dist/es5/mod/polyfills.*.js"
             ]
         },
         {
             "name": "es6-zip",
-            "path": "lib/dist-es6/index.js",
+            "path": "lib/dist/es6/mod/index.js",
             "limit": "8 Kb",
             "gzip": true,
             "ignore": [
-                "lib/dist-es6/polyfills.js",
-                "lib/dist-es6/polyfills.*.js"
+                "lib/dist/es6/mod/polyfills.js",
+                "lib/dist/es6/mod/polyfills.*.js"
             ]
         },
         {
             "name": "es5-env",
-            "path": "lib/dist-es5/index.js",
+            "path": "lib/dist/es5/mod/index.js",
             "limit": "2 kb",
             "import": "{ getGlobal, getInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory, getHistory, isNode, isWebWorker }",
             "brotli": false,
             "ignore": [
-                "lib/dist-es5/polyfills.js",
-                "lib/dist-es5/polyfills.*.js"
+                "lib/dist/es5/mod/polyfills.js",
+                "lib/dist/es5/mod/polyfills.*.js"
             ]
         },
         {
             "name": "es5-poly",
-            "path": "lib/dist-es5/polyfills.js",
+            "path": "lib/bundle/es5/ts-polyfills-utils.js",
             "limit": "7 kb",
             "brotli": false
         }   

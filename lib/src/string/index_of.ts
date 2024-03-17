@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { INDEX_OF, LAST_INDEX_OF, StrProto } from "../internal/constants";
+import { StrProto } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 
 /**
@@ -41,7 +41,7 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
  * strIndexOf('Blue Whale', '', 11)      // returns 10
  * ```
  */
-export const strIndexOf: (value: string, searchString: string, position?: number) => number = (/*#__PURE__*/_unwrapFunction(INDEX_OF, StrProto));
+export const strIndexOf: (value: string, searchString: string, position?: number) => number = (/*#__PURE__*/_unwrapFunction("indexOf", StrProto));
 
 /**
  * The `strLastIndexOf()` method, given two arguments: the string and a substring to search for, searches
@@ -64,4 +64,4 @@ export const strIndexOf: (value: string, searchString: string, position?: number
  * strLastIndexOf('canal', '', 2);   // returns 2
  * ```
  */
-export const strLastIndexOf: (value: string, searchString: string, position?: number) => number = (/*#__PURE__*/_unwrapFunction(LAST_INDEX_OF, StrProto));
+export const strLastIndexOf: (value: string, searchString: string, position?: number) => number = (/*#__PURE__*/_unwrapFunction("lastIndexOf", StrProto));

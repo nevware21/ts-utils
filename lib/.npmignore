@@ -9,6 +9,6 @@
 !tsconfig.**.json
 !/README.md
 !/LICENSE
-!dist-es**/**
+!bundle/**
 !dist/**
 !types/**

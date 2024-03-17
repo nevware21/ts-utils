@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { CALL, EMPTY, NULL_VALUE, NUMBER, ObjProto, TO_STRING, UNDEF_VALUE } from "../internal/constants";
+import { CALL, EMPTY, NULL_VALUE, ObjProto, TO_STRING, UNDEF_VALUE } from "../internal/constants";
 import { asString } from "../string/as_string";
 
 const ERROR_TYPE = "[object Error]";
@@ -74,7 +74,7 @@ export function dumpObj(object: any, format?: boolean | number): string {
     }
 
     try {
-        propertyValueDump = JSON.stringify(object, NULL_VALUE, format ? (((typeof format as unknown) === NUMBER) ? format as number : 4) : UNDEF_VALUE);
+        propertyValueDump = JSON.stringify(object, NULL_VALUE, format ? (((typeof format as unknown) === "number") ? format as number : 4) : UNDEF_VALUE);
         propertyValueDump = (propertyValueDump && propertyValueDump.replace(/"(\w+)"\s*:\s{0,1}/g, "$1: ")) || asString(object);
     } catch(e) {
         // Unable to convert object (probably circular)

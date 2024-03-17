@@ -6,8 +6,8 @@
  * Licensed under the MIT license.
  */
 
-import { fnApply } from "../funcs/fnApply";
-import { ArrProto, CALL, CONSTRUCTOR, NAME, NULL_VALUE, PROTOTYPE, SLICE } from "../internal/constants";
+import { fnApply } from "../funcs/funcs";
+import { ArrSlice, CALL, CONSTRUCTOR, NAME, NULL_VALUE, PROTOTYPE } from "../internal/constants";
 import { objCreate } from "../object/create";
 import { objDefine } from "../object/define";
 import { objGetPrototypeOf } from "../object/object";
@@ -29,6 +29,7 @@ export interface CustomErrorConstructor<T extends Error = Error> extends ErrorCo
  * @internal
  * @ignore
  */
+/*#__NO_SIDE_EFFECTS__*/
 function _createCustomError<T>(name: string, d: any, b: any): T {
     safe(objDefine, [ d, NAME, { v: name, c: true, e: false }]);
     d = objSetPrototypeOf(d, b);
@@ -130,7 +131,7 @@ export function createCustomError<T extends ErrorConstructor = CustomErrorConstr
         let theArgs = arguments;
         try {
             safe(_setName, [theBaseClass, name]);
-            let _self = fnApply(theBaseClass, _this, ArrProto[SLICE][CALL](theArgs)) || _this;
+            let _self = fnApply(theBaseClass, _this, ArrSlice[CALL](theArgs)) || _this;
             if (_self !== _this) {
                 // Looks like runtime error constructor reset the prototype chain, so restore it
                 let orgProto = objGetPrototypeOf(_this);

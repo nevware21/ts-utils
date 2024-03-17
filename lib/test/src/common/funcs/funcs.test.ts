@@ -7,9 +7,7 @@
  */
 
 import { assert } from "chai";
-import { fnBind } from "../../../../src/funcs/fnBind";
-import { fnApply } from "../../../../src/funcs/fnApply";
-import { fnCall } from "../../../../src/funcs/fnCall";
+import { fnApply, fnBind, fnCall } from "../../../../src/funcs/funcs";
 
 describe("function helpers", () => {
     describe("fnBind", () => {
