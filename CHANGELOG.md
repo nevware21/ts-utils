@@ -1,11 +1,18 @@
+# v0.11.0 Mar 17th, 2024
+
+
+## Changelog
+
+
 # v0.10.5 Feb 6th, 2024
 
 Minification and minor performance improvements, adds `createcacheValue`, `safe` implementations.
 
 ## Changelog
 
-- #239 Stop using internal functions for diagnostic to help with base minification for smaller usages
-- #238 Bump puppeteer from 21.11.0 to 22.0.0
+- #246 [Bug] Package sizes are too large
+- #241 Remove removed function link from readme
+- #244 Fix CreateIteratorContext `n` documentation
 
 # v0.10.4 Jan 10th, 2024
 
