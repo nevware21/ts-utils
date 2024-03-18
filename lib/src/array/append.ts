@@ -9,7 +9,7 @@
 import { isArray, isUndefined } from "../helpers/base";
 import { isIterable, isIterator } from "../iterator/iterator";
 import { iterForOf } from "../iterator/forOf";
-import { fnApply } from "../funcs/fnApply";
+import { fnApply } from "../funcs/funcs";
 
 /**
  * Appends the `elms` to the `target` where the elms may be an array, a single object

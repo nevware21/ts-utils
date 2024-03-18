@@ -6,10 +6,10 @@
  * Licensed under the MIT license.
  */
 
-import { ArrCls, BOOLEAN, FUNCTION, NULL_VALUE, NUMBER, OBJECT, ObjProto, STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
+import { ArrCls, FUNCTION, NULL_VALUE, OBJECT, ObjProto, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
 import { safeGet } from "./safe_get";
 
-const PRIMITIVE_TYPES = [ STRING, NUMBER, BOOLEAN, UNDEFINED, "symbol", "bigint" ];
+let _primitiveTypes: string[];
 
 /**
  * @ignore
@@ -355,7 +355,9 @@ export function isPrimitive(value: any): value is string | number | bigint | boo
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function isPrimitiveType(theType: string): boolean {
-    return theType !== OBJECT && PRIMITIVE_TYPES.indexOf(theType) !== -1;
+    !_primitiveTypes && (_primitiveTypes = [ "string", "number", "boolean", UNDEFINED, "symbol", "bigint" ]);
+
+    return theType !== OBJECT && _primitiveTypes.indexOf(theType) !== -1;
 }
 
 /**
@@ -376,7 +378,7 @@ export function isPrimitiveType(theType: string): boolean {
  * isString(0);             // false
  * ```
  */
-export const isString: (value: any) => value is string = (/*#__PURE__*/_createIs<string>(STRING));
+export const isString: (value: any) => value is string = (/*#__PURE__*/_createIs<string>("string"));
 
 /**
  * Checks to see if the past value is a function value
@@ -465,7 +467,7 @@ export const isDate: (value: any) => value is Date = (/*#__PURE__*/_createObjIs<
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a number, false otherwise.
  */
-export const isNumber: (value: any) => value is number = (/*#__PURE__*/_createIs<number>(NUMBER));
+export const isNumber: (value: any) => value is number = (/*#__PURE__*/_createIs<number>("number"));
 
 /**
  * Checks if the type of value is a boolean.
@@ -473,7 +475,7 @@ export const isNumber: (value: any) => value is number = (/*#__PURE__*/_createIs
  * @param {any} value - Value to be checked.
  * @return {boolean} True if the value is a boolean, false otherwise.
  */
-export const isBoolean: (value: any) => value is boolean = (/*#__PURE__*/_createIs<boolean>(BOOLEAN));
+export const isBoolean: (value: any) => value is boolean = (/*#__PURE__*/_createIs<boolean>("boolean"));
 
 /**
  * Determines if a value is a regular expression object.

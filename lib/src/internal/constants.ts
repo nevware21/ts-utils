@@ -13,24 +13,16 @@ export const UNDEF_VALUE: undefined = undefined;
 export const NULL_VALUE: null = null;
 
 export const EMPTY = "";
-export const BOOLEAN = "boolean";
 export const FUNCTION = "function";
-export const NUMBER = "number";
 export const OBJECT = "object";
 export const PROTOTYPE = "prototype";
 export const __PROTO__ = "__proto__";
-export const STRING = "string";
 export const UNDEFINED = "undefined";
 export const CONSTRUCTOR = "constructor";
 export const SYMBOL = "Symbol";
 export const POLYFILL_TAG = "_polyfill";
-export const INDEX_OF = "indexOf";
-export const LAST_INDEX_OF = "lastIndexOf";
 export const LENGTH = "length";
-export const DONE = "done";
-export const VALUE = "value";
 export const NAME = "name";
-export const SLICE = "slice";
 export const CALL = "call";
 export const TO_STRING = "toString";
 
@@ -68,3 +60,9 @@ export const ArrCls = Array;
  * @ignore
  */
 export const ArrProto = ArrCls[PROTOTYPE];
+
+/**
+ * @ignore
+ *
+ */
+export const ArrSlice = ArrProto["slice"];

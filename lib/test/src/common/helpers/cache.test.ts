@@ -97,7 +97,7 @@ describe("cache helpers", () => {
 
         it("validate json", () => {
             let deferredCacheValue = createDeferredCachedValue(() => "hello darkness");
-            assert.equal(JSON.stringify(deferredCacheValue), "{\"v\":\"hello darkness\"}");
+            assert.equal(JSON.stringify(deferredCacheValue), "\"hello darkness\"");
         });
 
         it("validate numeric value", () => {
@@ -110,9 +110,19 @@ describe("cache helpers", () => {
             assert.deepEqual(deferredCacheValue.v, { hello: "darkness" });
         });
 
+        it("validate object json", () => {
+            let deferredCacheValue = createDeferredCachedValue(() => ({ hello: "darkness" }));
+            assert.equal(JSON.stringify(deferredCacheValue), "{\"hello\":\"darkness\"}");
+        });
+
         it("validate array value", () => {
             let deferredCacheValue = createDeferredCachedValue(() => [1, 2, 3]);
             assert.deepEqual(deferredCacheValue.v, [1, 2, 3]);
+        });
+
+        it("validate array json", () => {
+            let deferredCacheValue = createDeferredCachedValue(() => [1, 2, 3]);
+            assert.equal(JSON.stringify(deferredCacheValue), "[1,2,3]");
         });
 
         it("validate boolean value", () => {

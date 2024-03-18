@@ -6,8 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { ArrProto, SLICE } from "../internal/constants";
-import { _unwrapFunction } from "../internal/unwrapFunction";
+import { ArrSlice, CALL } from "../internal/constants";
 
 /**
  * The arrSlice() method returns a shallow copy of a portion of an array into a new array object
@@ -52,4 +51,6 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
  * arrSlice(lyrics, 2, -1); // [ "my", "old", "friend.", "I've", "come", "to" ]
  * ```
  */
-export const arrSlice: <T>(theArray: ArrayLike<T>, start?: number, end?: number) => T[] = (/*#__PURE__*/_unwrapFunction(SLICE, ArrProto));
+export function arrSlice<T>(theArray: ArrayLike<T>, start?: number, end?: number): T[] {
+    return ((theArray && theArray["slice"]) || ArrSlice).apply(theArray, ArrSlice[CALL](arguments, 1));
+}

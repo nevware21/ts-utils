@@ -46,6 +46,7 @@ let _globalCfg: { [key: string ]: any };
  * Helper to get the current global value
  * @returns
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function _getGlobalValue(): Window {
     var result: Window;
 

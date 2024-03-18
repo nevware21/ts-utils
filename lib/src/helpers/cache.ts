@@ -25,7 +25,12 @@ export interface ICachedValue<T> {
     /**
      * Returns the current cached value
      */
-    v: T
+    v: T,
+
+    /**
+     * Returns the current cached value
+     */
+    toJSON(): T;
 }
 
 /**
@@ -52,7 +57,7 @@ export interface ICachedValue<T> {
 export function createCachedValue<T>(value: T): ICachedValue<T> {
     return objDefineProp({
         toJSON: () => value
-    } as any, "v", { value }) as ICachedValue<T>;
+    }, "v", { value }) as ICachedValue<T>;
 }
 
 /**
@@ -70,20 +75,17 @@ export function createCachedValue<T>(value: T): ICachedValue<T> {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function createDeferredCachedValue<T>(cb: () => T): ICachedValue<T> {
-    return objDefineProp({} as ICachedValue<T>, "v", {
-        get: function () {
-            let result = cb();
-            objDefineProp(this, "v", {
-                value: result,
-                enumerable: true
-            });
+    let theValue: any = {
+        toJSON: () => theValue.v
+    };
 
+    return objDefineProp(theValue as ICachedValue<T>, "v", {
+        get: () => {
+            let result = cb();
+            cb = null;
+            objDefineProp(theValue, "v", { value: result });
             return result;
         },
-        enumerable: true,
         configurable: true
     });
 }
-
-
-

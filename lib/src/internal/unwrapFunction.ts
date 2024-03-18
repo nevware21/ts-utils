@@ -9,9 +9,7 @@
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
 import { asString } from "../string/as_string";
-import { ArrProto, CALL, SLICE } from "./constants";
-
-let _slice: typeof ArrProto.slice;
+import { ArrSlice, CALL } from "./constants";
 
 /**
  * @internal
@@ -46,14 +44,13 @@ export const _unwrapFunction:<R, T>(funcName: keyof T, clsProto: T) => <T>(this:
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function _unwrapFunctionWithPoly<T, P extends (...args: any) => any>(funcName: keyof T, clsProto?: T, polyFunc?: P) {
-    _slice = _slice || ArrProto[SLICE];
     let clsFn = clsProto && clsProto[funcName];
 
     return function(thisArg: any): ReturnType<P> {
         let theFunc = (thisArg && thisArg[funcName]) || clsFn;
         if (theFunc || polyFunc) {
             let theArgs = arguments;
-            return ((theFunc || polyFunc) as Function).apply(thisArg, theFunc ? _slice[CALL](theArgs, 1) : theArgs);
+            return ((theFunc || polyFunc) as Function).apply(thisArg, theFunc ? ArrSlice[CALL](theArgs, 1) : theArgs);
         }
 
         throwTypeError("\"" + asString(funcName) + "\" not defined for " + dumpObj(thisArg));

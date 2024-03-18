@@ -6,7 +6,6 @@
  * Licensed under the MIT license.
  */
 
-import { DONE, VALUE } from "../internal/constants";
 import { objDefine } from "../object/define";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
@@ -200,11 +199,11 @@ export function createIterator<T>(ctx: CreateIteratorContext<T>): Iterator<T> {
         isDone = isDone || (ctx.n ? ctx.n(arguments) : true);
 
         let result  = {
-            [DONE]: isDone
+            done: isDone
         };
 
         if (!isDone) {
-            objDefine<IteratorResult<T>>(result as any, VALUE, { g: _value });
+            objDefine<IteratorResult<T>>(result as any, "value", { g: _value });
         }
 
         return result as IteratorResult<T>;
@@ -213,16 +212,16 @@ export function createIterator<T>(ctx: CreateIteratorContext<T>): Iterator<T> {
     function _return(value?: T): IteratorReturnResult<T> {
         isDone = true;
         return {
-            [DONE]: true,
-            [VALUE]: ctx.r && ctx.r(value)
+            done: true,
+            value: ctx.r && ctx.r(value)
         };
     }
 
     function _throw(e?: any): IteratorResult<T> {
         isDone = true;
         return {
-            [DONE]: true,
-            [VALUE]: ctx.t && ctx.t(e)
+            done: true,
+            value: ctx.t && ctx.t(e)
         };
     }
 
