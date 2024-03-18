@@ -7,7 +7,7 @@
  */
 
 import { fnApply } from "../funcs/funcs";
-import { ArrSlice, CALL } from "../internal/constants";
+import { ArrSlice, CALL, UNDEF_VALUE } from "../internal/constants";
 import { ITimerHandler, _createTimerHandler } from "./handler";
 
 /**
@@ -77,14 +77,13 @@ export function scheduleInterval<A extends any[]>(callback: (...args: A) => void
  * ```
  */
 export function scheduleInterval<A extends any[]>(callback: (...args: A) => void, timeout: number): ITimerHandler {
-    let self = this;
     let theArguments = ArrSlice[CALL](arguments);
 
     let handler = _createTimerHandler(true, (intervalId: any) => {
         intervalId && clearInterval(intervalId);
-        return fnApply(setInterval, self, theArguments)
+        return fnApply(setInterval, UNDEF_VALUE, theArguments)
     }, (intervalId: any) => {
-        fnApply(clearInterval, self, [ intervalId ]);
+        fnApply(clearInterval, UNDEF_VALUE, [ intervalId ]);
     });
 
     return handler.h;
