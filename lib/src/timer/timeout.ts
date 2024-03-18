@@ -11,7 +11,7 @@ import { isArray } from "../helpers/base";
 import { ArrSlice, CALL, UNDEF_VALUE } from "../internal/constants";
 import { ITimerHandler, _createTimerHandler } from "./handler";
 
-function _createTimeoutWith(self: any, startTimer: boolean, overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, theArgs: any[]): ITimerHandler {
+function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, theArgs: any[]): ITimerHandler {
     let isArr = isArray(overrideFn);
     let len = isArr ? overrideFn.length : 0;
     let setFn: TimeoutOverrideFn = (len > 0 ? overrideFn[0] : (!isArr ? overrideFn : UNDEF_VALUE)) || setTimeout;
@@ -20,7 +20,7 @@ function _createTimeoutWith(self: any, startTimer: boolean, overrideFn: TimeoutO
     let timerFn = theArgs[0];
     theArgs[0] = function () {
         handler.dn();
-        fnApply(timerFn, self, ArrSlice[CALL](arguments));
+        fnApply(timerFn, UNDEF_VALUE, ArrSlice[CALL](arguments));
     };
     
     let handler = _createTimerHandler(startTimer, (timerId?: any) => {
@@ -30,12 +30,12 @@ function _createTimeoutWith(self: any, startTimer: boolean, overrideFn: TimeoutO
                 return timerId;
             }
 
-            fnApply(clearFn, self, [ timerId ]);
+            fnApply(clearFn, UNDEF_VALUE, [ timerId ]);
         }
 
-        return fnApply(setFn, self, theArgs);
+        return fnApply(setFn, UNDEF_VALUE, theArgs);
     }, function (timerId: any) {
-        fnApply(clearFn, self, [ timerId ]);
+        fnApply(clearFn, UNDEF_VALUE, [ timerId ]);
     });
 
     return handler.h;
@@ -149,7 +149,7 @@ export function scheduleTimeout<A extends any[]>(callback: (...args: A) => void,
  * ```
  */
 export function scheduleTimeout<A extends any[]>(callback: (...args: A) => void, timeout: number): ITimerHandler {
-    return _createTimeoutWith(this, true, UNDEF_VALUE, ArrSlice[CALL](arguments));
+    return _createTimeoutWith(true, UNDEF_VALUE, ArrSlice[CALL](arguments));
 }
 
 /**
@@ -317,7 +317,7 @@ export function scheduleTimeoutWith<A extends any[]>(overrideFn: TimeoutOverride
  * ```
  */
 export function scheduleTimeoutWith<A extends any[]>(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, callback: (...args: A) => void, timeout: number): ITimerHandler {
-    return _createTimeoutWith(this, true, overrideFn, ArrSlice[CALL](arguments, 1));
+    return _createTimeoutWith(true, overrideFn, ArrSlice[CALL](arguments, 1));
 }
 
 /**
@@ -387,7 +387,7 @@ export function createTimeout<A extends any[]>(callback: (...args: A) => void, t
  * ```
  */
 export function createTimeout<A extends any[]>(callback: (...args: A) => void, timeout: number): ITimerHandler {
-    return _createTimeoutWith(this, false, UNDEF_VALUE, ArrSlice[CALL](arguments));
+    return _createTimeoutWith(false, UNDEF_VALUE, ArrSlice[CALL](arguments));
 }
 
 /**
@@ -535,5 +535,5 @@ export function createTimeoutWith<A extends any[]>(overrideFn: TimeoutOverrideFn
  * ```
  */
 export function createTimeoutWith<A extends any[]>(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, callback: (...args: A) => void, timeout: number): ITimerHandler {
-    return _createTimeoutWith(this, false, overrideFn, ArrSlice[CALL](arguments, 1));
+    return _createTimeoutWith(false, overrideFn, ArrSlice[CALL](arguments, 1));
 }
