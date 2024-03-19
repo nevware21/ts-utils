@@ -1,3 +1,12 @@
+# v0.11.0 Mar 17th, 2024
+
+## Changelog
+
+- #252 [Bug] TypeError: Illegal invocation when calling setTimeout
+- #246 [Bug] Package sizes are too large
+- #241 Remove removed function link from readme
+- #244 Fix CreateIteratorContext `n` documentation
+
 # v0.10.5 Feb 6th, 2024
 
 Minification and minor performance improvements, adds `createcacheValue`, `safe` implementations.
