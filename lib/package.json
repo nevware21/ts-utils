@@ -110,11 +110,8 @@
     "main": "./dist/es5/main/ts-utils.js",
     "module": "./dist/es5/mod/index.js",
     "esnext:main": "./dist/es6/main/ts-utils.js",
+    "esnext": "./dist/es6/mod/index.js",
     "esnext:module": "./dist/es6/mod/index.js",
-    "exports": {
-        "import": "./dist/es5/mod/index.js",
-        "require": "./dist/es5/main/ts-utils.js"
-    },
     "sideEffects": false,
     "repository": {
         "type": "git",
