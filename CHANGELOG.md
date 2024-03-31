@@ -1,3 +1,9 @@
+# v0.11.1 Mar 31st, 2024
+
+## Changelog
+
+- #258 Remove exports defintion from package.json
+
 # v0.11.0 Mar 18th, 2024
 
 ## Changelog
