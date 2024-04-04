@@ -7,6 +7,7 @@
  */
 
 import { MathCls } from "../internal/constants";
+import { _pureRef } from "../internal/treeshake_helpers";
 
 /**
  * The mathMin() function returns the lowest-valued number passed into it, or NaN if any
@@ -27,7 +28,7 @@ import { MathCls } from "../internal/constants";
  * const z = Math.min(x, y); // -20
  * ```
  */
-export const mathMin: (...values: number[]) => number = MathCls.min;
+export const mathMin: (...values: number[]) => number = (/*#__PURE__*/_pureRef<typeof Math.min>(MathCls, "min"));
 
 /**
  * The `mathMax()` function returns the largest of the zero or more numbers given as input
@@ -49,4 +50,4 @@ export const mathMin: (...values: number[]) => number = MathCls.min;
  * mathMax(-10, 20);  //  20
  * ```
  */
-export const mathMax: (...values: number[]) => number = MathCls.max;
+export const mathMax: (...values: number[]) => number = (/*#__PURE__*/_pureRef<typeof Math.min>(MathCls, "max"));

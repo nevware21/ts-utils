@@ -7,6 +7,7 @@
  */
 
 import { ObjClass } from "../internal/constants";
+import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { objGetOwnPropertyDescriptor } from "./get_own_prop_desc";
 import { objHasOwnProperty } from "./has_own_prop";
 
@@ -45,7 +46,7 @@ import { objHasOwnProperty } from "./has_own_prop";
  * objHasOwn(example, 'prop');   // true - own property exists with value of undefined
  * ```
  */
-export const objHasOwn: <T = any>(obj: T, prop: PropertyKey) => boolean = (ObjClass as any)["hasOwn"] || polyObjHasOwn;
+export const objHasOwn: <T = any>(obj: T, prop: PropertyKey) => boolean = (/*#__PURE__*/_pureAssign((/* #__PURE__ */_pureRef(ObjClass as any, "hasOwn")), polyObjHasOwn));
 
 /**
  * The polyObjHasOwn() method is a polyfill for {@link objHasOwn} when the native

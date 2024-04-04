@@ -6,7 +6,8 @@
  * Licensed under the MIT license.
  */
 
-import { ArrCls, FUNCTION, NULL_VALUE, OBJECT, ObjProto, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
+import { ArrCls, FUNCTION, NULL_VALUE, OBJECT, ObjProto, TO_STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
+import { _pureRef } from "../internal/treeshake_helpers";
 import { safeGet } from "./safe_get";
 
 let _primitiveTypes: string[];
@@ -67,7 +68,7 @@ export function _createObjIs<T>(theName: string): (value: any) => value is T {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function objToString(value: any): string {
-    return ObjProto.toString.call(value);
+    return ObjProto[TO_STRING].call(value);
 }
 
 /**
@@ -441,7 +442,7 @@ export function isObject<T>(value: T): value is T {
  * }
  * ```
  */
-export const isArray: <T = any>(arg: any) => arg is Array<T> = ArrCls.isArray;
+export const isArray: <T = any>(arg: any) => arg is Array<T> = (/* #__PURE__*/_pureRef<typeof ArrCls.isArray>(ArrCls as any, "isArray"));
 
 /**
  * Check if an object is of type Date

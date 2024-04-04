@@ -13,11 +13,10 @@ import { strPadStart } from "../string/pad";
 import { strUpper } from "../string/upper_lower";
 import { isNumber, isString, isUndefined } from "./base";
 import { dumpObj } from "./diagnostics";
-import { getLazy, ILazyValue } from "./lazy";
 
 const DBL_QUOTE = "\"";
 const INVALID_JS_NAME = /([^\w\d_$])/g;
-let _htmlEntityCache: ILazyValue<{ [key: string]: string}>;
+let _htmlEntityCache: { [key: string]: string};
 
 /**
  * Validates that the string name conforms to the JS IdentifierName specification and if not
@@ -168,15 +167,13 @@ export function encodeAsJson<T>(value: T, format?: boolean | number): string {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function encodeAsHtml(value: string) {
-    !_htmlEntityCache && (_htmlEntityCache = getLazy(() => {
-        return {
-            "&": "amp",
-            "<": "lt",
-            ">": "gt",
-            "\"": "quot",
-            "'": "#39"
-        };
-    }));
+    !_htmlEntityCache && (_htmlEntityCache = {
+        "&": "amp",
+        "<": "lt",
+        ">": "gt",
+        "\"": "quot",
+        "'": "#39"
+    });
     
-    return asString(value).replace(/[&<>"']/g, match => "&" + _htmlEntityCache.v[match] + ";");
+    return asString(value).replace(/[&<>"']/g, match => "&" + _htmlEntityCache[match] + ";");
 }

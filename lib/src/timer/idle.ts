@@ -6,22 +6,49 @@
  * Licensed under the MIT license.
  */
 
-import { isDefined, isUndefined } from "../helpers/base";
-import { ILazyValue } from "../helpers/lazy";
+import { isUndefined } from "../helpers/base";
+import { _getGlobalInstFn, getInst } from "../helpers/environment";
 import { elapsedTime, perfNow } from "../helpers/perf";
-import { safeGetLazy } from "../helpers/safe_lazy";
 import { ITimerHandler, _createTimerHandler } from "./handler";
 import { scheduleTimeout } from "./timeout";
 
-let _hasIdleCallback: ILazyValue<boolean>;
 let _defaultIdleTimeout = 100;
 let _maxExecutionTime = 50;
+
+/**
+ * Type that represents the global `requestIdleCallback` function, which can be used to
+ * schedule work when there is free time in the event loop. Defined as a type alias for
+ * easier reference and to support older TypeScript versions.
+ * @since 0.11.2
+ * @param callback - A callback function that should be called in the near future, when 
+ * the event loop is idle. The callback function is passed an [IdleDeadline](https://developer.mozilla.org/en-US/docs/Web/API/IdleDeadline)
+ * object describing the amount of time available and whether or not the callback has
+ * been run because the timeout period expired.
+ * @param options - Contains optional configuration parameters. Currently only one property is defined:
+ * - `timeout` If the number of milliseconds represented by this parameter has elapsed and the callback
+ * has not already been called, then a task to execute the callback is queued in the event loop (even
+ * if doing so risks causing a negative performance impact). timeout must be a positive value or it
+ * is ignored.
+ * @returns A handle which can be used to cancel the callback by passing it into the `cancelIdleCallback()` method.
+ */
+export type RequestIdleCallback = (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+
+/**
+ * Type that represents the global `cancelIdleCallback` function, which can be used to
+ * cancel a previously scheduled idle callback. Defined as a type alias for easier reference
+ * and to support older TypeScript versions.
+ * @since 0.11.2
+ * @param handle - The handle returned by the `requestIdleCallback` function that identifies
+ * the idle callback to cancel.
+ */
+export type CancelIdleCallback = (handle: number) => void;
 
 /**
  * Identifies if the runtime supports the `requestIdleCallback` API.
  *
  * @since 0.4.4
  * @group Timer
+ * @group Idle
  * @group Environment
  *
  * @returns True if the runtime supports `requestIdleCallback` otherwise false.
@@ -34,9 +61,28 @@ let _maxExecutionTime = 50;
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function hasIdleCallback(): boolean {
-    !_hasIdleCallback && (_hasIdleCallback = safeGetLazy(() => isDefined(requestIdleCallback), false));
-    return !!(_hasIdleCallback.v ? requestIdleCallback : false);
+    return !!( /*#__PURE__*/getIdleCallback());
 }
+
+/**
+ * Returns the global `requestIdleCallback` function if available, which can be used to
+ * schedule work when there is free time in the event loop, or if the runtime does not
+ * support the `requestIdleCallback` it will return `null`.
+ * @since 0.11.2
+ * @group Idle
+ * @group Environment
+ */
+export const getIdleCallback = (/*#__PURE__*/_getGlobalInstFn<RequestIdleCallback>(getInst, ["requestIdleCallback"]));
+
+/**
+ * Returns the global `cancelIdleCallback` function if available, which can be used to
+ * cancel a previously scheduled idle callback, or if the runtime does not support the
+ * `cancelIdleCallback` it will return `null`.
+ * @since 0.11.2
+ * @group Idle
+ * @group Environment
+ */
+export const getCancelIdleCallback = (/*#__PURE__*/_getGlobalInstFn<CancelIdleCallback>(getInst, ["cancelIdleCallback"]));
 
 /**
  * Set the idle timeout fallback timeout which is used when the runtime does not support `requestIdleCallback`
@@ -136,13 +182,13 @@ export function scheduleIdleCallback(callback: IdleRequestCallback, options?: Id
 
     if (hasIdleCallback()) {
         let handler = _createTimerHandler(true, (idleId: number) => {
-            idleId && cancelIdleCallback(idleId);
-            return requestIdleCallback((deadline: IdleDeadline) => {
+            idleId && getCancelIdleCallback()(idleId);
+            return getIdleCallback()((deadline: IdleDeadline) => {
                 handler.dn();
                 callback(deadline || _createDeadline(false));
             }, options);
         }, (idleId: number) => {
-            cancelIdleCallback(idleId);
+            getCancelIdleCallback()(idleId);
         });
 
         return handler.h;

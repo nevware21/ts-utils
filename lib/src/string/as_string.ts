@@ -7,6 +7,7 @@
  */
 
 import { StrCls } from "../internal/constants";
+import { _pureAssign } from "../internal/treeshake_helpers";
 
 /**
  * The asString() method returns a string representing the value by
@@ -27,4 +28,4 @@ import { StrCls } from "../internal/constants";
  * asString(Symbol.for("Hello"));   // "Symbol(Hello)"
  * ```
  */
-export const asString: (value: any) => string = StrCls;
+export const asString: (value: any) => string = (/* #__PURE__ */_pureAssign(StrCls));

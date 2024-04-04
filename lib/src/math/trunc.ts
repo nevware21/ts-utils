@@ -7,6 +7,7 @@
  */
 
 import { MathCls } from "../internal/constants";
+import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { mathCeil, mathFloor } from "./floor";
 
 /**
@@ -19,7 +20,7 @@ import { mathCeil, mathFloor } from "./floor";
  * @param value - The value to be truncated
  * @returns The integer path of the given number
  */
-export const mathTrunc = MathCls.trunc || polyMathTrunc;
+export const mathTrunc: (value: number) => number = (/* #__PURE__*/_pureAssign((/* #__PURE__*/_pureRef<typeof Math.trunc>(MathCls as any, "trunc")), polyMathTrunc));
 
 /**
  * The `mathTrunc()` function returns the integer part of a number by removing any fractional digits.

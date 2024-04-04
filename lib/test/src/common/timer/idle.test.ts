@@ -32,10 +32,12 @@ describe("idle tests", () => {
 
     beforeEach(() => {
         clock = sinon.useFakeTimers();
+        setBypassLazyCache(true);
     });
 
     afterEach(() => {
         clock.restore();
+        setBypassLazyCache(false);
     });
 
     it("hasIdleCallback", () => {
@@ -151,10 +153,12 @@ describe("idle tests", () => {
         beforeEach(() => {
             setDefaultMaxExecutionTime(50);
             (<any>getGlobal()).requestIdleCallback = null;
+            setBypassLazyCache(true);
         });
     
         afterEach(() => {
             (<any>getGlobal()).requestIdleCallback = theRequestIdleCallback;
+            setBypassLazyCache(false);
         });
 
         describe("Disable performance", () => {

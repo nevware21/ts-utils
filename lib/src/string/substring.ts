@@ -86,7 +86,7 @@ export const strSubstr: (value: string, indexStart: number, indexEnd?: number) =
 /*#__NO_SIDE_EFFECTS__*/
 export function polyStrSubstr(value: string, start: number, length?: number): string {
     if (isNullOrUndefined(value)) {
-        throwTypeError("'polyStrSubstr called with invalid " + dumpObj(value));
+        throwTypeError("Invalid " + dumpObj(value));
     }
 
     if (length < 0) {

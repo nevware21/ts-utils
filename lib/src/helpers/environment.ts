@@ -27,7 +27,7 @@ let _cachedGlobal: ICachedValue<Window>;
  * @param instName - The name of the global object to get, may be any valid PropertyKey (string, number or symbol)
  * @returns A function which will return the named global object if available, the funcion will return `null` if the object is not available.
  */
-function _getGlobalInstFn<T>(getFn: (...args: unknown[]) => T, theArgs?: unknown[]): () => T | null | undefined {
+export function _getGlobalInstFn<T>(getFn: (...args: unknown[]) => T, theArgs?: unknown[]): () => T | null | undefined {
     let cachedValue: ICachedValue<T>;
     return function() {
         !_globalLazyTestHooks && _initTestHooks();
@@ -138,7 +138,7 @@ export function getInst<T>(name: string | number | symbol, useCached?: boolean):
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function hasDocument(): boolean {
-    return !!getDocument();
+    return !!( /*#__PURE__*/getDocument());
 }
 
 /**
@@ -155,7 +155,7 @@ export const getDocument = (/*#__PURE__*/_getGlobalInstFn<Document>(getInst, ["d
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function hasWindow(): boolean {
-    return !!getWindow();
+    return !!( /*#__PURE__*/getWindow());
 }
 
 /**
@@ -172,7 +172,7 @@ export const getWindow = (/*#__PURE__*/_getGlobalInstFn<Window>(getInst, [WINDOW
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function hasNavigator(): boolean {
-    return !!getNavigator();
+    return !!( /*#__PURE__*/getNavigator());
 }
 
 /**
@@ -189,7 +189,7 @@ export const getNavigator = (/*#__PURE__*/_getGlobalInstFn<Navigator>(getInst, [
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function hasHistory(): boolean {
-    return !!getHistory();
+    return !!( /*#__PURE__*/getHistory());
 }
 
 /**
@@ -205,7 +205,7 @@ export const getHistory = (/*#__PURE__*/_getGlobalInstFn<History>(getInst, ["his
  * @returns True if you are
  */
 export const isNode = (/*#__PURE__*/_getGlobalInstFn<boolean>(() => {
-    return !!safe(() => (process && (process.versions||{}).node)).v;
+    return !!( /*#__PURE__*/safe(() => (process && (process.versions||{}).node)).v);
 }));
 
 /**
@@ -214,5 +214,5 @@ export const isNode = (/*#__PURE__*/_getGlobalInstFn<boolean>(() => {
  * @returns True if the environment you are in looks like a Web Worker
  */
 export const isWebWorker = (/*#__PURE__*/_getGlobalInstFn<boolean>(() => {
-    return !!safe(() => self && self instanceof WorkerGlobalScope).v;
+    return !!( /*#__PURE__*/safe(() => self && self instanceof WorkerGlobalScope).v);
 }));
