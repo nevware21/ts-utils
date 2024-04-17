@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { NULL_VALUE } from "../internal/constants";
 import { objDefineProp } from "../object/define";
 
 /**
@@ -82,7 +83,7 @@ export function createDeferredCachedValue<T>(cb: () => T): ICachedValue<T> {
     return objDefineProp(theValue as ICachedValue<T>, "v", {
         get: () => {
             let result = cb();
-            cb = null;
+            cb = NULL_VALUE;
             objDefineProp(theValue, "v", { value: result });
             return result;
         },

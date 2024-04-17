@@ -6,6 +6,8 @@
  * Licensed under the MIT license.
  */
 
+import { _pureAssign, _pureRef } from "./treeshake_helpers";
+
 // These constants are currently NOT exported directly, we may export them later associated with a frozen namespace (maybe)
 // For now do NOT expect that we will export these values.
 
@@ -29,40 +31,40 @@ export const TO_STRING = "toString";
 /**
  * @ignore
  */
-export const ObjClass = Object;
+export const ObjClass = (/*#__PURE__*/_pureAssign(Object));
 
 /**
  * @ignore
  */
-export const ObjProto = ObjClass[PROTOTYPE];
+export const ObjProto = (/*#__PURE__*/_pureRef<typeof Object.prototype>(ObjClass, PROTOTYPE));
 
 /**
  * @ignore
  */
-export const StrCls = String;
+export const StrCls = (/*#__PURE__*/_pureAssign(String));
 
 /**
  * @ignore
  */
-export const StrProto = StrCls[PROTOTYPE];
+export const StrProto = (/*#__PURE__*/_pureRef<typeof String.prototype>(StrCls, PROTOTYPE)) as String;
 
 /**
  * @ignore
  */
-export const MathCls = Math;
+export const MathCls = (/*#__PURE__*/_pureAssign(Math)) as Math;
 
 /**
  * @ignore
  */
-export const ArrCls = Array;
+export const ArrCls = (/*#__PURE__*/_pureAssign(Array));
 
 /**
  * @ignore
  */
-export const ArrProto = ArrCls[PROTOTYPE];
+export const ArrProto = (/*#__PURE__*/_pureRef<typeof ArrCls.prototype>(ArrCls, PROTOTYPE));
 
 /**
  * @ignore
  *
  */
-export const ArrSlice = ArrProto["slice"];
+export const ArrSlice = (/*#__PURE__*/_pureRef<typeof ArrProto.slice>(ArrProto, "slice"));

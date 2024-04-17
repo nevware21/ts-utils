@@ -108,10 +108,10 @@
     ],
     "types": "./dist/types/ts-utils.d.ts",
     "main": "./dist/es5/main/ts-utils.js",
-    "module": "./dist/es5/mod/index.js",
+    "module": "./dist/es5/mod/ts-utils.js",
     "esnext:main": "./dist/es6/main/ts-utils.js",
-    "esnext": "./dist/es6/mod/index.js",
-    "esnext:module": "./dist/es6/mod/index.js",
+    "esnext": "./dist/es6/mod/ts-utils.js",
+    "esnext:module": "./dist/es6/mod/ts-utils.js",
     "sideEffects": false,
     "repository": {
         "type": "git",

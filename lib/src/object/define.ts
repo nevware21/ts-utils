@@ -11,6 +11,7 @@ import { isFunction, isUndefined } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
 import { ILazyValue } from "../helpers/lazy";
 import { objGetOwnPropertyDescriptor } from "./get_own_prop_desc";
+import { _pureRef } from "../internal/treeshake_helpers";
 
 /**
  * Definition of the Property Descriptor mappings for the objDefine functions.
@@ -153,7 +154,7 @@ function _createProp(value: ObjDefinePropDescriptor): PropertyDescriptor {
  * @param descriptor - The descriptor for the property being defined or modified.
  * @returns The object that was passed to the function with the new or updated property.
  */
-export const objDefineProp: <T>(target: T, key: PropertyKey, descriptor: PropertyDescriptor & ThisType<any>) => T = ObjClass["defineProperty"];
+export const objDefineProp: <T>(target: T, key: PropertyKey, descriptor: PropertyDescriptor & ThisType<any>) => T = (/*#__PURE__*/_pureRef<typeof Object.defineProperty>(ObjClass as any, "defineProperty"));
 
 /**
  * The objDefineProperties() method defines new or modifies existing properties directly on an object, returning the object.
@@ -166,7 +167,7 @@ export const objDefineProp: <T>(target: T, key: PropertyKey, descriptor: Propert
  * it cannot be both (see {@link ObjDefinePropDescriptorMap} for more details).
  * @returns
  */
-export const objDefineProperties: <T>(target: T, props: PropertyDescriptorMap & ThisType<any>) => T = ObjClass["defineProperties"];
+export const objDefineProperties: <T>(target: T, props: PropertyDescriptorMap & ThisType<any>) => T = (/*#__PURE__*/_pureRef<typeof Object.defineProperties>(ObjClass as any, "defineProperties"));
 
 /**
  * Try to define a get object property accessor for the target object, if a function is past as the value this will

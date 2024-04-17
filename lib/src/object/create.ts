@@ -9,6 +9,7 @@
 import { FUNCTION, ObjClass, OBJECT, PROTOTYPE } from "../internal/constants";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
+import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 
 /**
  * Creates an object that has the specified prototype, and that optionally contains specified properties. This helper exists to avoid adding a polyfil
@@ -17,7 +18,7 @@ import { throwTypeError } from "../helpers/throw";
  * @group Object
  * @param obj Object to use as a prototype. May be null
  */
-export const objCreate = ObjClass["create"] || polyObjCreate;
+export const objCreate: (obj: any) => any = (/* #__PURE__*/_pureAssign((/* #__PURE__*/_pureRef<typeof Object.create>(ObjClass as any, "create")), polyObjCreate));
 
 /**
  * Creates an object that has the specified prototype, and that optionally contains specified properties. This helper exists to avoid adding a polyfil

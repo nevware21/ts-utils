@@ -10,6 +10,7 @@ import { isRegExp } from "../helpers/base";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
 import { StrProto } from "../internal/constants";
+import { _pureAssign } from "../internal/treeshake_helpers";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction"
 import { asString } from "./as_string";
 import { strIndexOf } from "./index_of";
@@ -48,8 +49,7 @@ export const strIncludes: (value: string, searchString: string, position?: numbe
  * when searchString is an empty string; otherwise, `false`.
  * @throws TypeError If searchString is a regex.
  */
-export const strContains: (value: string, searchString: string, position?: number) => boolean = strIncludes;
-
+export const strContains: (value: string, searchString: string, position?: number) => boolean = (/*#__PURE__*/_pureAssign(strIncludes));
 
 /**
  * The polyStrIncludes() method performs a case-sensitive search to determine whether one string

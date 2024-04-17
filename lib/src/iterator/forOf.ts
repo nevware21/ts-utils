@@ -7,7 +7,7 @@
  */
 
 import { ICachedValue, createCachedValue } from "../helpers/cache";
-import { CALL } from "../internal/constants";
+import { CALL, NULL_VALUE, UNDEF_VALUE } from "../internal/constants";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 import { isIterator } from "./iterator";
@@ -63,8 +63,8 @@ export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value
         }
         
         if (isIterator(iter)) {
-            let err: { e: any };
-            let iterResult: IteratorResult<T>;
+            let err: { e: any } = UNDEF_VALUE
+            let iterResult: IteratorResult<T> = UNDEF_VALUE
             try {
                 let count = 0;
                 while(!(iterResult = iter.next()).done) {
@@ -77,7 +77,7 @@ export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value
             } catch (failed) {
                 err = { e: failed };
                 if (iter.throw) {
-                    iterResult = null;
+                    iterResult = NULL_VALUE;
                     iter.throw(err);
                 }
             } finally {

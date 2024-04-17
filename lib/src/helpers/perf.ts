@@ -6,11 +6,13 @@
  * Licensed under the MIT license.
  */
 
+import { ICachedValue, createCachedValue } from "./cache";
 import { utcNow } from "./date";
-import { lazySafeGetInst } from "./environment";
-import { ILazyValue, _globalLazyTestHooks, _initTestHooks } from "./lazy";
+import { getInst } from "./environment";
+import { _globalLazyTestHooks, _initTestHooks } from "./lazy";
+import { safe } from "./safe";
 
-let _perf: ILazyValue<Performance>
+let _perf: ICachedValue<Performance>
 
 /**
  * Identify whether the runtimne contains a `performance` object
@@ -37,7 +39,7 @@ export function hasPerformance(): boolean {
 /*#__NO_SIDE_EFFECTS__*/
 export function getPerformance(): Performance {
     !_globalLazyTestHooks && _initTestHooks();
-    (!_perf || (!_perf.b && _globalLazyTestHooks.lzy)) && (_perf = lazySafeGetInst("performance"));
+    (!_perf || _globalLazyTestHooks.lzy) && (_perf = createCachedValue(safe(getInst<Performance>, ["performance"]).v));
     return _perf.v;
 }
 

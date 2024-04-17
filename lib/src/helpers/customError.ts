@@ -34,7 +34,7 @@ function _createCustomError<T>(name: string, d: any, b: any): T {
     safe(objDefine, [ d, NAME, { v: name, c: true, e: false }]);
     d = objSetPrototypeOf(d, b);
     function __() {
-        this.constructor = d;
+        this[CONSTRUCTOR] = d;
         safe(objDefine, [this, NAME, { v: name, c: true, e: false }]);
     }
 

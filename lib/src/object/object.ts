@@ -10,8 +10,9 @@ import { NULL_VALUE, ObjClass, __PROTO__ } from "../internal/constants";
 import { isArray, isObject } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
 import { polyObjEntries, polyObjValues } from "../polyfills/object";
+import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 
-const _objFreeze = ObjClass["freeze"];
+const _objFreeze = (/* #__PURE__ */_pureRef<typeof Object.freeze>(ObjClass, "freeze"));
 
 function _doNothing<T>(value: T) {
     return  value;
@@ -59,7 +60,7 @@ function _getProto(value: any) {
  * console.log(o1);  // { a: 1, b: 2, c: 3 }, target object itself is changed.
  * ```
  */
-export const objAssign = ObjClass["assign"];
+export const objAssign = (/*#__PURE__*/_pureRef<typeof Object.assign>(ObjClass, "assign"));
 
 /**
  * The `objKeys()` method returns an array of a given object's own enumerable property names, iterated in
@@ -95,7 +96,7 @@ export const objAssign = ObjClass["assign"];
  * console.log(objKeys(myObj)); // console: ['foo']
  * ```
  */
-export const objKeys: (value: any) => string[] = ObjClass.keys;
+export const objKeys: (value: any) => string[] = (/*#__PURE__*/_pureRef<typeof Object.keys>(ObjClass, "keys"));
 
 /**
  * Perform a deep freeze on the object and all of it's contained values / properties by recursively calling
@@ -137,7 +138,7 @@ export function objDeepFreeze<T>(value: T): T {
  * @param value - The object to freeze.
  * @returns The object that was passed to the function.
  */
-export const objFreeze: <T>(value: T) => T = _objFreeze || _doNothing;
+export const objFreeze: <T>(value: T) => T = (/* #__PURE__*/_pureAssign(_objFreeze, _doNothing));
 
 /**
  * The `objSeal()` method seals an object, preventing new properties from being added to it and marking all
@@ -147,7 +148,7 @@ export const objFreeze: <T>(value: T) => T = _objFreeze || _doNothing;
  * @param value - The object which should be sealed.
  * @returns The object being sealed.
  */
-export const objSeal: <T>(value: T) => T = ObjClass["seal"] || _doNothing;
+export const objSeal: <T>(value: T) => T = (/* #__PURE__*/_pureAssign((/* #__PURE__*/_pureRef<typeof Object.seal>(ObjClass, "seal")), _doNothing));
 
 /**
  * The objGetPrototypeOf() method returns the prototype (i.e. the value of the internal `Prototype` property)
@@ -156,7 +157,7 @@ export const objSeal: <T>(value: T) => T = ObjClass["seal"] || _doNothing;
  * @group Object
  * @param value - The object whose prototype is to be returned, which may be null.
  */
-export const objGetPrototypeOf: (value: any) => any = ObjClass["getPrototypeOf"] || _getProto;
+export const objGetPrototypeOf: (value: any) => any = (/* #__PURE__*/_pureAssign((/* #__PURE__*/_pureRef<typeof Object.getPrototypeOf>(ObjClass, "getPrototypeOf")), _getProto));
 
 /**
  * Returns an array of key/values of the enumerable properties of an object
@@ -178,7 +179,7 @@ export const objGetPrototypeOf: (value: any) => any = ObjClass["getPrototypeOf"]
  * // [ ['2', 'b'], ['7', 'c'], ['100', 'a'] ]*
  * ```
  */
-export const objEntries: <T = any>(value: {} | { [s: string]: T } | ArrayLike<T>) => [string, T][] = ObjClass.entries || polyObjEntries;
+export const objEntries: <T = any>(value: {} | { [s: string]: T } | ArrayLike<T>) => [string, T][] = (/* #__PURE__*/_pureAssign((/* #__PURE__*/_pureRef<typeof Object.entries>(ObjClass, "entries")), polyObjEntries));
 
 /**
  * The objValues() returns an array whose elements are values of enumerable string-keyed properties found
@@ -206,4 +207,4 @@ export const objEntries: <T = any>(value: {} | { [s: string]: T } | ArrayLike<T>
  * // [ 'b', 'c', 'a']
  * ```
  */
-export const objValues: <T = any>(value: {} | { [s: string]: T } | ArrayLike<T>) => T[] = ObjClass.values || polyObjValues;
+export const objValues: <T = any>(value: {} | { [s: string]: T } | ArrayLike<T>) => T[] = (/* #__PURE__*/_pureAssign((/* #__PURE__*/_pureRef<typeof Object.values>(ObjClass, "values")), polyObjValues));

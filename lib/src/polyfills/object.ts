@@ -7,6 +7,7 @@
  */
 
 import { isObject } from "../helpers/base";
+import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
 import { NULL_VALUE } from "../internal/constants";
 import { objForEachKey } from "../object/for_each_key";
@@ -23,7 +24,7 @@ import { objHasOwn } from "../object/has_own";
 /*#__NO_SIDE_EFFECTS__*/
 export function polyObjKeys(obj: any): string[] {
     if (!isObject(obj) || obj === NULL_VALUE) {
-        throwTypeError("polyObjKeys called on non-object");
+        throwTypeError("non-object " + dumpObj(obj));
     }
 
     const result: string[] = [];

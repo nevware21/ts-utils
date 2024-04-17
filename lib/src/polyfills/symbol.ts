@@ -47,7 +47,7 @@ export function polyNewSymbol(description?: string | number): symbol {
         description: asString(description),
         toString: () => SYMBOL + "(" + description + ")"
     } as symbol;
-
+    
     // Tag the symbol so we know it a polyfill
     theSymbol[POLYFILL_TAG] = true;
 

@@ -94,7 +94,10 @@ export { strLower, strUpper } from "./string/upper_lower";
 export { isSymbol, getSymbol, getKnownSymbol, hasSymbol, newSymbol, symbolFor, symbolKeyFor } from "./symbol/symbol";
 export { WellKnownSymbols } from "./symbol/well_known";
 export { ITimerHandler } from "./timer/handler";
-export { hasIdleCallback, scheduleIdleCallback, setDefaultIdleTimeout, setDefaultMaxExecutionTime } from "./timer/idle";
+export {
+    hasIdleCallback, scheduleIdleCallback, setDefaultIdleTimeout, setDefaultMaxExecutionTime,
+    getIdleCallback, getCancelIdleCallback, RequestIdleCallback, CancelIdleCallback
+} from "./timer/idle";
 export { scheduleInterval } from "./timer/interval";
 export { TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, scheduleTimeout, scheduleTimeoutWith, createTimeout, createTimeoutWith } from "./timer/timeout";
 
