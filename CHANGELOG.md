@@ -1,3 +1,9 @@
+# v0.11.2 Apr 16th, 2024
+
+## Changelog
+
+- #263 Generate single unified es module for exports
+
 # v0.11.1 Mar 31st, 2024
 
 ## Changelog
