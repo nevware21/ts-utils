@@ -20,7 +20,7 @@ let _maxExecutionTime = 50;
  * schedule work when there is free time in the event loop. Defined as a type alias for
  * easier reference and to support older TypeScript versions.
  * @since 0.11.2
- * @param callback - A callback function that should be called in the near future, when 
+ * @param callback - A callback function that should be called in the near future, when
  * the event loop is idle. The callback function is passed an [IdleDeadline](https://developer.mozilla.org/en-US/docs/Web/API/IdleDeadline)
  * object describing the amount of time available and whether or not the callback has
  * been run because the timeout period expired.
