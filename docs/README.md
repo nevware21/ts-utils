@@ -1,5 +1,5 @@
 
-<h1 align="center">@nevware21 ts-utils</h1>
+<h1 align="center">@nevware21/ts-utils</h1>
 <h2 align="center">Common JavaScript/TypeScript helper functions for better minification</h2>
 
 
