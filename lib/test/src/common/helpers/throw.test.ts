@@ -2,7 +2,7 @@
  * @nevware21/ts-utils
  * https://github.com/nevware21/ts-utils
  *
- * Copyright (c) 2022 Nevware21
+ * Copyright (c) 2022 NevWare21 Solutions LLC
  * Licensed under the MIT license.
  */
 
@@ -13,7 +13,7 @@ import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { throwError, throwTypeError } from "../../../../src/helpers/throw";
 
 
-function _expectThrow<T = Error>(cb: () => never, message: string): T {
+function _expectThrow<T extends Error = Error>(cb: () => never, message: string): T {
     try {
         cb();
     } catch (e) {
@@ -23,6 +23,14 @@ function _expectThrow<T = Error>(cb: () => never, message: string): T {
 
     assert.ok(false, "Expected an exception to be thrown");
     return null;
+}
+export interface TestError extends Error {
+    readonly errorId: number;
+    readonly args: any[];
+}
+
+export interface TestErrorConstructor extends CustomErrorConstructor<TestError> {
+
 }
 
 describe("throw helpers", () => {
@@ -79,7 +87,7 @@ describe("throw helpers", () => {
 
     describe("createCustomError", () => {
         it("null or undefined", () => {
-            let myCustomError = createCustomError("CriticalErrorTest");
+            let myCustomError = createCustomError<TestErrorConstructor>("CriticalErrorTest");
 
             assert.ok(isError(_expectThrow(() => {
                 throw new myCustomError(null);
@@ -91,15 +99,15 @@ describe("throw helpers", () => {
 
         it("with message", () => {
             let totalErrors = 0;
-            let myCustomError = createCustomError("CriticalErrorMessageTest", (self, args) => {
+            let myCustomError = createCustomError<TestErrorConstructor>("CriticalErrorMessageTest", (self, args) => {
                 totalErrors++;
                 self.errorId = totalErrors;
                 self.args = args;
             });
 
-            let error = _expectThrow(() => {
+            let error = _expectThrow<TestError>(() => {
                 throw new myCustomError("Failed")
-            }, "Failed") as any;
+            }, "Failed");
 
             assert.ok(error instanceof Error, "The custom error is an error");
             assert.ok(isError(error), "Validating an error was returned");
@@ -121,7 +129,7 @@ describe("throw helpers", () => {
 
         it("custom type aith additional args", () => {
             let totalErrors = 0;
-            interface CriticalErrorConstructor extends CustomErrorConstructor {
+            interface CriticalErrorConstructor extends CustomErrorConstructor<CriticalError> {
                 new(message: string, file: string, line: number, col: number): CriticalError;
                 (message: string, file: string, line: number, col: number): CriticalError;
             }
@@ -223,13 +231,14 @@ describe("throw helpers", () => {
 
                 throw theError;
             } catch(e) {
+                let theError: MyCriticalError = e;
                 assert.equal(e.name, "CriticalError");
                 assert.ok(isError(e));
-                assert.equal(e.args[0] , "Not Again!");
-                assert.equal(e.args[1] , "thefile.txt");
-                assert.equal(e.args[2] , "42");
-                assert.equal(e.args[3] , "21");
-                assert.equal(e.errorId, 1);
+                assert.equal(theError.args[0] , "Not Again!");
+                assert.equal(theError.args[1] , "thefile.txt");
+                assert.equal(theError.args[2] , "42");
+                assert.equal(theError.args[3] , "21");
+                assert.equal(theError.errorId, 1);
             }
         });
     });

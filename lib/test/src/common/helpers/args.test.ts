@@ -2,7 +2,7 @@
  * @nevware21/ts-utils
  * https://github.com/nevware21/ts-utils
  *
- * Copyright (c) 2023 Nevware21
+ * Copyright (c) 2023 NevWare21 Solutions LLC
  * Licensed under the MIT license.
  */
 
