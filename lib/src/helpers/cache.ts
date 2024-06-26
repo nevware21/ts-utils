@@ -14,7 +14,7 @@ import { objDefineProp } from "../object/define";
  * @since 0.10.5
  * @group Helpers
  * @group Cache
- * @typeparam T - The type of the value to be cached
+ * @typeParam T - The type of the value to be cached
  * @example
  * ```ts
  * let cachedValue: ICachedValue<string> = {
@@ -43,7 +43,7 @@ export interface ICachedValue<T> {
  * @since 0.10.5
  * @group Helpers
  * @group Cache
- * @typeparam T - The type of the value to be cached
+ * @typeParam T - The type of the value to be cached
  * @param value
  * @returns A new {@link ICachedValue} instance which wraps the provided value
  * @example
@@ -70,7 +70,7 @@ export function createCachedValue<T>(value: T): ICachedValue<T> {
  * @since 0.10.5
  * @group Helpers
  * @group Cache
- * @typeparam T - The type of the value to be cached
+ * @typeParam T - The type of the value to be cached
  * @param cb - The callback function to fetch the value to be lazily evaluated and cached
  * @returns
  */

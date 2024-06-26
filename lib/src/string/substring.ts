@@ -69,7 +69,7 @@ export const strSubstring: (value: string, indexStart: number, indexEnd?: number
  * @param length - The number of characters to extract.
  * @returns A new string containing the specified part of the given string.
  */
-export const strSubstr: (value: string, indexStart: number, indexEnd?: number) => string = (/*#__PURE__*/_unwrapFunctionWithPoly("substr", StrProto, polyStrSubstr));
+export const strSubstr: (value: string, start: number, length?: number) => string = (/*#__PURE__*/_unwrapFunctionWithPoly("substr", StrProto, polyStrSubstr));
 
 /**
  * The polyStrSubstr() method returns a portion of the string, starting at the specified index and extending for a given
