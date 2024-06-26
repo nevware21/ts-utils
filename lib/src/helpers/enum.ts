@@ -6,9 +6,9 @@
  * Licensed under the MIT license.
  */
 
-import { eMapValues, _createKeyValueMap } from "../internal/map";
+import { eMapValues, _createKeyValueMap, _assignMapValue } from "../internal/map";
 import { objForEachKey } from "../object/for_each_key";
-import { objDeepFreeze } from "../object/object";
+import { objFreeze } from "../object/object";
 
 /**
  * A type that identifies an enum class generated from a constant enum.
@@ -91,7 +91,7 @@ export declare type EnumTypeMap<E, V, T = { readonly [key in keyof E]: V }> = {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function createEnum<E>(values: { [key in keyof E]: E[keyof E] }): EnumCls<E> {
-    return _createKeyValueMap(values, eMapValues.Value, eMapValues.Key, objDeepFreeze);
+    return _createKeyValueMap(values, eMapValues.Value, eMapValues.Key, objFreeze);
 }
 
 /**
@@ -130,7 +130,7 @@ export function createEnum<E>(values: { [key in keyof E]: E[keyof E] }): EnumCls
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function createEnumKeyMap<E>(values: { [key in keyof E]: E[keyof E] }): EnumNameMap<E> {
-    return _createKeyValueMap(values, eMapValues.Key, eMapValues.Key, objDeepFreeze);
+    return _createKeyValueMap(values, eMapValues.Key, eMapValues.Key, objFreeze);
 }
 
 /**
@@ -171,7 +171,7 @@ export function createEnumKeyMap<E>(values: { [key in keyof E]: E[keyof E] }): E
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function createEnumValueMap<E>(values: { [key in keyof E]: E[keyof E] }): EnumValueMap<E> {
-    return _createKeyValueMap(values, eMapValues.Value, eMapValues.Value, objDeepFreeze);
+    return _createKeyValueMap(values, eMapValues.Value, eMapValues.Value, objFreeze);
 }
 
 /**
@@ -210,11 +210,11 @@ export function createEnumValueMap<E>(values: { [key in keyof E]: E[keyof E] }):
 export function createSimpleMap<E, V>(values: { [key in keyof E]: [ E[keyof E], V] }): EnumTypeMap<E, V> {
     let mapClass: any = {};
     objForEachKey(values, (key, value) => {
-        mapClass[key] = value[1];
-        mapClass[value[0]] = value[1];
+        _assignMapValue(mapClass, key, value[1]);
+        _assignMapValue(mapClass, value[0], value[1]);
     });
 
-    return objDeepFreeze(mapClass);
+    return objFreeze(mapClass);
 }
 
 /**

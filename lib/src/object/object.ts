@@ -109,7 +109,7 @@ export function objDeepFreeze<T>(value: T): T {
     if (_objFreeze) {
         objForEachKey(value, (key, value) => {
             if (isArray(value) || isObject(value)) {
-                _objFreeze(value);
+                objDeepFreeze(value);
             }
         });
     }

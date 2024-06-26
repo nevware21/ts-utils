@@ -200,6 +200,57 @@ describe("object helpers", () => {
         assert.equal((result.prop3 as any).ive, undefined);
     });
 
+    it("objDeepFreeze multiple levels", () => {
+        let theObject = {
+            prop1: "Hello!",
+            prop2: "Darkness",
+            prop3: {
+                my: {
+                    Old: "friend"
+                }
+            }
+        };
+
+        let expected = JSON.stringify(theObject);
+        let result = objDeepFreeze(theObject);
+
+        assert.ok(result === theObject, "The returned object should be the same object");
+        assert.deepEqual(result, theObject);
+        try {
+            result.prop1 = "Goodbye";
+        } catch (e) {
+            assert.equal(e.name, "TypeError", "Check the error type");
+        }
+        assert.deepEqual(result, theObject);
+        assert.equal(JSON.stringify(result), expected);
+
+        
+        // Try to change a sub object -- it should be frozen also
+        try {
+            (result.prop3.my as any).New = ":-)";
+        } catch (e) {
+            assert.equal(e.name, "TypeError", "Check the error type");
+        }
+        assert.equal((result.prop3.my as any).New, undefined);
+
+        // Try to change a sub object -- it should be frozen also
+        try {
+            result.prop3.my.Old = ":-)";
+        } catch (e) {
+            assert.equal(e.name, "TypeError", "Check the error type");
+        }
+        assert.equal(result.prop3.my.Old, "friend");
+
+        // We should NOT be able to add to the object
+        try {
+            (result.prop3 as any).ive = "come";
+        } catch (e) {
+            assert.equal(e.name, "TypeError", "Check the error type");
+        }
+
+        assert.equal((result.prop3 as any).ive, undefined);
+    });
+
     it("objDefineGet value", () => {
         let value: any = {};
         objDefineGet(value, "test", 42);

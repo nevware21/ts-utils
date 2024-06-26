@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { objDefineProp } from "../object/define";
 import { objForEachKey } from "../object/for_each_key";
 
 /**
@@ -26,15 +27,33 @@ export const enum eMapValues {
  * @param keyType - Identifies the value to populate against the key
  * @param valueType - Identifies the value to populate against the value
  * @param completeFn - The function to call to complete the map (used to freeze the instance)
+ * @param writable - Flag to indicate if the map should be writable
  * @returns
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function _createKeyValueMap(values: any, keyType: eMapValues, valueType: eMapValues, completeFn: <T>(value: T) => T) {
+export function _createKeyValueMap(values: any, keyType: eMapValues, valueType: eMapValues, completeFn?: <T>(value: T) => T, writable?: boolean) {
     let theMap: any = {};
     objForEachKey(values, (key, value) => {
-        theMap[key] = keyType ? value : key;
-        theMap[value] = valueType ? value : key;
+        _assignMapValue(theMap, key, keyType ? value : key, writable);
+        _assignMapValue(theMap, value, valueType ? value : key, writable);
     });
 
-    return completeFn(theMap);
+    return completeFn ? completeFn(theMap) : theMap;
+}
+
+/**
+ * @internal
+ * @ignore
+ * Internal Helper function to assign a key and value to the map
+ * @param theMap - The map to assign the key and value to
+ * @param key - The key to assign
+ * @param value - The value to assign
+ * @param writable - Flag to indicate if the map should be writable
+ */
+export function _assignMapValue(theMap: any, key: any, value: any, writable?: boolean) {
+    objDefineProp(theMap, key, {
+        value: value,
+        enumerable: true,
+        writable: !!writable
+    });
 }
