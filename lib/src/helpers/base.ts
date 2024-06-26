@@ -427,7 +427,7 @@ export function isObject<T>(value: T): value is T {
  *
  * @group Type Identity
  * @group Array
- * @param {any} value - Value to be checked.
+ * @param {any} arg - Value to be checked.
  * @return {boolean} True if the value is a Array, false otherwise.
  * @example
  * ```ts

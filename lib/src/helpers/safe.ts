@@ -10,7 +10,7 @@
  * Infers the return type of the specified function
  * @since 0.10.5
  * @group Safe
- * @typeparam T - The type of the function which to infer the return type
+ * @typeParam T - The type of the function which to infer the return type
  */
 export type SafeReturnType<T extends (...args: any) => any> = T extends (...args: any) => infer R ? R : any
 
@@ -18,8 +18,8 @@ export type SafeReturnType<T extends (...args: any) => any> = T extends (...args
  * Defines the return value of the {@link safe} function, which is an object with either a value or an error
  * @since 0.10.5
  * @group Safe
- * @typeparam T - The type of the function to call
- * @typeparam R - The return type of the function
+ * @typeParam T - The type of the function to call
+ * @typeParam R - The return type of the function
  */
 export interface ISafeReturn<T extends (...args: any) => any> {
     /**
