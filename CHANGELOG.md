@@ -1,3 +1,13 @@
+# v0.11.3 Jun 26th, 2024
+
+## Changelog
+
+- #286 [Feature] Don't use objDeepFreeze for enums
+- #285 Update Copyright message to conform with LLC operating agreement
+- #278 Bump @rollup/plugin-commonjs from 25.0.8 to 26.0.1
+- #288 Bump typedoc from 0.25.13 to 0.26.2
+- #279 Bump nyc from 15.1.0 to 17.0.0
+
 # v0.11.2 Apr 16th, 2024
 
 ## Changelog
