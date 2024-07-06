@@ -156,7 +156,7 @@
     "devDependencies": {
         "@istanbuljs/nyc-config-typescript": "^1.0.2",
         "@microsoft/api-extractor": "^7.34.4",
-        "@nevware21/grunt-eslint-ts": "0.2.4",
+        "@nevware21/grunt-eslint-ts": "0.2.5",
         "@nevware21/grunt-ts-plugin": "0.4.5",
         "@rollup/plugin-commonjs": "^26.0.1",
         "@rollup/plugin-json": "^6.0.0",
