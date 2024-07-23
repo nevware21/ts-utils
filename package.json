@@ -167,7 +167,7 @@
         "@size-limit/preset-small-lib": "^11.1.4",
         "@size-limit/time": "^11.1.4",
         "@types/chai": "^4.3.1",
-        "@types/eslint": "^8.56.10",
+        "@types/eslint": "^9.6.0",
         "@types/estree": "^1.0.0",
         "@types/mocha": "^10.0.1",
         "@types/sinon": "^17.0.1",
