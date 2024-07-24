@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { fnCall } from "../funcs/funcs";
 import { ICachedValue, createCachedValue } from "../helpers/cache";
 import { CALL, NULL_VALUE, UNDEF_VALUE } from "../internal/constants";
 import { getKnownSymbol } from "../symbol/symbol";
@@ -63,8 +64,8 @@ export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value
         }
         
         if (isIterator(iter)) {
-            let err: { e: any } = UNDEF_VALUE
-            let iterResult: IteratorResult<T> = UNDEF_VALUE
+            let err: { e: any } = UNDEF_VALUE;
+            let iterResult: IteratorResult<T> = UNDEF_VALUE;
             try {
                 let count = 0;
                 while(!(iterResult = iter.next()).done) {

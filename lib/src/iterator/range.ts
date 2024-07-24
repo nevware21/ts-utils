@@ -113,21 +113,17 @@ export function createRangeIterator(start: number, end: number, step?: number): 
         end = start;
     }
 
-    let theStep = step || ((start <= end) ? 1 : -1);
+    let theStep = step;
+    if (!theStep) {
+        theStep = (start <= end) ? 1 : -1;
+    }
 
     function _value(): number {
         return theValue;
     }
 
     function _getNext() {
-
-        let isDone = false;
-        if (theStep > 0) {
-            isDone = nextValue > end;
-        } else {
-            isDone = nextValue < end;
-        }
-
+        let isDone = (theStep > 0) ? (nextValue > end) : (nextValue < end);
         if (!isDone) {
             theValue = nextValue;
             nextValue += theStep;
@@ -136,11 +132,9 @@ export function createRangeIterator(start: number, end: number, step?: number): 
         return isDone;
     }
 
-    let ctx: CreateIteratorContext<number> = {
-        n: _getNext
-    };
-
-    objDefine(ctx, "v", { g: _value });
-
-    return createIterator<number>(ctx);
+    return createIterator<number>(
+        objDefine({
+            n: _getNext
+        } as CreateIteratorContext<number>, "v", { g: _value })
+    );
 }

@@ -36,7 +36,7 @@ import { createIterator, CreateIteratorContext } from "./create";
 export function createArrayIterator<T>(values: T[]): Iterator<T> {
     let idx = -1;
     let theValues = values ? values.slice() : [];
-    let len = theValues[LENGTH]
+    let len = theValues[LENGTH];
 
     function _value(): T {
         if (idx >= 0 && idx < len) {

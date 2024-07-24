@@ -30,9 +30,10 @@ jobs:
     - run: npm install
     - name: Build
       run: npm run build --verbose
-      timeout-minutes: 10
+      timeout-minutes: 15
     - name: Unit tests
       run: npm run test --verbose
+      timeout-minutes: 15
     - name: Report Coverage
       run: npm run codecov
     - name: Size tests

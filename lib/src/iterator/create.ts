@@ -230,7 +230,7 @@ export function createIterator<T>(ctx: CreateIteratorContext<T>): Iterator<T> {
     };
     
     if (ctx.r) {
-        theIterator.return = _return
+        theIterator.return = _return;
     }
 
     if (ctx.t) {
