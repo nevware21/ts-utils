@@ -123,11 +123,11 @@ function _createProp(value: ObjDefinePropDescriptor): PropertyDescriptor {
         if (desc && desc.set) {
             prop.set = (newValue: any) => {
                 value.l.v = newValue;
-            }
+            };
         }
     }
 
-    objForEachKey(value, (key, value) => {
+    objForEachKey(value, (key: keyof ObjDefinePropDescriptor, value) => {
         prop[propMap[key]] = isUndefined(value) ? prop[propMap[key]] : value;
     });
 
