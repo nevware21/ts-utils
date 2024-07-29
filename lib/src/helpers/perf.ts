@@ -39,7 +39,10 @@ export function hasPerformance(): boolean {
 /*#__NO_SIDE_EFFECTS__*/
 export function getPerformance(): Performance {
     !_globalLazyTestHooks && _initTestHooks();
-    (!_perf || _globalLazyTestHooks.lzy) && (_perf = createCachedValue(safe(getInst<Performance>, ["performance"]).v));
+    if (!_perf || _globalLazyTestHooks.lzy) {
+        _perf = createCachedValue(safe(getInst<Performance>, ["performance"]).v);
+    }
+    
     return _perf.v;
 }
 
