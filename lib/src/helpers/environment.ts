@@ -31,7 +31,9 @@ export function _getGlobalInstFn<T>(getFn: (...args: unknown[]) => T, theArgs?: 
     let cachedValue: ICachedValue<T>;
     return function() {
         !_globalLazyTestHooks && _initTestHooks();
-        (!cachedValue || _globalLazyTestHooks.lzy) && (cachedValue = createCachedValue(safe(getFn, theArgs).v));
+        if (!cachedValue || _globalLazyTestHooks.lzy) {
+            cachedValue = createCachedValue(safe(getFn, theArgs).v);
+        }
         
         return cachedValue.v;
     }
@@ -86,10 +88,11 @@ export function lazySafeGetInst<T>(name: string | number | symbol) : ILazyValue<
  * @param useCached - [Optional] used for testing to bypass the cached lookup, when `true` this will
  * cause the cached global to be reset.
  */
-/*#__NO_SIDE_EFFECTS__*/
 export function getGlobal(useCached?: boolean): Window {
     !_globalLazyTestHooks && _initTestHooks();
-    (!_cachedGlobal || useCached === false || _globalLazyTestHooks.lzy) && (_cachedGlobal = createCachedValue(safe(_getGlobalValue).v || NULL_VALUE));
+    if (!_cachedGlobal || useCached === false || _globalLazyTestHooks.lzy) {
+        _cachedGlobal = createCachedValue(safe(_getGlobalValue).v || NULL_VALUE);
+    }
 
     return _cachedGlobal.v;
 }
@@ -117,7 +120,13 @@ export function getGlobal(useCached?: boolean): Window {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function getInst<T>(name: string | number | symbol, useCached?: boolean): T | null {
-    const gbl = (!_cachedGlobal || useCached === false) ? getGlobal(useCached) : _cachedGlobal.v;
+    let gbl: any;
+    if (!_cachedGlobal || useCached === false) {
+        gbl = getGlobal(useCached);
+    } else {
+        gbl = _cachedGlobal.v;
+    }
+
     if (gbl && gbl[name]) {
         return gbl[name] as T;
     }
@@ -125,7 +134,11 @@ export function getInst<T>(name: string | number | symbol, useCached?: boolean):
     // Test workaround, for environments where <global>.window (when global == window) doesn't return the base window
     if (name === WINDOW) {
         // tslint:disable-next-line: no-angle-bracket-type-assertion
-        return <any>getWindow() as T;
+        try {
+            return window as T;
+        } catch (e) {
+            // Ignore
+        }
     }
 
     return NULL_VALUE;

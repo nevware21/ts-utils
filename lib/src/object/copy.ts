@@ -118,11 +118,13 @@ function _deepCopy<T>(visitMap: _RecursiveVisitMap[], value: T, ctx: _DeepCopyCo
 
     const theType = typeof value;
     let isPlain = false;
-    let isPrim = false;
-    if (value && theType === OBJECT) {
-        isPlain = isPlainObject(value);
-    } else {
-        isPrim = value === NULL_VALUE || isPrimitiveType(theType);
+    let isPrim = value === NULL_VALUE;
+    if (!isPrim) {
+        if (value && theType === OBJECT) {
+            isPlain = isPlainObject(value);
+        } else {
+            isPrim = isPrimitiveType(theType);
+        }
     }
 
     let details: IObjDeepCopyHandlerDetails = {

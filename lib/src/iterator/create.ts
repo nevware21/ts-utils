@@ -196,7 +196,9 @@ export function createIterator<T>(ctx: CreateIteratorContext<T>): Iterator<T> {
     }
 
     function _next(): IteratorResult<T> {
-        isDone = isDone || (ctx.n ? ctx.n(arguments) : true);
+        if (!isDone) {
+            isDone = (ctx.n ? ctx.n(arguments) : true);
+        }
 
         let result  = {
             done: isDone

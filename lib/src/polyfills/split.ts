@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { UNDEF_VALUE } from "../internal/constants";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 
@@ -55,7 +56,7 @@ import { WellKnownSymbols } from "../symbol/well_known";
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyStrSymSplit(value: string, splitter: { [Symbol.split](string: string, limit?: number): string[]; }, limit?: number): string[] {
-    let splitFn: (string: string, limit?: number) => string[] = splitter && splitter[getKnownSymbol(WellKnownSymbols.split)];
+    let splitFn: (string: string, limit?: number) => string[] = splitter ?(splitter as any)[getKnownSymbol(WellKnownSymbols.split)] : UNDEF_VALUE;
     
     return splitFn ? splitFn(value, limit) : [ value ];
 }

@@ -81,7 +81,7 @@ export function isPlainObject(value: any): value is object {
                     proto = proto[CONSTRUCTOR]
                 }
             
-                result = proto && typeof proto === FUNCTION && _fnToString[CALL](proto) === _objCtrFnString;
+                result = !!(proto && typeof proto === FUNCTION && _fnToString[CALL](proto) === _objCtrFnString);
             }
         } catch (ex) {
             // Something went wrong, so it's not an object we are playing with
