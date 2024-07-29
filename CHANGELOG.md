@@ -1,3 +1,20 @@
+# v0.11.4 Sept 21st, 2024
+
+## Changelog
+
+- [#289](https://github.com/nevware21/ts-utils/pull/289) Bump @typescript-eslint/parser from 6.21.0 to 7.14.1
+- [#292](https://github.com/nevware21/ts-utils/pull/292) Bump @nevware21/grunt-eslint-ts from 0.2.4 to 0.2.5
+- [#291](https://github.com/nevware21/ts-utils/pull/291) Bump @nevware21/grunt-ts-plugin from 0.4.5 to 0.4.6
+- [#300](https://github.com/nevware21/ts-utils/issues/300) [Bug] The createRangeIterator() function is getting mis-optimized for a worker on chrome. [#298](https://github.com/nevware21/ts-utils/pull/298)
+  - Bump @nevware21/grunt-eslint-ts from 0.2.5 to 0.5.0
+  - Bump @nevware21/grunt-ts-plugin from 0.4.5 to 0.5.0
+- [#302](https://github.com/nevware21/ts-utils/issues/302) [Bug] getInst() function is getting mis-optimized for a worker with rollup [#303](https://github.com/nevware21/ts-utils/pull/303)
+  - Bump @nevware21/grunt-eslint-ts from 0.5.0 to ^0.5.1
+  - Bump @nevware21/grunt-ts-plugin from 0.5.0 to ^0.5.1
+- [#306](https://github.com/nevware21/ts-utils/issues/306) [Bug] CI Tests are failing [#319](https://github.com/nevware21/ts-utils/pull/319)
+- [#318](https://github.com/nevware21/ts-utils/pull/318) Bump puppeteer from 22.15.0 to 23.4.0
+- [#320](https://github.com/nevware21/ts-utils/pull/320) bug: update objDefine to use strict undefined
+
 # v0.11.3 Jun 26th, 2024
 
 ## Changelog
