@@ -174,7 +174,7 @@
         "@types/estree": "^1.0.0",
         "@types/mocha": "^10.0.1",
         "@types/sinon": "^17.0.1",
-        "@typescript-eslint/eslint-plugin": "^7.14.1",
+        "@typescript-eslint/eslint-plugin": "^8.1.0",
         "@typescript-eslint/parser": "^7.14.1",
         "chai": "4.3.10",
         "chromium": "^3.0.3",
