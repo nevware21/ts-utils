@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { readArgs }  from "../../../../src/funcs/readArgs";
 import { _initTestHooks } from "../../../../src/helpers/lazy";
 

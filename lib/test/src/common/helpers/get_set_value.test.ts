@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { getValueByIter, getValueByKey, setValueByIter, setValueByKey } from "../../../../src/helpers/get_set_value";
 import { encodeAsJson } from "../../../../src/helpers/encode";
 

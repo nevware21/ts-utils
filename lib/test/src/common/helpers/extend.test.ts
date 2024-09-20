@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { isObject } from "../../../../src/helpers/base";
 import { deepExtend, objExtend } from "../../../../src/helpers/extend";
 import { objKeys } from "../../../../src/object/object";

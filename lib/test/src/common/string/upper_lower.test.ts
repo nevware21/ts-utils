@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { strLower, strUpper } from "../../../../src/string/upper_lower";
 
 function _expectThrow(cb: () => void): Error {

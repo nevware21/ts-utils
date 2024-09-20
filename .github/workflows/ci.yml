@@ -34,8 +34,16 @@ jobs:
     - name: Unit tests
       run: npm run test --verbose
       timeout-minutes: 15
+
     - name: Report Coverage
       run: npm run codecov
+    
+    - name: Upload Coverage
+      uses: codecov/codecov-action@v2
+      with:
+        files: ./coverage/coverage-final.json
+        token: ${{ secrets.CODECOV_TOKEN }}
+
     - name: Size tests
       if: matrix.node == 20 || matrix.node == 18 # Only run size tests on the latest Node.js versions
       run: npm run size

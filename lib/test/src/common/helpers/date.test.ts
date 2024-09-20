@@ -7,7 +7,7 @@
  */
 
 import * as sinon from "sinon";
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { utcNow, polyUtcNow } from "../../../../src/helpers/date";
 
 describe("date helpers", () => {

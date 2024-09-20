@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { createEnum, createEnumKeyMap, createEnumValueMap, createSimpleMap, createTypeMap } from "../../../../src/helpers/enum";
 import { isNumber, isString } from "../../../../src/helpers/base";
 

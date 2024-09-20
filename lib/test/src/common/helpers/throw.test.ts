@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { isError, objToString } from "../../../../src/helpers/base";
 import { createCustomError, CustomErrorConstructor, throwUnsupported } from "../../../../src/helpers/customError";
 import { dumpObj } from "../../../../src/helpers/diagnostics";

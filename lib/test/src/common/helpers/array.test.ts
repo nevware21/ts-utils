@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { arrAppend } from "../../../../src/array/append";
 import { arrFind, arrFindIndex, arrFindLast, arrFindLastIndex } from "../../../../src/array/find";
 import { arrFrom } from "../../../../src/array/from";

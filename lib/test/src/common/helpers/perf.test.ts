@@ -7,7 +7,7 @@
  */
 
 import * as sinon from "sinon";
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { utcNow } from "../../../../src/helpers/date";
 import { elapsedTime, getPerformance, hasPerformance, perfNow } from "../../../../src/helpers/perf";
 import { getGlobal } from "../../../../src/helpers/environment";

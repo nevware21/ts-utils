@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { getGlobal, getInst, hasDocument, hasHistory, hasNavigator, hasWindow, isWebWorker } from "../../../../src/helpers/environment";
 import { setBypassLazyCache } from "../../../../src/helpers/lazy";
 

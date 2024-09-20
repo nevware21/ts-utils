@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { strIncludes, polyStrIncludes, strContains } from "../../../../src/string/includes";
 
 function _expectThrow(cb: () => void): Error {

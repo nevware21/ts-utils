@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { PROTOTYPE } from "../../../../src/internal/constants";
 import { makePolyFn } from "../../../../src/internal/poly_helpers";
 
