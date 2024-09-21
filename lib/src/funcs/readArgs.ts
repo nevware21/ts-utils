@@ -91,7 +91,11 @@ export function readArgs<T = any>(theArgs: ArrayLike<T> | Iterable<T>, start?: n
         // IArgument is both ArrayLike and an iterable, so prefering to treat it as
         // an array for performance
         !_iterSymbol && (_iterSymbol = createCachedValue(hasSymbol() && getKnownSymbol(WellKnownSymbols.iterator)));
-        let iterFn = _iterSymbol.v && theArgs[_iterSymbol.v];
+        let iterFn: any;
+        if (_iterSymbol.v) {
+            iterFn = theArgs[_iterSymbol.v];
+        }
+
         if (iterFn) {
             let values: T[] = [];
             let from = (start === UNDEF_VALUE || start < 0) ? 0 : start;

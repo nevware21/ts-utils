@@ -6,7 +6,6 @@
  * Licensed under the MIT license.
  */
 
-import { fnCall } from "../funcs/funcs";
 import { ICachedValue, createCachedValue } from "../helpers/cache";
 import { CALL, NULL_VALUE, UNDEF_VALUE } from "../internal/constants";
 import { getKnownSymbol } from "../symbol/symbol";
@@ -60,7 +59,7 @@ export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value
     if (iter) {
         if (!isIterator(iter)) {
             !_iterSymbol && (_iterSymbol = createCachedValue(getKnownSymbol(WellKnownSymbols.iterator)));
-            iter = iter[_iterSymbol.v] ? iter[_iterSymbol.v]() : null;
+            iter = iter[_iterSymbol.v] ? iter[_iterSymbol.v]() : NULL_VALUE;
         }
         
         if (isIterator(iter)) {

@@ -9,7 +9,7 @@
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
 import { asString } from "../string/as_string";
-import { ArrSlice, CALL } from "./constants";
+import { ArrSlice, CALL, NULL_VALUE } from "./constants";
 
 /**
  * @internal
@@ -44,10 +44,10 @@ export const _unwrapFunction:<R, T>(funcName: keyof T, clsProto: T) => <T>(this:
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function _unwrapFunctionWithPoly<T, P extends (...args: any) => any>(funcName: keyof T, clsProto?: T, polyFunc?: P) {
-    let clsFn = clsProto && clsProto[funcName];
+    let clsFn = clsProto ? clsProto[funcName] : NULL_VALUE;
 
     return function(thisArg: any): ReturnType<P> {
-        let theFunc = (thisArg && thisArg[funcName]) || clsFn;
+        let theFunc = (thisArg ? thisArg[funcName] : NULL_VALUE) || clsFn;
         if (theFunc || polyFunc) {
             let theArgs = arguments;
             return ((theFunc || polyFunc) as Function).apply(thisArg, theFunc ? ArrSlice[CALL](theArgs, 1) : theArgs);

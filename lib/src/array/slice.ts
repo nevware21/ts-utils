@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { ArrSlice, CALL } from "../internal/constants";
+import { ArrSlice, CALL, NULL_VALUE } from "../internal/constants";
 
 /**
  * The arrSlice() method returns a shallow copy of a portion of an array into a new array object
@@ -52,5 +52,5 @@ import { ArrSlice, CALL } from "../internal/constants";
  * ```
  */
 export function arrSlice<T>(theArray: ArrayLike<T>, start?: number, end?: number): T[] {
-    return ((theArray && theArray["slice"]) || ArrSlice).apply(theArray, ArrSlice[CALL](arguments, 1));
+    return ((theArray ? theArray["slice"] : NULL_VALUE) || ArrSlice).apply(theArray, ArrSlice[CALL](arguments, 1));
 }

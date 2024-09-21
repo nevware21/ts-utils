@@ -358,7 +358,7 @@ export function isPrimitive(value: any): value is string | number | bigint | boo
 export function isPrimitiveType(theType: string): boolean {
     !_primitiveTypes && (_primitiveTypes = [ "string", "number", "boolean", UNDEFINED, "symbol", "bigint" ]);
 
-    return theType !== OBJECT && _primitiveTypes.indexOf(theType) !== -1;
+    return !!(theType !== OBJECT && _primitiveTypes.indexOf(theType) !== -1);
 }
 
 /**
