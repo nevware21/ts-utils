@@ -7,7 +7,7 @@
  */
 
 import { ObjClass } from "../internal/constants";
-import { isFunction, isUndefined } from "../helpers/base";
+import { isFunction, isStrictUndefined } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
 import { ILazyValue } from "../helpers/lazy";
 import { objGetOwnPropertyDescriptor } from "./get_own_prop_desc";
@@ -128,7 +128,7 @@ function _createProp(value: ObjDefinePropDescriptor): PropertyDescriptor {
     }
 
     objForEachKey(value, (key: keyof ObjDefinePropDescriptor, value) => {
-        prop[propMap[key]] = isUndefined(value) ? prop[propMap[key]] : value;
+        prop[propMap[key]] = isStrictUndefined(value) ? prop[propMap[key]] : value;
     });
 
     return prop;
