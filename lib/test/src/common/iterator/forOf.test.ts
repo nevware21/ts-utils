@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { createArrayIterator } from "../../../../src/iterator/array";
 import { iterForOf } from "../../../../src/iterator/forOf";
 import { createRangeIterator } from "../../../../src/iterator/range";

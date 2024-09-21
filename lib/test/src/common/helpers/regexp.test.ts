@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { arrForEach } from "../../../../src/array/forEach";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { createFilenameRegex, createWildcardRegex, makeGlobRegex } from "../../../../src/helpers/regexp";

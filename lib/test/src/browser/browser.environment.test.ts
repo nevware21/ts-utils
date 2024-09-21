@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { isNode, isWebWorker } from "../../../src/helpers/environment";
 
 describe("browser environment helpers", () => {

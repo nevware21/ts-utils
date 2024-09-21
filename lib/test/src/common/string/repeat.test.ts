@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { polyStrRepeat, strRepeat } from "../../../../src/string/repeat";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isUndefined } from "../../../../src/helpers/base";

@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { createFnDeferredProxy, createProxyFuncs } from "../../../../src/funcs/fnProxy";
 
 describe("function proxy helpers", () => {

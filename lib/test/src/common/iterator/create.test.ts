@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { throwError } from "../../../../src/helpers/throw";
 import { createArrayIterator } from "../../../../src/iterator/array";

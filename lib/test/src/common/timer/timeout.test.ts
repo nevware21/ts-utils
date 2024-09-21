@@ -7,7 +7,7 @@
  */
 
 import * as sinon from "sinon";
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { createTimeout, createTimeoutWith, scheduleTimeout, scheduleTimeoutWith, TimeoutOverrideFuncs } from "../../../../src/timer/timeout";
 import { isNode } from "../../../../src/helpers/environment";
 

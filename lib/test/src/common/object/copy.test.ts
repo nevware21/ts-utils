@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isDate, isError, isObject } from "../../../../src/helpers/base";
 import { arrayDeepCopyHandler, IObjDeepCopyHandlerDetails, objCopyProps, objDeepCopy, plainObjDeepCopyHandler } from "../../../../src/object/copy";

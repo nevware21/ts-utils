@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { hasValue } from "../../../../src/helpers/value";
 import { polyObjCreate } from "../../../../src/object/create";
 

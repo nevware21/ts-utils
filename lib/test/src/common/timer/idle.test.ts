@@ -7,7 +7,7 @@
  */
 
 import * as sinon from "sinon";
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { hasIdleCallback, scheduleIdleCallback, setDefaultMaxExecutionTime, setDefaultIdleTimeout } from "../../../../src/timer/idle";
 import { getGlobal } from "../../../../src/helpers/environment";
 import { elapsedTime, perfNow } from "../../../../src/helpers/perf";

@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { strPadStart, polyStrPadStart, strPadEnd, polyStrPadEnd } from "../../../../src/string/pad";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isUndefined } from "../../../../src/helpers/base";

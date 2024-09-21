@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { assert } from "chai";
+import { assert } from "@nevware21/tripwire-chai";
 import { _unwrapFunction, _unwrapFunctionWithPoly, _unwrapInstFunction } from "../../../../src/internal/unwrapFunction";
 import { strIncludes } from "../../../../src/string/includes";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
