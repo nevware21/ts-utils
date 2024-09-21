@@ -14,6 +14,7 @@
 - [#306](https://github.com/nevware21/ts-utils/issues/306) [Bug] CI Tests are failing [#319](https://github.com/nevware21/ts-utils/pull/319)
 - [#318](https://github.com/nevware21/ts-utils/pull/318) Bump puppeteer from 22.15.0 to 23.4.0
 - [#320](https://github.com/nevware21/ts-utils/pull/320) bug: update objDefine to use strict undefined
+- [#322](https://github.com/nevware21/ts-utils/pull/322) Revert "Bump puppeteer from 22.15.0 to 23.4.0 (#318)"
 
 # v0.11.3 Jun 26th, 2024
 
