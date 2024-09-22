@@ -131,7 +131,7 @@
         "coverage:merge": "node tools/coverage/merge-coverage.js",
         "codecov": "npm run coverage:merge",
         "clean": "git clean -xdf && npm install",
-        "cleanBuild": "npm run clean && npm run rebuild && npm run docs",
+        "cleanBuild": "npm run clean && npm run rebuild",
         "docs": "typedoc",
         "prep-release": "npm run cleanBuild && npm run npm-pack",
         "npm-pack": "copyfiles README.md LICENSE lib && cd lib && npm pack",
