@@ -166,7 +166,7 @@
         "@rollup/plugin-json": "^6.0.0",
         "@rollup/plugin-node-resolve": "^15.0.1",
         "@rollup/plugin-strip": "^3.0.2",
-        "@rollup/plugin-typescript": "^11.0.0",
+        "@rollup/plugin-typescript": "^12.1.0",
         "@size-limit/esbuild-why": "^11.1.4",
         "@size-limit/preset-small-lib": "^11.1.4",
         "@size-limit/time": "^11.1.4",
