@@ -1,12 +1,25 @@
-process.env.CHROME_BIN = require('puppeteer').executablePath()
-
 module.exports = function (config) {
     const typescript = require("@rollup/plugin-typescript");
     const plugin = require("@rollup/plugin-node-resolve");
     const commonjs = require("@rollup/plugin-commonjs");
     const istanbul = require("rollup-plugin-istanbul");
+    const process = require('process');
+    process.env.CHROME_BIN = require('puppeteer').executablePath()
+    process.env.CHROMIUM_BIN = require('puppeteer').executablePath()
+
     config.set({
-        browsers: [ "ChromeHeadless" ],
+        browsers: [ "ChromeHeadlessNoSandbox" ],
+        customLaunchers: {
+            ChromeHeadlessNoSandbox: {
+                base: "ChromeHeadless",
+                flags: [
+                    "--no-sandbox",
+                    "--disable-gpu",
+                    "--disable-web-security",
+                    "--disable-dev-shm-usage"
+                ]
+            }
+        },
         listenAddress: 'localhost',
         hostname: 'localhost',
         frameworks: [ "mocha-webworker" ],

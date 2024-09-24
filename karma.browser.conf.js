@@ -1,10 +1,24 @@
-process.env.CHROME_BIN = require('puppeteer').executablePath();
 
 const path = require('path');
 
 module.exports = function (config) {
+    const process = require('process');
+    process.env.CHROME_BIN = require('puppeteer').executablePath();
+    process.env.CHROMIUM_BIN = require('puppeteer').executablePath();
+     
     config.set({
-        browsers: [ "ChromeHeadless" ],
+        browsers: [ "ChromeHeadlessNoSandbox" ],
+        customLaunchers: {
+            ChromeHeadlessNoSandbox: {
+                base: "ChromeHeadless",
+                flags: [
+                    "--no-sandbox",
+                    "--disable-gpu",
+                    "--disable-web-security",
+                    "--disable-dev-shm-usage"
+                ]
+            }
+        },
         listenAddress: 'localhost',
         hostname: 'localhost',
         frameworks: [ "mocha", "karma-typescript" ],
