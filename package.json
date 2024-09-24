@@ -162,7 +162,7 @@
         "@nevware21/grunt-eslint-ts": "^0.5.1",
         "@nevware21/grunt-ts-plugin": "^0.5.1",
         "@nevware21/tripwire-chai": ">= 0.1.1 && < 2.0.0",
-        "@rollup/plugin-commonjs": "^26.0.1",
+        "@rollup/plugin-commonjs": "^28.0.0",
         "@rollup/plugin-json": "^6.0.0",
         "@rollup/plugin-node-resolve": "^15.0.1",
         "@rollup/plugin-strip": "^3.0.2",
