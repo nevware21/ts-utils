@@ -202,6 +202,7 @@
         "rollup-plugin-cleanup": "^3.2.1",
         "rollup-plugin-istanbul": "^5.0.0",
         "rollup-plugin-minify-es": "^1.1.1",
+        "rollup-plugin-sourcemaps": "^0.6.3",
         "sinon": "^15.0.0",
         "size-limit": "^11.1.2",
         "ts-mocha": "^10.0.0",
