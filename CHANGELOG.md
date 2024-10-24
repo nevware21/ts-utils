@@ -1,3 +1,17 @@
+# v0.11.5 Oct 23rd, 2024
+
+## Changelog
+
+- [#324](https://github.com/nevware21/ts-utils/pull/324) [Doc] Auto deploy docs and remove from repo
+- [#325](https://github.com/nevware21/ts-utils/pull/325) chore: Auto deploy docs
+- [#326](https://github.com/nevware21/ts-utils/pull/326) Update auto-docs generation
+- [#328](https://github.com/nevware21/ts-utils/pull/328) Bump @rollup/plugin-typescript from 11.1.6 to 12.1.0
+- [#327](https://github.com/nevware21/ts-utils/pull/327) Typedoc: rename workflow
+- [#330](https://github.com/nevware21/ts-utils/pull/330) Bump @rollup/plugin-commonjs from 26.0.3 to 28.0.0
+- [#331](https://github.com/nevware21/ts-utils/pull/331) Bump puppeteer from 22.15.0 to 23.4.0
+- [#333](https://github.com/nevware21/ts-utils/issues/333) [Bug] Glob is missing from the dev dependencies -- unable to build a clean repo
+- [#332](https://github.com/nevware21/ts-utils/issues/332) [BUG] Sourcemap load errors in debugger from @nevware21 dependencies
+
 # v0.11.4 Sept 21st, 2024
 
 ## Changelog
