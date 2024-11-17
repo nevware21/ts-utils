@@ -2,7 +2,7 @@
 // NPM Publish group definitions
 // ------------------------------
 {
-    "repoRoot": "../../..",
+    "repoRoot": ".",
     "default": "ts-utils",
     "groups": {
         "ts-utils": [
