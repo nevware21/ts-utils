@@ -105,9 +105,9 @@ export interface ITimerHandler {
      * Gets or Sets a flag indicating if the underlying timer is currently enabled and running.
      * Setting the enabled flag to the same as it's current value has no effect, setting to `true`
      * when already `true` will not {@link ITimerHandler.refresh | refresh}() the timer.
-     * And setting to 'false` will {@link ITimerHandler.cancel | cancel}() the timer.
+     * And setting to `false` will {@link ITimerHandler.cancel | cancel}() the timer.
      * @since 0.8.1
-        * @example
+     * @example
      * ```ts
      * let theTimer = createTimeout(...);
      *

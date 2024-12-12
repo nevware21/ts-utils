@@ -37,8 +37,8 @@ export type ArrReduceCallbackFn<T, R = T> = (previousValue: T | R, currentValue:
  * @group ArrayLike
  * @typeParam T - Identifies the type of array elements
  * @param theArray - The array or array like object of elements to be searched.
- * @param callbackfn A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
- * @param initialValue If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
+ * @param callbackfn - A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array.
+ * @param initialValue - If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.
  * @returns The value that results from running the "reducer" callback function to completion over the entire array.
  * @example
  * ```ts

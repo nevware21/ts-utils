@@ -21,7 +21,7 @@ import { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "./callbacks";
  * @typeParam T - Identifies the base type of array elements
  * @typeParam E - Identifies a more specific instance of the base array type
  * @param theArray - The array or array like object of elements to be searched.
- * @param callbackFn A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
+ * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
  * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
  * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
  * @param thisArg - A value to use as this when executing callbackFn. Defaults to the array if not provided.
@@ -82,7 +82,7 @@ export const arrEvery: <T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrP
  * @typeParam T - Identifies the base type of the elements.
  * @typeParam E - Identifies a more specific instance of the base array type.
  * @param theArray - The array or array like object of elements to be searched.
- * @param callbackFn A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
+ * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
  * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
  * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
  * @param thisArg - A value to use as this when executing callbackFn. Defaults to the array if not provided.

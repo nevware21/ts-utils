@@ -36,7 +36,7 @@ export interface ISafeReturn<T extends (...args: any) => any> {
 /**
  * Call the specified function with zero or more individual arguments, the call will be wrapped in a try / catch
  * block and the result returned wrapped in an {@link ISafeReturn} instance. If the function call throws an
- * exception the {@link ISafeReturn.e error} property will contain the exception otherwise the {@link ISafeReturn.v value}
+ * exception the {@link ISafeReturn.e | error} property will contain the exception otherwise the {@link ISafeReturn.v | value}
  * property will contain the value returned from the function.
  * @since 0.10.5
  * @group Safe
@@ -53,9 +53,10 @@ export interface ISafeReturn<T extends (...args: any) => any> {
  *
  * let result2 = safe((value: string) => {
  *   return JSON.parse(value);
- * }, ["{ valid: json value"]);
+ * }, ["{ valid: 'json value' }"]);
  *
  * // result2.v === { valid: "json value" }
+ * ```
  */
 export function safe<F extends (...args: unknown[]) => any>(func: F, argArray?: any[]): ISafeReturn<F> {
     try {

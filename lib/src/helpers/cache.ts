@@ -44,7 +44,7 @@ export interface ICachedValue<T> {
  * @group Helpers
  * @group Cache
  * @typeParam T - The type of the value to be cached
- * @param value
+ * @param value - The value to cache
  * @returns A new {@link ICachedValue} instance which wraps the provided value
  * @example
  * ```ts

@@ -27,15 +27,15 @@ import { ArrSlice, CALL, NULL_VALUE } from "../internal/constants";
  * @since 0.9.3
  * @group Array
  * @group ArrayLike
- * @param start Zero-based index at which to start extraction, converted to an integer.
- * - Negative index counts back from the end of the array — if start < 0, start + array.length is used.
- * - If start < -array.length or start is omitted, 0 is used.
- * - If start >= array.length, nothing is extracted.
- * @param end Zero-based index at which to end extraction, converted to an integer. slice() extracts
+ * @param start - Zero-based index at which to start extraction, converted to an integer.
+ * - Negative index counts back from the end of the array — if start \< 0, start + array.length is used.
+ * - If start \< -array.length or start is omitted, 0 is used.
+ * - If start \>= array.length, nothing is extracted.
+ * @param end - Zero-based index at which to end extraction, converted to an integer. slice() extracts
  * up to but not including end.
- * - Negative index counts back from the end of the array — if end < 0, end + array.length is used.
- * - If end < -array.length, 0 is used.
- * - If end >= array.length or end is omitted, array.length is used, causing all elements until the
+ * - Negative index counts back from the end of the array — if end \< 0, end + array.length is used.
+ * - If end \< -array.length, 0 is used.
+ * - If end \>= array.length or end is omitted, array.length is used, causing all elements until the
  * end to be extracted.
  * - If end is positioned before or at start after normalization, nothing is extracted.
  * @example

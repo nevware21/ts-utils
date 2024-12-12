@@ -164,7 +164,7 @@ export const objGetPrototypeOf: (value: any) => any = (/* #__PURE__*/_pureAssign
  * @since 0.9.7
  * @group Object
  * @group ArrayLike
- * @param value Object that contains the properties and methods.
+ * @param value - Object that contains the properties and methods.
  * @example
  * ```ts
  * objEntries({ Hello: "Darkness", my: "old", friend: "." });

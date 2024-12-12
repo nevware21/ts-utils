@@ -59,7 +59,7 @@ export declare type EnumTypeMap<E, V, T = { readonly [key in keyof E]: V }> = {
 } & T;
 
 /**
- * Create a TypeScript style enum class which is a mapping that maps from the key -> value and the value -> key.
+ * Create a TypeScript style enum class which is a mapping that maps from the key -\> value and the value -\> key.
  * This is effectively the same as defining a non-constant enum, but this only repeats the "Name" of the enum value once.
  * @group Enum
  * @example
@@ -96,7 +96,7 @@ export function createEnum<E>(values: { [key in keyof E]: E[keyof E] }): EnumCls
 
 /**
  * Create a map object which contains both the property key and value which both map to the key,
- * E[key] => key and E[value] => key.
+ * E[key] =\> key and E[value] =\> key.
  * @group Enum
  * @example
  * ```ts
@@ -135,7 +135,7 @@ export function createEnumKeyMap<E>(values: { [key in keyof E]: E[keyof E] }): E
 
 /**
  * Create a map object which contains both the perperty key and value which both map to the resulting value,
- * E[key] => value and E[value] => value.
+ * E[key] =\> value and E[value] =\> value.
  * @group Enum
  * @example
  * ```ts
@@ -176,7 +176,7 @@ export function createEnumValueMap<E>(values: { [key in keyof E]: E[keyof E] }):
 
 /**
  * Create a map object which contains both the perperty key and value which both map to the requested
- * generic mapValue with a type of V, E[key] => mapValue and E[value] => mapValue.
+ * generic mapValue with a type of V, E[key] =\> mapValue and E[value] =\> mapValue.
  * @group Enum
  * @example
  * ```ts
@@ -220,7 +220,7 @@ export function createSimpleMap<E, V>(values: { [key in keyof E]: [ E[keyof E], 
 /**
  * Create a strongly types map object which contains both the perperty key and value which both map
  * to the requested mapValue,
- * E[key] => mapValue and E[value] => mapValue.
+ * E[key] =\> mapValue and E[value] =\> mapValue.
  * - E = the const enum type (typeof Animal);
  * - V = Identifies the valid values for the keys, this should include both the enum numeric and string key of the type. The
  * resulting "Value" of each entry identifies the valid values withing the assignments.

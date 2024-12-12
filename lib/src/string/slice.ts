@@ -31,11 +31,11 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
  * If `endIndex` is omitted, undefined, or cannot be converted to a number (using Number(`endIndex`))
  * strSlice() extracts to the end of the string. (E.g. `strSlice("test", 2)` returns "st")
  * If `endIndex` is greater than `value.length`, strSlice() also extracts to the end of the string.
- * (E.g. strSlice("test", 2, 10)` returns "st")
+ * (E.g. `strSlice("test", 2, 10)` returns "st")
  * If `endIndex` is negative, `strSlice()` treats it as `value.length + endIndex`. (E.g, if `endIndex`
  * is -2, it is treated as `value.length - 2` and `strSlice("test", 1, -2)` returns "e") .
  * If `endIndex` represents a position that is before the one represented by startIndex, `strSlice()`
- * returns "". (E.g `strSlice("test", 2, -10)`, strSlice("test", -1, -2)` or `strSlice("test", 3, 2)`).
+ * returns "". (E.g `strSlice("test", 2, -10)`, `strSlice("test", -1, -2)` or `strSlice("test", 3, 2)`).
  * @returns A new string containing the extracted section of the string.
  */
 export const strSlice: (value: string, beginIndex: number, endIndex?: number) => string = (/*#__PURE__*/_unwrapFunction("slice", StrProto));

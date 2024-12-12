@@ -112,7 +112,7 @@ export function polyStrSubstr(value: string, start: number, length?: number): st
  *
  * `strLeft()` extracts the number of characters from left of the string up to the count. In particular:
  * - If `count` is less than zero, strLeft() returns an empty string.
- * - If `count` is less than `value.length', strLeft() returns a new string with the `count` number of characters from the left of the string.
+ * - If `count` is less than `value.length`, strLeft() returns a new string with the `count` number of characters from the left of the string.
  * - If `count` is greater than `value.length`, then the value original value is returned.
  *
  * Any argument value that is NaN is treated as if it were 0.
@@ -141,7 +141,7 @@ export function strLeft(value: string, count: number): string {
  *
  * `strRight()` extracts the number of characters from right of the string up to the count. In particular:
  * - If `count` is less than zero, strRight() returns an empty string.
- * - If `count` is less than `value.length', strRight() returns a new string with the `count` number of characters from the right of the string.
+ * - If `count` is less than `value.length`, strRight() returns a new string with the `count` number of characters from the right of the string.
  * - If `count` is greater than `value.length`, then the value original value is returned.
  *
  * Any argument value that is NaN is treated as if it were 0.

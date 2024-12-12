@@ -27,12 +27,12 @@ let _htmlEntityCache: { [key: string]: string};
  * @group Value
  * @param jsName - The string value to validate
  * @param camelCase - Optionally (see [1]) convert into CamelCase with the leading character either
- * - `true` => lowercase
- * - 'false' => uppercase
- * - undefined => not converted
+ * - `true` =\> lowercase
+ * - 'false' =\> uppercase
+ * - undefined =\> not converted
  * @return The original string name, if it conforms to the JS naming convention otherwise an encoded version.
  *
- * > **[1]**: Camel casing the name will remove all non-word characters from the result
+ * **[1]**: Camel casing the name will remove all non-word characters from the result
  * so you will NOT end up with any leading, embedded or trailing `_` characters which may cause
  * duplicate results for different string values.
  * @example

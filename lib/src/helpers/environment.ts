@@ -49,7 +49,7 @@ export function _getGlobalInstFn<T>(getFn: (...args: unknown[]) => T, theArgs?: 
  * @group Environment
  * @group Lazy
  * @group Safe
- * @param name The name of the global object to get, may be any valid PropertyKey (string, number or symbol)
+ * @param name - The name of the global object to get, may be any valid PropertyKey (string, number or symbol)
  * @returns A new readonly {@link ILazyValue} instance which will lazily attempt to return the globally
  * available named instance.
  * @example
@@ -100,7 +100,7 @@ export function getGlobal(useCached?: boolean): Window {
 /**
  * Return the named global object if available, will return null if the object is not available.
  * @group Environment
- * @param name The globally named object, may be any valid property key (string, number or symbol)
+ * @param name - The globally named object, may be any valid property key (string, number or symbol)
  * @param useCached - [Optional] used for testing to bypass the cached lookup, when `true` this will
  * cause the cached global to be reset.
  * @example

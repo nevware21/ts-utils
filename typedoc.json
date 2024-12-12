@@ -12,6 +12,7 @@
         "instance-first"
     ],
     "basePath": "./",
+    "cleanOutputDir": true,
     "excludeExternals": true,
     "excludeInternal": true,
     "excludePrivate": true,
@@ -23,7 +24,6 @@
     "compilerOptions": {
         "stripInternal": true
     },
-    "suppressCommentWarningsInDeclarationFiles": true,
     "blockTags": [
         "@defaultValue",
         "@deprecated",

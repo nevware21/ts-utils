@@ -18,7 +18,7 @@ import { isFunction, isStrictNullOrUndefined } from "../helpers/base";
  * @group Iterator
  * @typeParam T - Identifies the return type of the iterator defaults to any
  * @param value - The value to be checked
- * @returns {boolean} True if the value is an Iterator, otherwise false
+ * @returns True if the value is an Iterator, otherwise false
  * @example
  * ```ts
  * isIterator(null);        // false
@@ -43,7 +43,7 @@ export function isIterator<T = any>(value: any): value is Iterator<T> {
  * @group Iterator
  * @typeParam T - Identifies the return type of the iterator
  * @param value - The value to be checked
- * @returns {boolean} True if the value is an Iterable, otherwise false
+ * @returns True if the value is an Iterable, otherwise false
  * @example
  * ```ts
  * isIterable(null);        // false

@@ -72,9 +72,9 @@ export function fnApply<F extends (...args: any) => any, T>(fn: F, thisArg: T, a
 
 /**
  * The `fnCall` function calls the function with the given `thisArg` as the `this` value and with
- * al of the `_args` provided as it's `arguments.
+ * al of the `_args` provided as it's `arguments`.
  *
- * > This is almost identical to `fnApply`, except that the function arguments are passed to `fnCall`
+ * Note: This is almost identical to `fnApply`, except that the function arguments are passed to `fnCall`
  * individually as a list, while with `fnApply` that are combined into a single array argument.
  *
  * Normally, when calling a function, the value of `this` inside the function is the object that the

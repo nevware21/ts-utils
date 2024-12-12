@@ -41,10 +41,10 @@ export function polyIsArray<T>(value: any): value is T[] {
  * @param theArray - The array or array like object of elements to be searched.
  * @param searchElement - The value to search for
  * @param fromIndex - The optional Zero-based index at which to start searching, converted to an integer.
- * - Negative index counts back from the end of the array — if fromIndex < 0, fromIndex + array.length
+ * - Negative index counts back from the end of the array — if fromIndex \< 0, fromIndex + array.length
  * is used. However, the array is still searched from front to back in this case.
- * - If fromIndex < -array.length or fromIndex is omitted, 0 is used, causing the entire array to be searched.
- * - If fromIndex >= array.length, the array is not searched and false is returned.
+ * - If fromIndex \< -array.length or fromIndex is omitted, 0 is used, causing the entire array to be searched.
+ * - If fromIndex \>= array.length, the array is not searched and false is returned.
  * @returns A boolean value which is true if the value searchElement is found within the array (or the part of
  * the array indicated by the index fromIndex, if specified).
  */
@@ -85,7 +85,7 @@ export function polyArrIncludes<T>(theArray: ArrayLike<T>, searchElement: T, fro
  * @typeParam T - Identifies the base type of array elements
  * @typeParam E - Identifies a more specific instance of the base array type
  * @param theArray - The array or array like object of elements to be searched.
- * @param callbackFn A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
+ * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
  * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
  * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
  * @return The first element in the array that satisfies the provided testing function. Otherwise, undefined
@@ -149,14 +149,11 @@ export function polyArrFind<T, E extends T>(theArray: ArrayLike<T>, callbackFn: 
  * @typeParam T - Identifies the base type of array elements
  * @typeParam E - Identifies a more specific instance of the base array type
  * @param theArray - The array or array like object of elements to be searched.
- * @param callbackFn A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
+ * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
  * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
  * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
  * @param thisArg - A value to use as this when executing callbackFn. Defaults to the array if not provided.
  * @return The index of the first element in the array that passes the test. Otherwise, -1.
- * @example
- * ```ts
- * ```
  */
 export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
     let result = -1;
@@ -200,7 +197,7 @@ export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbac
  * @typeParam T - Identifies the base type of array elements
  * @typeParam E - Identifies a more specific instance of the base array type
  * @param theArray - The array or array like object of elements to be searched.
- * @param callbackFn A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
+ * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
  * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
  * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
  * @param thisArg - A value to use as this when executing callbackFn. Defaults to the array if not provided.
@@ -264,7 +261,7 @@ export function polyArrFindLast<T, E extends T>(theArray: ArrayLike<T>, callback
  * @typeParam T - Identifies the base type of array elements
  * @typeParam E - Identifies a more specific instance of the base array type
  * @param theArray - The array or array like object of elements to be searched.
- * @param callbackFn A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
+ * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
  * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
  * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
  * @param thisArg - A value to use as this when executing callbackFn. Defaults to the array if not provided.
@@ -297,7 +294,7 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
  * @param mapFn - A {@link ArrFromMapFn | mapping function} to call on every element of the array. If provided, every
  * value to be added to the array is first passed through this map function, and the return
  * value is added to the array instead. The function is called with the following arguments:
- * @param thisArg Value of 'this' used to invoke the mapfn.
+ * @param thisArg - Value of 'this' used to invoke the mapfn.
  * @example
  * ```ts
  * polyArrFrom("Hello");

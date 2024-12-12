@@ -19,10 +19,10 @@ import { polyArrIncludes } from "../polyfills/array";
  * @param theArray - The array or array like object of elements to be searched.
  * @param searchElement - The value to search for
  * @param fromIndex - The optional Zero-based index at which to start searching, converted to an integer.
- * - Negative index counts back from the end of the array — if fromIndex < 0, fromIndex + array.length
+ * - Negative index counts back from the end of the array — if fromIndex \< 0, fromIndex + array.length
  * is used. However, the array is still searched from front to back in this case.
- * - If fromIndex < -array.length or fromIndex is omitted, 0 is used, causing the entire array to be searched.
- * - If fromIndex >= array.length, the array is not searched and false is returned.
+ * - If fromIndex \< -array.length or fromIndex is omitted, 0 is used, causing the entire array to be searched.
+ * - If fromIndex \>= array.length, the array is not searched and false is returned.
  * @returns A boolean value which is true if the value searchElement is found within the array (or the part of
  * the array indicated by the index fromIndex, if specified).
  * @example
@@ -54,10 +54,10 @@ export const arrIncludes: <T>(theArray: ArrayLike<T>, searchElement: T, fromInde
  * @param theArray - The array or array like object of elements to be searched.
  * @param searchElement - The value to search for
  * @param fromIndex - The optional Zero-based index at which to start searching, converted to an integer.
- * - Negative index counts back from the end of the array — if fromIndex < 0, fromIndex + array.length
+ * - Negative index counts back from the end of the array — if fromIndex \< 0, fromIndex + array.length
  * is used. However, the array is still searched from front to back in this case.
- * - If fromIndex < -array.length or fromIndex is omitted, 0 is used, causing the entire array to be searched.
- * - If fromIndex >= array.length, the array is not searched and false is returned.
+ * - If fromIndex \< -array.length or fromIndex is omitted, 0 is used, causing the entire array to be searched.
+ * - If fromIndex \>= array.length, the array is not searched and false is returned.
  * @returns A boolean value which is true if the value searchElement is found within the array (or the part of
  * the array indicated by the index fromIndex, if specified).
  * @example

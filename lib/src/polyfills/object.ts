@@ -19,7 +19,7 @@ import { objHasOwn } from "../object/has_own";
  * Note: For consistency this will not use the Object.keys implementation if it exists as this would cause a testing requirement to test with and without the implementations
  * @group Polyfill
  * @group Object
- * @param obj Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+ * @param obj - Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyObjKeys(obj: any): string[] {
@@ -43,7 +43,7 @@ export function polyObjKeys(obj: any): string[] {
  * @group Polyfill
  * @group Object
  * @group ArrayLike
- * @param value Object that contains the properties and methods.
+ * @param value - Object that contains the properties and methods.
  * @example
  * ```ts
  * polyObjEntries({ Hello: "Darkness", my: "old", friend: "." });
@@ -75,7 +75,7 @@ export function polyObjEntries<T = any>(value: {} | { [s: string]: T } | ArrayLi
  * @group Polyfill
  * @group Object
  * @group ArrayLike
- * @param value Object that contains the properties and methods.
+ * @param value - Object that contains the properties and methods.
  * @example
  * ```ts
  * polyObjValues({ Hello: "Darkness", my: "old", friend: "." });

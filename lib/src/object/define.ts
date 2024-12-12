@@ -71,7 +71,7 @@ export interface ObjDefinePropDescriptor<V = any> {
      * A function which serves as a setter for the property, or undefined if there is no setter. When the property
      * is assigned, this function is called with one argument (the value being assigned to the property) and with
      * this set to the object through which the property is assigned. Defaults to undefined.
-     * @param value
+     * @param value - The value to set the property to.
      */
     s?(value: V): void;
 }

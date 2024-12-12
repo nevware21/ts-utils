@@ -59,7 +59,7 @@ export function polyNewSymbol(description?: string | number): symbol {
  * Otherwise, returns a new symbol with this key.
  * @group Polyfill
  * @group Symbol
- * @param key key to search for.
+ * @param key - key to search for.
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polySymbolFor(key: string): symbol {
@@ -80,7 +80,7 @@ export function polySymbolFor(key: string): symbol {
  * Otherwise, returns a undefined.
  * @group Polyfill
  * @group Symbol
- * @param sym Symbol to find the key for.
+ * @param sym - Symbol to find the key for.
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polySymbolKeyFor(sym: symbol): string | undefined {

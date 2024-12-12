@@ -96,11 +96,11 @@ export const arrIndexOf: <T>(theArray: ArrayLike<T>, searchElement: T, fromIndex
  * @param theArray - The array or array like object of elements to be searched.
  * @param searchElement - The element to locate in the array.
  * @param fromIndex - Zero-based index at which to start searching backwards, converted to an integer.
- * - Negative index counts back from the end of the array — if fromIndex < 0, fromIndex + array.length is used.
- * - If fromIndex < -array.length, the array is not searched and -1 is returned. You can think of it conceptually
+ * - Negative index counts back from the end of the array — if fromIndex \< 0, fromIndex + array.length is used.
+ * - If fromIndex \< -array.length, the array is not searched and -1 is returned. You can think of it conceptually
  * as starting at a nonexistent position before the beginning of the array and going backwards from there. There
  * are no array elements on the way, so searchElement is never found.
- * - If fromIndex >= array.length or fromIndex is omitted, array.length - 1 is used, causing the entire array to
+ * - If fromIndex \>= array.length or fromIndex is omitted, array.length - 1 is used, causing the entire array to
  * be searched. You can think of it conceptually as starting at a nonexistent position beyond the end of the array and going backwards from there. It eventually reaches the real end position of the array, at which point it starts searching backwards through the actual array elements.
  * @return The first index of the element in the array; -1 if not found.
  * @example
