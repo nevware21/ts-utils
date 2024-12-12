@@ -16,7 +16,7 @@ import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
  * for older browsers that do not define Object.create eg. ES3 only, IE8 just in case any page checks for presence/absence of the prototype implementation.
  * Note: For consistency this will not use the Object.create implementation if it exists as this would cause a testing requirement to test with and without the implementations
  * @group Object
- * @param obj Object to use as a prototype. May be null
+ * @param obj - Object to use as a prototype. May be null
  */
 export const objCreate: (obj: any) => any = (/* #__PURE__*/_pureAssign((/* #__PURE__*/_pureRef<typeof Object.create>(ObjClass as any, "create")), polyObjCreate));
 
@@ -26,7 +26,7 @@ export const objCreate: (obj: any) => any = (/* #__PURE__*/_pureAssign((/* #__PU
  * Note: For consistency this will not use the Object.create implementation if it exists as this would cause a testing requirement to test with and without the implementations
  * @group Polyfill
  * @group Object
- * @param obj Object to use as a prototype. May be null
+ * @param obj - Object to use as a prototype. May be null
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyObjCreate(obj: any): any {

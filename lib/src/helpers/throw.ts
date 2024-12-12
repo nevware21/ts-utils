@@ -9,7 +9,7 @@
 /**
  * Throw an error exception with the specified optional message
  * @group Error
- * @param message
+ * @param message - The optional message to include in the error
  */
 export function throwError(message?: string): never {
     throw new Error(message);
@@ -18,7 +18,7 @@ export function throwError(message?: string): never {
 /**
  * Throw a type error with the specified optional message
  * @group Error
- * @param message
+ * @param message - The optional message to include in the error
  */
 export function throwTypeError(message?: string): never {
     throw new TypeError(message);
@@ -27,7 +27,7 @@ export function throwTypeError(message?: string): never {
 /**
  * Throw a RangeError with the specified optional message
  * @group Error
- * @param message
+ * @param message - The optional message to include in the error
  */
 export function throwRangeError(message?: string): never {
     throw new RangeError(message);

@@ -15,14 +15,14 @@ import { createIterator, CreateIteratorContext } from "./create";
  * Create a simple range iterator which will return an iterator that increments it's value from
  * `start` to `end` by the `step`.
  * - If `end` is omitted, null or undefined the value will be set to `start`
- * - If the `step` value is omitted, null, undefined or zero then it will default to 1 if end > start otherwise -1.
+ * - If the `step` value is omitted, null, undefined or zero then it will default to 1 if end \> start otherwise -1.
  *
  * @since 0.4.2
  * @group Iterator
  * @param start - The initial value of the numeric iterator
  * @param end - The inclusive maximum (or minimum when moving backwards) value of the iterator.
  * @param step - The step size for each iteration, may be positive or negative. Defaults to 1 when
- * start <= end and -1 when start > end. Zero is treated as not provided.
+ * start \<= end and -1 when start \> end. Zero is treated as not provided.
  * @returns A new iterator which will return a numeric value between start and end at step intervals
  * @example
  * ```ts

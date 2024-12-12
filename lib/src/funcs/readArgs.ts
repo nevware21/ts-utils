@@ -20,18 +20,18 @@ let _iterSymbol: ICachedValue<symbol>;
  * Read the arguments from the provided array, iterator /  or generator function
  * When processing an Iterable and a negative start or end is provided the entire
  * iterator will be processed into an array before applying the start / end restrictions
- * and when undefined or >= 0 any iterator will not be fully processed.
+ * and when undefined or \>= 0 any iterator will not be fully processed.
  * @param theArgs - The arguments to process, may be ArrayLike or an Iterable
- * @param start Zero-based index at which to start extraction, converted to an integer.
+ * @param start - Zero-based index at which to start extraction, converted to an integer.
  * - Negative index counts back from the end of the array or iteration
- * - if start < 0, start + (array.length || iterator.count) is used.
- * - If start < -array.length or start is omitted, 0 is used.
- * - If start >= array.length, nothing is extracted.
- * @param end Zero-based index at which to end extraction, converted to an integer. readArgs() extracts
+ * - if start \< 0, start + (array.length || iterator.count) is used.
+ * - If start \< -array.length or start is omitted, 0 is used.
+ * - If start \>= array.length, nothing is extracted.
+ * @param end - Zero-based index at which to end extraction, converted to an integer. readArgs() extracts
  * up to but not including end.
- * - Negative index counts back from the end of the array — if end < 0, end + array.length is used.
- * - If end < -array.length, 0 is used.
- * - If end >= array.length or end is omitted, array.length is used, causing all elements until the
+ * - Negative index counts back from the end of the array — if end \< 0, end + array.length is used.
+ * - If end \< -array.length, 0 is used.
+ * - If end \>= array.length or end is omitted, array.length is used, causing all elements until the
  * end to be extracted.
  * - If end is positioned before or at start after normalization, nothing is extracted.
  * @returns A new array with the extracted elements

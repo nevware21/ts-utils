@@ -19,8 +19,8 @@ import { CALL, LENGTH } from "../internal/constants";
  * @group ArrayLike
  * @typeParam T - Identifies the element type of the array
  * @param theArray - The array or array like object of elements to be searched.
- * @param callbackfn A `synchronous` function that accepts up to three arguments. arrForEach calls the callbackfn function one time for each element in the array.
- * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, null or undefined
+ * @param callbackfn - A `synchronous` function that accepts up to three arguments. arrForEach calls the callbackfn function one time for each element in the array.
+ * @param thisArg - An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, null or undefined
  * the array will be used as the this value.
  * @remarks
  * arrForEach expects a `synchronous` function.

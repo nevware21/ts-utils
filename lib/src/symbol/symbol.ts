@@ -35,8 +35,8 @@ function _getSymbolKey<R>(key: string) {
 /**
  * Checks if the type of value is a symbol.
  * @group Symbol
- * @param {any} value - Value to be checked.
- * @return {boolean} True if the value is a symbol, false otherwise.
+ * @param value - Value to be checked.
+ * @return True if the value is a symbol, false otherwise.
  */
 export const isSymbol: (value: any) => value is symbol = (/*#__PURE__*/_createIs<symbol>("symbol"));
 
@@ -92,7 +92,7 @@ export function getKnownSymbol<T = symbol>(name: string | WellKnownSymbols, noPo
  * Returns a new unique Symbol value. If noPoly is true and symbols are not supported
  * then this will return null.
  * @group Symbol
- * @param description Description of the new Symbol object.
+ * @param description - Description of the new Symbol object.
  * @param noPoly - Flag indicating whether to return a polyfil if symbols are not supported.
  * @returns The new symbol
  */
@@ -111,7 +111,7 @@ export function newSymbol(description?: string | number, noPoly?: boolean): symb
  * Otherwise, returns a new symbol with this key. This will always return a polyfill if symbols
  * are not supported.
  * @group Symbol
- * @param key key to search for.
+ * @param key - key to search for.
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function symbolFor(key: string): symbol {
@@ -128,7 +128,7 @@ export function symbolFor(key: string): symbol {
  * Otherwise, returns a undefined. This will always attempt to lookup the polyfill
  * implementation if symbols are not supported
  * @group Symbol
- * @param sym Symbol to find the key for.
+ * @param sym - Symbol to find the key for.
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function symbolKeyFor(sym: symbol): string | undefined {

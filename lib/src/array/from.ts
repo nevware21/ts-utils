@@ -23,7 +23,7 @@ import { ArrFromMapFn } from "./callbacks";
  * @param mapFn - A {@link ArrFromMapFn | mapping function} to call on every element of the array. If provided, every
  * value to be added to the array is first passed through this map function, and the return
  * value is added to the array instead. The function is called with the following arguments:
- * @param thisArg Value of 'this' used to invoke the mapfn.
+ * @param thisArg - Value of 'this' used to invoke the mapfn.
  * @example
  * ```ts
  * arrFrom("Hello");

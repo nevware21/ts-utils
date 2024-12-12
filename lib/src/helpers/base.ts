@@ -427,8 +427,8 @@ export function isObject<T>(value: T): value is T {
  *
  * @group Type Identity
  * @group Array
- * @param {any} arg - Value to be checked.
- * @return {boolean} True if the value is a Array, false otherwise.
+ * @param arg - Value to be checked.
+ * @return True if the value is a Array, false otherwise.
  * @example
  * ```ts
  * import { isArray, isObject } from "@nevware21/ts-utils";
@@ -465,56 +465,56 @@ export const isDate: (value: any) => value is Date = (/*#__PURE__*/_createObjIs<
 /**
  * Checks if the type of value is a number.
  * @group Type Identity
- * @param {any} value - Value to be checked.
- * @return {boolean} True if the value is a number, false otherwise.
+ * @param value - Value to be checked.
+ * @return True if the value is a number, false otherwise.
  */
 export const isNumber: (value: any) => value is number = (/*#__PURE__*/_createIs<number>("number"));
 
 /**
  * Checks if the type of value is a boolean.
  * @group Type Identity
- * @param {any} value - Value to be checked.
- * @return {boolean} True if the value is a boolean, false otherwise.
+ * @param value - Value to be checked.
+ * @return True if the value is a boolean, false otherwise.
  */
 export const isBoolean: (value: any) => value is boolean = (/*#__PURE__*/_createIs<boolean>("boolean"));
 
 /**
  * Determines if a value is a regular expression object.
  * @group Type Identity
- * @param {*} value Reference to check.
- * @returns {boolean} True if `value` is a `RegExp`.
+ * @param value - Reference to check.
+ * @returns True if `value` is a `RegExp`.
  */
 export const isRegExp: (value: any) => value is RegExp = (/*#__PURE__*/_createObjIs<RegExp>("RegExp"));
 
 /**
  * Checks if the type of value is a File object.
  * @group Type Identity
- * @param {any} value - Value to be checked.
- * @return {boolean} True if the value is a File, false otherwise.
+ * @param value - Value to be checked.
+ * @return True if the value is a File, false otherwise.
  */
 export const isFile: (value: any) => value is File = (/*#__PURE__*/_createObjIs<File>("File"));
 
 /**
  * Checks if the type of value is a FormData object.
  * @group Type Identity
- * @param {any} value - Value to be checked.
- * @return {boolean} True if the value is a FormData, false otherwise.
+ * @param value - Value to be checked.
+ * @return True if the value is a FormData, false otherwise.
  */
 export const isFormData: (value: any) => value is FormData = (/*#__PURE__*/_createObjIs<FormData>("FormData"));
 
 /**
  * Checks if the type of value is a Blob object.
  * @group Type Identity
- * @param {any} value - Value to be checked.
- * @return {boolean} True if the value is a Blob, false otherwise.
+ * @param value - Value to be checked.
+ * @return True if the value is a Blob, false otherwise.
  */
 export const isBlob: (value: any) => value is Blob = (/*#__PURE__*/_createObjIs<Blob>("Blob"));
 
 /**
  * Checks if the type of value is a ArrayBuffer object.
  * @group Type Identity
- * @param {any} value - Value to be checked.
- * @return {boolean} True if the value is a ArrayBuffer, false otherwise.
+ * @param value - Value to be checked.
+ * @return True if the value is a ArrayBuffer, false otherwise.
  */
 export const isArrayBuffer: (value: any) => value is ArrayBuffer = (/*#__PURE__*/_createObjIs<ArrayBuffer>("ArrayBuffer"));
 
@@ -522,16 +522,16 @@ export const isArrayBuffer: (value: any) => value is ArrayBuffer = (/*#__PURE__*
  * Checks if the type of value is a Error object.
  * @group Type Identity
  * @group Error
- * @param {any} value - Value to be checked.
- * @return {boolean} True if the value is a Error, false otherwise.
+ * @param value - Value to be checked.
+ * @return True if the value is a Error, false otherwise.
  */
 export const isError: (value: any) => value is Error = (/*#__PURE__*/_createObjIs<Error>("Error"));
 
 /**
  * Checks if the type of value is a PromiseLike instance (contains a then function).
  * @group Type Identity
- * @param {any} value - Value to be checked.
- * @return {boolean} True if the value is a PromiseLike, false otherwise.
+ * @param value - Value to be checked.
+ * @return True if the value is a PromiseLike, false otherwise.
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function isPromiseLike<T>(value: any): value is PromiseLike<T> {
@@ -542,16 +542,16 @@ export function isPromiseLike<T>(value: any): value is PromiseLike<T> {
  * Checks if the type of value is a PromiseLike instance (contains a then function).
  * This is an alias for {@link isPromiseLike}.
  * @group Type Identity
- * @param {any} value - Value to be checked.
- * @return {boolean} True if the value is a PromiseLike, false otherwise.
+ * @param value - Value to be checked.
+ * @return True if the value is a PromiseLike, false otherwise.
  */
 export const isThenable: <T>(value: any) => value is PromiseLike<T> = isPromiseLike;
 
 /**
  * Checks if the type of value is a Promise instance (contains then and catch functions).
  * @group Type Identity
- * @param {any} value - Value to be checked.
- * @return {boolean} True if the value is a Promise, false otherwise.
+ * @param value - Value to be checked.
+ * @return True if the value is a Promise, false otherwise.
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function isPromise<T>(value: any): value is Promise<T> {
@@ -562,8 +562,8 @@ export function isPromise<T>(value: any): value is Promise<T> {
  * Checks if the type of value does not evaluate to true value, handling some special
  * case usages of Boolean(true/false) and new Boolean(true/false).
  * @group Value Check
- * @param {any} value - Value to be checked.
- * @return {boolean} True if the value is not truthy, false otherwise.
+ * @param value - Value to be checked.
+ * @return True if the value is not truthy, false otherwise.
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function isNotTruthy(value: any) {
@@ -574,8 +574,8 @@ export function isNotTruthy(value: any) {
  * Checks if the type of value evaluates to true value, handling some special
  * case usages of Boolean(true/false) and new Boolean(true/false).
  * @group Value Check
- * @param {any} value - Value to be checked.
- * @return {boolean} True if the value is not truthy, false otherwise.
+ * @param value - Value to be checked.
+ * @return True if the value is not truthy, false otherwise.
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function isTruthy(value: any) {

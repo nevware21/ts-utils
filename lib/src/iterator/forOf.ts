@@ -35,9 +35,9 @@ let _iterSymbol: ICachedValue<symbol>;
  * @since 0.4.2
  * @group Iterator
  * @typeParam T - Identifies the element type of the iterator
- * @param callbackfn A `synchronous` function that accepts up to three arguments. iterForOf calls the
+ * @param callbackfn - A `synchronous` function that accepts up to three arguments. iterForOf calls the
  * callbackfn function one time for each element returned by the iterator.
- * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is
+ * @param thisArg - An object to which the this keyword can refer in the callbackfn function. If thisArg is
  * omitted, null or undefined the iterator will be used as the this value.
  * @throws Any exception thrown while processing the iterator
  * @example

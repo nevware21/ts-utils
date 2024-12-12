@@ -57,7 +57,7 @@ export const strPadStart: (value: string, targetLength: number, padString?: stri
  * the resulting string reaches a given length. The padding is applied from the end of the current string.
  * @group String
  * @param value - The value to be padded
- * @param targetLength - The length of the resulting string once the current `value`` has been padded. If
+ * @param targetLength - The length of the resulting string once the current `value` has been padded. If
  * the `targetLength` is lower than `value.length`, the current string will be returned as-is.
  * @param padString - The string to pad the current `value` with. If padString is too long to stay within
  * `targetLength`, it will be truncated: for left-to-right languages the left-most part and for right-to-left

@@ -65,7 +65,7 @@ function _hasValue(value: any, depth: number): boolean {
  * - value is not null, undefined or string value of "undefined"
  * - value === false
  * - value === 0
- * - An array with a length >= 1
+ * - An array with a length \>= 1
  * - A valid Date
  * - If object has a `length` property or function and the returned value.length or value.length() !== 0
  * - If object has a `byteLength` property or function and the returned value.byteLength or value.byteLength() !== 0

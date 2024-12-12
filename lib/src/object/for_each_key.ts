@@ -16,8 +16,8 @@ import { objHasOwn } from "./has_own";
  * keys before iterating over them and like the `arrForEach` helper you CAN stop or break the iteration by returning -1 from the `callbackFn` function.
  * @group Object
  * @typeParam T - The object type
- * @param callbackfn  A function that accepts up to two arguments, the key name and the current value of the property represented by the key.
- * @param thisArg  [Optional] An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, null or undefined
+ * @param callbackfn - A function that accepts up to two arguments, the key name and the current value of the property represented by the key.
+ * @param thisArg - [Optional] An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, null or undefined
  * the object will be used as the this value.
  * @example
  * ```ts
