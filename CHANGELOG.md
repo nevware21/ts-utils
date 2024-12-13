@@ -1,3 +1,21 @@
+# v0.11.6 Dec 12th, 2024
+
+## Changelog
+
+- [#337](https://github.com/nevware21/ts-utils/pull/337) Update dependabot.yml
+- [#338](https://github.com/nevware21/ts-utils/pull/338) Bump github/codeql-action from 2 to 3
+- [#340](https://github.com/nevware21/ts-utils/pull/340) Bump actions/checkout from 2 to 4
+- [#339](https://github.com/nevware21/ts-utils/pull/339) Bump codecov/codecov-action from 2 to 4
+- [#341](https://github.com/nevware21/ts-utils/pull/341) Bump actions/configure-pages from 4 to 5
+- [#342](https://github.com/nevware21/ts-utils/pull/342) Bump actions/setup-node from 3 to 4
+- [#343](https://github.com/nevware21/ts-utils/pull/343) Update to use ts-build-tools
+  - [#344](https://github.com/nevware21/ts-utils/pull/344) Bump @nevware21/ts-build-tools to ^0.1.3
+- [#345](https://github.com/nevware21/ts-utils/pull/345) Bump codecov/codecov-action from 4 to 5
+- [#347](https://github.com/nevware21/ts-utils/pull/347) Create FUNDING.yml
+  - [#348](https://github.com/nevware21/ts-utils/pull/348) Update FUNDING.yml
+- [#350](https://github.com/nevware21/ts-utils/issues/350) [doc] TSDoc Error During Build
+
+
 # v0.11.5 Oct 23rd, 2024
 
 ## Changelog
