@@ -197,7 +197,7 @@
         "karma-rollup-preprocessor": "^7.0.8",
         "karma-spec-reporter": "^0.0.36",
         "karma-typescript": "^5.5.4",
-        "mocha": "^10.7.0",
+        "mocha": "^11.1.0",
         "nyc": "^17.0.0",
         "puppeteer": "^23.4.0",
         "rollup": "^4.14.1",
