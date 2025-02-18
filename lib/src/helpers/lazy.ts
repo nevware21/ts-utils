@@ -110,7 +110,7 @@ export function setBypassLazyCache(newValue: boolean) {
  * does not cause re-execution of the callback as the result from the first call is cached internally. The
  * value may be set as many times as required, if the callback has not been called when you set the value
  * it will never get called.
- * @since 0.9.4
+ * @since 0.11.7
  * @group Lazy
  * @param cb - The callback function to fetch the value to be lazily evaluated and cached
  * @returns A new writable {@link ILazyValue} instance which wraps the callback and will be used to cache

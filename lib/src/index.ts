@@ -42,14 +42,14 @@ export { encodeAsHtml, encodeAsJson, normalizeJsName } from "./helpers/encode";
 export {
     deepExtend, objExtend
 } from "./helpers/extend";
-export { ILazyValue, getLazy, setBypassLazyCache } from "./helpers/lazy";
+export { ILazyValue, getLazy, setBypassLazyCache, getWritableLazy } from "./helpers/lazy";
 export { IGetLength as GetLengthImpl, getLength } from "./helpers/length";
 export { getIntValue } from "./helpers/number";
 export { getPerformance, hasPerformance, elapsedTime, perfNow } from "./helpers/perf";
 export { createFilenameRegex, createWildcardRegex, makeGlobRegex } from "./helpers/regexp";
 export { safe, ISafeReturn, SafeReturnType } from "./helpers/safe";
 export { safeGet } from "./helpers/safe_get";
-export { safeGetLazy } from "./helpers/safe_lazy";
+export { safeGetLazy, safeGetWritableLazy } from "./helpers/safe_lazy";
 export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";
 export { hasValue } from "./helpers/value";
 export { createArrayIterator } from "./iterator/array";
