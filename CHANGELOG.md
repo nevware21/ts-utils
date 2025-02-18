@@ -1,3 +1,12 @@
+# v0.11.6 Feb 17th, 2025
+
+## Changelog
+
+- [#366](https://github.com/nevware21/ts-utils/issues/366) [Bug] getWritableLazy() intriduced in 0.9.4 has not been exported
+- [#353](https://github.com/nevware21/ts-utils/pull/353) Bump @rollup/plugin-node-resolve from 15.3.1 to 16.0.0
+- [#355](https://github.com/nevware21/ts-utils/pull/355) Bump puppeteer from 23.11.1 to 24.0.0
+- [#356](https://github.com/nevware21/ts-utils/pull/356) Bump glob from 11.0.0 to 11.0.1
+
 # v0.11.6 Dec 12th, 2024
 
 ## Changelog
