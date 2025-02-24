@@ -59,6 +59,7 @@ export { isIterable, isIterator } from "./iterator/iterator";
 export { createRangeIterator } from "./iterator/range";
 export { mathCeil, mathFloor } from "./math/floor";
 export { mathMin, mathMax } from "./math/min_max";
+export { mathRound } from "./math/round";
 export { mathToInt } from "./math/to_int";
 export { mathTrunc } from "./math/trunc";
 export {
