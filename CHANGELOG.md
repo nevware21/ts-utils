@@ -1,4 +1,11 @@
-# v0.11.6 Feb 17th, 2025
+# v0.11.7 Feb 24th, 2025
+
+## Changelog
+
+- [#369](https://github.com/nevware21/ts-utils/pull/369) Bump ts-mocha from 10.1.0 to 11.1.0
+- [#370](https://github.com/nevware21/ts-utils/pull/370) Add mathRound alias for Math.round
+
+# v0.11.7 Feb 17th, 2025
 
 ## Changelog
 
