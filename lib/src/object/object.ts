@@ -9,7 +9,7 @@
 import { NULL_VALUE, ObjClass, __PROTO__ } from "../internal/constants";
 import { isArray, isObject } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
-import { polyObjEntries, polyObjValues } from "../polyfills/object";
+import { polyObjEntries, polyObjIs, polyObjValues } from "../polyfills/object";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 
 const _objFreeze = (/* #__PURE__ */_pureRef<typeof Object.freeze>(ObjClass, "freeze"));
@@ -208,3 +208,51 @@ export const objEntries: <T = any>(value: {} | { [s: string]: T } | ArrayLike<T>
  * ```
  */
 export const objValues: <T = any>(value: {} | { [s: string]: T } | ArrayLike<T>) => T[] = (/* #__PURE__*/_pureAssign((/* #__PURE__*/_pureRef<typeof Object.values>(ObjClass, "values")), polyObjValues));
+
+// Add after objValues definition
+
+/**
+ * The objIs() method determines whether two values are the same value.
+ *
+ * Two values are the same if one of the following holds:
+ * - both undefined
+ * - both null
+ * - both true or both false
+ * - both strings of the same length with the same characters in the same order
+ * - both the same object (meaning both values reference the same object in memory)
+ * - both numbers and both +0, both -0, both NaN, or both non-zero and both not NaN and both have the same value
+ *
+ * This is different from the === operator in that:
+ * - NaN is equal to NaN
+ * - +0 is not equal to -0
+ *
+ * @since 0.11.9
+ * @group Object
+ * @param value1 - The first value to compare
+ * @param value2 - The second value to compare
+ * @returns True if the values are the same value, false otherwise
+ * @example
+ * ```ts
+ * // Case 1: NaN
+ * objIs(NaN, NaN);                  // true
+ * NaN === NaN;                      // false
+ *
+ * // Case 2: Signed zeros
+ * objIs(0, -0);                     // false
+ * objIs(+0, -0);                    // false
+ * objIs(-0, -0);                    // true
+ * 0 === -0;                         // true
+ *
+ * // Regular comparison
+ * objIs('hello', 'hello');          // true
+ * objIs('hello', 'goodbye');        // false
+ * objIs(1, 1);                      // true
+ * objIs(1, 2);                      // false
+ *
+ * // Objects
+ * const obj = { a: 1 };
+ * objIs(obj, obj);                  // true
+ * objIs(obj, { a: 1 });             // false (different objects with same content)
+ * ```
+ */
+export const objIs: (value1: any, value2: any) => boolean = (/* #__PURE__*/_pureAssign((/* #__PURE__*/_pureRef<typeof Object.is>(ObjClass, "is")), polyObjIs));
