@@ -74,7 +74,7 @@ export { objHasOwn, polyObjHasOwn } from "./object/has_own";
 export { objHasOwnProperty } from "./object/has_own_prop";
 export { isPlainObject } from "./object/is_plain_object";
 export {
-    objAssign, objKeys, objDeepFreeze, objFreeze, objSeal, objGetPrototypeOf, objEntries
+    objAssign, objKeys, objDeepFreeze, objFreeze, objSeal, objGetPrototypeOf, objEntries, objIs
 } from "./object/object";
 export { objSetPrototypeOf } from "./object/set_proto";
 export { getValueByKey, setValueByKey, getValueByIter, setValueByIter } from "./helpers/get_set_value";
@@ -105,7 +105,7 @@ export { TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, schedu
 // Exporting the helpers, but not the "initialization" code to populate any missing values
 // This will enable anyone to "reuse" or create their own polyfills.ts implementation if they want.
 export { polyIsArray, polyArrFind, polyArrFindIndex, polyArrFindLast, polyArrFindLastIndex, polyArrIncludes, polyArrFrom } from "./polyfills/array";
-export { polyObjKeys, polyObjEntries } from "./polyfills/object";
+export { polyObjKeys, polyObjEntries, polyObjIs } from "./polyfills/object";
 export { polyStrSymSplit } from "./polyfills/split";
 export { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "./polyfills/symbol";
 export { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "./polyfills/trim";

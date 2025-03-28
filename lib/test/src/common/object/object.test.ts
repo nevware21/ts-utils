@@ -11,7 +11,7 @@ import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isFunction, isObject, isString, isUndefined } from "../../../../src/helpers/base";
 import { objForEachKey } from "../../../../src/object/for_each_key";
 import { objHasOwnProperty } from "../../../../src/object/has_own_prop";
-import { objDeepFreeze, objEntries, objFreeze, objKeys, objSeal, objValues } from "../../../../src/object/object";
+import { objDeepFreeze, objEntries, objFreeze, objIs, objKeys, objSeal, objValues } from "../../../../src/object/object";
 import { objDefine, objDefineAccessors, objDefineGet, objDefineProps } from "../../../../src/object/define";
 import { FUNCTION } from "../../../../src/internal/constants";
 import { objSetPrototypeOf } from "../../../../src/object/set_proto";
@@ -1275,6 +1275,101 @@ describe("object helpers", () => {
 
             // Array-like object with random key ordering
             assert.deepEqual(objValues({ 100: "a", 2: "b", 7: "c" }), [ "b", "c", "a"]);
+        });
+    });
+
+    describe("objIs", () => {
+        it("should handle undefined values", () => {
+            assert.isTrue(objIs(undefined, undefined), "undefined should equal undefined");
+            assert.isFalse(objIs(undefined, null), "undefined should not equal null");
+            assert.isFalse(objIs(undefined, 0), "undefined should not equal 0");
+            assert.isFalse(objIs(undefined, ""), "undefined should not equal empty string");
+        });
+
+        it("should handle null values", () => {
+            assert.isTrue(objIs(null, null), "null should equal null");
+            assert.isFalse(objIs(null, undefined), "null should not equal undefined");
+            assert.isFalse(objIs(null, 0), "null should not equal 0");
+            assert.isFalse(objIs(null, ""), "null should not equal empty string");
+        });
+
+        it("should handle boolean values", () => {
+            assert.isTrue(objIs(true, true), "true should equal true");
+            assert.isTrue(objIs(false, false), "false should equal false");
+            assert.isFalse(objIs(true, false), "true should not equal false");
+            assert.isFalse(objIs(false, true), "false should not equal true");
+            assert.isFalse(objIs(true, 1), "true should not equal 1");
+            assert.isFalse(objIs(false, 0), "false should not equal 0");
+        });
+
+        it("should handle string values", () => {
+            assert.isTrue(objIs("hello", "hello"), "identical strings should be equal");
+            assert.isFalse(objIs("hello", "world"), "different strings should not be equal");
+            assert.isFalse(objIs("", 0), "empty string should not equal 0");
+            assert.isTrue(objIs("", ""), "empty string should equal empty string");
+        });
+
+        it("should handle NaN special case", () => {
+            assert.isTrue(objIs(NaN, NaN), "NaN should equal NaN");
+            assert.notStrictEqual(NaN, NaN, "=== operator says NaN is not equal to NaN");
+            assert.isFalse(objIs(NaN, 0), "NaN should not equal 0");
+            assert.isFalse(objIs(NaN, undefined), "NaN should not equal undefined");
+        });
+
+        it("should handle signed zeros special case", () => {
+            // These tests verify the special handling of +0 and -0
+            assert.isTrue(objIs(0, 0), "+0 should equal +0");
+            assert.isTrue(objIs(-0, -0), "-0 should equal -0");
+            assert.isFalse(objIs(0, -0), "+0 should not equal -0");
+            assert.isFalse(objIs(-0, 0), "-0 should not equal +0");
+            
+            // Compare with regular equality
+            assert.strictEqual(0, -0, "=== operator says +0 is equal to -0");
+        });
+
+        it("should handle regular number values", () => {
+            assert.isTrue(objIs(42, 42), "identical numbers should be equal");
+            assert.isFalse(objIs(42, 43), "different numbers should not be equal");
+            assert.isFalse(objIs(42, "42"), "number should not equal string representation");
+            assert.isFalse(objIs(Infinity, -Infinity), "Infinity should not equal -Infinity");
+            assert.isTrue(objIs(Infinity, Infinity), "Infinity should equal Infinity");
+            assert.isTrue(objIs(-Infinity, -Infinity), "-Infinity should equal -Infinity");
+        });
+
+        it("should handle object references", () => {
+            const obj1 = { a: 1 };
+            const obj2 = { a: 1 };
+            const obj3 = obj1;
+            
+            assert.isTrue(objIs(obj1, obj1), "object should equal itself");
+            assert.isTrue(objIs(obj1, obj3), "object should equal its reference");
+            assert.isFalse(objIs(obj1, obj2), "different objects with same content should not be equal");
+            assert.isFalse(objIs({}, {}), "empty objects should not be equal");
+        });
+
+        it("should handle arrays", () => {
+            const arr1 = [1, 2, 3];
+            const arr2 = [1, 2, 3];
+            const arr3 = arr1;
+            
+            assert.isTrue(objIs(arr1, arr1), "array should equal itself");
+            assert.isTrue(objIs(arr1, arr3), "array should equal its reference");
+            assert.isFalse(objIs(arr1, arr2), "different arrays with same content should not be equal");
+            assert.isFalse(objIs([], []), "empty arrays should not be equal");
+        });
+
+        it("should handle functions", () => {
+            function fn1() {
+                return 1;
+            }
+            function fn2() {
+                return 1;
+            }
+            const fn3 = fn1;
+            
+            assert.isTrue(objIs(fn1, fn1), "function should equal itself");
+            assert.isTrue(objIs(fn1, fn3), "function should equal its reference");
+            assert.isFalse(objIs(fn1, fn2), "different functions should not be equal");
         });
     });
 

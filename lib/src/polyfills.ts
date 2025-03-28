@@ -9,7 +9,7 @@
 import { arrForEach } from "./array/forEach";
 import { ArrCls, ArrProto, ObjClass, StrProto } from "./internal/constants";
 import { polyIsArray, polyArrIncludes, polyArrFind, polyArrFindIndex, polyArrFindLastIndex, polyArrFindLast, polyArrFrom } from "./polyfills/array";
-import { polyObjKeys } from "./polyfills/object";
+import { polyObjIs, polyObjKeys } from "./polyfills/object";
 import { polyStrStartsWith } from "./string/starts_with";
 import { polyStrEndsWith } from "./string/ends_with";
 import { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "./polyfills/trim";
@@ -23,7 +23,8 @@ import { polyStrIncludes } from "./string/includes";
 
     const objectPolyfills = {
         "keys": polyObjKeys,
-        "hasOwn": polyObjHasOwn
+        "hasOwn": polyObjHasOwn,
+        "is": polyObjIs
     };
 
     const stringPolyfills = {

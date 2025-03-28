@@ -7,12 +7,12 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
-import { polyObjEntries, polyObjKeys, polyObjValues } from "../../../../src/polyfills/object";
+import { polyObjEntries, polyObjIs, polyObjKeys, polyObjValues } from "../../../../src/polyfills/object";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isObject, isUndefined } from "../../../../src/helpers/base";
 
 describe("object polyfills", () => {
-    it("ployObjKeys", () => {
+    it("polyObjKeys", () => {
         _checkObjKeys(null);
         _checkObjKeys(undefined);
         _checkObjKeys("null");
@@ -76,6 +76,102 @@ describe("object polyfills", () => {
 
             // Array-like object with random key ordering
             assert.deepEqual(polyObjValues({ 100: "a", 2: "b", 7: "c" }), [ "b", "c", "a"]);
+        });
+    });
+
+    // Add this after the polyObjValues test section and before the _checkObjKeys function
+
+    describe("polyObjIs", () => {
+        it("should handle primitive values correctly", () => {
+            // Undefined
+            assert.isTrue(polyObjIs(undefined, undefined), "undefined should equal undefined");
+            assert.isFalse(polyObjIs(undefined, null), "undefined should not equal null");
+            
+            // Null
+            assert.isTrue(polyObjIs(null, null), "null should equal null");
+            
+            // Booleans
+            assert.isTrue(polyObjIs(true, true), "true should equal true");
+            assert.isTrue(polyObjIs(false, false), "false should equal false");
+            assert.isFalse(polyObjIs(true, false), "true should not equal false");
+            
+            // Strings
+            assert.isTrue(polyObjIs("hello", "hello"), "identical strings should be equal");
+            assert.isFalse(polyObjIs("hello", "world"), "different strings should not be equal");
+            assert.isTrue(polyObjIs("", ""), "empty string should equal empty string");
+            
+            // Numbers
+            assert.isTrue(polyObjIs(42, 42), "identical numbers should be equal");
+            assert.isFalse(polyObjIs(42, 43), "different numbers should not be equal");
+            assert.isTrue(polyObjIs(Infinity, Infinity), "Infinity should equal Infinity");
+            assert.isTrue(polyObjIs(-Infinity, -Infinity), "-Infinity should equal -Infinity");
+            assert.isFalse(polyObjIs(Infinity, -Infinity), "Infinity should not equal -Infinity");
+        });
+
+        it("should handle the special case of NaN", () => {
+            // This is one of the key differences from ===
+            assert.isTrue(polyObjIs(NaN, NaN), "NaN should equal NaN (unlike ===)");
+            assert.notStrictEqual(NaN, NaN, "=== operator says NaN is not equal to NaN");
+        });
+
+        it("should handle the special case of signed zeros", () => {
+            // This is the other key difference from ===
+            assert.isTrue(polyObjIs(0, 0), "+0 should equal +0");
+            assert.isTrue(polyObjIs(-0, -0), "-0 should equal -0");
+            assert.isFalse(polyObjIs(0, -0), "+0 should not equal -0 (unlike ===)");
+            assert.isFalse(polyObjIs(-0, 0), "-0 should not equal +0 (unlike ===)");
+            assert.strictEqual(0, -0, "=== operator says +0 is equal to -0");
+        });
+
+        it("should handle object references", () => {
+            const obj1 = { a: 1 };
+            const obj2 = { a: 1 };
+            const obj3 = obj1;
+            
+            assert.isTrue(polyObjIs(obj1, obj1), "object should equal itself");
+            assert.isTrue(polyObjIs(obj1, obj3), "object should equal its reference");
+            assert.isFalse(polyObjIs(obj1, obj2), "different objects with same content should not be equal");
+        });
+
+        it("should behave the same as native Object.is when available", () => {
+            // Only run this comparison if Object.is is available in the environment
+            if (typeof Object.is === "function") {
+                const testValues = [
+                    undefined, null, true, false, 0, -0, 42, NaN, "", "hello",
+                    {}, [], _dummyFunction, new Date()
+                ];
+                
+                for (let i = 0; i < testValues.length; i++) {
+                    for (let j = 0; j < testValues.length; j++) {
+                        assert.equal(
+                            polyObjIs(testValues[i], testValues[j]),
+                            Object.is(testValues[i], testValues[j]),
+                            `polyObjIs and Object.is should give same result for ${dumpObj(testValues[i])} and ${dumpObj(testValues[j])}`
+                        );
+                    }
+                }
+            }
+        });
+
+        it("examples", () => {
+            // Case 1: NaN
+            assert.isTrue(polyObjIs(NaN, NaN), "NaN should equal NaN");
+            
+            // Case 2: Signed zeros
+            assert.isFalse(polyObjIs(0, -0), "+0 should not equal -0");
+            assert.isFalse(polyObjIs(+0, -0), "+0 should not equal -0");
+            assert.isTrue(polyObjIs(-0, -0), "-0 should equal -0");
+            
+            // Regular comparison
+            assert.isTrue(polyObjIs("hello", "hello"), "identical strings should be equal");
+            assert.isFalse(polyObjIs("hello", "goodbye"), "different strings should not be equal");
+            assert.isTrue(polyObjIs(1, 1), "identical numbers should be equal");
+            assert.isFalse(polyObjIs(1, 2), "different numbers should not be equal");
+            
+            // Objects
+            const obj = { a: 1 };
+            assert.isTrue(polyObjIs(obj, obj), "object should equal itself");
+            assert.isFalse(polyObjIs(obj, { a: 1 }), "different objects with same content should not be equal");
         });
     });
 
