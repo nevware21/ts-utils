@@ -2,11 +2,12 @@
  * @nevware21/ts-utils
  * https://github.com/nevware21/ts-utils
  *
- * Copyright (c) 2022 NevWare21 Solutions LLC
+ * Copyright (c) 2022-2025 NevWare21 Solutions LLC
  * Licensed under the MIT license.
  */
 
 import { ArrCls, FUNCTION, NULL_VALUE, OBJECT, ObjProto, TO_STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
+import { _isPolyfillType } from "../internal/poly_helpers";
 import { _pureRef } from "../internal/treeshake_helpers";
 import { safeGet } from "./safe_get";
 
@@ -24,6 +25,21 @@ let _primitiveTypes: string[];
 export function _createIs<T>(theType: string): (value: any) => value is T {
     return function (value: any): value is T {
         return typeof value === theType;
+    }
+}
+
+/**
+ * @ignore
+ * @internal
+ * Create and returns a function that will return `true` if the argument passed
+ * to it matches the provided type or the type is a polyfill for the provided type.
+ * @param theType - The type to match against the `typeof value`
+ * @returns A function which takes a single argument and returns a boolean
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function _createIsWithPoly<T>(theType: string): (value: any) => value is T {
+    return function (value: any): value is T {
+        return typeof value === theType || _isPolyfillType(value, theType);
     }
 }
 
@@ -161,7 +177,7 @@ export function isUndefined(value: any) {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function isStrictUndefined(arg: any): arg is undefined {
-    return !isDefined(arg);
+    return arg === UNDEF_VALUE;
 }
 
 /**
@@ -220,7 +236,7 @@ export function isNullOrUndefined(value:  any): boolean {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function isStrictNullOrUndefined(value: any): boolean {
-    return value === NULL_VALUE || !isDefined(value);
+    return value === NULL_VALUE || value === UNDEF_VALUE;
 }
 
 /**
@@ -556,6 +572,55 @@ export const isThenable: <T>(value: any) => value is PromiseLike<T> = isPromiseL
 /*#__NO_SIDE_EFFECTS__*/
 export function isPromise<T>(value: any): value is Promise<T> {
     return !!(value && value.then && value.catch && isFunction(value.then) && isFunction((value as any).catch));
+}
+
+/**
+ * Checks if the type of value is a Map object.
+ * @group Type Identity
+ * @param value - Value to be checked.
+ * @return True if the value is a Map, false otherwise.
+ * @example
+ * ```ts
+ * isMap(new Map());        // true
+ * isMap(new WeakMap());    // false
+ * isMap({});               // false
+ * isMap(null);             // false
+ * ```
+ */
+export const isMap: <K = any, V = any>(value: any) => value is Map<K, V> = (/*#__PURE__*/_createObjIs<Map<any, any>>("Map"));
+
+/**
+ * Checks if the type of value is Map-like (has essential Map methods).
+ * @group Type Identity
+ * @param value - Value to be checked.
+ * @return True if the value implements the Map interface, false otherwise.
+ * @example
+ * ```ts
+ * isMapLike(new Map());                // true
+ *
+ * // Custom map-like implementation
+ * const myMap = {
+ *   get: (key) => { return null; },
+ *   set: (key, value) => { return myMap; },
+ *   has: (key) => { return false; },
+ *   delete: (key) => { return false; },
+ *   size: 0
+ * };
+ * isMapLike(myMap);                    // true
+ *
+ * isMapLike({});                       // false
+ * isMapLike(null);                     // false
+ * isMapLike(undefined);                // false
+ * ```
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function isMapLike<K = any, V = any>(value: any): value is Map<K, V> {
+    return !!(value &&
+        isFunction(value.get) &&
+        isFunction(value.set) &&
+        isFunction(value.has) &&
+        isFunction(value.delete) &&
+        !isStrictUndefined(value.size));
 }
 
 /**

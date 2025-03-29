@@ -2,14 +2,13 @@
  * @nevware21/ts-utils
  * https://github.com/nevware21/ts-utils
  *
- * Copyright (c) 2022 NevWare21 Solutions LLC
+ * Copyright (c) 2022-2025 NevWare21 Solutions LLC
  * Licensed under the MIT license.
  */
 
 import { isString, isUndefined } from "../helpers/base";
-import { dumpObj } from "../helpers/diagnostics";
-import { throwTypeError } from "../helpers/throw";
 import { LENGTH, StrProto } from "../internal/constants";
+import { _throwIfNotString } from "../internal/throwIf";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { asString } from "./as_string";
 import { strSubstring } from "./substring";
@@ -33,9 +32,7 @@ export const strEndsWith: (value: string, searchString: string, length?: number)
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyStrEndsWith(value: string, searchString: string, length?: number): boolean {
-    if (!isString(value)) {
-        throwTypeError("'" + dumpObj(value) + "' is not a string");
-    }
+    _throwIfNotString(value);
 
     let searchValue = isString(searchString) ? searchString : asString(searchString);
     let end = (!isUndefined(length) && length < value[LENGTH]) ? length : value[LENGTH];

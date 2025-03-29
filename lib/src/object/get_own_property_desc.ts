@@ -2,12 +2,13 @@
  * @nevware21/ts-utils
  * https://github.com/nevware21/ts-utils
  *
- * Copyright (c) 2022 NevWare21 Solutions LLC
+ * Copyright (c) 2022-2025 NevWare21 Solutions LLC
  * Licensed under the MIT license.
  */
 
 import { ObjClass } from "../internal/constants";
-import { _pureRef } from "../internal/treeshake_helpers";
+import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
+import { polyObjGetOwnPropertyDescriptor } from "../polyfills/object/objGetOwnPropertyDescriptor";
 
 /**
  * The objGetOwnPropertyDescriptor() method returns an object describing the configuration of a specific property on
@@ -48,4 +49,4 @@ import { _pureRef } from "../internal/treeshake_helpers";
  * ```
  * Note: In ES5, if the first argument to this method is not an object (a primitive), then it will cause a TypeError. In ES2015, a non-object first argument will be coerced to an object at first.
  */
-export const objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, "getOwnPropertyDescriptor"));
+export const objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, "getOwnPropertyDescriptor")), polyObjGetOwnPropertyDescriptor));

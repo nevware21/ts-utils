@@ -2,7 +2,7 @@
  * @nevware21/ts-utils
  * https://github.com/nevware21/ts-utils
  *
- * Copyright (c) 2022 NevWare21 Solutions LLC
+ * Copyright (c) 2022-2025 NevWare21 Solutions LLC
  * Licensed under the MIT license.
  */
 
@@ -10,8 +10,11 @@ import { ObjClass } from "../internal/constants";
 import { isFunction, isStrictUndefined } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
 import { ILazyValue } from "../helpers/lazy";
-import { objGetOwnPropertyDescriptor } from "./get_own_prop_desc";
+import { objGetOwnPropertyDescriptor } from "./get_own_property_desc";
 import { _pureRef } from "../internal/treeshake_helpers";
+import { objGetOwnPropertySymbols } from "./get_own_property_symbols";
+import { arrForEach } from "../array/forEach";
+import { objPropertyIsEnumerable } from "./property_is_enumerable";
 
 /**
  * Definition of the Property Descriptor mappings for the objDefine functions.
@@ -258,6 +261,12 @@ export function objDefineProps<T>(target: T, propDescMap: ObjDefinePropDescripto
 
     objForEachKey(propDescMap, (key, value: ObjDefinePropDescriptor) => {
         props[key] = _createProp(value);
+    });
+
+    arrForEach(objGetOwnPropertySymbols(propDescMap), (sym) => {
+        if (objPropertyIsEnumerable(propDescMap, sym)) {
+            props[sym] = _createProp(propDescMap[sym]);
+        }
     });
 
     return objDefineProperties(target, props);

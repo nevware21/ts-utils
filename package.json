@@ -117,7 +117,7 @@
     "sideEffects": false,
     "scripts": {
         "build": "grunt ts_utils --verbose && npm run package && npm run dtsgen",
-        "rebuild": "npm run build && npm run test && npm run size",
+        "rebuild": "npm run build && npm run test && npm run size && npm run size-check",
         "package": "rollup -c lib/rollup.config.js --bundleConfigAsCjs",
         "test": "npm run test:node && npm run test:worker && npm run test:browser && npm run coverage:report",
         "test:node": "nyc ts-mocha -p lib/test/tsconfig.test.json lib/test/src/node/**/*.test.ts lib/test/src/common/**/*.test.ts",
@@ -138,7 +138,8 @@
         "npm-publish": "publish-npm",
         "dtsgen": "api-extractor run --local --verbose",
         "size": "size-limit",
-        "size-save": "size-limit --clean-dir --save-bundle build/size"
+        "size-save": "size-limit --clean-dir --save-bundle build/size",
+        "size-check": "node lib/test/bundle-size-check.js"
     },
     "repository": {
         "type": "git",
@@ -159,11 +160,11 @@
     "devDependencies": {
         "@istanbuljs/nyc-config-typescript": "^1.0.2",
         "@microsoft/api-extractor": "^7.34.4",
+        "@nevware21/coverage-tools": "^0.1.3",
         "@nevware21/grunt-eslint-ts": "^0.5.1",
         "@nevware21/grunt-ts-plugin": "^0.5.1",
-        "@nevware21/tripwire-chai": ">= 0.1.1 && < 2.0.0",
-        "@nevware21/coverage-tools": "^0.1.3",
         "@nevware21/publish-npm": "^0.1.3",
+        "@nevware21/tripwire-chai": ">= 0.1.2 && < 2.0.0",
         "@rollup/plugin-commonjs": "^28.0.0",
         "@rollup/plugin-json": "^6.0.0",
         "@rollup/plugin-node-resolve": "^16.0.0",
@@ -206,50 +207,11 @@
         "rollup-plugin-minify-es": "^1.1.1",
         "rollup-plugin-sourcemaps": "^0.6.3",
         "sinon": "^15.0.0",
-        "size-limit": "^11.1.6",
+        "size-limit": "^11.2.0",
         "ts-mocha": "^11.1.0",
         "tslib": "^2.6.0",
         "typedoc": "^0.26.2",
         "typescript": "^4.9.5",
         "uglify-js": "^3.15.5"
-    },
-    "size-limit": [
-        {
-            "name": "es5-full",
-            "path": "lib/dist/es5/mod/ts-utils.js",
-            "limit": "19 kb",
-            "brotli": false
-        },
-        {
-            "name": "es6-full",
-            "path": "lib/dist/es6/mod/ts-utils.js",
-            "limit": "18 kb",
-            "brotli": false
-        },
-        {
-            "name": "es5-zip",
-            "path": "lib/dist/es5/mod/ts-utils.js",
-            "limit": "8 Kb",
-            "gzip": true
-        },
-        {
-            "name": "es6-zip",
-            "path": "lib/dist/es6/mod/ts-utils.js",
-            "limit": "8 Kb",
-            "gzip": true
-        },
-        {
-            "name": "es5-env",
-            "path": "lib/dist/es5/mod/ts-utils.js",
-            "limit": "2 kb",
-            "import": "{ getGlobal, getInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory, getHistory, isNode, isWebWorker }",
-            "brotli": false
-        },
-        {
-            "name": "es5-poly",
-            "path": "lib/bundle/es5/ts-polyfills-utils.js",
-            "limit": "7 kb",
-            "brotli": false
-        }
-    ]
+    }
 }

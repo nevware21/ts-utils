@@ -2,15 +2,19 @@
  * @nevware21/ts-utils
  * https://github.com/nevware21/ts-utils
  *
- * Copyright (c) 2022 NevWare21 Solutions LLC
+ * Copyright (c) 2022-2025 NevWare21 Solutions LLC
  * Licensed under the MIT license.
  */
 
 import { NULL_VALUE, ObjClass, __PROTO__ } from "../internal/constants";
-import { isArray, isObject } from "../helpers/base";
+import { isArray, isFunction, isObject } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
-import { polyObjEntries, polyObjIs, polyObjValues } from "../polyfills/object";
+import { polyObjEntries } from "../polyfills/object/objEntries";
+import { polyObjIs } from "../polyfills/object/objIs";
+import { polyObjValues } from "../polyfills/object/objValues";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
+import { objIsFrozen } from "./object_state";
+import { _throwIfNullOrUndefined } from "../internal/throwIf";
 
 const _objFreeze = (/* #__PURE__ */_pureRef<typeof Object.freeze>(ObjClass, "freeze"));
 
@@ -18,8 +22,17 @@ function _doNothing<T>(value: T) {
     return  value;
 }
 
+/**
+ * Fallback implementation of Object.getPrototypeOf for environments that do not support it.
+ * This function retrieves the prototype of a given object. If the object does not have a prototype, it returns null.
+ * @internal
+ * @ignore
+ * @param value - The object whose prototype is to be returned, which may be null.
+ * @returns true if the value is an object, false otherwise.
+ */
 /*#__NO_SIDE_EFFECTS__*/
-function _getProto(value: any) {
+export function _getProto(value: any) {
+    _throwIfNullOrUndefined(value);
     return value[__PROTO__] || NULL_VALUE;
 }
 
@@ -99,22 +112,45 @@ export const objAssign = (/*#__PURE__*/_pureRef<typeof Object.assign>(ObjClass, 
 export const objKeys: (value: any) => string[] = (/*#__PURE__*/_pureRef<typeof Object.keys>(ObjClass, "keys"));
 
 /**
+ * Internal helper function with a visited array to track objects we've seen, this is used
+ * to prevent infinite recursion when we have circular references in the object graph.
+ * @internal
+ * @ignore
+ * @param val - The object to be frozen.
+ * @param visited - An array to track visited objects to prevent infinite recursion.
+ */
+function _deepFreeze(val: any, visited: any[]): any {
+    if ((isArray(val) || isObject(val) || isFunction(val)) && !objIsFrozen(val)) {
+        // If already visited, don't process again to prevent infinite recursion
+        for (let lp = 0; lp < visited.length; lp++) {
+            if (visited[lp] === val) {
+                return val;
+            }
+        }
+        
+        // Mark this object as visited by adding it to the array
+        visited.push(val);
+        
+        // Freeze properties recursively
+        objForEachKey(val, (_key, propValue) => {
+            _deepFreeze(propValue, visited);
+        });
+        
+        objFreeze(val);
+    }
+    
+    return val;
+}
+/**
  * Perform a deep freeze on the object and all of it's contained values / properties by recursively calling
  * `objFreeze()` on all enumerable properties of the object and on each property returned.
+ * This implementation handles recursive objects (objects that reference themselves) by tracking visited objects.
  * @group Object
  * @param value - the object to be completly frozen.
  * @returns The originally passed in object.
  */
 export function objDeepFreeze<T>(value: T): T {
-    if (_objFreeze) {
-        objForEachKey(value, (key, value) => {
-            if (isArray(value) || isObject(value)) {
-                objDeepFreeze(value);
-            }
-        });
-    }
-
-    return objFreeze(value);
+    return _objFreeze ? _deepFreeze(value, []) : value;
 }
 
 /**
@@ -226,7 +262,7 @@ export const objValues: <T = any>(value: {} | { [s: string]: T } | ArrayLike<T>)
  * - NaN is equal to NaN
  * - +0 is not equal to -0
  *
- * @since 0.11.9
+ * @since 0.12.0
  * @group Object
  * @param value1 - The first value to compare
  * @param value2 - The second value to compare
