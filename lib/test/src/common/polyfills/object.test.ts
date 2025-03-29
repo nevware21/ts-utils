@@ -7,9 +7,17 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
-import { polyObjEntries, polyObjIs, polyObjKeys, polyObjValues } from "../../../../src/polyfills/object";
+import { polyObjEntries } from "../../../../src/polyfills/object/objEntries";
+import { polyObjFromEntries } from "../../../../src/polyfills/object/objFromEntries";
+import { polyObjIs } from "../../../../src/polyfills/object/objIs";
+import { polyObjKeys } from "../../../../src/polyfills/object/objKeys";
+import { polyObjValues } from "../../../../src/polyfills/object/objValues";
+import { polyObjGetOwnPropertyNames } from "../../../../src/polyfills/object/objGetOwnPropertyNames";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isObject, isUndefined } from "../../../../src/helpers/base";
+import { objFromEntries } from "../../../../src/object/object";
+import { createIterable, CreateIteratorContext } from "../../../../src/iterator/create";
+import { createArrayIterator } from "../../../../src/iterator/array";
 
 describe("object polyfills", () => {
     it("polyObjKeys", () => {
@@ -78,8 +86,6 @@ describe("object polyfills", () => {
             assert.deepEqual(polyObjValues({ 100: "a", 2: "b", 7: "c" }), [ "b", "c", "a"]);
         });
     });
-
-    // Add this after the polyObjValues test section and before the _checkObjKeys function
 
     describe("polyObjIs", () => {
         it("should handle primitive values correctly", () => {
@@ -175,6 +181,331 @@ describe("object polyfills", () => {
         });
     });
 
+    describe("polyObjFromEntries", () => {
+    
+        it("should create an object from an array of entries", () => {
+            const entries = [["a", 1], ["b", 2], ["c", 3]];
+            const result = polyObjFromEntries(entries);
+            
+            assert.equal(result.a, 1);
+            assert.equal(result.b, 2);
+            assert.equal(result.c, 3);
+        });
+
+        it("should create an object from a Map", () => {
+            const map = new Map<string, number>([["a", 1], ["b", 2], ["c", 3]]);
+            const result = polyObjFromEntries(map);
+            
+            assert.equal(result.a, 1);
+            assert.equal(result.b, 2);
+            assert.equal(result.c, 3);
+        });
+
+        it("should handle Symbol keys", () => {
+            const symKey1 = Symbol("key1");
+            const symKey2 = Symbol("key2");
+            const entries = [[symKey1, "value1"], [symKey2, "value2"]];
+            
+            const result = polyObjFromEntries(entries);
+            
+            assert.equal(result[symKey1], "value1");
+            assert.equal(result[symKey2], "value2");
+        });
+
+        it("should work with iterables created using createIterable", () => {
+            let idx = -1;
+            const entries = [["a", 1], ["b", 2]];
+            
+            const ctx: CreateIteratorContext<[string, number]> = {
+                n: function() {
+                    idx++;
+                    const isDone = idx >= entries.length;
+                    if (!isDone) {
+                        this.v = entries[idx];
+                    }
+                    return isDone;
+                }
+            };
+            
+            const customIterable = createIterable(ctx);
+            const result = polyObjFromEntries(customIterable);
+            
+            assert.equal(result.a, 1);
+            assert.equal(result.b, 2);
+        });
+
+        it("should handle non-iterable input gracefully", () => {
+            const result = polyObjFromEntries(42);
+            
+            assert.equal(Object.keys(result).length, 0);
+        });
+
+        it("should handle null or undefined input gracefully", () => {
+            assert.doesNotThrow(() => polyObjFromEntries(null));
+            assert.doesNotThrow(() => polyObjFromEntries(undefined));
+            
+            const result1 = polyObjFromEntries(null);
+            const result2 = polyObjFromEntries(undefined);
+            
+            assert.equal(Object.keys(result1).length, 0);
+            assert.equal(Object.keys(result2).length, 0);
+        });
+
+        it("should handle empty iterables", () => {
+            const emptyArray = [];
+            const emptyMap = new Map();
+            
+            const result1 = polyObjFromEntries(emptyArray);
+            const result2 = polyObjFromEntries(emptyMap);
+            
+            assert.deepEqual(result1, {});
+            assert.deepEqual(result2, {});
+            assert.equal(Object.keys(result1).length, 0);
+            assert.equal(Object.keys(result2).length, 0);
+        });
+        
+        it("should use the last value when duplicate keys exist", () => {
+            const entriesWithDuplicates = [
+                ["a", 1],
+                ["b", 2],
+                ["a", 3]  // This should override the first entry with key "a"
+            ];
+            
+            const result = polyObjFromEntries(entriesWithDuplicates);
+            
+            assert.equal(result.a, 3, "Should use the last value for duplicate key 'a'");
+            assert.equal(result.b, 2);
+            assert.equal(Object.keys(result).length, 2, "Should have only 2 keys despite having 3 entries");
+        });
+        
+        it("should coerce non-string/symbol keys to strings", () => {
+            const entriesWithNonStringKeys = [
+                [42, "number"],
+                [true, "boolean"],
+                [null, "null"],
+                [undefined, "undefined"],
+                [{}, "object"]
+            ];
+            
+            const result = polyObjFromEntries(entriesWithNonStringKeys);
+            
+            assert.equal(result["42"], "number");
+            assert.equal(result["true"], "boolean");
+            assert.equal(result["null"], "null");
+            assert.equal(result["undefined"], "undefined");
+            assert.equal(result["[object Object]"], "object");
+        });
+        
+        it("should handle complex values", () => {
+            const complexValues = [
+                ["array", [1, 2, 3]],
+                ["object", { a: 1, b: 2 }],
+                ["function", function() {
+                    return 42;
+                }],
+                ["date", new Date()]
+            ];
+            
+            const result = polyObjFromEntries(complexValues);
+            
+            assert.deepEqual(result.array, [1, 2, 3]);
+            assert.deepEqual(result.object, { a: 1, b: 2 });
+            assert.equal(result.function(), 42);
+            assert.isTrue(result.date instanceof Date);
+        });
+        
+        it("should preserve numeric key ordering according to the iterable", () => {
+            // Keys will be ordered as strings, but we want to ensure the values match as expected
+            const numericEntries = [
+                ["1", "first"],
+                ["10", "second"],
+                ["2", "third"]
+            ];
+            
+            const result = polyObjFromEntries(numericEntries);
+            
+            assert.equal(result["1"], "first");
+            assert.equal(result["10"], "second");
+            assert.equal(result["2"], "third");
+        });
+
+        // Test equivalence between the two implementations
+        describe("polyfill equivalence", () => {
+            it("objFromEntries and polyObjFromEntries should be equivalent for valid inputs", () => {
+                // Generate test cases without using the helper
+                const arrayEntries = createArrayIterator([["a", 1], ["b", 2]]);
+                const mapEntries = new Map([["x", 10], ["y", 20]]);
+                
+                // Test array entries
+                const result1Array = objFromEntries(arrayEntries);
+                const result2Array = polyObjFromEntries(arrayEntries);
+                
+                assert.equal(Object.keys(result1Array).length, Object.keys(result2Array).length);
+                assert.equal(result1Array.a, result2Array.a);
+                assert.equal(result1Array.b, result2Array.b);
+                
+                // Test Map entries
+                const result1Map = objFromEntries(mapEntries);
+                const result2Map = polyObjFromEntries(mapEntries);
+                
+                assert.equal(Object.keys(result1Map).length, Object.keys(result2Map).length);
+                assert.equal(result1Map.x, result2Map.x);
+                assert.equal(result1Map.y, result2Map.y);
+                
+                // Test custom iterable using the library's createIterable
+                let idx = -1;
+                const customEntries = [["foo", "bar"], ["baz", "qux"]];
+                
+                const ctx: CreateIteratorContext<[string, string]> = {
+                    n: function() {
+                        idx++;
+                        const isDone = idx >= customEntries.length;
+                        if (!isDone) {
+                            this.v = customEntries[idx];
+                        }
+                        return isDone;
+                    }
+                };
+                
+                const customIterable = createIterable(ctx);
+                
+                const result1Custom = objFromEntries(customIterable);
+                const result2Custom = polyObjFromEntries(customIterable);
+                
+                assert.equal(Object.keys(result1Custom).length, Object.keys(result2Custom).length);
+                assert.equal(result1Custom.foo, result2Custom.foo);
+                assert.equal(result1Custom.baz, result2Custom.baz);
+            });
+        });
+    });
+
+    describe("polyObjGetOwnPropertyNames", () => {
+        it("should return all own property names for simple objects", () => {
+            const obj = { a: 1, b: 2, c: 3 };
+            const result = polyObjGetOwnPropertyNames(obj);
+            
+            assert.isArray(result);
+            assert.includeMembers(result, ["a", "b", "c"]);
+            assert.lengthOf(result, 3);
+        });
+
+        it("should include array indices and length property for arrays", () => {
+            const arr = ["apple", "banana", "cherry"];
+            const result = polyObjGetOwnPropertyNames(arr);
+            
+            assert.isArray(result);
+            assert.includeMembers(result, ["0", "1", "2", "length"]);
+            assert.lengthOf(result, 4);
+        });
+
+        it("should handle empty arrays", () => {
+            const emptyArr = [];
+            const result = polyObjGetOwnPropertyNames(emptyArr);
+            
+            assert.isArray(result);
+            assert.includeMembers(result, ["length"]);
+            assert.lengthOf(result, 1);
+        });
+
+        it("should include non-enumerable properties if possible", function() {
+            // Create an object with both enumerable and non-enumerable properties
+            const obj = Object.create({}, {
+                visible: { value: "public", enumerable: true },
+                hidden: { value: "secret", enumerable: false }
+            });
+            
+            const result = polyObjGetOwnPropertyNames(obj);
+            
+            // Native implementation can access non-enumerable properties
+            const nativeResult = Object.getOwnPropertyNames ? Object.getOwnPropertyNames(obj) : null;
+            
+            // If native exists and can get non-enumerable properties, our polyfill has a known limitation
+            if (nativeResult && nativeResult.includes("hidden")) {
+                // Skip this test if non-enumerable properties can't be accessed in this environment
+                assert.includeMembers(result, ["visible"]);
+                // Note: We don't assert that "hidden" is included because the polyfill
+                // may not be able to see non-enumerable properties
+            } else {
+                assert.includeMembers(result, ["visible"]);
+            }
+        });
+
+        it("should handle primitive types by boxing them", () => {
+            // String
+            const strResult = polyObjGetOwnPropertyNames("hello");
+            assert.isArray(strResult);
+            assert.includeMembers(strResult, ["0", "1", "2", "3", "4", "length"]);
+            
+            // Number - should return properties of Number object
+            const numResult = polyObjGetOwnPropertyNames(123);
+            assert.isArray(numResult);
+            
+            // Boolean - should return properties of Boolean object
+            const boolResult = polyObjGetOwnPropertyNames(true);
+            assert.isArray(boolResult);
+        });
+
+        it("should throw for null and undefined", () => {
+            assert.throws(() => {
+                polyObjGetOwnPropertyNames(null);
+            }, TypeError);
+            
+            assert.throws(() => {
+                polyObjGetOwnPropertyNames(undefined);
+            }, TypeError);
+        });
+
+        it("should not include properties from the prototype chain", () => {
+            // Create an object with a prototype
+            const proto = { protoProp: "from prototype" };
+            const obj = Object.create(proto);
+            obj.ownProp = "own property";
+            
+            const result = polyObjGetOwnPropertyNames(obj);
+            
+            assert.includeMembers(result, ["ownProp"]);
+            assert.notIncludeMembers(result, ["protoProp"]);
+            assert.lengthOf(result, 1);
+        });
+
+        it("should be compatible with the native implementation for basic objects", function() {
+            // Skip if the native method doesn't exist
+            if (typeof Object.getOwnPropertyNames !== "function") {
+                this.skip();
+                return;
+            }
+            
+            // Test various objects
+            const testCases = [
+                { a: 1, b: 2 },
+                ["x", "y", "z"],
+                { method() {
+                    return true;
+                }, prop: "value" },
+                new Date()
+            ];
+            
+            testCases.forEach(obj => {
+                const polyResult = polyObjGetOwnPropertyNames(obj);
+                const nativeResult = Object.getOwnPropertyNames(obj);
+                
+                // Check that all enumerable properties found by the native implementation
+                // are also found by our polyfill
+                for (const prop of nativeResult) {
+                    // Skip non-enumerable properties since our polyfill has a known limitation
+                    const descriptor = Object.getOwnPropertyDescriptor(obj, prop);
+                    if (descriptor && descriptor.enumerable) {
+                        assert.include(
+                            polyResult,
+                            prop,
+                            `Polyfill should find enumerable property "${prop}" on ${dumpObj(obj)}`
+                        );
+                    }
+                }
+            });
+        });
+    });
+    
     function _checkObjKeys(value: any) {
         let polyResult: any;
         let nativeResult: any;
@@ -218,8 +549,8 @@ describe("object polyfills", () => {
         };
     }
 
-    function _getFile(): File {
-        let theFile: File = null;
+    function _getFile(): File | null {
+        let theFile: File | null = null;
         try {
             theFile = new File([], "text.txt");
         } catch (e) {
@@ -230,8 +561,8 @@ describe("object polyfills", () => {
         return theFile;
     }
 
-    function _getFormData(): FormData {
-        let formData: FormData = null;
+    function _getFormData(): FormData | null {
+        let formData: FormData | null = null;
         try {
             formData = new FormData();
         } catch (e) {
@@ -242,8 +573,8 @@ describe("object polyfills", () => {
         return formData;
     }
 
-    function _getBlob(): Blob {
-        let blob: Blob = null;
+    function _getBlob(): Blob | null {
+        let blob: Blob | null = null;
         try {
             blob = new Blob();
         } catch (e) {

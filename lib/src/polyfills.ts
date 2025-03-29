@@ -9,7 +9,8 @@
 import { arrForEach } from "./array/forEach";
 import { ArrCls, ArrProto, ObjClass, StrProto } from "./internal/constants";
 import { polyIsArray, polyArrIncludes, polyArrFind, polyArrFindIndex, polyArrFindLastIndex, polyArrFindLast, polyArrFrom } from "./polyfills/array";
-import { polyObjIs, polyObjKeys } from "./polyfills/object";
+import { polyObjIs } from "./polyfills/object/objIs";
+import { polyObjKeys } from "./polyfills/object/objKeys";
 import { polyStrStartsWith } from "./string/starts_with";
 import { polyStrEndsWith } from "./string/ends_with";
 import { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "./polyfills/trim";
@@ -18,13 +19,21 @@ import { makePolyFn } from "./internal/poly_helpers";
 import { polyObjHasOwn } from "./object/has_own";
 import { polyStrSubstr } from "./string/substring";
 import { polyStrIncludes } from "./string/includes";
+import { polyObjFromEntries } from "./polyfills/object/objFromEntries";
+import { polyObjGetOwnPropertyDescriptor } from "./object/get_own_prop_desc";
+import { polyObjGetOwnPropertyDescriptors } from "./object/get_own_prop_descs";
+import { polyObjGetOwnPropertyNames } from "./object/get_own_prop_names";
 
 (function () {
 
     const objectPolyfills = {
         "keys": polyObjKeys,
         "hasOwn": polyObjHasOwn,
-        "is": polyObjIs
+        "is": polyObjIs,
+        "fromEntries": polyObjFromEntries,
+        "getOwnPropertyDescriptor": polyObjGetOwnPropertyDescriptor,
+        "getOwnPropertyDescriptors": polyObjGetOwnPropertyDescriptors,
+        "getOwnPropertyNames": polyObjGetOwnPropertyNames
     };
 
     const stringPolyfills = {

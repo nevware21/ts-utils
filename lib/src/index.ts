@@ -70,11 +70,13 @@ export { objCreate } from "./object/create";
 export { ObjDefinePropDescriptor, ObjDefinePropDescriptorMap, objDefine, objDefineProp, objDefineGet, objDefineAccessors, objDefineProperties, objDefineProps } from "./object/define";
 export { objForEachKey } from "./object/for_each_key";
 export { objGetOwnPropertyDescriptor } from "./object/get_own_prop_desc";
+export { objGetOwnPropertyDescriptors } from "./object/get_own_prop_descs";
+export { objGetOwnPropertyNames } from "./object/get_own_prop_names";
 export { objHasOwn, polyObjHasOwn } from "./object/has_own";
 export { objHasOwnProperty } from "./object/has_own_prop";
 export { isPlainObject } from "./object/is_plain_object";
 export {
-    objAssign, objKeys, objDeepFreeze, objFreeze, objSeal, objGetPrototypeOf, objEntries, objIs
+    objAssign, objKeys, objDeepFreeze, objFreeze, objFromEntries, ObjFromEntriesFn, objSeal, objGetPrototypeOf, objEntries, objIs
 } from "./object/object";
 export { objSetPrototypeOf } from "./object/set_proto";
 export { getValueByKey, setValueByKey, getValueByIter, setValueByIter } from "./helpers/get_set_value";
@@ -105,7 +107,14 @@ export { TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, schedu
 // Exporting the helpers, but not the "initialization" code to populate any missing values
 // This will enable anyone to "reuse" or create their own polyfills.ts implementation if they want.
 export { polyIsArray, polyArrFind, polyArrFindIndex, polyArrFindLast, polyArrFindLastIndex, polyArrIncludes, polyArrFrom } from "./polyfills/array";
-export { polyObjKeys, polyObjEntries, polyObjIs } from "./polyfills/object";
+export { polyObjKeys } from "./polyfills/object/objKeys";
+export { polyObjEntries } from "./polyfills/object/objEntries";
+export { polyObjIs } from "./polyfills/object/objIs";
+export { polyObjFromEntries } from "./polyfills/object/objFromEntries";
 export { polyStrSymSplit } from "./polyfills/split";
 export { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "./polyfills/symbol";
 export { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "./polyfills/trim";
+export { polyObjGetOwnPropertyDescriptor } from "./object/get_own_prop_desc";
+export { polyObjGetOwnPropertyDescriptors } from "./object/get_own_prop_descs";
+export { polyObjGetOwnPropertyNames } from "./object/get_own_prop_names";
+
