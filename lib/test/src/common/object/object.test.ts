@@ -11,7 +11,7 @@ import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isFunction, isObject, isString, isUndefined } from "../../../../src/helpers/base";
 import { objForEachKey } from "../../../../src/object/for_each_key";
 import { objHasOwnProperty } from "../../../../src/object/has_own_prop";
-import { objDeepFreeze, objEntries, objFreeze, objIs, objKeys, objSeal, objValues } from "../../../../src/object/object";
+import { objDeepFreeze, objEntries, objFreeze, objFromEntries, objIs, objKeys, objSeal, objValues } from "../../../../src/object/object";
 import { objDefine, objDefineAccessors, objDefineGet, objDefineProps } from "../../../../src/object/define";
 import { FUNCTION } from "../../../../src/internal/constants";
 import { objSetPrototypeOf } from "../../../../src/object/set_proto";
@@ -1370,6 +1370,121 @@ describe("object helpers", () => {
             assert.isTrue(objIs(fn1, fn1), "function should equal itself");
             assert.isTrue(objIs(fn1, fn3), "function should equal its reference");
             assert.isFalse(objIs(fn1, fn2), "different functions should not be equal");
+        });
+    });
+
+    describe("objFromEntries", () => {
+        it("should create an object from an array of entries", () => {
+            const entries = [["a", 1], ["b", 2], ["c", 3]];
+            const result = objFromEntries(entries);
+            
+            assert.equal(result.a, 1);
+            assert.equal(result.b, 2);
+            assert.equal(result.c, 3);
+        });
+
+        it("should create an object from a Map", () => {
+            const map = new Map<string, number>([["a", 1], ["b", 2], ["c", 3]]);
+            const result = objFromEntries(map);
+            
+            assert.equal(result.a, 1);
+            assert.equal(result.b, 2);
+            assert.equal(result.c, 3);
+        });
+
+        it("should handle Symbol keys", () => {
+            const symKey1 = Symbol("key1");
+            const symKey2 = Symbol("key2");
+            const entries = [[symKey1, "value1"], [symKey2, "value2"]];
+            
+            const result = objFromEntries(entries);
+            
+            assert.equal(result[symKey1], "value1");
+            assert.equal(result[symKey2], "value2");
+        });
+
+        it("should handle numeric keys", () => {
+            const entries = [[0, "zero"], [1, "one"], [2, "two"]];
+            const result = objFromEntries(entries);
+            
+            assert.equal(result[0], "zero");
+            assert.equal(result[1], "one");
+            assert.equal(result[2], "two");
+        });
+
+        it("should handle various value types", () => {
+            const obj = { nested: { prop: true } };
+            const func = function() {
+                return 42;
+            };
+            const entries = [
+                ["string", "string value"],
+                ["number", 42],
+                ["boolean", true],
+                ["object", obj],
+                ["function", func],
+                ["null", null],
+                ["undefined", undefined]
+            ];
+            
+            const result = objFromEntries(entries);
+            
+            assert.equal(result.string, "string value");
+            assert.equal(result.number, 42);
+            assert.equal(result.boolean, true);
+            assert.equal(result.object, obj);
+            assert.equal(result.function, func);
+            assert.equal(result.null, null);
+            assert.equal(result.undefined, undefined);
+        });
+
+        it("should transform objects", () => {
+            const obj = { a: 1, b: 2, c: 3 };
+            const doubledObj = objFromEntries(
+                objEntries(obj).map(([key, value]) => [key, (value as number) * 2])
+            );
+            
+            assert.equal(doubledObj.a, 2);
+            assert.equal(doubledObj.b, 4);
+            assert.equal(doubledObj.c, 6);
+        });
+
+        it("should work with custom iterables", () => {
+            const customIterable = [
+                ["a", 1],
+                ["b", 2]
+            ];
+            
+            const result = objFromEntries(customIterable);
+            
+            assert.equal(result.a, 1);
+            assert.equal(result.b, 2);
+        });
+
+        it("should ignore entries that are not arrays or have less than 2 elements", () => {
+            const entries = [["valid", 1], "invalid" as any, ["incomplete"] as any, null as any, undefined as any];
+            const result = objFromEntries(entries);
+            
+            assert.equal(result.valid, 1);
+            assert.equal(Object.keys(result).length, 1);
+        });
+    
+        it("should handle null or undefined input gracefully", () => {
+            assert.doesNotThrow(() => objFromEntries(null as any));
+            assert.doesNotThrow(() => objFromEntries(undefined as any));
+            
+            const result1 = objFromEntries(null as any);
+            const result2 = objFromEntries(undefined as any);
+            
+            assert.equal(Object.keys(result1).length, 0);
+            assert.equal(Object.keys(result2).length, 0);
+        });
+    
+        // Add a test for edge case with non-iterable input
+        it("should handle non-iterable input gracefully", () => {
+            const result = objFromEntries(42 as any);
+            
+            assert.equal(Object.keys(result).length, 0);
         });
     });
 
