@@ -52,7 +52,7 @@ describe("object property_is_enumerable tests", () => {
             assert.isFalse(objPropertyIsEnumerable(arr, "length"), "Array length should not be enumerable");
             
             // Custom properties on arrays
-            arr["customProp"] = "value";
+            (arr as any)["customProp"] = "value";
             assert.isTrue(objPropertyIsEnumerable(arr, "customProp"), "Custom properties on arrays should be enumerable");
         });
 
@@ -63,7 +63,7 @@ describe("object property_is_enumerable tests", () => {
             }
             
             const sym = Symbol("testSymbol");
-            const obj = {};
+            const obj: any = {};
             obj[sym] = "symbol value";
             
             assert.isTrue(objPropertyIsEnumerable(obj, sym), "Symbol properties should be enumerable by default");

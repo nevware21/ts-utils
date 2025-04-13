@@ -145,7 +145,7 @@ export function fnCall<F extends (...args: any) => any, T>(fn: F, thisArg: T, ..
  * @param fn - The function to be called
  * @param thisArg - The value of `this` provided for the call to `fn`. If the function is not in strict mode,
  * `null` and `undefined` will be replaced with the global object, and primitive values will be converted to objects.
- * @param _args - The zero or more arguments to be passed to the `fn` function.
+ * @param args - The zero or more arguments to be passed to the `fn` function.
  * @returns The result of calling the function with the specified `this` value and arguments.
  * @example
  * ```ts

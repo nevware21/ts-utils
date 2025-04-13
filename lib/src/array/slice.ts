@@ -52,5 +52,5 @@ import { ArrSlice, CALL, NULL_VALUE } from "../internal/constants";
  * ```
  */
 export function arrSlice<T>(theArray: ArrayLike<T>, start?: number, end?: number): T[] {
-    return ((theArray ? theArray["slice"] : NULL_VALUE) || ArrSlice).apply(theArray, ArrSlice[CALL](arguments, 1));
+    return ((theArray ? (theArray as any)["slice"] : NULL_VALUE) || ArrSlice).apply(theArray, ArrSlice[CALL](arguments, 1));
 }

@@ -13,6 +13,7 @@ import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
  * The `objGetOwnPropertySymbols()` method returns an array of all symbol properties found directly upon
  * the given object. Unlike Object.getOwnPropertyNames(), this method returns symbol properties only.
  *
+ * @function
  * @since 0.12.0
  * @group Object
  * @param obj - The object whose symbol properties are to be returned.

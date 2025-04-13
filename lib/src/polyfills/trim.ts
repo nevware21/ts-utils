@@ -27,6 +27,7 @@ function _createTrimFn(exp: RegExp): (value: string) => string {
  * without modifying the original string. Whitespace in this context is all the whitespace
  * characters (space, tab, no-break space, etc.) and all the line terminator characters
  * (LF, CR, etc.).
+ * @function
  * @group Polyfill
  * @group String
  * @param value - The string value to be trimmed.
@@ -39,6 +40,7 @@ export const polyStrTrim = (/*#__PURE__*/_createTrimFn(/^\s+|(?=\s)\s+$/g));
 
 /**
  * The `polyStrTrimStart()` method removes whitespace from the beginning of a string.
+ * @function
  * @group Polyfill
  * @group String
  * @param value - The value to be trimmed.
@@ -50,6 +52,7 @@ export const polyStrTrimStart = (/*#__PURE__*/_createTrimFn(/^\s+/g));
  
 /**
  * The `polyStrTrimEnd()` method removes whitespace from the end of a string.
+ * @function
  * @group Polyfill
  * @group String
  * @param value - The value to be trimmed.

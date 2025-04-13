@@ -12,7 +12,6 @@
         "alwaysStrict": true,
         "declaration": false,
         "outDir": "./build/base",
-        "suppressImplicitAnyIndexErrors": true,
         "allowSyntheticDefaultImports": true,
         "removeComments": false
     },

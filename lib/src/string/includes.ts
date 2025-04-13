@@ -20,6 +20,7 @@ import { strIndexOf } from "./index_of";
  * may be found within another string, returning `true` or `false` as appropriate.
  *
  * This method lets you determine whether or not a string includes another string.
+ * @function
  * @since 0.9.0
  * @group String
  * @param value - The string value to be searched.
@@ -38,6 +39,7 @@ export const strIncludes: (value: string, searchString: string, position?: numbe
  * may be found within another string, returning `true` or `false` as appropriate.
  *
  * This method lets you determine whether or not a string includes another string.
+ * @function
  * @since 0.9.0
  * @group String
  * @param value - The string value to be searched.

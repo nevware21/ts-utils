@@ -23,6 +23,7 @@ import { _pureRef } from "../internal/treeshake_helpers";
  * `mathRound(x)` is not exactly the same as `mathFloor(x + 0.5)`. When `x` is -0, or -0.5 ≤ x &lt; 0, `mathRound(x)`
  * returns -0, while `mathFloor(x + 0.5)` returns 0. However, neglecting that difference and potential precision errors,
  * `mathRound(x)` and `mathFloor(x + 0.5)` are generally equivalent.
+ * @function
  * @group Math
  * @since 0.11.8
  * @param x - A number

@@ -25,6 +25,7 @@ import { polyObjHasOwn } from "../polyfills/object/objHasOwn";
  * While it is possible to workaround these problems by calling Object.prototype.hasOwnProperty()
  * on an external object, Object.hasOwn() is more intuitive.
  *
+ * @function
  * @since 0.4.3
  * @group Object
  * @param obj - The object being evaluated

@@ -44,7 +44,7 @@ describe("enum helpers", () => {
         assert.equal(chkNotAny(animalEnum[Animal.Dog]), true);
         assert.equal(chkNotAny(animalEnum[0]), true);
         assert.equal(chkNotAny(animalEnum["Dog"]), true);
-        assert.equal(chkIsAny(animalEnum["Hello"]), true);
+        assert.equal(chkIsAny((animalEnum as any)["Hello"]), true);
 
         assert.equal(chkIs<Animal>(animalEnum.Dog, isNumber), true);
         assert.equal(chkIs<String>(animalEnum[Animal.Dog], isString), true);
@@ -89,7 +89,7 @@ describe("enum helpers", () => {
         assert.equal(chkNotAny(animalEnum[Animal.Dog]), true);
         assert.equal(chkNotAny(animalEnum[0]), true);
         assert.equal(chkNotAny(animalEnum["Bear"]), true);
-        assert.equal(chkIsAny(animalEnum["Hello"]), true);
+        assert.equal(chkIsAny((animalEnum as any)["Hello"]), true);
 
         assert.equal(chkIs<String>(animalEnum.Dog, isString), true);
         assert.equal(chkIs<String>(animalEnum[Animal.Dog], isString), true);
@@ -134,7 +134,7 @@ describe("enum helpers", () => {
         assert.equal(chkNotAny(animalEnum[Animal.Dog]), true);
         assert.equal(chkNotAny(animalEnum[0]), true);
         assert.equal(chkNotAny(animalEnum["Bear"]), true);
-        assert.equal(chkIsAny(animalEnum["Hello"]), true);
+        assert.equal(chkIsAny((animalEnum as any)["Hello"]), true);
 
         assert.equal(chkIs<Animal>(animalEnum.Dog, isNumber), true);
         assert.equal(chkIs<Animal>(animalEnum[Animal.Dog], isNumber), true);
@@ -176,7 +176,7 @@ describe("enum helpers", () => {
         assert.equal(chkNotAny(animalFamilyMap[Animal.Dog]), true);
         assert.equal(chkNotAny(animalFamilyMap[0]), true);
         assert.equal(chkNotAny(animalFamilyMap["Bear"]), true);
-        assert.equal(chkIsAny(animalFamilyMap["Hello"]), true);
+        assert.equal(chkIsAny((animalFamilyMap as any)["Hello"]), true);
 
         assert.equal(chkIs<String>(animalFamilyMap.Dog, isString), true);
         assert.equal(chkIs<String>(animalFamilyMap[Animal.Dog], isString), true);
@@ -229,7 +229,7 @@ describe("enum helpers", () => {
         assert.equal(chkNotAny(animalFamilyMap[Animal.Dog]), true);
         assert.equal(chkNotAny(animalFamilyMap[0]), true);
         assert.equal(chkNotAny(animalFamilyMap["Bear"]), true);
-        assert.equal(chkIsAny(animalFamilyMap["Hello"]), true);
+        assert.equal(chkIsAny((animalFamilyMap as any)["Hello"]), true);
 
         assert.equal(chkIs<String>(animalFamilyMap.Dog, isString), true);
         assert.equal(chkIs<String>(animalFamilyMap[Animal.Dog], isString), true);
@@ -289,7 +289,7 @@ describe("enum helpers", () => {
         assert.equal(chkNotAny(animalFamilyMap[Animal.Dog]), true);
         assert.equal(chkNotAny(animalFamilyMap[0]), true);
         assert.equal(chkNotAny(animalFamilyMap["Bear"]), true);
-        assert.equal(chkIsAny(animalFamilyMap["Hello"]), true);
+        assert.equal(chkIsAny((animalFamilyMap as any)["Hello"]), true);
 
         assert.equal(chkIs<String>(animalFamilyMap.Dog, isString), true);
         assert.equal(chkIs<String>(animalFamilyMap[Animal.Dog], isString), true);
@@ -344,7 +344,7 @@ describe("enum helpers", () => {
         assert.equal(chkNotAny(animalFamilyMap[Animal.Dog]), true);
         assert.equal(chkNotAny(animalFamilyMap[0]), true);
         assert.equal(chkNotAny(animalFamilyMap["Bear"]), true);
-        assert.equal(chkIsAny(animalFamilyMap["Hello"]), true);
+        assert.equal(chkIsAny((animalFamilyMap as any)["Hello"]), true);
 
         assert.equal(chkIs<String>(animalFamilyMap.Dog, isString), true);
         assert.equal(chkIs<String>(animalFamilyMap[Animal.Dog], isString), true);

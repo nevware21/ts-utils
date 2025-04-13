@@ -30,6 +30,7 @@ export interface IGetLength {
  * Helper to return the length value of an object, this will return the value
  * of the "length" property. Generally used to return the length of a string or array.
  *
+ * @function
  * @since 0.4.2
  * @group Array
  * @group String

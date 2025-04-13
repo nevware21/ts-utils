@@ -12,6 +12,7 @@ import { asString } from "../string/as_string";
 import { ArrSlice, CALL, NULL_VALUE } from "./constants";
 
 /**
+ * @function
  * @internal
  * @ignore
  * Internal helper to run the named function on the passed first argument, this does not support polyfill
@@ -24,6 +25,7 @@ import { ArrSlice, CALL, NULL_VALUE } from "./constants";
 export const _unwrapInstFunction:<R, T>(funcName: keyof T) => <T>(this: T, ..._args:any) => R = (/*__PURE__*/_unwrapFunctionWithPoly);
 
 /**
+ * @function
  * @internal
  * @ignore
  * Internal helper to convert an expanded function back into an instance `this` function call

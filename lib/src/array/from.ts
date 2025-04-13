@@ -13,6 +13,7 @@ import { ArrFromMapFn } from "./callbacks";
 
 /**
  * Creates an new shallow-copied array from an array-like object or an iterable.
+ * @function
  * @since 0.9.7
  * @group ArrayLike
  * @group Array

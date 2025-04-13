@@ -67,6 +67,7 @@ build/
 dist/
 dist-es**/
 bundle/
+docs/typedoc/**
 
 # Misc
 statistics.html

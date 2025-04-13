@@ -33,6 +33,7 @@ export type ArrReduceCallbackFn<T, R = T> = (previousValue: T | R, currentValue:
  * The first time that the callback is run there is no "return value of the previous calculation". If supplied,
  * an initial value may be used in its place. Otherwise the array element at index 0 is used as the initial
  * value and iteration starts from the next element (index 1 instead of index 0).
+ * @function
  * @group Array
  * @group ArrayLike
  * @typeParam T - Identifies the type of array elements

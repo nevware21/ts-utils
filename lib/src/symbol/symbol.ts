@@ -27,13 +27,15 @@ function _initSymbol() {
 }
 
 function _getSymbolKey<R>(key: string) {
-    let gblSym = ((!_globalLazyTestHooks.lzy ? _symbol : 0) || _initSymbol());
+    let gblSym: any = ((!_globalLazyTestHooks.lzy ? _symbol : 0) || _initSymbol());
 
     return (gblSym.v ? gblSym.v[key] : UNDEF_VALUE) as R;
 }
 
 /**
  * Checks if the type of value is a symbol.
+ * 
+ * @function
  * @group Symbol
  * @param value - Value to be checked.
  * @return True if the value is a symbol, false otherwise.
@@ -79,13 +81,13 @@ export function getSymbol(): Symbol {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function getKnownSymbol<T = symbol>(name: string | WellKnownSymbols, noPoly?: boolean): T {
-    let knownName = _wellKnownSymbolMap[name];
+    let knownName = (_wellKnownSymbolMap as any)[name];
     !_globalLazyTestHooks && _initTestHooks();
 
     // Get the current lazy symbol or cause it to get initialized
-    let sym = ((!_globalLazyTestHooks.lzy ? _symbol : 0) || _initSymbol());
+    let sym: any = ((!_globalLazyTestHooks.lzy ? _symbol : 0) || _initSymbol());
     
-    return sym.v ? sym.v[knownName || name] : (!noPoly ? polyGetKnownSymbol(name) : UNDEF_VALUE);
+    return sym.v ? sym.v[knownName || name] : (!noPoly ? polyGetKnownSymbol(name) as T : UNDEF_VALUE);
 }
 
 /**

@@ -42,6 +42,7 @@ function _padValue(value: string, targetLength: number, padString?: string) {
  * until the resulting string reaches the given length. The padding is applied from the start of the
  * current string. This will use any native implementation if available, but will fall back to the
  * provided polyfill for runtimes that don't support [padStart](https://caniuse.com/?search=padStart)
+ * @function
  * @group String
  * @param value - The value to be padded
  * @param targetLength - The length of the resulting string once the current str has been padded.
@@ -55,6 +56,7 @@ export const strPadStart: (value: string, targetLength: number, padString?: stri
 /**
  * The `strPadEnd()` method pads the current string with a given string (repeated, if needed) so that
  * the resulting string reaches a given length. The padding is applied from the end of the current string.
+ * @function
  * @group String
  * @param value - The value to be padded
  * @param targetLength - The length of the resulting string once the current `value` has been padded. If

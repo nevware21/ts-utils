@@ -133,11 +133,11 @@ export function createProxyFuncs<T, H>(target: T, host: H | (() => H), funcDefs:
 
         arrForEach(funcDefs, (funcDef) => {
             let targetName = (funcDef.as || funcDef.n) as any;
-            if (funcDef.rp === false && target[targetName]) {
+            if (funcDef.rp === false && (target as any)[targetName]) {
                 return;
             }
 
-            target[targetName] = isDeferred ?
+            (target as any)[targetName] = isDeferred ?
                 createFnDeferredProxy(host as () => H, funcDef.n) :
                 fnBind((host as H)[funcDef.n] as Function, host);
         });

@@ -41,6 +41,7 @@
         "@categoryDescription",
         "@default",
         "@document",
+        "@function",
         "@group",
         "@groupDescription",
         "@import",

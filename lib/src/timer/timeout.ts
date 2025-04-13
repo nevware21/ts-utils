@@ -14,8 +14,8 @@ import { ITimerHandler, _createTimerHandler } from "./handler";
 function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, theArgs: any[]): ITimerHandler {
     let isArr = isArray(overrideFn);
     let len = isArr ? overrideFn.length : 0;
-    let setFn: TimeoutOverrideFn = (len > 0 ? overrideFn[0] : (!isArr ? overrideFn : UNDEF_VALUE)) || setTimeout;
-    let clearFn: ClearTimeoutOverrideFn = (len > 1 ? overrideFn[1] : UNDEF_VALUE) || clearTimeout;
+    let setFn: TimeoutOverrideFn = (len > 0 ? (overrideFn as TimeoutOverrideFuncs)[0] : (!isArr ? overrideFn as TimeoutOverrideFn: UNDEF_VALUE)) || setTimeout;
+    let clearFn: ClearTimeoutOverrideFn = (len > 1 ? (overrideFn as TimeoutOverrideFuncs)[1] : UNDEF_VALUE) || clearTimeout;
 
     let timerFn = theArgs[0];
     theArgs[0] = function () {

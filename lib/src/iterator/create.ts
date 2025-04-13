@@ -145,7 +145,7 @@ export function makeIterable<T, I>(target: T, ctx: CreateIteratorContext<I>): T 
         return createIterator(ctx);
     }
 
-    target[itSymbol] = _createIterator;
+    (target as any)[itSymbol] = _createIterator;
 
     return target as T & Iterable<I>;
 }

@@ -37,6 +37,7 @@ import { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "./callbacks";
  * - If an existing, yet-unvisited element of the array is changed by callbackFn, its value passed to the
  * `callbackFn` will be the value at the time that element gets visited. Deleted elements are visited as if they
  * were undefined.
+ * @function
  * @since 0.8.0
  * @group Array
  * @group ArrayLike
@@ -102,6 +103,7 @@ export const arrFind =  (/*#__PURE__*/_unwrapFunctionWithPoly("find", ArrProto, 
  * - Changes to already-visited indexes do not cause `callbackFn` to be invoked on them again.
  * If an existing, yet-unvisited element of the array is changed by `callbackFn`, its value passed to the `callbackFn`
  * will be the value at the time that element gets visited. Deleted elements are visited as if they were undefined.
+ * @function
  * @since 0.8.0
  * @group Array
  * @group ArrayLike
@@ -174,6 +176,7 @@ export const arrFindIndex = (/*#__PURE__*/_unwrapFunctionWithPoly("findIndex", A
  * - Changes to already-visited indexes do not cause callbackFn to be invoked on them again.
  * - If an existing, yet-unvisited element of the array is changed by `callbackFn`, its value passed to the `callbackFn`
  * will be the value at the time that element gets visited. Deleted elements are visited as if they were undefined.
+ * @function
  * @since 0.8.0
  * @group Array
  * @group ArrayLike
@@ -238,6 +241,7 @@ export const arrFindLast = (/*#__PURE__*/_unwrapFunctionWithPoly("findLast", Arr
  * - Changes to already-visited indexes do not cause callbackFn to be invoked on them again.
  * - If an existing, yet-unvisited element of the array is changed by `callbackFn`, its value passed to the callbackFn
  * will be the value at the time that element gets visited. Deleted elements are visited as if they were undefined.
+ * @function
  * @since 0.8.0
  * @group Array
  * @group ArrayLike

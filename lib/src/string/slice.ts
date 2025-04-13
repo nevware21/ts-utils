@@ -18,6 +18,7 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
  * through the fourth character (characters indexed 1, 2, and 3).
  * As an example, strSlice(2, -1) extracts the third character through the second to last character
  * in the string.
+ * @function
  * @group String
  * @param value - The value to haveextract a number
  * @param beginIndex - The zero-based index at which to begin extraction.
