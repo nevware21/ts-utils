@@ -57,6 +57,7 @@ export function _getProto(value: any) {
  *
  * In case of an error, for example if a property is non-writable, a TypeError is raised, and
  * the target object is changed if any properties are added before the error is raised.
+ * @function
  * @group Object
  * @example
  * ```ts
@@ -82,6 +83,7 @@ export const objAssign = (/*#__PURE__*/_pureRef<typeof Object.assign>(ObjClass, 
  * objKeys() returns an array whose elements are strings corresponding to the enumerable properties found
  * directly upon object. The ordering of the properties is the same as that given by looping over the
  * properties of the object manually.
+ * @function
  * @group Object
  * @param value - The object to obtain a copy of the keys from
  * @returns An array of the properties names for the value object.
@@ -170,6 +172,7 @@ export function objDeepFreeze<T>(value: T): T {
  * to or removed from the array.
  *
  * `objFreeze()` returns the same object that was passed into the function. It does not create a frozen copy.
+ * @function
  * @group Object
  * @param value - The object to freeze.
  * @returns The object that was passed to the function.
@@ -180,6 +183,7 @@ export const objFreeze: <T>(value: T) => T = (/* #__PURE__*/_pureAssign(_objFree
  * The `objSeal()` method seals an object, preventing new properties from being added to it and marking all
  * existing properties as non-configurable. Values of present properties can still be changed as long as they
  * are writable.
+ * @function
  * @group Object
  * @param value - The object which should be sealed.
  * @returns The object being sealed.
@@ -189,6 +193,7 @@ export const objSeal: <T>(value: T) => T = (/* #__PURE__*/_pureAssign((/* #__PUR
 /**
  * The objGetPrototypeOf() method returns the prototype (i.e. the value of the internal `Prototype` property)
  * of the specified value.
+ * @function
  * @since 0.4.4
  * @group Object
  * @param value - The object whose prototype is to be returned, which may be null.
@@ -197,6 +202,7 @@ export const objGetPrototypeOf: (value: any) => any = (/* #__PURE__*/_pureAssign
 
 /**
  * Returns an array of key/values of the enumerable properties of an object
+ * @function
  * @since 0.9.7
  * @group Object
  * @group ArrayLike
@@ -224,6 +230,7 @@ export const objEntries: <T = any>(value: {} | { [s: string]: T } | ArrayLike<T>
  * is the same as that provided by a for...in loop.
  *
  * If you need the property keys, use objKeys() instead. If you need both the property keys and values, use objEntries() instead.
+ * @function
  * @since 0.9.7
  * @group Object
  * @group ArrayLike
@@ -262,6 +269,7 @@ export const objValues: <T = any>(value: {} | { [s: string]: T } | ArrayLike<T>)
  * - NaN is equal to NaN
  * - +0 is not equal to -0
  *
+ * @function
  * @since 0.12.0
  * @group Object
  * @param value1 - The first value to compare

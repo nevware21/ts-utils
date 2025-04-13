@@ -17,6 +17,7 @@ import { _pureRef } from "../internal/treeshake_helpers";
  *
  * If at least one of arguments cannot be converted to a number, the result is NaN.
  *
+ * @function
  * @since 0.4.2
  * @group Math
  * @param values - Zero or more numbers among which the lowest value will be selected and returned.
@@ -38,6 +39,7 @@ export const mathMin: (...values: number[]) => number = (/*#__PURE__*/_pureRef<t
  *
  * If at least one of arguments cannot be converted to a number, the result is NaN.
  *
+ * @function
  * @since 0.4.2
  * @group Math
  * @param values - Zero or more numbers among which the largest value will be selected and returned.

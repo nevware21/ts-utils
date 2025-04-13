@@ -14,6 +14,7 @@ import { polyObjGetOwnPropertyDescriptor } from "../polyfills/object/objGetOwnPr
  * The objGetOwnPropertyDescriptor() method returns an object describing the configuration of a specific property on
  * a given object (that is, one directly present on an object and not in the object's prototype chain). The object
  * returned is mutable but mutating it has no effect on the original property's configuration.
+ * @function
  * @since 0.4.3
  * @group Object
  * @param target - Object that contains the property.

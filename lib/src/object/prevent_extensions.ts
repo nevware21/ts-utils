@@ -15,6 +15,7 @@ import { polyObjPreventExtensions } from "../polyfills/object/objPreventExtensio
  * The Object.preventExtensions() method prevents new properties from ever being added to an object
  * (i.e. prevents future extensions to the object). It also prevents the object's prototype from
  * being re-assigned.
+ * @function
  * @group Object
  * @param obj - The object which should be made non-extensible.
  * @returns The object being made non-extensible.
@@ -24,6 +25,7 @@ export const objPreventExtensions: <T>(obj: T) => T = (/* #__PURE__*/_pureAssign
 /**
  * The Object.isExtensible() method determines if an object is extensible (whether it can have new
  * properties added to it).
+ * @function
  * @group Object
  * @param obj - The object which should be checked.
  * @returns A Boolean indicating whether or not the object is extensible.

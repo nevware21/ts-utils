@@ -321,7 +321,7 @@ describe("object state polyfills", () => {
                 {
                     name: "Array with symbols",
                     value: (() => {
-                        const arr = [1, 2, 3];
+                        const arr: any = [1, 2, 3];
                         arr[sym1] = "symbol on array";
                         return arr;
                     })()
@@ -333,7 +333,7 @@ describe("object state polyfills", () => {
                         const fn = function() {
                             return 42;
                         };
-                        fn[sym1] = "symbol on function";
+                        (fn as any)[sym1] = "symbol on function";
                         return fn;
                     })()
                 },

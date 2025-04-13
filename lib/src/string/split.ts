@@ -15,6 +15,7 @@ import { hasSymbol } from "../symbol/symbol";
  * The `strSplit()` splits a string into substrings using the pattern and divides a String
  * into an ordered list of substrings by searching for the pattern, puts these substrings
  * into an array, and returns the array.
+ * @function
  * @since 0.9.1
  * @group String
  * @param value - The string value to be split into substrings.
@@ -48,6 +49,7 @@ export const strSplit: (value: string, separator: string | RegExp, limit?: numbe
  * then the default runtime `split` method will be called, It will use {@link getKnownSymbol}
  * to get the {@link WellKnownSymbols.split} symbol which will return the runtime symbol or the
  * polyfill symbol when not supported by the runtime.
+ * @function
  * @since 0.9.1
  * @group String
  * @param value - The string value to be split into substrings.

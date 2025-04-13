@@ -16,6 +16,7 @@ import { mathCeil, mathFloor } from "./floor";
  * works is very simple. It truncates (cuts off) the dot and the digits to the right of it, no matter
  * whether the argument is a positive or negative number.
  * The argument passed to this method will be converted to number type implicitly.
+ * @function
  * @group Math
  * @param value - The value to be truncated
  * @returns The integer path of the given number

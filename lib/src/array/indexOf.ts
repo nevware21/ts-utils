@@ -14,6 +14,7 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
  * or -1 if it is not present.
  * `arrIndexOf()` compares searchElement to elements of the Array using strict equality (the same
  * method used by the === or triple-equals operator).
+ * @function
  * @group Array
  * @group ArrayLike
  * @typeParam T - Identifies the type of array elements
@@ -89,6 +90,7 @@ export const arrIndexOf: <T>(theArray: ArrayLike<T>, searchElement: T, fromIndex
  *
  * The arrLastIndexOf() method is generic. It only expects the this value to have a length property and integer-keyed properties.
  *
+ * @function
  * @since 0.8.0
  * @group Array
  * @group ArrayLike

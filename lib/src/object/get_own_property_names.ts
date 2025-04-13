@@ -13,6 +13,7 @@ import { polyObjGetOwnPropertyNames } from "../polyfills/object/objGetOwnPropert
 /**
  * The objGetOwnPropertyNames() method returns an array of all properties (including non-enumerable properties except for
  * those which use Symbol) found directly in a given object.
+ * @function
  * @since 0.12.0
  * @group Object
  * @param obj - The object whose enumerable and non-enumerable properties are to be returned

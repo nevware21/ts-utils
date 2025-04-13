@@ -95,7 +95,7 @@ describe("object is_plain_object tests", () => {
 
             // This should at least not throw an error
             const result = isPlainObject(mockWindow);
-            // We don't assert on the result as it may vary by environment
+            assert.isTrue(result, "Mock window-like object should be treated as a plain object");
         });
     });
 });

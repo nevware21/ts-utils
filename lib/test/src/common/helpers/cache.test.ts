@@ -131,12 +131,12 @@ describe("cache helpers", () => {
         });
 
         it("validate null value", () => {
-            let deferredCacheValue = createDeferredCachedValue(() => null);
+            let deferredCacheValue = createDeferredCachedValue(() => null as any);
             assert.equal(deferredCacheValue.v, null);
         });
 
         it("validate undefined value", () => {
-            let deferredCacheValue = createDeferredCachedValue(() => undefined);
+            let deferredCacheValue = createDeferredCachedValue(() => undefined as any);
             assert.equal(deferredCacheValue.v, undefined);
         });
 

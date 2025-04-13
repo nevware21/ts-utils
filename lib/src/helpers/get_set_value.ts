@@ -60,7 +60,7 @@ export function getValueByKey<V, T extends object = any>(target: T, path: string
     let cnt = parts.length;
 
     for (let lp = 0; lp < cnt && !isNullOrUndefined(target); lp++) {
-        target = target[parts[lp]];
+        target = (target as any)[parts[lp]];
     }
 
     return (!isNullOrUndefined(target) ? target : defValue) as V;
@@ -122,7 +122,7 @@ export function getValueByIter<V, T extends object = any>(target: T, iter: Itera
             return -1;
         }
 
-        target = target[value];
+        target = (target as any)[value];
     });
 
     return (!isNullOrUndefined(target) ? target : defValue) as V;

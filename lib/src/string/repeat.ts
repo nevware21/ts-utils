@@ -18,6 +18,7 @@ import { asString } from "./as_string";
  * The `strRepeat()` method constructs and returns a new string which contains the
  * specified number of copies of the string on which it was called, concatenated
  * together.
+ * @function
  * @group String
  * @param value - The value to be repeated
  * @param count - An integer between 0 and +Infinity, indicating the number of times to repeat the string.

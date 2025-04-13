@@ -15,6 +15,7 @@ import { strSubstring } from "./substring";
 
 /**
  * This method lets you determine whether or not a string begins with another string. This method is case-sensitive.
+ * @function
  * @group String
  * @param value - The value to be checked
  * @param searchString - The characters to be searched for at the start of the string

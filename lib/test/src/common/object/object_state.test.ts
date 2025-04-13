@@ -88,7 +88,7 @@ describe("object object_state tests", () => {
         
         it("Should return false for non-extensible but not sealed objects", () => {
             // Creating a non-extensible object where properties are still configurable
-            const obj = objPreventExtensions({ a: 1 });
+            const obj: any = objPreventExtensions({ a: 1 });
             
             // Check if we can delete properties (which should be possible if not sealed)
             if (typeof Object.getOwnPropertyDescriptor === "function") {

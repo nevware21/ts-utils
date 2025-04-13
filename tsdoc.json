@@ -34,6 +34,10 @@
             "syntaxKind": "modifier"
         },
         {
+            "tagName": "@function",
+            "syntaxKind": "modifier"
+        },
+        {
             "tagName": "@interface",
             "syntaxKind": "block"
         },
@@ -73,7 +77,8 @@
       "@ignore": true,
       "@return": true,
       "@group": true,
-      "@remarks": true
+      "@remarks": true,
+      "@function": true
     }
   }
   

@@ -13,6 +13,7 @@ import { _pureAssign } from "../internal/treeshake_helpers";
  * The asString() method returns a string representing the value by
  * explicitly using `String(`value`)`.
  *
+ * @function
  * @since 0.4.3
  * @group String
  * @group Conversion

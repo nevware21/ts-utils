@@ -15,6 +15,7 @@ import { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "./callbacks";
  * each element in an array, until the callbackFn returns a falsy value. If such an element is found,
  * arrEvery() immediately returns false and stops iterating through the array. Otherwise, if callbackFn
  * returns a truthy value for all elements, every() returns true.
+ * @function
  * @since 0.8.0
  * @group Array
  * @group ArrayLike
@@ -76,6 +77,7 @@ export const arrEvery: <T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrP
  * - Changes to already-visited indexes do not cause callbackFn to be invoked on them again.
  * - If an existing, yet-unvisited element of the array is changed by callbackFn, its value passed to the `callbackFn`
  * will be the value at the time that element gets visited. Deleted elements are not visited.
+ * @function
  * @since 0.8.0
  * @group Array
  * @group ArrayLike
