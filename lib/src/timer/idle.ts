@@ -68,7 +68,7 @@ export function hasIdleCallback(): boolean {
  * Returns the global `requestIdleCallback` function if available, which can be used to
  * schedule work when there is free time in the event loop, or if the runtime does not
  * support the `requestIdleCallback` it will return `null`.
- * 
+ *
  * @function
  * @since 0.11.2
  * @group Idle
@@ -80,7 +80,7 @@ export const getIdleCallback = (/*#__PURE__*/_getGlobalInstFn<RequestIdleCallbac
  * Returns the global `cancelIdleCallback` function if available, which can be used to
  * cancel a previously scheduled idle callback, or if the runtime does not support the
  * `cancelIdleCallback` it will return `null`.
- * 
+ *
  * @function
  * @since 0.11.2
  * @group Idle
