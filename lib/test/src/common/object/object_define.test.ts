@@ -17,7 +17,7 @@ import { safe } from "../../../../src/helpers/safe";
 describe("object define tests", () => {
     describe("objDefineGet tests", () => {
         it("should define a property with a value", () => {
-            const obj = {};
+            const obj: any = {};
             objDefineGet(obj, "testProp", 42);
             
             assert.equal(obj["testProp"], 42);
@@ -31,7 +31,7 @@ describe("object define tests", () => {
         });
 
         it("should define a getter function", () => {
-            const obj = {};
+            const obj: any = {};
             let value = 42;
             objDefineGet(obj, "testProp", () => value);
             
@@ -57,7 +57,7 @@ describe("object define tests", () => {
         });
 
         it("should handle function values correctly", () => {
-            const obj = {};
+            const obj: any = {};
             const fn = function() {
                 return "Hello darkness my old friend";
             };
@@ -78,7 +78,7 @@ describe("object define tests", () => {
 
     describe("objDefineAccessors tests", () => {
         it("should define getter and setter", () => {
-            const obj = {};
+            const obj: any = {};
             let value = 42;
             
             objDefineAccessors(obj, "testProp",
@@ -101,7 +101,7 @@ describe("object define tests", () => {
         });
 
         it("should define getter only", () => {
-            const obj = {};
+            const obj: any = {};
             let value = 42;
             
             objDefineAccessors(obj, "testProp", () => value, null);
@@ -114,7 +114,7 @@ describe("object define tests", () => {
         });
 
         it("should define setter only", () => {
-            const obj = {};
+            const obj: any = {};
             let value = 42;
             
             objDefineAccessors(obj, "testProp", null, (v) => {
@@ -291,7 +291,7 @@ describe("object define tests", () => {
 
     describe("objDefineProps tests", () => {
         it("should define multiple data properties", () => {
-            const obj = {};
+            const obj: any = {};
             
             objDefineProps(obj, {
                 "prop1": { v: 10 },
@@ -305,7 +305,7 @@ describe("object define tests", () => {
         });
         
         it("should define data and accessor properties together", () => {
-            const obj = {};
+            const obj: any = {};
             let value = 42;
             
             objDefineProps(obj, {
@@ -369,7 +369,7 @@ describe("object define tests", () => {
                 return;
             }
             
-            const obj = {};
+            const obj: any = {};
             const symbolKey = Symbol("test");
             
             objDefineProps(obj, {
@@ -380,7 +380,7 @@ describe("object define tests", () => {
         });
         
         it("should handle lazy values in multiple properties", () => {
-            const obj = {};
+            const obj: any = {};
             let init1Count = 0;
             let init2Count = 0;
             const lazy1 = getLazy(() => {

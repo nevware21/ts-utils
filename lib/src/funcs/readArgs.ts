@@ -93,7 +93,7 @@ export function readArgs<T = any>(theArgs: ArrayLike<T> | Iterable<T>, start?: n
         !_iterSymbol && (_iterSymbol = createCachedValue(hasSymbol() && getKnownSymbol(WellKnownSymbols.iterator)));
         let iterFn: any;
         if (_iterSymbol.v) {
-            iterFn = theArgs[_iterSymbol.v];
+            iterFn = (theArgs as any)[_iterSymbol.v];
         }
 
         if (iterFn) {

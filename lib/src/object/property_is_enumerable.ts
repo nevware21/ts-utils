@@ -44,6 +44,7 @@ function _objPropertyIsEnum(obj: any, propKey: PropertyKey): boolean {
  * instance provided, if that instance has a `propertyIsEnumerable` method it will be called, otherwise it
  * will check whether the property is available on the instance and if it is enumerable.
  *
+ * @function
  * @since 0.12.0
  * @group Object
  * @param obj - The object on which to check if the property is enumerable

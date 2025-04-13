@@ -79,7 +79,7 @@ export function _getGlobalValue(): Window {
 /*#__NO_SIDE_EFFECTS__*/
 export function _getGlobalConfig(): TsUtilsGlobalConfig {
     if (!_globalCfg) {
-        let gbl = safe(_getGlobalValue).v || {};
+        let gbl: any = safe(_getGlobalValue).v || {};
         _globalCfg = gbl[GLOBAL_CONFIG_KEY] = gbl[GLOBAL_CONFIG_KEY] || {};
     }
 

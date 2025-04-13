@@ -78,27 +78,27 @@ import { polyObjIsSealed } from "./polyfills/object/objIsSealed";
 
     // Add Object polyfills
     arrForEach(polyObjKeys(objectPolyfills), (key) => {
-        if (!ObjClass[key]) {
-            ObjClass[key] = makePolyFn(objectPolyfills[key]);
+        if (!(ObjClass as any)[key]) {
+            (ObjClass as any)[key] = makePolyFn((objectPolyfills as any)[key]);
         }
     });
     
     arrForEach(polyObjKeys(arrayClsPolyfills), (key) => {
-        if (!ArrCls[key]) {
-            ArrCls[key] = makePolyFn(arrayClsPolyfills[key]);
+        if (!(ArrCls as any)[key]) {
+            (ArrCls as any)[key] = makePolyFn((arrayClsPolyfills as any)[key]);
         }
     });
 
     // Add Array polyfills
     arrForEach(polyObjKeys(arrayPolyfills), (key) => {
-        if (!ArrProto[key]) {
-            ArrProto[key] = makePolyFn(arrayPolyfills[key]);
+        if (!(ArrProto as any)[key]) {
+            (ArrProto as any)[key] = makePolyFn((arrayPolyfills as any)[key]);
         }
     });
 
     arrForEach(polyObjKeys(stringPolyfills), (key) => {
-        if (!StrProto[key]) {
-            StrProto[key] = makePolyFn(stringPolyfills[key]);
+        if (!(StrProto as any)[key]) {
+            (StrProto as any)[key] = makePolyFn((stringPolyfills as any)[key]);
         }
     });
 })();

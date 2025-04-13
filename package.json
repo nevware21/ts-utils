@@ -119,7 +119,7 @@
         "build": "grunt ts_utils --verbose && npm run package && npm run dtsgen",
         "rebuild": "npm run build && npm run test && npm run size && npm run size-check",
         "package": "rollup -c lib/rollup.config.js --bundleConfigAsCjs",
-        "test": "npm run test:node && npm run test:worker && npm run test:browser && npm run coverage:report",
+        "test": "npm run test:node && npm run test:browser && npm run test:worker && npm run coverage:report",
         "test:node": "nyc ts-mocha -p lib/test/tsconfig.test.json lib/test/src/node/**/*.test.ts lib/test/src/common/**/*.test.ts",
         "test:browser": "karma start karma.browser.conf.js --single-run",
         "test:worker": "cross-env NODE_OPTIONS='--max-old-space-size=8192' karma start karma.worker.conf.js --single-run",
@@ -132,7 +132,7 @@
         "codecov": "npm run coverage:merge",
         "clean": "git clean -xdf && npm install",
         "cleanBuild": "npm run clean && npm run rebuild",
-        "docs": "typedoc",
+        "docs": "typedoc --plugin typedoc-github-theme",
         "prep-release": "npm run cleanBuild && npm run npm-pack",
         "npm-pack": "copyfiles README.md LICENSE lib && cd lib && npm pack",
         "npm-publish": "publish-npm",
@@ -210,8 +210,9 @@
         "size-limit": "^11.2.0",
         "ts-mocha": "^11.1.0",
         "tslib": "^2.6.0",
-        "typedoc": "^0.26.2",
-        "typescript": "^4.9.5",
+        "typedoc": "^0.28.2",
+        "typedoc-github-theme": "^0.3.0",
+        "typescript": "~5.2.2",
         "uglify-js": "^3.15.5"
     }
 }

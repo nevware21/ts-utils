@@ -379,6 +379,7 @@ export function isPrimitiveType(theType: string): boolean {
 
 /**
  * Checks to see if the past value is a string value
+ * @function
  * @group Type Identity
  * @group String
  * @param value - The value to check
@@ -399,6 +400,7 @@ export const isString: (value: any) => value is string = (/*#__PURE__*/_createIs
 
 /**
  * Checks to see if the past value is a function value
+ * @function
  * @group Type Identity
  * @param value - The value to check
  * @returns
@@ -423,6 +425,7 @@ export const isFunction: (value: any) => value is Function = (/*#__PURE__*/_crea
 
 /**
  * Checks to see if the past value is an object value
+ * @function
  * @group Type Identity
  * @group Object
  * @typeParam T - The object type, defaults to any
@@ -441,6 +444,7 @@ export function isObject<T>(value: T): value is T {
 /**
  * Checks if the type of value is an Array.
  *
+ * @function
  * @group Type Identity
  * @group Array
  * @param arg - Value to be checked.
@@ -462,6 +466,7 @@ export const isArray: <T = any>(arg: any) => arg is Array<T> = (/* #__PURE__*/_p
 
 /**
  * Check if an object is of type Date
+ * @function
  * @group Type Identity
  * @example
  * ```ts
@@ -480,6 +485,7 @@ export const isDate: (value: any) => value is Date = (/*#__PURE__*/_createObjIs<
 
 /**
  * Checks if the type of value is a number.
+ * @function
  * @group Type Identity
  * @param value - Value to be checked.
  * @return True if the value is a number, false otherwise.
@@ -488,6 +494,7 @@ export const isNumber: (value: any) => value is number = (/*#__PURE__*/_createIs
 
 /**
  * Checks if the type of value is a boolean.
+ * @function
  * @group Type Identity
  * @param value - Value to be checked.
  * @return True if the value is a boolean, false otherwise.
@@ -496,6 +503,7 @@ export const isBoolean: (value: any) => value is boolean = (/*#__PURE__*/_create
 
 /**
  * Determines if a value is a regular expression object.
+ * @function
  * @group Type Identity
  * @param value - Reference to check.
  * @returns True if `value` is a `RegExp`.
@@ -504,6 +512,7 @@ export const isRegExp: (value: any) => value is RegExp = (/*#__PURE__*/_createOb
 
 /**
  * Checks if the type of value is a File object.
+ * @function
  * @group Type Identity
  * @param value - Value to be checked.
  * @return True if the value is a File, false otherwise.
@@ -512,6 +521,7 @@ export const isFile: (value: any) => value is File = (/*#__PURE__*/_createObjIs<
 
 /**
  * Checks if the type of value is a FormData object.
+ * @function
  * @group Type Identity
  * @param value - Value to be checked.
  * @return True if the value is a FormData, false otherwise.
@@ -520,6 +530,7 @@ export const isFormData: (value: any) => value is FormData = (/*#__PURE__*/_crea
 
 /**
  * Checks if the type of value is a Blob object.
+ * @function
  * @group Type Identity
  * @param value - Value to be checked.
  * @return True if the value is a Blob, false otherwise.
@@ -528,6 +539,7 @@ export const isBlob: (value: any) => value is Blob = (/*#__PURE__*/_createObjIs<
 
 /**
  * Checks if the type of value is a ArrayBuffer object.
+ * @function
  * @group Type Identity
  * @param value - Value to be checked.
  * @return True if the value is a ArrayBuffer, false otherwise.
@@ -536,6 +548,7 @@ export const isArrayBuffer: (value: any) => value is ArrayBuffer = (/*#__PURE__*
 
 /**
  * Checks if the type of value is a Error object.
+ * @function
  * @group Type Identity
  * @group Error
  * @param value - Value to be checked.
@@ -557,6 +570,7 @@ export function isPromiseLike<T>(value: any): value is PromiseLike<T> {
 /**
  * Checks if the type of value is a PromiseLike instance (contains a then function).
  * This is an alias for {@link isPromiseLike}.
+ * @function
  * @group Type Identity
  * @param value - Value to be checked.
  * @return True if the value is a PromiseLike, false otherwise.
@@ -576,6 +590,7 @@ export function isPromise<T>(value: any): value is Promise<T> {
 
 /**
  * Checks if the type of value is a Map object.
+ * @function
  * @group Type Identity
  * @param value - Value to be checked.
  * @return True if the value is a Map, false otherwise.

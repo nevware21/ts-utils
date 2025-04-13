@@ -516,7 +516,7 @@ describe("array helpers", () => {
     describe("arrEvery", () => {
         it("example", () => {
             function isBigEnough<T>(element: T, index: number, array: T[]) {
-                return element >= 10;
+                return (element as any) >= 10;
             }
 
             assert.equal(arrEvery([12, 5, 8, 130, 44], isBigEnough), false); // false
@@ -536,7 +536,7 @@ describe("array helpers", () => {
 
         it("array like", () => {
             function isBigEnough<T>(element: T, index: number, array: T[]) {
-                return element >= 10;
+                return (element as any) >= 10;
             }
 
             assert.equal(arrEvery({ length: 5, 0: 12, 1: 5, 2: 8, 3: 130, 4: 44 }, isBigEnough), false); // false
@@ -566,7 +566,7 @@ describe("array helpers", () => {
             let called = 0;
             function isBigger<T>(element: T, index: number, array: T[]) {
                 called++;
-                return element >= 20;
+                return (element as any) >= 20;
             }
 
             called = 0;
@@ -652,7 +652,7 @@ describe("array helpers", () => {
     describe("arrFilter", () => {
         it("examples", () => {
             function isBigEnough<T>(value: T) {
-                return value >= 10;
+                return (value as any) >= 10;
             }
             
             const filtered = arrFilter([12, 5, 8, 130, 44], isBigEnough);
@@ -674,7 +674,7 @@ describe("array helpers", () => {
 
         it("array like", () => {
             function isBigEnough<T>(value: T) {
-                return value >= 10;
+                return (value as any) >= 10;
             }
             
             const filtered = arrFilter({ length: 5, 0: 12, 1: 5, 2: 8, 3: 130, 4: 44 }, isBigEnough);

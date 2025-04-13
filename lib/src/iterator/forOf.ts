@@ -59,7 +59,7 @@ export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value
     if (iter) {
         if (!isIterator(iter)) {
             !_iterSymbol && (_iterSymbol = createCachedValue(getKnownSymbol(WellKnownSymbols.iterator)));
-            iter = iter[_iterSymbol.v] ? iter[_iterSymbol.v]() : NULL_VALUE;
+            iter = (iter as any)[_iterSymbol.v] ? (iter as any)[_iterSymbol.v]() : NULL_VALUE;
         }
         
         if (isIterator(iter)) {

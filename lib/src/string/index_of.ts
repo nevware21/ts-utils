@@ -14,6 +14,7 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
  * the entire calling string, and returns the index of the first occurrence of the specified substring.
  * Given a thrid argument: a number, the method returns the first occurrence of the specified substring
  * at an index greater than or equal to the specified number.
+ * @function
  * @group String
  * @param value - The value to be checked for the seeach string
  * @param searchString - The substring to search for in the value
@@ -48,6 +49,7 @@ export const strIndexOf: (value: string, searchString: string, position?: number
  * the entire calling string, and returns the index of the last occurrence of the specified substring.
  * Given a third argument: a number, the method returns the last occurrence of the specified substring
  * at an index less than or equal to the specified number.
+ * @function
  * @group String
  * @param value - The value to be checked for the seeach string
  * @param searchString - The substring to search for in the value

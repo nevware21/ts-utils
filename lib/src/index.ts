@@ -25,7 +25,7 @@ export { ProxyFunctionDef, TypeFuncNames } from "./funcs/types";
 export {
     isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isDate, isNumber, isBoolean,
     isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isThenable, isNotTruthy, isTruthy, objToString,
-    isStrictNullOrUndefined, isStrictUndefined, isError, isPrimitive, isPrimitiveType
+    isStrictNullOrUndefined, isStrictUndefined, isError, isPrimitive, isPrimitiveType, isMap, isMapLike
 } from "./helpers/base";
 export { ICachedValue, createCachedValue, createDeferredCachedValue } from "./helpers/cache";
 export { CustomErrorConstructor, createCustomError, throwUnsupported } from "./helpers/customError";
@@ -83,6 +83,7 @@ export {
 export { objFromEntries, ObjFromEntriesFn } from "./object/from_entries";
 export { objPreventExtensions, objIsExtensible } from "./object/prevent_extensions";
 export { objPropertyIsEnumerable } from "./object/property_is_enumerable";
+export { objSetPrototypeOf } from "./object/set_proto";
 export { objIsFrozen, objIsSealed } from "./object/object_state";
 export { strCamelCase, strKebabCase, strLetterCase, strSnakeCase } from "./string/conversion";
 export { strEndsWith } from "./string/ends_with";

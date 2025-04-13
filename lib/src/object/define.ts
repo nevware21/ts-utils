@@ -151,6 +151,7 @@ function _createProp(value: ObjDefinePropDescriptor): PropertyDescriptor {
  * described by a getter-setter pair of functions. A descriptor must be one of these two flavors; it cannot be both.
  *
  * This is an alias for Object.defineProperty
+ * @function
  * @group Object
  * @param target - The object on which to define the property.
  * @param key - The name or Symbol of the property to be defined or modified.
@@ -162,6 +163,7 @@ export const objDefineProp: <T>(target: T, key: PropertyKey, descriptor: Propert
 /**
  * The objDefineProperties() method defines new or modifies existing properties directly on an object, returning the object.
  * This is a wrapper for [Object.defineProperties](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperties)
+ * @function
  * @since 0.6.0
  * @group Object
  * @param target - The object on which to define or modify properties.

@@ -22,6 +22,7 @@ import { ArrMapCallbackFn } from "./callbacks";
  * - indexes that have never been set;
  * - indexes which have been deleted.
  *
+ * @function
  * @since 0.3.3
  * @group Array
  * @group ArrayLike

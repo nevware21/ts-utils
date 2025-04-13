@@ -24,6 +24,7 @@ import { strSlice } from "./slice";
  * Any argument value that is less than 0 or greater than `value.length` is treated as if it were 0 and `value.length`, respectively.
  *
  * Any argument value that is NaN is treated as if it were 0.
+ * @function
  * @group String
  * @param value - The string value to return the substring from.
  * @param indexStart - The index of the first character to include in the returned substring.
@@ -61,6 +62,7 @@ export const strSubstring: (value: string, indexStart: number, indexEnd?: number
  * The strSubstr() method returns a portion of the string, starting at the specified index and extending for a given
  * number of characters afterwards.
  *
+ * @function
  * @since 0.4.2
  * @group String
  * @param value - The string value to return the substring from.

@@ -169,7 +169,7 @@ export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId:
 
     function _unref() {
         ref = false;
-        timerId && timerId[UNREF] && timerId[UNREF]();
+        timerId && (timerId as any)[UNREF] && (timerId as any)[UNREF]();
         return theTimerHandler;
     }
 
@@ -198,8 +198,8 @@ export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId:
     } as any;
 
     theTimerHandler[HAS_REF] = () => {
-        if (timerId && timerId[HAS_REF]) {
-            return timerId[HAS_REF]();
+        if (timerId && (timerId as any)[HAS_REF]) {
+            return (timerId as any)[HAS_REF]();
         }
 
         return ref;
@@ -207,7 +207,7 @@ export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId:
 
     theTimerHandler[REF] = () => {
         ref = true;
-        timerId && timerId[REF] && timerId[REF]();
+        timerId && (timerId as any)[REF] && (timerId as any)[REF]();
         return theTimerHandler;
     };
 

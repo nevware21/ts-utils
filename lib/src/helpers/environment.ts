@@ -156,6 +156,7 @@ export function hasDocument(): boolean {
 
 /**
  * Return the global `document` instance.
+ * @function
  * @group Environment
  * @returns
  */
@@ -173,6 +174,7 @@ export function hasWindow(): boolean {
 
 /**
  * Return the global `window` instance.
+ * @function
  * @group Environment
  * @returns
  */
@@ -190,6 +192,7 @@ export function hasNavigator(): boolean {
 
 /**
  * Returns the global `navigator` instance
+ * @function
  * @group Environment
  * @returns
  */
@@ -207,6 +210,7 @@ export function hasHistory(): boolean {
 
 /**
  * Returns the global `history` instance
+ * @function
  * @group Environment
  * @returns
  */
@@ -214,6 +218,7 @@ export const getHistory = (/*#__PURE__*/_getGlobalInstFn<History>(getInst, ["his
 
 /**
  * Simple method to determine if we are running in a node environment
+ * @function
  * @group Environment
  * @returns True if you are
  */
@@ -223,6 +228,7 @@ export const isNode = (/*#__PURE__*/_getGlobalInstFn<boolean>(() => {
 
 /**
  * Helper to identify if you are running as a Dedicated, Shared or Service worker
+ * @function
  * @group Environment
  * @returns True if the environment you are in looks like a Web Worker
  */

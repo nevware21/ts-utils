@@ -33,7 +33,7 @@ describe("polyfill helpers", () => {
             result3 = arg3;
         }
 
-        TestClass[PROTOTYPE]["polyTest"] = makePolyFn(dummyFunction);
+        (TestClass as any)[PROTOTYPE]["polyTest"] = makePolyFn(dummyFunction);
         
         let testObj1 = new TestClass(42);
         let testObj2 = new TestClass(53);
@@ -44,13 +44,13 @@ describe("polyfill helpers", () => {
         assert.equal(undefined, result1);
         assert.equal(undefined, result2);
 
-        testObj2["polyTest"]("Hello", "World");
+        (testObj2 as any)["polyTest"]("Hello", "World");
         assert.equal(testObj2, resultThis);
         assert.equal(testObj2, result1);
         assert.equal("Hello", result2);
         assert.equal("World", result3);
 
-        testObj1["polyTest"]("Goodbye!");
+        (testObj1 as any)["polyTest"]("Goodbye!");
         assert.equal(testObj1, resultThis);
         assert.equal(testObj1, result1);
         assert.equal("Goodbye!", result2);

@@ -635,7 +635,7 @@ describe("object polyfills", () => {
         
         it("should support Symbol as property key", () => {
             const sym = newSymbol("test");
-            const obj = {};
+            const obj: any = {};
             obj[sym] = "symbol value";
             
             const descriptor = polyObjGetOwnPropertyDescriptor(obj, sym);
@@ -943,7 +943,7 @@ describe("object polyfills", () => {
             }
             
             const sym = Symbol("test");
-            const obj = {};
+            const obj: any = {};
             obj[sym] = "symbol value";
             
             const descriptors = polyObjGetOwnPropertyDescriptors(obj);
@@ -1097,7 +1097,7 @@ describe("object polyfills", () => {
                 return;
             }
             
-            const obj = {};
+            const obj: any = {};
             obj[iteratorSym] = function*() {
                 yield 1;
             };
@@ -1113,7 +1113,7 @@ describe("object polyfills", () => {
             const sym2 = polyNewSymbol("test2");
             const sym3 = polyNewSymbol("test2");
             
-            const obj = {};
+            const obj: any = {};
             obj[sym1] = "value1";
             obj[sym2] = "value2";
             obj[sym3] = "value3";
@@ -1145,7 +1145,7 @@ describe("object polyfills", () => {
         it("should handle recursive calls safely", () => {
             // This test ensures the recursion protection works
             const sym = Symbol("test");
-            const obj = {};
+            const obj: any = {};
             obj[sym] = "value";
             
             // Call it again within its own test to check recursion guard
@@ -1163,7 +1163,7 @@ describe("object polyfills", () => {
             }
             
             const sym = Symbol("test");
-            const obj = {};
+            const obj: any = {};
             obj[sym] = "value";
             
             let polyResult = polyObjGetOwnPropertySymbols(obj);
@@ -1208,7 +1208,7 @@ describe("object polyfills", () => {
         
         it("should handle Symbol keys", () => {
             const sym = Symbol("test");
-            const obj = {};
+            const obj: any = {};
             obj[sym] = "symbol value";
             
             assert.isTrue(polyObjHasOwn(obj, sym));
@@ -1236,7 +1236,7 @@ describe("object polyfills", () => {
             arrForEach(values, (value) => {
 
                 try {
-                    Object["hasOwn"](value, "prop");
+                    (Object as any)["hasOwn"](value, "prop");
                 } catch (e) {
                     nativeThrow = e;
                 }
@@ -1261,10 +1261,10 @@ describe("object polyfills", () => {
         it("should be compatible with the native implementation when available", function() {
             const obj = { a: 1, b: "string", c: true };
             
-            assert.equal(polyObjHasOwn(obj, "a"), Object["hasOwn"](obj, "a"));
-            assert.equal(polyObjHasOwn(obj, "b"), Object["hasOwn"](obj, "b"));
-            assert.equal(polyObjHasOwn(obj, "c"), Object["hasOwn"](obj, "c"));
-            assert.equal(polyObjHasOwn(obj, "nonExistent"), Object["hasOwn"](obj, "nonExistent"));
+            assert.equal(polyObjHasOwn(obj, "a"), (Object as any)["hasOwn"](obj, "a"));
+            assert.equal(polyObjHasOwn(obj, "b"), (Object as any)["hasOwn"](obj, "b"));
+            assert.equal(polyObjHasOwn(obj, "c"), (Object as any)["hasOwn"](obj, "c"));
+            assert.equal(polyObjHasOwn(obj, "nonExistent"), (Object as any)["hasOwn"](obj, "nonExistent"));
         });
         
         it("should handle equivalence with objHasOwn for valid inputs", () => {

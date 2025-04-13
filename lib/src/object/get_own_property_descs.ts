@@ -12,6 +12,7 @@ import { polyObjGetOwnPropertyDescriptors } from "../polyfills/object/objGetOwnP
 
 /**
  * The objGetOwnPropertyDescriptors() method returns all own property descriptors of a given object.
+ * @function
  * @since 0.12.0
  * @group Object
  * @param obj - The object for which to get all own property descriptors

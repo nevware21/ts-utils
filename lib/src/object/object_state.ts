@@ -15,6 +15,7 @@ import { polyObjIsSealed } from "../polyfills/object/objIsSealed";
  * The `objIsFrozen()` method determines if an object is frozen. An object is frozen if and only if it is not
  * extensible, all its properties are non-configurable, and all its data properties are non-writable.
  *
+ * @function
  * @since 0.12.0
  * @group Object
  * @param obj - The object to check if it is frozen.
@@ -34,6 +35,7 @@ export const objIsFrozen: (obj: any) => boolean = (/* #__PURE__*/_pureAssign((/*
  * The `objIsSealed()` method determines if an object is sealed. An object is sealed if it is not
  * extensible and if all its properties are non-configurable (but potentially still writable).
  *
+ * @function
  * @since 0.12.0
  * @group Object
  * @param obj - The object to check if it is sealed.

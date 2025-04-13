@@ -100,7 +100,7 @@ export function polyNewSymbol(description?: string | number): symbol {
 export function polySymbolFor(key: string): symbol {
     let registry = _globalSymbolRegistry();
     if (!objHasOwn(registry.k, key)) {
-        let newSymbol = polyNewSymbol(key);
+        let newSymbol: any = polyNewSymbol(key);
         let regId = objKeys(registry.s).length;
         newSymbol[UNIQUE_REGISTRY_ID] = () => regId + "_" + newSymbol[TO_STRING]();
         registry.k[key] = newSymbol;
@@ -123,7 +123,7 @@ export function polySymbolKeyFor(sym: symbol): string | undefined {
         throwTypeError((sym as any) + " is not a symbol");
     }
 
-    const regId = _isPolyfill(sym) && sym[UNIQUE_REGISTRY_ID] && sym[UNIQUE_REGISTRY_ID]();
+    const regId = _isPolyfill(sym) && (sym as any)[UNIQUE_REGISTRY_ID] && (sym as any)[UNIQUE_REGISTRY_ID]();
 
     return regId ? _globalSymbolRegistry().s[regId] : undefined;
 }
@@ -152,9 +152,9 @@ export function polySymbolKeyFor(sym: symbol): string | undefined {
 export function polyGetKnownSymbol(name: string | WellKnownSymbols): symbol {
     !_wellKnownSymbolCache && (_wellKnownSymbolCache = {} as any);
     let result: symbol;
-    let knownName: WellKnownSymbols = _wellKnownSymbolMap[name];
+    let knownName: WellKnownSymbols = (_wellKnownSymbolMap as any)[name];
     if (knownName) {
-        result = _wellKnownSymbolCache[knownName] = _wellKnownSymbolCache[knownName] || polyNewSymbol(SYMBOL + "." + knownName);
+        result = (_wellKnownSymbolCache as any)[knownName] = _wellKnownSymbolCache[knownName] || polyNewSymbol(SYMBOL + "." + knownName);
     }
 
     return result

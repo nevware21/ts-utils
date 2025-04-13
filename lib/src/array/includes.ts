@@ -13,6 +13,7 @@ import { polyArrIncludes } from "../polyfills/array";
 /**
  * The arrIncludes() method determines whether an array includes a certain value among its
  * entries, returning true or false as appropriate.
+ * @function
  * @since 0.8.0
  * @group Array
  * @group ArrayLike
@@ -48,6 +49,7 @@ export const arrIncludes: <T>(theArray: ArrayLike<T>, searchElement: T, fromInde
 /**
  * The arrContains() method determines whether an array contains a certain value among its
  * entries, returning true or false as appropriate.
+ * @function
  * @since 0.8.0
  * @group Array
  * @group ArrayLike

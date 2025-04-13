@@ -51,6 +51,7 @@ export type ObjFromEntriesFn = {
  * The objFromEntries() method transforms a list of key-value pairs into an object.
  * This is the reverse of objEntries().
  *
+ * @function
  * @since 0.12.0
  * @group Object
  * @param entries - An iterable object that contains key-value pairs (typically an array of [key, value] arrays)

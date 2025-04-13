@@ -33,6 +33,7 @@ import { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "./callbacks";
  * - If an existing, yet-unvisited element of the array is changed by `callbackFn`, its value passed to the
  * `callbackFn` will be the value at the time that element gets visited. Deleted elements are not visited.
  * - The arrSome() method is generic. It only expects the this value to have a length property and integer-keyed properties.
+ * @function
  * @since 0.8.0
  * @group Array
  * @group ArrayLike
