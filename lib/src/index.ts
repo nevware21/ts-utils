@@ -2,7 +2,7 @@
  * @nevware21/ts-utils
  * https://github.com/nevware21/ts-utils
  *
- * Copyright (c) 2022 NevWare21 Solutions LLC
+ * Copyright (c) 2022-2025 NevWare21 Solutions LLC
  * Licensed under the MIT license.
  */
 
@@ -69,15 +69,21 @@ export {
 export { objCreate } from "./object/create";
 export { ObjDefinePropDescriptor, ObjDefinePropDescriptorMap, objDefine, objDefineProp, objDefineGet, objDefineAccessors, objDefineProperties, objDefineProps } from "./object/define";
 export { objForEachKey } from "./object/for_each_key";
-export { objGetOwnPropertyDescriptor } from "./object/get_own_prop_desc";
-export { objHasOwn, polyObjHasOwn } from "./object/has_own";
+export { objGetOwnPropertyDescriptor } from "./object/get_own_property_desc";
+export { objGetOwnPropertyDescriptors } from "./object/get_own_property_descs";
+export { objGetOwnPropertyNames } from "./object/get_own_property_names";
+export { objGetOwnPropertySymbols } from "./object/get_own_property_symbols";
+export { objHasOwn } from "./object/has_own";
 export { objHasOwnProperty } from "./object/has_own_prop";
 export { isPlainObject } from "./object/is_plain_object";
 export {
-    objAssign, objKeys, objDeepFreeze, objFreeze, objSeal, objGetPrototypeOf, objEntries, objIs
+    objAssign, objKeys, objDeepFreeze, objFreeze, objSeal, objGetPrototypeOf, objEntries,
+    objIs, objValues
 } from "./object/object";
-export { objSetPrototypeOf } from "./object/set_proto";
-export { getValueByKey, setValueByKey, getValueByIter, setValueByIter } from "./helpers/get_set_value";
+export { objFromEntries, ObjFromEntriesFn } from "./object/from_entries";
+export { objPreventExtensions, objIsExtensible } from "./object/prevent_extensions";
+export { objPropertyIsEnumerable } from "./object/property_is_enumerable";
+export { objIsFrozen, objIsSealed } from "./object/object_state";
 export { strCamelCase, strKebabCase, strLetterCase, strSnakeCase } from "./string/conversion";
 export { strEndsWith } from "./string/ends_with";
 export { strContains, strIncludes, polyStrIncludes } from "./string/includes";
@@ -104,8 +110,13 @@ export { TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, schedu
 
 // Exporting the helpers, but not the "initialization" code to populate any missing values
 // This will enable anyone to "reuse" or create their own polyfills.ts implementation if they want.
+// Not including all of the polyfills as they will be removed in v2.x and beyond, so only including the
+// initial exported ones, even these you should not depend on.
 export { polyIsArray, polyArrFind, polyArrFindIndex, polyArrFindLast, polyArrFindLastIndex, polyArrIncludes, polyArrFrom } from "./polyfills/array";
-export { polyObjKeys, polyObjEntries, polyObjIs } from "./polyfills/object";
+export { polyObjKeys } from "./polyfills/object/objKeys";
+export { polyObjEntries } from "./polyfills/object/objEntries";
+export { polyObjIs } from "./polyfills/object/objIs";
 export { polyStrSymSplit } from "./polyfills/split";
 export { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "./polyfills/symbol";
 export { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "./polyfills/trim";
+

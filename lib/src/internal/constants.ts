@@ -2,7 +2,7 @@
  * @nevware21/ts-utils
  * https://github.com/nevware21/ts-utils
  *
- * Copyright (c) 2022 NevWare21 Solutions LLC
+ * Copyright (c) 2022-2025 NevWare21 Solutions LLC
  * Licensed under the MIT license.
  */
 
@@ -22,11 +22,14 @@ export const __PROTO__ = "__proto__";
 export const UNDEFINED = "undefined";
 export const CONSTRUCTOR = "constructor";
 export const SYMBOL = "Symbol";
-export const POLYFILL_TAG = "_polyfill";
 export const LENGTH = "length";
 export const NAME = "name";
 export const CALL = "call";
 export const TO_STRING = "toString";
+
+// Check if getter or setter exists (very limited detection)
+export const GETTER_NAME = "__lookupGetter__";
+export const SETTER_NAME = "__lookupSetter__";
 
 /**
  * @ignore

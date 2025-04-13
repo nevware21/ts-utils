@@ -2,11 +2,11 @@
  * @nevware21/ts-utils
  * https://github.com/nevware21/ts-utils
  *
- * Copyright (c) 2022 NevWare21 Solutions LLC
+ * Copyright (c) 2022-2025 NevWare21 Solutions LLC
  * Licensed under the MIT license.
  */
 
-import { isObject } from "../helpers/base";
+import { isFunction, isObject } from "../helpers/base";
 import { CALL } from "../internal/constants";
 import { objHasOwn } from "./has_own";
 
@@ -34,7 +34,7 @@ import { objHasOwn } from "./has_own";
  * ```
  */
 export function objForEachKey<T>(theObject: T, callbackfn: (key: string, value: T[keyof T]) => void | number, thisArg?: any): void {
-    if (theObject && isObject(theObject)) {
+    if (theObject && (isObject(theObject) || isFunction(theObject))) {
         for (const prop in theObject) {
             if (objHasOwn(theObject, prop)) {
                 if (callbackfn[CALL](thisArg || theObject, prop, theObject[prop]) === -1) {

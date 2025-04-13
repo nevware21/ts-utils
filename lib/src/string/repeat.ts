@@ -2,14 +2,14 @@
  * @nevware21/ts-utils
  * https://github.com/nevware21/ts-utils
  *
- * Copyright (c) 2022 NevWare21 Solutions LLC
+ * Copyright (c) 2022-2025 NevWare21 Solutions LLC
  * Licensed under the MIT license.
  */
 
-import { isNullOrUndefined, isString } from "../helpers/base";
-import { dumpObj } from "../helpers/diagnostics";
-import { throwRangeError, throwTypeError } from "../helpers/throw";
+import { isString } from "../helpers/base";
+import { throwRangeError } from "../helpers/throw";
 import { EMPTY, StrProto } from "../internal/constants";
+import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { mathToInt } from "../math/to_int";
 import { asString } from "./as_string";
@@ -41,9 +41,7 @@ export const strRepeat: (value: string, count: number) => string = (/*#__PURE__*
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyStrRepeat(value: string, count: number): string {
-    if (isNullOrUndefined(value)) {
-        throwTypeError("can't convert [" + dumpObj(value) + "]")
-    }
+    _throwIfNullOrUndefined(value);
 
     count = mathToInt(count, true);
     if (count < 0) {

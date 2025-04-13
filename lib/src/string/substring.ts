@@ -2,14 +2,13 @@
  * @nevware21/ts-utils
  * https://github.com/nevware21/ts-utils
  *
- * Copyright (c) 2022 NevWare21 Solutions LLC
+ * Copyright (c) 2022-2025 NevWare21 Solutions LLC
  * Licensed under the MIT license.
  */
 
-import { isNullOrUndefined, isUndefined } from "../helpers/base";
-import { dumpObj } from "../helpers/diagnostics";
-import { throwTypeError } from "../helpers/throw";
+import { isUndefined } from "../helpers/base";
 import { EMPTY, LENGTH, StrProto } from "../internal/constants";
+import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunction, _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { mathMax } from "../math/min_max";
 import { strSlice } from "./slice";
@@ -85,9 +84,7 @@ export const strSubstr: (value: string, start: number, length?: number) => strin
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyStrSubstr(value: string, start: number, length?: number): string {
-    if (isNullOrUndefined(value)) {
-        throwTypeError("Invalid " + dumpObj(value));
-    }
+    _throwIfNullOrUndefined(value);
 
     if (length < 0) {
         return EMPTY;

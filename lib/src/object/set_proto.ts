@@ -2,12 +2,13 @@
  * @nevware21/ts-utils
  * https://github.com/nevware21/ts-utils
  *
- * Copyright (c) 2022 NevWare21 Solutions LLC
+ * Copyright (c) 2022-2025 NevWare21 Solutions LLC
  * Licensed under the MIT license.
  */
 
 import { ICachedValue, createCachedValue } from "../helpers/cache";
 import { ObjClass, __PROTO__ } from "../internal/constants";
+import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { objForEachKey } from "./for_each_key";
 
 let _isProtoArray: ICachedValue<boolean>;
@@ -20,13 +21,11 @@ let _isProtoArray: ICachedValue<boolean>;
  * @param proto - The object's new prototype (an object or null)
  * @returns The specified object.
  */
-export function objSetPrototypeOf(obj: any, proto: object) {
-    let fn = ObjClass["setPrototypeOf"] ||
-        // tslint:disable-next-line: only-arrow-functions
-        function (d: any, b: any) {
-            !_isProtoArray && (_isProtoArray = createCachedValue({ [__PROTO__]: [] } instanceof Array));
-            _isProtoArray.v ? d[__PROTO__] = b : objForEachKey(b, (key: any, value: any) => d[key] = value );
-        };
+export const objSetPrototypeOf: (obj: any, proto: object) => any = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.setPrototypeOf>(ObjClass, "setPrototypeOf")), _polyObjSetPrototypeOf));
 
-    return fn(obj, proto);
+export function _polyObjSetPrototypeOf(obj: any, proto: object) {
+    !_isProtoArray && (_isProtoArray = createCachedValue({ [__PROTO__]: [] } instanceof Array));
+    _isProtoArray.v ? obj[__PROTO__] = proto : objForEachKey(proto, (key: any, value: any) => obj[key] = value );
+    
+    return obj;
 }

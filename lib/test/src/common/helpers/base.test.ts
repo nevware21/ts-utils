@@ -10,7 +10,7 @@ import { assert } from "@nevware21/tripwire-chai";
 import {
     isArray, isBoolean, isDate, isDefined, isFunction, isNullOrUndefined, isNumber, isObject, isString, isTypeof,
     isUndefined, isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isError, isPromiseLike, isPromise, isNotTruthy,
-    isTruthy, isStrictUndefined, isStrictNullOrUndefined, isPrimitive, isPrimitiveType
+    isTruthy, isStrictUndefined, isStrictNullOrUndefined, isPrimitive, isPrimitiveType, isMap
 } from "../../../../src/helpers/base";
 import { polyObjCreate } from "../../../../src//object/create";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
@@ -741,8 +741,6 @@ describe("base helpers", () => {
             assert.equal(isBoolean(false), true, "Checking false");
             assert.equal(isBoolean("true"), false, "Checking 'true'");
             assert.equal(isBoolean("false"), false, "Checking 'false'");
-
-            // Test Boolean objects
             assert.equal(isBoolean(new Boolean(true)), false, "Checking new Boolean(true)");
             assert.equal(isBoolean(new Boolean(false)), false, "Checking new Boolean(false)");
             assert.equal(isBoolean(new Boolean("true")), false, "Checking new Boolean('true')");
@@ -1158,8 +1156,8 @@ describe("base helpers", () => {
             assert.equal(isNotTruthy(Boolean("false")), false, "Checking Boolean('false')");
             assert.equal(isNotTruthy(Boolean("0")), false, "Checking Boolean('0')");
             assert.equal(isNotTruthy(Boolean(0)), true, "Checking Boolean(0)");
-            assert.equal(isNotTruthy(Boolean("1")), false, "Checking Boolean('0')");
-            assert.equal(isNotTruthy(Boolean(1)), false, "Checking Boolean(0)");
+            assert.equal(isNotTruthy(Boolean("1")), false, "Checking Boolean('1')");
+            assert.equal(isNotTruthy(Boolean(1)), false, "Checking Boolean(1)");
 
             assert.equal(isNotTruthy(/[a-z]/g), false, "Checking '/[a-z]/g'");
             assert.equal(isNotTruthy(new RegExp("")), false, "Checking new RegExp('')");
@@ -1308,4 +1306,66 @@ describe("base helpers", () => {
             super(message);
         }
     }
+
+    describe("isMap", () => {
+        it("Validate values", () => {
+            assert.equal(isMap(null), false, "Checking null");
+            assert.equal(isMap(undefined), false, "Checking undefined");
+            assert.equal(isMap("null"), false, "Checking 'null'");
+            assert.equal(isMap("undefined"), false, "Checking 'undefined'");
+            assert.equal(isMap("1"), false, "Checking '1'");
+            assert.equal(isMap("aa"), false, "Checking 'aa'");
+            assert.equal(isMap(new Date()), false, "Checking Date");
+            assert.equal(isMap(1), false, "Checking 1");
+            assert.equal(isMap(""), false, "Checking ''");
+            assert.equal(isMap(_dummyFunction), false, "Checking _dummyFunction");
+            assert.equal(isMap([]), false, "Checking []");
+            assert.equal(isMap(new Array(1)), false, "Checking new Array(1)");
+            assert.equal(isMap(true), false, "Checking true");
+            assert.equal(isMap(false), false, "Checking false");
+            assert.equal(isMap("true"), false, "Checking 'true'");
+            assert.equal(isMap("false"), false, "Checking 'false'");
+            assert.equal(isMap(new Boolean(true)), false, "Checking new Boolean(true)");
+            assert.equal(isMap(new Boolean(false)), false, "Checking new Boolean(false)");
+            assert.equal(isMap(new Boolean("true")), false, "Checking new Boolean('true')");
+            assert.equal(isMap(new Boolean("false")), false, "Checking new Boolean('false')");
+            assert.equal(isMap(/[a-z]/g), false, "Checking '/[a-z]/g'");
+            assert.equal(isMap(new RegExp("")), false, "Checking new RegExp('')");
+            _isFileCheck(isMap, false);
+            _isFormDataCheck(isMap, false);
+            _isBlobCheck(isMap, false);
+            assert.equal(isMap(new ArrayBuffer(0)), false, "Checking new ArrayBuffer([])");
+            assert.equal(isMap(new Error("Test Error")), false, "Checking new Error('')");
+            assert.equal(isMap(new TypeError("Test TypeError")), false, "Checking new TypeError('')");
+            assert.equal(isMap(new TestError("Test TestError")), false, "Checking new TestError('')");
+            assert.equal(isMap(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+            assert.equal(isMap(Promise.reject()), false, "Checking Promise.reject");
+            assert.equal(isMap(Promise.resolve()), false, "Checking Promise.resolve");
+            assert.equal(isMap(new Promise(() => {})), false, "Checking new Promise(() => {})");
+            assert.equal(isMap(_simplePromise()), false, "Checking _simplePromise");
+            assert.equal(isMap(_simplePromiseLike()), false, "Checking _simplePromiseLike");
+            assert.equal(isMap(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isMap(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
+            
+            // Map-specific tests
+            assert.equal(isMap(new Map()), true, "Checking new Map()");
+            assert.equal(isMap(new Map([["key", "value"]])), true, "Checking new Map with entries");
+            assert.equal(isMap(new WeakMap()), false, "Checking new WeakMap()");
+            
+            // Testing objects that might look like maps
+            const mapLike = {
+                size: 1,
+                get: () => {},
+                set: () => {},
+                has: () => {},
+                delete: () => {},
+                clear: () => {}
+            };
+            assert.equal(isMap(mapLike), false, "Checking map-like object");
+            
+            // Testing Set objects
+            assert.equal(isMap(new Set()), false, "Checking new Set()");
+            assert.equal(isMap(new WeakSet()), false, "Checking new WeakSet()");
+        });
+    });
 });

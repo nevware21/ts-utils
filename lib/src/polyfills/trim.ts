@@ -6,17 +6,13 @@
  * Licensed under the MIT license.
  */
 
-import { isNullOrUndefined } from "../helpers/base";
-import { dumpObj } from "../helpers/diagnostics";
-import { throwTypeError } from "../helpers/throw";
 import { EMPTY } from "../internal/constants";
+import { _throwIfNullOrUndefined } from "../internal/throwIf";
 
 /*#__NO_SIDE_EFFECTS__*/
 function _createTrimFn(exp: RegExp): (value: string) => string {
     return function _doTrim(value: string): string {
-        if (isNullOrUndefined(value)) {
-            throwTypeError("strTrim called [" + dumpObj(value) + "]")
-        }
+        _throwIfNullOrUndefined(value);
     
         if (value && value.replace) {
             value = value.replace(exp, EMPTY);

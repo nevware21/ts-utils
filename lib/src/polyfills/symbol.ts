@@ -8,15 +8,23 @@
 
 import { WellKnownSymbols, _wellKnownSymbolMap } from "../symbol/well_known";
 import { throwTypeError } from "../helpers/throw";
-import { POLYFILL_TAG, SYMBOL, TO_STRING } from "../internal/constants";
+import { SYMBOL, TO_STRING } from "../internal/constants";
 import { objHasOwn } from "../object/has_own";
 import { asString } from "../string/as_string";
 import { _GlobalPolySymbols, _getGlobalConfig } from "../internal/global";
 import { strSubstring } from "../string/substring";
 import { objKeys } from "../object/object";
+import { objDefine } from "../object/define";
+import { _isPolyfill } from "../internal/poly_helpers";
+import { _tagAsPolyfill } from "../internal/poly_utils";
+import { objCreate } from "../object/create";
+import { _uniqueInstanceId } from "../internal/instance";
 
 const UNIQUE_REGISTRY_ID = "_urid";
+const POLY_SYM = "$nw21sym";
 let _polySymbols: _GlobalPolySymbols;
+
+let _polyId = 0;
 
 /*#__NO_SIDE_EFFECTS__*/
 function _globalSymbolRegistry(): _GlobalPolySymbols {
@@ -43,15 +51,42 @@ let _wellKnownSymbolCache: { [key in keyof typeof WellKnownSymbols ]: symbol };
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyNewSymbol(description?: string | number): symbol {
-    let theSymbol: symbol = {
-        description: asString(description),
-        toString: () => SYMBOL + "(" + description + ")"
-    } as symbol;
+    // Create a unique identifier for this symbol instance
+    const uniqueId = "_" + _polyId++ + "_" + _uniqueInstanceId.v;
+    const symString = SYMBOL + "(" + description + ")";
     
-    // Tag the symbol so we know it a polyfill
-    theSymbol[POLYFILL_TAG] = true;
+    let theSymbol = objCreate(null) as symbol;
+    objDefine(theSymbol, "description", {
+        v: asString(description),
+        e: false,
+        w: false
+    });
 
-    return theSymbol;
+    objDefine(theSymbol as any, TO_STRING, {
+        v: () => symString + POLY_SYM + uniqueId,
+        e: false,
+        w: false
+    });
+
+    objDefine(theSymbol, "valueOf", {
+        v: () => theSymbol,
+        e: false,
+        w: false
+    });
+
+    objDefine((theSymbol as any), "v", {
+        v: symString,
+        e: false,
+        w: false
+    });
+
+    objDefine((theSymbol as any), "_uid", {
+        v: uniqueId,
+        e: false,
+        w: false
+    });
+
+    return _tagAsPolyfill(theSymbol as any, "symbol") as symbol;
 }
 
 /**
@@ -88,7 +123,7 @@ export function polySymbolKeyFor(sym: symbol): string | undefined {
         throwTypeError((sym as any) + " is not a symbol");
     }
 
-    const regId = sym[POLYFILL_TAG] && sym[UNIQUE_REGISTRY_ID] && sym[UNIQUE_REGISTRY_ID]();
+    const regId = _isPolyfill(sym) && sym[UNIQUE_REGISTRY_ID] && sym[UNIQUE_REGISTRY_ID]();
 
     return regId ? _globalSymbolRegistry().s[regId] : undefined;
 }
