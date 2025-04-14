@@ -26,11 +26,13 @@ export {
     isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isDate, isNumber, isBoolean,
     isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isThenable, isNotTruthy, isTruthy, objToString,
     isStrictNullOrUndefined, isStrictUndefined, isError, isPrimitive, isPrimitiveType, isMap, isMapLike, isSet, isSetLike,
-    isWeakMap, isWeakSet
+    isWeakMap, isWeakSet, isBigInt
 } from "./helpers/base";
 export { ICachedValue, createCachedValue, createDeferredCachedValue } from "./helpers/cache";
 export { CustomErrorConstructor, createCustomError, throwUnsupported } from "./helpers/customError";
 export { utcNow, polyUtcNow } from "./helpers/date";
+export { isElement } from "./helpers/dom";
+export { isEmpty } from "./helpers/is_empty";
 export { dumpObj } from "./helpers/diagnostics";
 export {
     EnumCls, EnumNameMap, EnumValueMap, EnumTypeMap, createEnum, createEnumKeyMap, createEnumValueMap, createSimpleMap, createTypeMap
@@ -45,7 +47,7 @@ export {
 } from "./helpers/extend";
 export { ILazyValue, getLazy, setBypassLazyCache, getWritableLazy } from "./helpers/lazy";
 export { IGetLength as GetLengthImpl, getLength } from "./helpers/length";
-export { getIntValue } from "./helpers/number";
+export { getIntValue, isInteger, isFiniteNumber } from "./helpers/number";
 export { getPerformance, hasPerformance, elapsedTime, perfNow } from "./helpers/perf";
 export { createFilenameRegex, createWildcardRegex, makeGlobRegex } from "./helpers/regexp";
 export { safe, ISafeReturn, SafeReturnType } from "./helpers/safe";

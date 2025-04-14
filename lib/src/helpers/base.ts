@@ -744,3 +744,22 @@ export function isTruthy(value: any) {
     return !(!value || safeGet(() => !(value && (0 + value)), !value));
     //return !(!value || !(value && (0 + value)));
 }
+
+/**
+ * Checks if the type of value is a BigInt.
+ * @function
+ * @group Type Identity
+ * @param value - Value to be checked.
+ * @return True if the value is a BigInt, false otherwise.
+ * @example
+ * ```ts
+ * isBigInt(BigInt(42));           // true
+ * isBigInt(42n);                  // true
+ *
+ * isBigInt(42);                   // false
+ * isBigInt("42");                 // false
+ * isBigInt(null);                 // false
+ * isBigInt(undefined);            // false
+ * ```
+ */
+export const isBigInt: (value: any) => value is bigint = (/*#__PURE__*/_createIsWithPoly<bigint>("bigint"));

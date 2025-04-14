@@ -71,3 +71,9 @@ export const ArrProto = (/*#__PURE__*/_pureRef<typeof ArrCls.prototype>(ArrCls, 
  *
  */
 export const ArrSlice = (/*#__PURE__*/_pureRef<typeof ArrProto.slice>(ArrProto, "slice"));
+
+/**
+ * @ignore
+ */
+export const NumberCls = (/*#__PURE__*/_pureAssign(Number));
+
