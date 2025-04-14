@@ -45,6 +45,7 @@ export { encodeAsHtml, encodeAsJson, normalizeJsName } from "./helpers/encode";
 export {
     deepExtend, objExtend
 } from "./helpers/extend";
+export { getValueByKey, setValueByKey, getValueByIter, setValueByIter } from "./helpers/get_set_value";
 export { ILazyValue, getLazy, setBypassLazyCache, getWritableLazy } from "./helpers/lazy";
 export { IGetLength as GetLengthImpl, getLength } from "./helpers/length";
 export { getIntValue, isInteger, isFiniteNumber } from "./helpers/number";
@@ -129,4 +130,4 @@ export { polyObjIs } from "./polyfills/object/objIs";
 export { polyStrSymSplit } from "./polyfills/split";
 export { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "./polyfills/symbol";
 export { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "./polyfills/trim";
-
+export { polyObjHasOwn } from "./polyfills/object/objHasOwn";
