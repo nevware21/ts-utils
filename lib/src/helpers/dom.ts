@@ -31,3 +31,31 @@ export function isElement(value: any): value is Element {
            !!value.nodeName &&
            !!(typeof Element !== "undefined" && value instanceof Element);
 }
+
+/**
+ * Checks if a value has the basic properties of a DOM Element without requiring it to be an actual Element instance.
+ * This is useful for identifying objects that have element-like properties but aren't actual DOM Elements.
+ * @group Type Identity
+ * @group DOM
+ * @param value - The value to check
+ * @returns True if the value has the basic properties of a DOM Element, false otherwise
+ * @example
+ * ```ts
+ * // Real DOM element
+ * isElementLike(document.createElement('div'));    // true
+ *
+ * // Object that has element-like properties
+ * isElementLike({
+ *   nodeType: 1,
+ *   nodeName: 'DIV'
+ * });                                             // true
+ *
+ * isElementLike(document);                        // false
+ * isElementLike({});                              // false
+ * isElementLike(null);                            // false
+ * isElementLike(undefined);                       // false
+ * ```
+ */
+export function isElementLike(value: any): boolean {
+    return !!value && value.nodeType === 1 && !!value.nodeName;
+}

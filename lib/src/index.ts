@@ -31,7 +31,7 @@ export {
 export { ICachedValue, createCachedValue, createDeferredCachedValue } from "./helpers/cache";
 export { CustomErrorConstructor, createCustomError, throwUnsupported } from "./helpers/customError";
 export { utcNow, polyUtcNow } from "./helpers/date";
-export { isElement } from "./helpers/dom";
+export { isElement, isElementLike } from "./helpers/dom";
 export { isEmpty } from "./helpers/is_empty";
 export { dumpObj } from "./helpers/diagnostics";
 export {
