@@ -1,3 +1,16 @@
+# v0.12.1 Apr 14th, 2025
+
+## Changelog
+
+### Issues
+
+- [#398](https://github.com/nevware21/ts-utils/issues/398) [Bug] setValueByKey function is no longer exported in version 0.12.0
+
+### Commits
+
+- [#399](https://github.com/nevware21/ts-utils/issues/399) Reinstate the dropped exports due to code re-organization
+
+
 # v0.12.0 Apr 14th, 2025
 
 ## Changelog
