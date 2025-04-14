@@ -1,3 +1,35 @@
+# v0.12.0 Apr 14th, 2025
+
+## Changelog
+
+### Issues
+
+- [#387](https://github.com/nevware21/ts-utils/issues/387) [Bug] Polyfill symbol doesn't work as expected as unique key for an object
+- [#389](https://github.com/nevware21/ts-utils/issues/389) [Bug] objCreate doesn't support additional optional properties argument
+- [#392](https://github.com/nevware21/ts-utils/issues/392) [Bug] mathMax is defined to use using Math.min
+
+### Commits
+
+- [#378](https://github.com/nevware21/ts-utils/pull/378) Bump mocha from 10.8.2 to 11.2.0
+- [#383](https://github.com/nevware21/ts-utils/pull/383) Add objIs and polyObjIs
+- [#384](https://github.com/nevware21/ts-utils/pull/384) Add additional Object alias functions
+  - objPropertyIsEnumerable, objFromEntries, objGetOwnPropertyDescriptors,objGetOwnPropertyNames, objGetOwnPropertySymbols, objIsFrozen, objIsSealed, objPreventExtensions, objIsExtensible
+  - Add new type check functions
+    - isMap, isMapLike
+  - Update symbol polyfill to enable isSymbol
+- [#390](https://github.com/nevware21/ts-utils/pull/390) Fixup exports and readme for new functions
+- [#391](https://github.com/nevware21/ts-utils/pull/391) Bump to typedoc ^0.28.2, Bump to typescript ~5.2.2
+  - Use github theme
+  - tag alias constants as functions
+  - Bump to typescript ~5.2.2
+    - remove suppressImplicitAnyIndexErrors
+- [#393](https://github.com/nevware21/ts-utils/pull/393) [Bug] mathMax is defined to use using Math.min [#392](https://github.com/nevware21/ts-utils/issues/392)
+  - Add additional ES5 Math aliases
+    - mathAbs, mathExp, mathLog, mathAsin, mathAcos, mathAtan, mathAtan2, mathPow, mathSqrt, mathRandom, mathSin, mathCos, mathTan
+- [#394](https://github.com/nevware21/ts-utils/pull/394) Add isSet, SetLike, WeakSet and isWeakMap helpers
+- [#395](https://github.com/nevware21/ts-utils/pull/395) Add isBigInt, isElement, isEmpty, isInteger, isFiniteNumber
+- [#396](https://github.com/nevware21/ts-utils/pull/396) Add isElementLike helper
+
 # v0.11.7 Feb 24th, 2025
 
 ## Changelog

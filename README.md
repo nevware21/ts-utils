@@ -16,7 +16,7 @@ Support for standard JavaScript functions (ES5+) that are not support in all env
 
 ### Test Environments
 
-- Node (16, 18, 20)
+- Node (16, 18, 20, 22)
 - Browser (Chromium - headless)
 - Web Worker (Chromium - headless)
 
@@ -68,7 +68,7 @@ This library plans to maintain ES5 compatibility for all versions of v0.x and v1
 ### ES(future [6 next, etc])
 
 Future versions of this library starting at version 2.x are planned to lift and remove the internal polyfills to support the new targetted baseline once it is defined.
-ie. It may or may not be ES6 depending on the runtime landscape and requests received.
+ie. It may or may not be ES2020 depending on the runtime landscape and requests received.
 
 When we release v2.x the supported browser matrix will also shift as required to match the defined language level supported at that time. 
 
@@ -83,7 +83,7 @@ Install the npm packare: `npm install @nevware21/ts-utils --save`
 > It is suggested / recommended that you use the following definition in your `package.json` so that you are compatible with any future releases as they become available
 > we do not intend to make ANY known breaking changes moving forward until v2.x 
 > ```json
-> "@nevware21/ts-utils": ">= 0.11.8 < 2.x"
+> "@nevware21/ts-utils": ">= 0.12.0 < 2.x"
 > ```
 
 And then just import the helpers and use them.
