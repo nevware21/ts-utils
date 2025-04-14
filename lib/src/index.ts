@@ -57,9 +57,15 @@ export { CreateIteratorContext, createIterator, createIterable, makeIterable } f
 export { iterForOf } from "./iterator/forOf";
 export { isIterable, isIterator } from "./iterator/iterator";
 export { createRangeIterator } from "./iterator/range";
+export { mathAbs } from "./math/abs";
 export { mathCeil, mathFloor } from "./math/floor";
+export { mathExp, mathLog } from "./math/exp_log";
+export { mathAsin, mathAcos, mathAtan, mathAtan2 } from "./math/inverse_trig";
 export { mathMin, mathMax } from "./math/min_max";
+export { mathPow, mathSqrt } from "./math/power";
+export { mathRandom } from "./math/random";
 export { mathRound } from "./math/round";
+export { mathSin, mathCos, mathTan } from "./math/trig";
 export { mathToInt } from "./math/to_int";
 export { mathTrunc } from "./math/trunc";
 export {

@@ -29,7 +29,7 @@ export const strTrim: (value: string) => string = (/*#__PURE__*/_unwrapFunctionW
 
 /**
  * The `strTrimStart()` method removes whitespace from the beginning of a string.
- * 
+ *
  * @function
  * @group String
  * @param value - The value to be trimmed.
@@ -41,7 +41,7 @@ export const strTrimStart: (value: string) => string = (/*#__PURE__*/_unwrapFunc
 
 /**
  * Alias for `strTrimStart()` method removes whitespace from the beginning of a string.
- * 
+ *
  * @function
  * @group String
  * @param value - The value to be trimmed.
@@ -53,7 +53,7 @@ export const strTrimLeft = (/*#__PURE__*/_pureAssign(strTrimStart));
 
 /**
  * The `strTrimEnd()` method removes whitespace from the end of a string.
- * 
+ *
  * @function
  * @group String
  * @param value - The value to be trimmed.
@@ -65,7 +65,7 @@ export const strTrimEnd: (value: string) => string = (/*#__PURE__*/_unwrapFuncti
 
 /**
  * Alias for `strTrimEnd()` method removes whitespace from the end of a string.
- * 
+ *
  * @function
  * @group String
  * @param value - The value to be trimmed.

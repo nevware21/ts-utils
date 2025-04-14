@@ -52,4 +52,4 @@ export const mathMin: (...values: number[]) => number = (/*#__PURE__*/_pureRef<t
  * mathMax(-10, 20);  //  20
  * ```
  */
-export const mathMax: (...values: number[]) => number = (/*#__PURE__*/_pureRef<typeof Math.min>(MathCls, "max"));
+export const mathMax: (...values: number[]) => number = (/*#__PURE__*/_pureRef<typeof Math.max>(MathCls, "max"));

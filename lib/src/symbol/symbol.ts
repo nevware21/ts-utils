@@ -34,7 +34,7 @@ function _getSymbolKey<R>(key: string) {
 
 /**
  * Checks if the type of value is a symbol.
- * 
+ *
  * @function
  * @group Symbol
  * @param value - Value to be checked.

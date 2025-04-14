@@ -12,7 +12,7 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
 /**
  * The strUpper() method returns the calling string value converted to uppercase.
  * (the value will be converted to a string if it isn't one).
- * 
+ *
  * @function
  * @since 0.9.0
  * @group String
@@ -34,7 +34,7 @@ export const strUpper: <T>(value: T) => string = (/*#__PURE__*/_unwrapFunction("
 /**
  * The strLower() method returns the value of the string converted to lower case.
  * strLower() does not affect the value of the string str itself.
- * 
+ *
  * @function
  * @since 0.9.0
  * @group String
