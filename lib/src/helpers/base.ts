@@ -605,6 +605,54 @@ export function isPromise<T>(value: any): value is Promise<T> {
 export const isMap: <K = any, V = any>(value: any) => value is Map<K, V> = (/*#__PURE__*/_createObjIs<Map<any, any>>("Map"));
 
 /**
+ * Checks if the type of value is a WeakMap object.
+ * @function
+ * @group Type Identity
+ * @param value - Value to be checked.
+ * @return True if the value is a WeakMap, false otherwise.
+ * @example
+ * ```ts
+ * isWeakMap(new WeakMap());    // true
+ * isWeakMap(new Map());        // false
+ * isWeakMap({});               // false
+ * isWeakMap(null);             // false
+ * ```
+ */
+export const isWeakMap: <K extends object = object, V = any>(value: any) => value is WeakMap<K, V> = (/*#__PURE__*/_createObjIs<WeakMap<any, any>>("WeakMap"));
+
+/**
+ * Checks if the type of value is a Set object.
+ * @function
+ * @group Type Identity
+ * @param value - Value to be checked.
+ * @return True if the value is a Set, false otherwise.
+ * @example
+ * ```ts
+ * isSet(new Set());        // true
+ * isSet(new WeakSet());    // false
+ * isSet({});               // false
+ * isSet(null);             // false
+ * ```
+ */
+export const isSet: <T = any>(value: any) => value is Set<T> = (/*#__PURE__*/_createObjIs<Set<any>>("Set"));
+
+/**
+ * Checks if the type of value is a WeakSet object.
+ * @function
+ * @group Type Identity
+ * @param value - Value to be checked.
+ * @return True if the value is a WeakSet, false otherwise.
+ * @example
+ * ```ts
+ * isWeakSet(new WeakSet());    // true
+ * isWeakSet(new Set());        // false
+ * isWeakSet({});               // false
+ * isWeakSet(null);             // false
+ * ```
+ */
+export const isWeakSet: <T extends object = object>(value: any) => value is WeakSet<T> = (/*#__PURE__*/_createObjIs<WeakSet<any>>("WeakSet"));
+
+/**
  * Checks if the type of value is Map-like (has essential Map methods).
  * @group Type Identity
  * @param value - Value to be checked.
@@ -635,7 +683,38 @@ export function isMapLike<K = any, V = any>(value: any): value is Map<K, V> {
         isFunction(value.set) &&
         isFunction(value.has) &&
         isFunction(value.delete) &&
-        !isStrictUndefined(value.size));
+        isNumber(value.size));
+}
+
+/**
+ * Checks if the type of value is Set-like (has essential Set methods).
+ * @group Type Identity
+ * @param value - Value to be checked.
+ * @return True if the value implements the Set interface, false otherwise.
+ * @example
+ * ```ts
+ * isSetLike(new Set());                // true
+ *
+ * // Custom set-like implementation
+ * const mySet = {
+ *   add: (value) => { return mySet; },
+ *   has: (value) => { return false; },
+ *   delete: (value) => { return false; },
+ *   size: 0
+ * };
+ * isSetLike(mySet);                    // true
+ *
+ * isSetLike({});                       // false
+ * isSetLike(null);                     // false
+ * isSetLike(undefined);                // false
+ * ```
+ */
+export function isSetLike<T = any>(value: any): value is Set<T> {
+    return !!(value &&
+        isFunction(value.add) &&
+        isFunction(value.has) &&
+        isFunction(value.delete) &&
+        isNumber(value.size));
 }
 
 /**
