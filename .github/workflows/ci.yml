@@ -50,3 +50,6 @@ jobs:
 
     - name: Bundle Size Checks
       run: npm run size-check
+
+    - name: Docs link check
+      run: npm run readme-link-check
