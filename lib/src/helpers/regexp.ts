@@ -69,7 +69,7 @@ function _createRegExp(value: string, escapeRgx: RegExp, replaceFn: (value: stri
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function createWildcardRegex(value: string, ignoreCase?: boolean, fullMatch?: boolean) {
-    return _createRegExp(asString(value), /([-+|^$#.\?{}()\[\]\\/\"\'])/g, (value: string) => {
+    return _createRegExp(asString(value), /([-+|^$#\.\?{}()\[\]\\\/\"\'])/g, (value: string) => {
         return value.replace(/\*/g, MATCH_ANY);
     }, !!ignoreCase, fullMatch);
 }
@@ -119,7 +119,7 @@ export function createWildcardRegex(value: string, ignoreCase?: boolean, fullMat
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function createFilenameRegex(value: string, ignoreCase?: boolean, fullMatch?: boolean) {
-    return _createRegExp(asString(value), /([-+|^$#.{}()\\\/\[\]\"\'])/g, (value: string) => {
+    return _createRegExp(asString(value), /([-+|^$#\.{}()\\\/\[\]\"\'])/g, (value: string) => {
         return value.replace(/(\\\\|\\\/|\*|\?)/g, function (_all, g1) {
             if (g1 == "\\/" || g1 == "\\\\") {
                 return "[\\\\\\/]{1}";
@@ -193,7 +193,7 @@ export function createFilenameRegex(value: string, ignoreCase?: boolean, fullMat
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function makeGlobRegex(value: string, ignoreCase?: boolean, fullMatch?: boolean) {
-    return _createRegExp(asString(value), /([-+|^$#.{}()\\\/\[\]\"\'])/g, (value: string) => {
+    return _createRegExp(asString(value), /([-+|^$#\.{}()\\\/\[\]\"\'])/g, (value: string) => {
         //"**\/*\.txt"
         return value.replace(/(\*\*\\[\\\/]|\\\\|\\\/|\*\*|\*|\?)/g, function (_all, g1) {
             if (g1 == "**\\/" || g1 == "**\\\\") {

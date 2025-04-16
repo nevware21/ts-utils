@@ -139,7 +139,9 @@
         "dtsgen": "api-extractor run --local --verbose",
         "size": "size-limit",
         "size-save": "size-limit --clean-dir --save-bundle build/size",
-        "size-check": "node lib/test/bundle-size-check.js"
+        "size-check": "node lib/test/bundle-size-check.js",
+        "link-check": "node lib/test/readme-links-check.js",
+        "readme-link-check": "npm run docs && npm run link-check"
     },
     "repository": {
         "type": "git",
