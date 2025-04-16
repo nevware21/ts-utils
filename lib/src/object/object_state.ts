@@ -8,8 +8,10 @@
 
 import { ObjClass } from "../internal/constants";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
-import { polyObjIsFrozen } from "../polyfills/object/objIsFrozen";
-import { polyObjIsSealed } from "../polyfills/object/objIsSealed";
+
+function _returnFalse(): boolean {
+    return false;
+}
 
 /**
  * The `objIsFrozen()` method determines if an object is frozen. An object is frozen if and only if it is not
@@ -29,7 +31,7 @@ import { polyObjIsSealed } from "../polyfills/object/objIsSealed";
  * console.log(objIsFrozen(frozen)); // true
  * ```
  */
-export const objIsFrozen: (obj: any) => boolean = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.isFrozen>(ObjClass, "isFrozen")), polyObjIsFrozen));
+export const objIsFrozen: (obj: any) => boolean = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.isFrozen>(ObjClass, "isFrozen")), _returnFalse));
 
 /**
  * The `objIsSealed()` method determines if an object is sealed. An object is sealed if it is not
@@ -53,4 +55,4 @@ export const objIsFrozen: (obj: any) => boolean = (/* #__PURE__*/_pureAssign((/*
  * console.log(objIsSealed(frozen)); // true
  * ```
  */
-export const objIsSealed: (obj: any) => boolean = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.isSealed>(ObjClass, "isSealed")), polyObjIsSealed));
+export const objIsSealed: (obj: any) => boolean = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.isSealed>(ObjClass, "isSealed")), _returnFalse));

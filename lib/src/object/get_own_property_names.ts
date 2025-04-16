@@ -8,7 +8,10 @@
 
 import { ObjClass } from "../internal/constants";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
-import { polyObjGetOwnPropertyNames } from "../polyfills/object/objGetOwnPropertyNames";
+
+function _returnEmptyArray(): string[] {
+    return [];
+}
 
 /**
  * The objGetOwnPropertyNames() method returns an array of all properties (including non-enumerable properties except for
@@ -34,4 +37,4 @@ import { polyObjGetOwnPropertyNames } from "../polyfills/object/objGetOwnPropert
  * objGetOwnPropertyNames(obj); // ['hidden', 'visible']
  * ```
  */
-export const objGetOwnPropertyNames: (obj: any) => string[] = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyNames>(ObjClass, "getOwnPropertyNames")), polyObjGetOwnPropertyNames));
+export const objGetOwnPropertyNames: (obj: any) => string[] = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyNames>(ObjClass, "getOwnPropertyNames")), _returnEmptyArray));

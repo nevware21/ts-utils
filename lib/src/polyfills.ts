@@ -21,7 +21,6 @@ import { makePolyFn } from "./internal/poly_helpers";
 import { polyStrSubstr } from "./string/substring";
 import { polyStrIncludes } from "./string/includes";
 import { polyObjFromEntries } from "./polyfills/object/objFromEntries";
-import { polyObjGetOwnPropertyDescriptor } from "./polyfills/object/objGetOwnPropertyDescriptor";
 import { polyObjGetOwnPropertyDescriptors, polyObjGetOwnPropertySymbols } from "./polyfills/object/objGetOwnPropertyDescriptors";
 import { polyObjGetOwnPropertyNames } from "./polyfills/object/objGetOwnPropertyNames";
 import { polyObjHasOwn } from "./polyfills/object/objHasOwn";
@@ -42,7 +41,6 @@ import { polyObjIsSealed } from "./polyfills/object/objIsSealed";
         "fromEntries": polyObjFromEntries,
         "entries": polyObjEntries,
         "values": polyObjValues,
-        "getOwnPropertyDescriptor": polyObjGetOwnPropertyDescriptor,
         "getOwnPropertyDescriptors": polyObjGetOwnPropertyDescriptors,
         "getOwnPropertyNames": polyObjGetOwnPropertyNames,
         "getOwnPropertySymbols": polyObjGetOwnPropertySymbols,

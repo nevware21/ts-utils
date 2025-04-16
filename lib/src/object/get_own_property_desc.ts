@@ -6,9 +6,12 @@
  * Licensed under the MIT license.
  */
 
-import { ObjClass } from "../internal/constants";
+import { ObjClass, UNDEF_VALUE } from "../internal/constants";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
-import { polyObjGetOwnPropertyDescriptor } from "../polyfills/object/objGetOwnPropertyDescriptor";
+
+function _returnNothing(): PropertyDescriptor | undefined {
+    return UNDEF_VALUE;
+}
 
 /**
  * The objGetOwnPropertyDescriptor() method returns an object describing the configuration of a specific property on
@@ -50,4 +53,4 @@ import { polyObjGetOwnPropertyDescriptor } from "../polyfills/object/objGetOwnPr
  * ```
  * Note: In ES5, if the first argument to this method is not an object (a primitive), then it will cause a TypeError. In ES2015, a non-object first argument will be coerced to an object at first.
  */
-export const objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, "getOwnPropertyDescriptor")), polyObjGetOwnPropertyDescriptor));
+export const objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, "getOwnPropertyDescriptor")), _returnNothing));

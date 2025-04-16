@@ -9,10 +9,10 @@
 import { arrForEach } from "../../array/forEach";
 import { ObjClass } from "../../internal/constants";
 import { _throwIfNullOrUndefined } from "../../internal/throwIf";
+import { objGetOwnPropertyDescriptor } from "../../object/get_own_property_desc";
 import { objGetOwnPropertyNames } from "../../object/get_own_property_names";
 import { getKnownSymbol } from "../../symbol/symbol";
 import { WellKnownSymbols } from "../../symbol/well_known";
-import { polyObjGetOwnPropertyDescriptor } from "./objGetOwnPropertyDescriptor";
 import { polyObjHasOwn } from "./objHasOwn";
 
 let recursionCheckOwnDescriptors: boolean;
@@ -38,7 +38,7 @@ export function polyObjGetOwnPropertyDescriptors(obj: any): PropertyDescriptorMa
             // Get all property names, including non-enumerable ones if the environment supports it
             arrForEach(objGetOwnPropertyNames(obj), (propName) => {
                 // Add descriptor for each property
-                const descriptor = polyObjGetOwnPropertyDescriptor(obj, propName);
+                const descriptor = objGetOwnPropertyDescriptor(obj, propName);
                 if (descriptor !== undefined) {
                     result[propName] = descriptor;
                 }
@@ -46,7 +46,7 @@ export function polyObjGetOwnPropertyDescriptors(obj: any): PropertyDescriptorMa
             
             // Handle symbol properties if supported in the environment
             arrForEach(polyObjGetOwnPropertySymbols(obj), (sym) => {
-                const descriptor = polyObjGetOwnPropertyDescriptor(obj, sym);
+                const descriptor = objGetOwnPropertyDescriptor(obj, sym);
                     
                 if (descriptor !== undefined) {
                     result[sym as any] = descriptor;

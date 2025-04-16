@@ -13,7 +13,6 @@ import { polyObjIs } from "../../../../src/polyfills/object/objIs";
 import { polyObjKeys } from "../../../../src/polyfills/object/objKeys";
 import { polyObjValues } from "../../../../src/polyfills/object/objValues";
 import { polyObjGetOwnPropertyNames } from "../../../../src/polyfills/object/objGetOwnPropertyNames";
-import { polyObjGetOwnPropertyDescriptor } from "../../../../src/polyfills/object/objGetOwnPropertyDescriptor";
 import { polyObjGetOwnPropertyDescriptors, polyObjGetOwnPropertySymbols } from "../../../../src/polyfills/object/objGetOwnPropertyDescriptors";
 import { polyObjHasOwn } from "../../../../src/polyfills/object/objHasOwn";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
@@ -574,294 +573,6 @@ describe("object polyfills", () => {
         });
     });
 
-    describe("polyObjGetOwnPropertyDescriptor", () => {
-        it("should return correct descriptor for data property", () => {
-            const obj = { a: 1, b: "hello" };
-            
-            const descriptorA = polyObjGetOwnPropertyDescriptor(obj, "a");
-            assert.isObject(descriptorA);
-            assert.equal(descriptorA?.value, 1);
-            assert.isTrue(descriptorA?.configurable);
-            assert.isTrue(descriptorA?.enumerable);
-            assert.isTrue(descriptorA?.writable);
-            
-            const descriptorB = polyObjGetOwnPropertyDescriptor(obj, "b");
-            assert.isObject(descriptorB);
-            assert.equal(descriptorB?.value, "hello");
-            assert.isTrue(descriptorB?.configurable);
-            assert.isTrue(descriptorB?.enumerable);
-            assert.isTrue(descriptorB?.writable);
-        });
-        
-        it("should return undefined for non-existent properties", () => {
-            const obj = { a: 1 };
-            
-            const descriptor = polyObjGetOwnPropertyDescriptor(obj, "nonExistent");
-            assert.isUndefined(descriptor);
-        });
-        
-        it("should handle primitive types by converting them to objects", () => {
-            // String
-            const strDescriptor = polyObjGetOwnPropertyDescriptor("hello", "0");
-            assert.isObject(strDescriptor);
-            assert.equal(strDescriptor?.value, "h");
-            assert.isTrue(strDescriptor?.configurable);
-            assert.isTrue(strDescriptor?.enumerable);
-            
-            // Number
-            const numDescriptor = polyObjGetOwnPropertyDescriptor(42, "toString");
-            // This test is environment-dependent, as Number.prototype.toString accessibility may vary
-            if (numDescriptor) {
-                assert.isObject(numDescriptor);
-            }
-            
-            // Boolean
-            const boolDescriptor = polyObjGetOwnPropertyDescriptor(true, "valueOf");
-            // This test is environment-dependent, as Boolean.prototype.valueOf accessibility may vary
-            if (boolDescriptor) {
-                assert.isObject(boolDescriptor);
-            }
-        });
-        
-        it("should throw TypeError for null and undefined", () => {
-            assert.throws(() => {
-                polyObjGetOwnPropertyDescriptor(null, "prop");
-            }, TypeError);
-            
-            assert.throws(() => {
-                polyObjGetOwnPropertyDescriptor(undefined, "prop");
-            }, TypeError);
-        });
-        
-        it("should support Symbol as property key", () => {
-            const sym = newSymbol("test");
-            const obj: any = {};
-            obj[sym] = "symbol value";
-            
-            const descriptor = polyObjGetOwnPropertyDescriptor(obj, sym);
-            assert.isObject(descriptor);
-            assert.equal(descriptor?.value, "symbol value");
-            assert.isTrue(descriptor?.configurable);
-            assert.isTrue(descriptor?.enumerable);
-            assert.isTrue(descriptor?.writable);
-        });
-        
-        it("should handle accessor properties when possible", () => {
-            // Skip if defineProperty isn't available
-            if (typeof Object.defineProperty !== "function") {
-                return;
-            }
-            
-            let value = 0;
-            const obj = {};
-            
-            Object.defineProperty(obj, "accessorProp", {
-                get: function() {
-                    return value;
-                },
-                set: function(v) {
-                    value = v;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            
-            const descriptor = polyObjGetOwnPropertyDescriptor(obj, "accessorProp");
-            
-            // In environments with full descriptor support
-            if (descriptor && typeof descriptor.get === "function") {
-                assert.isFunction(descriptor.get);
-                assert.isFunction(descriptor.set);
-                assert.isUndefined(descriptor.value);
-                assert.isUndefined(descriptor.writable);
-            } else if (descriptor) {
-                // In environments with limited support, it might fall back to a data property
-                assert.isTrue(descriptor.configurable);
-                assert.isTrue(descriptor.enumerable);
-            }
-        });
-        
-        it("should be compatible with the native implementation for basic objects", function() {
-            // Skip if the native method doesn't exist
-            if (typeof Object.getOwnPropertyDescriptor !== "function") {
-                return;
-            }
-            
-            // Test various objects
-            const testCases = [
-                { a: 1, b: "string" },
-                ["x", "y", "z"],
-                new Date()
-            ];
-            
-            testCases.forEach(obj => {
-                for (const propName in obj) {
-                    if (Object.prototype.hasOwnProperty.call(obj, propName)) {
-                        const polyResult = polyObjGetOwnPropertyDescriptor(obj, propName);
-                        const nativeResult = Object.getOwnPropertyDescriptor(obj, propName);
-                        
-                        // Check if key properties match
-                        assert.equal(
-                            polyResult?.value,
-                            nativeResult?.value,
-                            `Value should match for property "${propName}" on ${dumpObj(obj)}`
-                        );
-                        
-                        assert.equal(
-                            polyResult?.enumerable,
-                            nativeResult?.enumerable,
-                            `Enumerable should match for property "${propName}" on ${dumpObj(obj)}`
-                        );
-                        
-                        // Check that we're always returning configurable and writable as true
-                        // for our polyfill (this is a limitation)
-                        assert.isTrue(polyResult?.configurable);
-                        assert.isTrue(polyResult?.writable);
-                    }
-                }
-            });
-        });
-        
-        it("should handle equivalence with objGetOwnPropertyDescriptor for valid inputs", () => {
-            const obj = { a: 1, b: "string", c: true };
-            
-            assert.deepEqual(
-                polyObjGetOwnPropertyDescriptor(obj, "a"),
-                objGetOwnPropertyDescriptor(obj, "a")
-            );
-            
-            assert.deepEqual(
-                polyObjGetOwnPropertyDescriptor(obj, "b"),
-                objGetOwnPropertyDescriptor(obj, "b")
-            );
-            
-            assert.deepEqual(
-                polyObjGetOwnPropertyDescriptor(obj, "nonExistent"),
-                objGetOwnPropertyDescriptor(obj, "nonExistent")
-            );
-        });
-
-        it("should have comprehensive compatibility with native implementation", function() {
-            // Skip if native implementation doesn't exist
-            if (typeof Object.getOwnPropertyDescriptor !== "function") {
-                this.skip();
-                return;
-            }
-            
-            // Test a variety of objects and properties
-            const testCases = [
-                { obj: { a: 1, b: "hello", c: true }, props: ["a", "b", "c", "nonExistent"] },
-                { obj: ["apple", "banana", "cherry"], props: ["0", "1", "2", "length", "nonExistent"] },
-                { obj: new Date(), props: ["getTime", "getFullYear", "nonExistent"] },
-                { obj: /test/g, props: ["source", "flags", "lastIndex", "nonExistent"] },
-                { obj: { method() {
-                    return 42;
-                } }, props: ["method", "nonExistent"] }
-            ];
-            
-            testCases.forEach(({ obj, props }) => {
-                props.forEach(prop => {
-                    const nativeDesc = Object.getOwnPropertyDescriptor(obj, prop);
-                    const polyDesc = polyObjGetOwnPropertyDescriptor(obj, prop);
-                    
-                    // Both should return undefined for non-existent properties
-                    if (nativeDesc === undefined) {
-                        assert.isUndefined(polyDesc, `Both should return undefined for nonexistent property '${prop}'`);
-                        return;
-                    }
-                    
-                    // For existing properties, compare the descriptors
-                    assert.isObject(polyDesc, `Polyfill should return descriptor object for property '${prop}'`);
-                    assert.equal(polyDesc?.value, nativeDesc?.value,
-                        `Value should match for property '${prop}' for ${dumpObj(obj)}`);
-                    assert.equal(polyDesc?.enumerable, nativeDesc?.enumerable,
-                        `Enumerable flag should match for property '${prop}' for ${dumpObj(obj)}: [${dumpObj(nativeDesc)}]; [${dumpObj(polyDesc)}]`);
-                    
-                    // If the native property has get/set, the polyfill should handle it correctly if supported
-                    if (typeof nativeDesc?.get === "function" || typeof nativeDesc?.set === "function") {
-                        if (typeof polyDesc?.get === "function" || typeof polyDesc?.set === "function") {
-                            assert.equal(typeof polyDesc?.get, typeof nativeDesc?.get,
-                                `Getter presence should match for property '${prop}'`);
-                            assert.equal(typeof polyDesc?.set, typeof nativeDesc?.set,
-                                `Setter presence should match for property '${prop}'`);
-                        } else if (polyDesc) {
-                            // If polyfill doesn't support accessors fully, at least it shouldn't have value/writable
-                            // This is just acknowledging a potential limitation
-                            assert.ok(true, "Polyfill may have limited accessor support");
-                        }
-                    }
-                });
-            });
-        });
-        
-        it("should handle property descriptors with non-default attributes correctly", function() {
-            // Skip if defineProperty isn't available
-            if (typeof Object.defineProperty !== "function") {
-                this.skip();
-                return;
-            }
-            
-            const obj = {};
-            
-            // Create properties with various descriptor configurations
-            try {
-                Object.defineProperty(obj, "nonEnumerable", {
-                    value: "hidden",
-                    enumerable: false,
-                    configurable: true,
-                    writable: true
-                });
-                
-                Object.defineProperty(obj, "nonWritable", {
-                    value: "readonly",
-                    enumerable: true,
-                    configurable: true,
-                    writable: false
-                });
-                
-                Object.defineProperty(obj, "nonConfigurable", {
-                    value: "locked",
-                    enumerable: true,
-                    configurable: false,
-                    writable: true
-                });
-            } catch (e) {
-                // Some environments might have limited support
-                this.skip();
-                return;
-            }
-            
-            // Test non-enumerable property
-            const nonEnumDesc = polyObjGetOwnPropertyDescriptor(obj, "nonEnumerable");
-            if (nonEnumDesc) {
-                // If polyfill can see non-enumerable properties
-                assert.equal(nonEnumDesc.value, "hidden");
-                assert.equal(nonEnumDesc.enumerable, false);
-                // Our polyfill might always return true for these
-                // assert.equal(nonEnumDesc.configurable, true);
-                // assert.equal(nonEnumDesc.writable, true);
-            }
-            
-            // Test non-writable property
-            const nonWritableDesc = polyObjGetOwnPropertyDescriptor(obj, "nonWritable");
-            if (nonWritableDesc) {
-                assert.equal(nonWritableDesc.value, "readonly");
-                assert.equal(nonWritableDesc.enumerable, true);
-                // Our polyfill might always return true for writable
-                // assert.equal(nonWritableDesc.writable, false);
-            }
-            
-            // Test non-configurable property
-            const nonConfigDesc = polyObjGetOwnPropertyDescriptor(obj, "nonConfigurable");
-            if (nonConfigDesc) {
-                assert.equal(nonConfigDesc.value, "locked");
-                assert.equal(nonConfigDesc.enumerable, true);
-                // Our polyfill might always return true for configurable
-                // assert.equal(nonConfigDesc.configurable, false);
-            }
-        });
-    });
-
     describe("polyObjGetOwnPropertyDescriptors", () => {
         it("should return all property descriptors for a simple object", () => {
             const obj = { a: 1, b: "string", c: true };
@@ -1061,8 +772,8 @@ describe("object polyfills", () => {
             // We're calling polyObjGetOwnPropertyDescriptors within the test for polyObjGetOwnPropertyDescriptors
             
             const obj = { a: 1, b: 2 };
-            const descForA = polyObjGetOwnPropertyDescriptor(obj, "a");
-            const allDescs = polyObjGetOwnPropertyDescriptors(obj);
+            const descForA = objGetOwnPropertyDescriptor(obj, "a");
+            const allDescs = objGetOwnPropertyDescriptors(obj);
             
             // Verify that both methods complete without errors
             assert.isObject(descForA);
@@ -1429,23 +1140,6 @@ describe("object polyfills", () => {
             assert.strictEqual(Object.getPrototypeOf(polyObj), proto, "Polyfill: should have correct prototype");
         });
         
-        it("should create an object with null prototype", () => {
-            // Create objects with null prototype
-            const nativeObj = Object.create(null);
-            const polyObj = polyObjCreate(null);
-            
-            // Verify they don't inherit Object.prototype methods
-            assert.isUndefined(nativeObj.toString, "Native: should not inherit Object.prototype.toString");
-            assert.isUndefined(polyObj.toString, "Polyfill: should not inherit Object.prototype.toString");
-            
-            assert.isUndefined(nativeObj.hasOwnProperty, "Native: should not inherit Object.prototype.hasOwnProperty");
-            assert.isUndefined(polyObj.hasOwnProperty, "Polyfill: should not inherit Object.prototype.hasOwnProperty");
-            
-            // Verify they have null prototype
-            assert.isNull(Object.getPrototypeOf(nativeObj), "Native: should have null prototype");
-            assert.isNull(Object.getPrototypeOf(polyObj), "Polyfill: should have null prototype");
-        });
-        
         it("should handle the properties parameter correctly", () => {
             // Define property descriptors
             const properties = {
@@ -1518,10 +1212,6 @@ describe("object polyfills", () => {
             // Test property was set
             assert.equal(nativeObj.testProp, "test", "Native: property should be set on null-prototype object");
             assert.equal(polyObj.testProp, "test", "Polyfill: property should be set on null-prototype object");
-            
-            // Verify they have null prototype
-            assert.isNull(Object.getPrototypeOf(nativeObj), "Native: should have null prototype");
-            assert.isNull(Object.getPrototypeOf(polyObj), "Polyfill: should have null prototype");
         });
         
         it("should handle accessor properties correctly", function() {

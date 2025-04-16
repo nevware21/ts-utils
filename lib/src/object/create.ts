@@ -12,7 +12,6 @@ import { throwTypeError } from "../helpers/throw";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { objDefineProperties } from "./define";
 import { safe } from "../helpers/safe";
-import { _polyObjSetPrototypeOf } from "./set_proto";
 import { isStrictNullOrUndefined } from "../helpers/base";
 
 /**
@@ -37,7 +36,9 @@ export const objCreate: (obj: any, properties?: PropertyDescriptorMap & ThisType
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyObjCreate(obj: any, properties?: PropertyDescriptorMap & ThisType<any>): any {
-    let newObj: any;
+    let newObj: any = null;
+
+    // Create a temporary constructor function to set the prototype
     function tempFunc() {}
 
     if (!isStrictNullOrUndefined(obj)) {
@@ -45,16 +46,16 @@ export function polyObjCreate(obj: any, properties?: PropertyDescriptorMap & Thi
         if (type !== OBJECT && type !== FUNCTION) {
             throwTypeError("Prototype must be an Object or function: " + dumpObj(obj));
         }
+
         tempFunc[PROTOTYPE] = obj;
         safe(() => {
             (tempFunc as any)[__PROTO__] = obj;
         });
         newObj = new (tempFunc as any)();
     } else {
+        // If obj is null or undefined, create an empty object
         newObj = {};
     }
-
-    safe(_polyObjSetPrototypeOf, [newObj, obj]);
 
     // Apply property descriptors if provided
     if (properties) {

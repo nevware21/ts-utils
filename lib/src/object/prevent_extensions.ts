@@ -9,7 +9,7 @@
 import { ObjClass } from "../internal/constants";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { polyObjIsExtensible } from "../polyfills/object/objIsExtensible";
-import { polyObjPreventExtensions } from "../polyfills/object/objPreventExtensions";
+import { _doNothing } from "./object";
 
 /**
  * The Object.preventExtensions() method prevents new properties from ever being added to an object
@@ -20,7 +20,7 @@ import { polyObjPreventExtensions } from "../polyfills/object/objPreventExtensio
  * @param obj - The object which should be made non-extensible.
  * @returns The object being made non-extensible.
  */
-export const objPreventExtensions: <T>(obj: T) => T = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.preventExtensions>(ObjClass, "preventExtensions")), polyObjPreventExtensions));
+export const objPreventExtensions: <T>(obj: T) => T = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.preventExtensions>(ObjClass, "preventExtensions")), _doNothing));
 
 /**
  * The Object.isExtensible() method determines if an object is extensible (whether it can have new
