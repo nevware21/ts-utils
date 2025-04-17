@@ -18,7 +18,7 @@ import { _throwIfNullOrUndefined } from "../internal/throwIf";
 
 const _objFreeze = (/* #__PURE__ */_pureRef<typeof Object.freeze>(ObjClass, "freeze"));
 
-function _doNothing<T>(value: T) {
+export function _doNothing<T>(value: T) {
     return  value;
 }
 

@@ -21,7 +21,7 @@ import { mathTrunc } from "./trunc";
 export function mathToInt(value: any, throwInfinity?: boolean): number {
     let result = +value;
 
-    if (result == Infinity && throwInfinity) {
+    if (throwInfinity && (result === Infinity || result == Infinity)) {
         throwRangeError("invalid value [" + dumpObj(value) + "]");
     }
     

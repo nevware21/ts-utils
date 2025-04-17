@@ -27,10 +27,6 @@ export const NAME = "name";
 export const CALL = "call";
 export const TO_STRING = "toString";
 
-// Check if getter or setter exists (very limited detection)
-export const GETTER_NAME = "__lookupGetter__";
-export const SETTER_NAME = "__lookupSetter__";
-
 /**
  * @ignore
  */

@@ -55,36 +55,21 @@ export function polyNewSymbol(description?: string | number): symbol {
     const uniqueId = "_" + _polyId++ + "_" + _uniqueInstanceId.v;
     const symString = SYMBOL + "(" + description + ")";
     
+    function _setProp(name: string, value: any) {
+        objDefine(theSymbol as any, name, {
+            v: value,
+            e: false,
+            w: false
+        });
+    }
+    
     let theSymbol = objCreate(null) as symbol;
-    objDefine(theSymbol, "description", {
-        v: asString(description),
-        e: false,
-        w: false
-    });
 
-    objDefine(theSymbol as any, TO_STRING, {
-        v: () => symString + POLY_SYM + uniqueId,
-        e: false,
-        w: false
-    });
-
-    objDefine(theSymbol, "valueOf", {
-        v: () => theSymbol,
-        e: false,
-        w: false
-    });
-
-    objDefine((theSymbol as any), "v", {
-        v: symString,
-        e: false,
-        w: false
-    });
-
-    objDefine((theSymbol as any), "_uid", {
-        v: uniqueId,
-        e: false,
-        w: false
-    });
+    _setProp("description", asString(description));
+    _setProp(TO_STRING, () => symString + POLY_SYM + uniqueId);
+    _setProp("valueOf", () => theSymbol);
+    _setProp("v", symString);
+    _setProp("_uid", uniqueId);
 
     return _tagAsPolyfill(theSymbol as any, "symbol") as symbol;
 }
