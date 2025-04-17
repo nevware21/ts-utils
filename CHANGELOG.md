@@ -1,3 +1,23 @@
+# v0.12.2 Apr 17th, 2025
+
+## Changelog
+
+### Issues
+
+- [#403](https://github.com/nevware21/ts-utils/issues/403) [Bug] Excessive increase in 0.12.0/0.12.1 which introduced a polyfill for objGetOwnPropertyDescriptor
+- [#405](https://github.com/nevware21/ts-utils/issues/405) [Bug] createWildcardRegex has an invalid regular expression
+
+### Tasks
+
+- (Partial) [#401](https://github.com/nevware21/ts-utils/issues/401) [Task] Add pre-release testing validation with external projects
+  - Adds a simple check that validates that all of the links in the readme map to the typedoc generated docs, this should catch unexpected dropped exports
+
+### Commits
+
+- [#402](https://github.com/nevware21/ts-utils/pull/402) [Bug] createWildcardRegex invalid regular expression [#405](https://github.com/nevware21/ts-utils/issues/405) and link checker [#401](https://github.com/nevware21/ts-utils/issues/401)
+- [#406](https://github.com/nevware21/ts-utils/pull/406) [Bug] Excessive increase in 0.12.0/0.12.1 which introduced a polyfill for objGetOwnPropertyDescriptor [#403](https://github.com/nevware21/ts-utils/issues/403)
+
+
 # v0.12.1 Apr 14th, 2025
 
 ## Changelog
