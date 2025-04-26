@@ -8,7 +8,14 @@
 
 import * as sinon from "sinon";
 import { assert } from "@nevware21/tripwire-chai";
-import { hasIdleCallback, scheduleIdleCallback, setDefaultMaxExecutionTime, setDefaultIdleTimeout } from "../../../../src/timer/idle";
+import {
+    hasIdleCallback,
+    scheduleIdleCallback,
+    setDefaultMaxExecutionTime,
+    setDefaultIdleTimeout,
+    getIdleCallback,
+    getCancelIdleCallback
+} from "../../../../src/timer/idle";
 import { getGlobal } from "../../../../src/helpers/environment";
 import { elapsedTime, perfNow } from "../../../../src/helpers/perf";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
@@ -148,6 +155,16 @@ describe("idle tests", () => {
         });
     }
 
+    it("getIdleCallback and getCancelIdleCallback", () => {
+        // Test the getIdleCallback function directly
+        const requestIdleFn = getIdleCallback();
+        assert.equal(!!requestIdleFn, !!theRequestIdleCallback, "getIdleCallback should match environment capabilities");
+        
+        // Test the getCancelIdleCallback function directly
+        const cancelIdleFn = getCancelIdleCallback();
+        assert.equal(!!cancelIdleFn, !!theRequestIdleCallback, "getCancelIdleCallback should match environment capabilities");
+    });
+
     describe("remove requestIdleCallback", () => {
 
         beforeEach(() => {
@@ -259,6 +276,122 @@ describe("idle tests", () => {
             clock.tick(1);
             assert.equal(idleCalled, 0, "Idle should not have been called yet");
             clock.tick(1000);
+        });
+    });
+
+    describe("setDefaultIdleTimeout tests", () => {
+        // Store the original state to restore it later
+        let originalRequestIdleCallback: any;
+
+        beforeEach(() => {
+            originalRequestIdleCallback = (<any>getGlobal()).requestIdleCallback;
+            (<any>getGlobal()).requestIdleCallback = null;
+            setBypassLazyCache(true);
+        });
+
+        afterEach(() => {
+            (<any>getGlobal()).requestIdleCallback = originalRequestIdleCallback;
+            setBypassLazyCache(false);
+        });
+
+        it("should use the set default timeout when no timeout provided", () => {
+            let idleCalled = 0;
+            setDefaultIdleTimeout(200); // Setting a different timeout value
+
+            const handler = scheduleIdleCallback((deadline) => {
+                idleCalled++;
+                assert.equal(deadline.didTimeout, true, "Expected the deadline to be timed out");
+            });
+
+            // Should not be called before the timeout period
+            clock.tick(199);
+            assert.equal(idleCalled, 0, "Callback should not be called before timeout");
+
+            // Should be called exactly at the timeout
+            clock.tick(1);
+            assert.equal(idleCalled, 1, "Callback should be called after timeout");
+        });
+
+        it("should respect the provided timeout over default timeout", () => {
+            let idleCalled = 0;
+            setDefaultIdleTimeout(500); // Setting default to 500ms
+
+            const handler = scheduleIdleCallback((deadline) => {
+                idleCalled++;
+                assert.equal(deadline.didTimeout, true, "Expected the deadline to be timed out");
+            }, { timeout: 150 }); // But requesting 150ms timeout
+
+            // Should not be called before the provided timeout
+            clock.tick(149);
+            assert.equal(idleCalled, 0, "Callback should not be called before provided timeout");
+
+            // Should be called at the provided timeout, not the default
+            clock.tick(1);
+            assert.equal(idleCalled, 1, "Callback should be called after provided timeout");
+        });
+    });
+
+    describe("fallback implementation refresh tests", () => {
+        let originalRequestIdleCallback: any;
+
+        beforeEach(() => {
+            originalRequestIdleCallback = (<any>getGlobal()).requestIdleCallback;
+            (<any>getGlobal()).requestIdleCallback = null;
+            setBypassLazyCache(true);
+        });
+
+        afterEach(() => {
+            (<any>getGlobal()).requestIdleCallback = originalRequestIdleCallback;
+            setBypassLazyCache(false);
+        });
+
+        it("should restart the timer when refresh is called", () => {
+            let callCount = 0;
+            setDefaultIdleTimeout(100);
+            
+            const handler = scheduleIdleCallback(() => {
+                callCount++;
+            });
+            
+            // Advance time to just before the timeout
+            clock.tick(90);
+            assert.equal(callCount, 0, "Callback should not be called yet");
+            
+            // Refresh the timer, which should reset the countdown
+            handler.refresh();
+            
+            // Advance time to cover the original timeout
+            clock.tick(20);
+            assert.equal(callCount, 0, "Callback should not be called yet because timer was refreshed");
+            
+            // Now advance to the new timeout
+            clock.tick(80);
+            assert.equal(callCount, 1, "Callback should be called after the new timeout period");
+        });
+
+        it("should enable the timer when refresh is called after cancel", () => {
+            let callCount = 0;
+            setDefaultIdleTimeout(100);
+            
+            const handler = scheduleIdleCallback(() => {
+                callCount++;
+            });
+            
+            // Cancel the timer
+            handler.cancel();
+            assert.equal(handler.enabled, false, "Timer should be disabled after cancel");
+            
+            // Advance time - nothing should happen
+            clock.tick(150);
+            assert.equal(callCount, 0, "Callback should not be called after cancel");
+            
+            // Refresh the timer, which should re-enable it
+            handler.refresh();
+            assert.equal(handler.enabled, true, "Timer should be enabled after refresh");
+            
+            // Advance time to the new timeout
+            clock.tick(100);
+            assert.equal(callCount, 1, "Callback should be called after refresh and timeout");
         });
     });
 });

@@ -14,7 +14,7 @@ import { polyObjIsSealed } from "../../../../src/polyfills/object/objIsSealed";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { hasSymbol } from "../../../../src/symbol/symbol";
 import { polyNewSymbol, polySymbolFor } from "../../../../src/polyfills/symbol";
-import { polyObjGetOwnPropertySymbols } from "../../../../src/polyfills/object/objGetOwnPropertyDescriptors";
+import { _polyObjGetOwnPropertySymbols } from "../../../../src/polyfills/object/objGetOwnProperty";
 
 describe("object state polyfills", () => {
     describe("polyObjPreventExtensions", () => {
@@ -250,7 +250,7 @@ describe("object state polyfills", () => {
     describe("polyObjGetOwnPropertySymbols", () => {
         it("should return an empty array for objects without symbol properties", () => {
             const obj = { a: 1, b: 2 };
-            const result = polyObjGetOwnPropertySymbols(obj);
+            const result = _polyObjGetOwnPropertySymbols(obj);
             
             assert.isArray(result);
             assert.equal(result.length, 0);
@@ -267,7 +267,7 @@ describe("object state polyfills", () => {
                 [sym2]: "symbol2 value"
             };
             
-            const result = polyObjGetOwnPropertySymbols(obj);
+            const result = _polyObjGetOwnPropertySymbols(obj);
             const nativeResult = Object.getOwnPropertySymbols(obj);
             // If native can get symbols, verify that our polyfill can also get symbols
             // when the native implementation is used
@@ -285,15 +285,15 @@ describe("object state polyfills", () => {
         
         it("should handle primitive values", () => {
             // These should return empty arrays
-            assert.throws(() => polyObjGetOwnPropertySymbols(null));
-            assert.throws(() => polyObjGetOwnPropertySymbols(undefined));
-            assert.isArray(polyObjGetOwnPropertySymbols(1));
-            assert.isArray(polyObjGetOwnPropertySymbols("string"));
-            assert.isArray(polyObjGetOwnPropertySymbols(true));
+            assert.throws(() => _polyObjGetOwnPropertySymbols(null));
+            assert.throws(() => _polyObjGetOwnPropertySymbols(undefined));
+            assert.isArray(_polyObjGetOwnPropertySymbols(1));
+            assert.isArray(_polyObjGetOwnPropertySymbols("string"));
+            assert.isArray(_polyObjGetOwnPropertySymbols(true));
             
-            assert.equal(polyObjGetOwnPropertySymbols(1).length, 0);
-            assert.equal(polyObjGetOwnPropertySymbols("string").length, 0);
-            assert.equal(polyObjGetOwnPropertySymbols(true).length, 0);
+            assert.equal(_polyObjGetOwnPropertySymbols(1).length, 0);
+            assert.equal(_polyObjGetOwnPropertySymbols("string").length, 0);
+            assert.equal(_polyObjGetOwnPropertySymbols(true).length, 0);
         });
 
         it("should match native Object.getOwnPropertySymbols behavior for all inputs", function() {
@@ -361,7 +361,7 @@ describe("object state polyfills", () => {
                 let polyResult;
                 let polyThrown: any;
                 try {
-                    polyResult = polyObjGetOwnPropertySymbols(testCase.value);
+                    polyResult = _polyObjGetOwnPropertySymbols(testCase.value);
                 } catch (e) {
                     polyThrown = e;
                 }

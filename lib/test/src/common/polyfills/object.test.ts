@@ -12,17 +12,14 @@ import { polyObjFromEntries } from "../../../../src/polyfills/object/objFromEntr
 import { polyObjIs } from "../../../../src/polyfills/object/objIs";
 import { polyObjKeys } from "../../../../src/polyfills/object/objKeys";
 import { polyObjValues } from "../../../../src/polyfills/object/objValues";
-import { polyObjGetOwnPropertyNames } from "../../../../src/polyfills/object/objGetOwnPropertyNames";
-import { polyObjGetOwnPropertyDescriptors, polyObjGetOwnPropertySymbols } from "../../../../src/polyfills/object/objGetOwnPropertyDescriptors";
-import { polyObjHasOwn } from "../../../../src/polyfills/object/objHasOwn";
+import { polyObjGetOwnPropertyDescriptors, _polyObjGetOwnPropertySymbols, _polyObjGetOwnPropertyNames } from "../../../../src/polyfills/object/objGetOwnProperty";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isObject, isUndefined } from "../../../../src/helpers/base";
 import { objFromEntries } from "../../../../src/object/from_entries";
-import { objGetOwnPropertyDescriptor } from "../../../../src/object/get_own_property_desc";
-import { objGetOwnPropertyDescriptors } from "../../../../src/object/get_own_property_descs";
-import { objHasOwn } from "../../../../src/object/has_own";
+import { objGetOwnPropertyDescriptor, objGetOwnPropertyDescriptors } from "../../../../src/object/get_own_property";
+import { objHasOwn, polyObjHasOwn } from "../../../../src/object/has_own";
 import { createIterable, CreateIteratorContext } from "../../../../src/iterator/create";
-import { getKnownSymbol, newSymbol } from "../../../../src/symbol/symbol";
+import { getKnownSymbol } from "../../../../src/symbol/symbol";
 import { WellKnownSymbols } from "../../../../src/symbol/well_known";
 import { polyNewSymbol } from "../../../../src/polyfills/symbol";
 import { objCreate, polyObjCreate } from "../../../../src/object/create";
@@ -449,7 +446,7 @@ describe("object polyfills", () => {
     describe("polyObjGetOwnPropertyNames", () => {
         it("should return all own property names for simple objects", () => {
             const obj = { a: 1, b: 2, c: 3 };
-            const result = polyObjGetOwnPropertyNames(obj);
+            const result = _polyObjGetOwnPropertyNames(obj);
             
             assert.isArray(result);
             assert.includeMembers(result, ["a", "b", "c"]);
@@ -458,7 +455,7 @@ describe("object polyfills", () => {
 
         it("should include array indices and length property for arrays", () => {
             const arr = ["apple", "banana", "cherry"];
-            const result = polyObjGetOwnPropertyNames(arr);
+            const result = _polyObjGetOwnPropertyNames(arr);
             
             assert.isArray(result);
             assert.includeMembers(result, ["0", "1", "2", "length"]);
@@ -467,7 +464,7 @@ describe("object polyfills", () => {
 
         it("should handle empty arrays", () => {
             const emptyArr: any[] = [];
-            const result = polyObjGetOwnPropertyNames(emptyArr);
+            const result = _polyObjGetOwnPropertyNames(emptyArr);
             
             assert.isArray(result);
             assert.includeMembers(result, ["length"]);
@@ -481,7 +478,7 @@ describe("object polyfills", () => {
                 hidden: { value: "secret", enumerable: false }
             });
             
-            const result = polyObjGetOwnPropertyNames(obj);
+            const result = _polyObjGetOwnPropertyNames(obj);
             
             // Native implementation can access non-enumerable properties
             const nativeResult = Object.getOwnPropertyNames ? Object.getOwnPropertyNames(obj) : null;
@@ -499,26 +496,26 @@ describe("object polyfills", () => {
 
         it("should handle primitive types by boxing them", () => {
             // String
-            const strResult = polyObjGetOwnPropertyNames("hello");
+            const strResult = _polyObjGetOwnPropertyNames("hello");
             assert.isArray(strResult);
             assert.includeMembers(strResult, ["0", "1", "2", "3", "4", "length"]);
             
             // Number - should return properties of Number object
-            const numResult = polyObjGetOwnPropertyNames(123);
+            const numResult = _polyObjGetOwnPropertyNames(123);
             assert.isArray(numResult);
             
             // Boolean - should return properties of Boolean object
-            const boolResult = polyObjGetOwnPropertyNames(true);
+            const boolResult = _polyObjGetOwnPropertyNames(true);
             assert.isArray(boolResult);
         });
 
         it("should throw for null and undefined", () => {
             assert.throws(() => {
-                polyObjGetOwnPropertyNames(null);
+                _polyObjGetOwnPropertyNames(null);
             }, TypeError);
             
             assert.throws(() => {
-                polyObjGetOwnPropertyNames(undefined);
+                _polyObjGetOwnPropertyNames(undefined);
             }, TypeError);
         });
 
@@ -528,7 +525,7 @@ describe("object polyfills", () => {
             const obj = Object.create(proto);
             obj.ownProp = "own property";
             
-            const result = polyObjGetOwnPropertyNames(obj);
+            const result = _polyObjGetOwnPropertyNames(obj);
             
             assert.includeMembers(result, ["ownProp"]);
             assert.notIncludeMembers(result, ["protoProp"]);
@@ -553,7 +550,7 @@ describe("object polyfills", () => {
             ];
             
             testCases.forEach(obj => {
-                const polyResult = polyObjGetOwnPropertyNames(obj);
+                const polyResult = _polyObjGetOwnPropertyNames(obj);
                 const nativeResult = Object.getOwnPropertyNames(obj);
                 
                 // Check that all enumerable properties found by the native implementation
@@ -795,7 +792,7 @@ describe("object polyfills", () => {
         it("should return an empty array for objects with no symbols", () => {
             const obj = { a: 1, b: "string" };
             
-            const symbols = polyObjGetOwnPropertySymbols(obj);
+            const symbols = _polyObjGetOwnPropertySymbols(obj);
             
             assert.isArray(symbols);
             assert.equal(symbols.length, 0);
@@ -813,7 +810,7 @@ describe("object polyfills", () => {
                 yield 1;
             };
             
-            const symbols = polyObjGetOwnPropertySymbols(obj);
+            const symbols = _polyObjGetOwnPropertySymbols(obj);
             
             assert.isArray(symbols);
             assert.include(symbols, iteratorSym);
@@ -830,7 +827,7 @@ describe("object polyfills", () => {
             obj[sym3] = "value3";
             obj[getKnownSymbol(WellKnownSymbols.toStringTag)] = "test";
             
-            const symbols = polyObjGetOwnPropertySymbols(obj);
+            const symbols = _polyObjGetOwnPropertySymbols(obj);
             
             assert.isArray(symbols);
             assert.equal(symbols.length, 1, "Should find only one symbol property");
@@ -846,7 +843,7 @@ describe("object polyfills", () => {
                 prop2: sym2
             };
             
-            const symbols = polyObjGetOwnPropertySymbols(obj);
+            const symbols = _polyObjGetOwnPropertySymbols(obj);
             
             // Note: The symbol-valued properties wouldn't be returned
             // by Object.getOwnPropertySymbols since they're not symbol *keys*
@@ -860,8 +857,8 @@ describe("object polyfills", () => {
             obj[sym] = "value";
             
             // Call it again within its own test to check recursion guard
-            const symbols1 = polyObjGetOwnPropertySymbols(obj);
-            const symbols2 = polyObjGetOwnPropertySymbols(obj);
+            const symbols1 = _polyObjGetOwnPropertySymbols(obj);
+            const symbols2 = _polyObjGetOwnPropertySymbols(obj);
             
             assert.isArray(symbols1);
             assert.isArray(symbols2);
@@ -877,7 +874,7 @@ describe("object polyfills", () => {
             const obj: any = {};
             obj[sym] = "value";
             
-            let polyResult = polyObjGetOwnPropertySymbols(obj);
+            let polyResult = _polyObjGetOwnPropertySymbols(obj);
             let nativeResult = Object.getOwnPropertySymbols(obj);
 
             assert.equal(nativeResult.length, 1, "Native should find the symbol property");
@@ -885,7 +882,7 @@ describe("object polyfills", () => {
 
             obj[getKnownSymbol(WellKnownSymbols.species)] = "test";
 
-            polyResult = polyObjGetOwnPropertySymbols(obj);
+            polyResult = _polyObjGetOwnPropertySymbols(obj);
             nativeResult = Object.getOwnPropertySymbols(obj);
 
             assert.equal(nativeResult.length, 2, "Native should find the symbol property");

@@ -21,13 +21,12 @@ import { makePolyFn } from "./internal/poly_helpers";
 import { polyStrSubstr } from "./string/substring";
 import { polyStrIncludes } from "./string/includes";
 import { polyObjFromEntries } from "./polyfills/object/objFromEntries";
-import { polyObjGetOwnPropertyDescriptors, polyObjGetOwnPropertySymbols } from "./polyfills/object/objGetOwnPropertyDescriptors";
-import { polyObjGetOwnPropertyNames } from "./polyfills/object/objGetOwnPropertyNames";
-import { polyObjHasOwn } from "./polyfills/object/objHasOwn";
+import { polyObjGetOwnPropertyDescriptors, _polyObjGetOwnPropertySymbols, _polyObjGetOwnPropertyNames } from "./polyfills/object/objGetOwnProperty";
 import { polyObjPreventExtensions } from "./polyfills/object/objPreventExtensions";
 import { polyObjIsExtensible } from "./polyfills/object/objIsExtensible";
 import { polyObjIsFrozen } from "./polyfills/object/objIsFrozen";
 import { polyObjIsSealed } from "./polyfills/object/objIsSealed";
+import { polyObjHasOwn } from "./object/has_own";
 
 (function () {
 
@@ -42,8 +41,8 @@ import { polyObjIsSealed } from "./polyfills/object/objIsSealed";
         "entries": polyObjEntries,
         "values": polyObjValues,
         "getOwnPropertyDescriptors": polyObjGetOwnPropertyDescriptors,
-        "getOwnPropertyNames": polyObjGetOwnPropertyNames,
-        "getOwnPropertySymbols": polyObjGetOwnPropertySymbols,
+        GET_OWN_PROPERTY_NAMES: _polyObjGetOwnPropertyNames,
+        GET_OWN_PROPERTY_SYMBOLS: _polyObjGetOwnPropertySymbols,
         "preventExtensions": polyObjPreventExtensions
     };
 

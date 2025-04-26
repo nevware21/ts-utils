@@ -6,15 +6,17 @@
  * Licensed under the MIT license.
  */
 
-import { ObjClass } from "../internal/constants";
+import { GET_OWN_PROPERTY_DESCRIPTOR, GET_OWN_PROPERTY_SYMBOLS, ObjClass } from "../internal/constants";
 import { isFunction, isStrictUndefined } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
 import { ILazyValue } from "../helpers/lazy";
-import { objGetOwnPropertyDescriptor } from "./get_own_property_desc";
-import { _pureRef } from "../internal/treeshake_helpers";
-import { objGetOwnPropertySymbols } from "./get_own_property_symbols";
+import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { arrForEach } from "../array/forEach";
 import { objPropertyIsEnumerable } from "./property_is_enumerable";
+import { _returnEmptyArray, _returnNothing } from "../internal/stubs";
+
+const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR)), _returnNothing));
+const _objGetOwnPropertySymbols: (obj: any) => symbol[] = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertySymbols>(ObjClass, GET_OWN_PROPERTY_SYMBOLS)), _returnEmptyArray));
 
 /**
  * Definition of the Property Descriptor mappings for the objDefine functions.
@@ -122,7 +124,7 @@ function _createProp(value: ObjDefinePropDescriptor): PropertyDescriptor {
         prop.get = () => value.l.v;
 
         // If it has a setter then expose it as well
-        let desc = objGetOwnPropertyDescriptor(value.l, "v");
+        let desc = _objGetOwnPropertyDescriptor(value.l, "v");
         if (desc && desc.set) {
             prop.set = (newValue: any) => {
                 value.l.v = newValue;
@@ -265,7 +267,7 @@ export function objDefineProps<T>(target: T, propDescMap: ObjDefinePropDescripto
         props[key] = _createProp(value);
     });
 
-    arrForEach(objGetOwnPropertySymbols(propDescMap), (sym) => {
+    arrForEach(_objGetOwnPropertySymbols(propDescMap), (sym) => {
         if (objPropertyIsEnumerable(propDescMap, sym)) {
             props[sym] = _createProp(propDescMap[sym]);
         }

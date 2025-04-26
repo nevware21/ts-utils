@@ -7,11 +7,8 @@
  */
 
 import { ObjClass } from "../internal/constants";
+import { _returnFalse } from "../internal/stubs";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
-
-function _returnFalse(): boolean {
-    return false;
-}
 
 /**
  * The `objIsFrozen()` method determines if an object is frozen. An object is frozen if and only if it is not
