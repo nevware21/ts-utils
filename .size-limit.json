@@ -50,6 +50,22 @@
     "running": false
   },
   {
+    "name": "es5-is",
+    "path": "lib/dist/es5/mod/ts-utils.js",
+    "limit": "700b",
+    "import": "{ isString, isFunction, isObject, isArray, isDate, isRegExp, isBoolean, isNumber, isNullOrUndefined, isUndefined }",
+    "brotli": false,
+    "running": false
+  },
+  {
+    "name": "es5-is-zip",
+    "path": "lib/dist/es5/mod/ts-utils.js",
+    "limit": "500b",
+    "import": "{ isString, isFunction, isObject, isArray, isDate, isRegExp, isBoolean, isNumber, isNullOrUndefined, isUndefined }",
+    "gzip": true,
+    "running": false
+  },
+  {
     "name": "es5-poly",
     "path": "lib/bundle/es5/ts-polyfills-utils.js",
     "limit": "9 kb",
