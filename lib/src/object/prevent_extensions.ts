@@ -7,8 +7,8 @@
  */
 
 import { ObjClass } from "../internal/constants";
+import { _returnFalse } from "../internal/stubs";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
-import { polyObjIsExtensible } from "../polyfills/object/objIsExtensible";
 import { _doNothing } from "./object";
 
 /**
@@ -30,4 +30,4 @@ export const objPreventExtensions: <T>(obj: T) => T = (/* #__PURE__*/_pureAssign
  * @param obj - The object which should be checked.
  * @returns A Boolean indicating whether or not the object is extensible.
  */
-export const objIsExtensible: (obj: any) => boolean = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.isExtensible>(ObjClass, "isExtensible")), polyObjIsExtensible));
+export const objIsExtensible: (obj: any) => boolean = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.isExtensible>(ObjClass, "isExtensible")), _returnFalse));

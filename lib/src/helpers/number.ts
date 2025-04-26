@@ -10,6 +10,7 @@ import { isNullOrUndefined, isNumber } from "./base";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { NumberCls } from "../internal/constants";
 import { mathFloor } from "../math/floor";
+import { asString } from "../string/as_string";
 
 /**
  * Helper to obtain the integer value using base 10 conversion from a string,
@@ -23,13 +24,15 @@ import { mathFloor } from "../math/floor";
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function getIntValue(value?: string | number, defValue?: number): number {
-    if (!isNullOrUndefined(value)) {
-        if (isNumber(value)) {
-            return value;
+    try {
+        let theValue: any = value;
+        if (!isNumber(value)) {
+            theValue = parseInt(asString(value), 10);
         }
 
-        let theValue = parseInt(value, 10);
-        return isNaN(theValue) ? defValue : theValue;
+        return (isNullOrUndefined(value) || isNaN(theValue)) ? defValue : theValue;
+    } catch (e) {
+        // Ignore any errors and return the default value
     }
 
     return defValue;

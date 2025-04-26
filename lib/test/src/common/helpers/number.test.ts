@@ -7,9 +7,48 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
-import { isFiniteNumber, isInteger, _polyNumberIsInteger } from "../../../../src/helpers/number";
+import { isFiniteNumber, isInteger, _polyNumberIsInteger, getIntValue } from "../../../../src/helpers/number";
 
 describe("number helpers", () => {
+    describe("getIntValue", () => {
+        it("should return the value when it's a number", () => {
+            assert.equal(getIntValue(0), 0, "Should return 0");
+            assert.equal(getIntValue(42), 42, "Should return 42");
+            assert.equal(getIntValue(-42), -42, "Should return -42");
+            assert.equal(getIntValue(3.14), 3.14, "Should return float as-is");
+        });
+
+        it("should parse string values to integers", () => {
+            assert.equal(getIntValue("0"), 0, "Should parse '0'");
+            assert.equal(getIntValue("42"), 42, "Should parse '42'");
+            assert.equal(getIntValue("-42"), -42, "Should parse '-42'");
+            assert.equal(getIntValue("3.14"), 3, "Should parse '3.14' as 3");
+            assert.equal(getIntValue("42px"), 42, "Should parse '42px' as 42");
+        });
+
+        it("should return default value for invalid inputs", () => {
+            assert.equal(getIntValue("not a number", 99), 99, "Should return default for invalid string");
+            assert.equal(getIntValue("", 99), 99, "Should return default for empty string");
+            assert.equal(getIntValue(null, 99), 99, "Should return default for null");
+            assert.equal(getIntValue(undefined, 99), 99, "Should return default for undefined");
+            assert.equal(getIntValue(NaN, 99), 99, "Should return default for NaN");
+        });
+
+        it("should return undefined for invalid inputs with no default", () => {
+            assert.equal(getIntValue("not a number"), undefined, "Should return undefined for invalid string");
+            assert.equal(getIntValue(""), undefined, "Should return undefined for empty string");
+            assert.equal(getIntValue(null), undefined, "Should return undefined for null");
+            assert.equal(getIntValue(undefined), undefined, "Should return undefined for undefined");
+            assert.equal(getIntValue(NaN), undefined, "Should return undefined for NaN");
+        });
+
+        it("should handle different default values", () => {
+            assert.equal(getIntValue("invalid", 0), 0, "Should return 0 as default");
+            assert.equal(getIntValue("invalid", -1), -1, "Should return -1 as default");
+            assert.equal(getIntValue("invalid", 42), 42, "Should return 42 as default");
+        });
+    });
+
     describe("isInteger", () => {
         it("should identify integer values", () => {
             assert.equal(isInteger(0), true, "Should return true for 0");
