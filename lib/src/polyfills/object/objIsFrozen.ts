@@ -7,7 +7,7 @@
  */
 
 import { isFunction, isObject, isStrictNullOrUndefined } from "../../helpers/base";
-import { objGetOwnPropertyDescriptor } from "../../object/get_own_property_desc";
+import { objGetOwnPropertyDescriptor } from "../../object/get_own_property";
 
 /**
  * Polyfill implementation for Object.isFrozen

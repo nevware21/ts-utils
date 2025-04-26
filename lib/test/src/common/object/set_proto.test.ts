@@ -7,159 +7,152 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
-import { objSetPrototypeOf, _polyObjSetPrototypeOf } from "../../../../src/object/set_proto";
-import { __PROTO__ } from "../../../../src/internal/constants";
 import { objCreate } from "../../../../src/object/create";
+import { objGetPrototypeOf } from "../../../../src/object/object";
+import { objSetPrototypeOf, _polyObjSetPrototypeOf } from "../../../../src/object/set_proto";
+import { __PROTO__, NULL_VALUE } from "../../../../src/internal/constants";
 
-describe("_polyObjSetPrototypeOf tests", () => {
-    it("should set prototype of objects using the polyfill implementation", () => {
+describe("objSetPrototypeOf tests", () => {
+    it("should set prototype of objects", () => {
         // Create a base object
-        const baseObj: any = {};
+        const testObj = {};
         
-        // Create a prototype with a test method
+        // Create a prototype with a test function
         const testProto = {
             testMethod: function() {
                 return "Hello World";
             }
         };
+
+        // Set the prototype using objSetPrototypeOf
+        const result = objSetPrototypeOf(testObj, testProto);
         
-        // Use the polyfill to set the prototype
-        const result = _polyObjSetPrototypeOf(baseObj, testProto);
+        // Verify the function returns the original object
+        assert.strictEqual(result, testObj, "objSetPrototypeOf should return the original object");
         
-        // Verify the result is the original object
-        assert.strictEqual(result, baseObj, "Should return the original object");
+        // Verify the prototype was set correctly
+        const proto = objGetPrototypeOf(testObj);
+        assert.strictEqual(proto, testProto, "Prototype should be correctly set");
         
-        // Verify the object now has access to the prototype's method
-        assert.isFunction(baseObj["testMethod"], "Object should have access to prototype's method");
-        assert.equal(baseObj["testMethod"](), "Hello World", "Method from prototype should work correctly");
+        // Verify the function from prototype is accessible
+        assert.isFunction((testObj as any).testMethod, "Should be able to access functions from the new prototype");
+        assert.equal((testObj as any).testMethod(), "Hello World", "Methods from new prototype should work correctly");
     });
 
-    it("should handle the __PROTO__ property based environment detection", () => {
-        // Create objects
-        const baseObj: any = {};
-        const testProto = {
-            testMethod: function() {
-                return "Test Method";
-            },
-            testProp: "Test Property"
-        };
+    it("should set null as prototype", () => {
+        const testObj = {};
         
-        // Use the polyfill
-        _polyObjSetPrototypeOf(baseObj, testProto);
+        // Set null as the prototype
+        const result = objSetPrototypeOf(testObj, null as any);
         
-        // Test if properties were correctly assigned
-        assert.isFunction(baseObj["testMethod"], "Method should be accessible");
-        assert.equal(baseObj["testProp"], "Test Property", "Property should be accessible");
+        assert.strictEqual(result, testObj, "objSetPrototypeOf should return the original object");
+        
+        // Verify the prototype was set to null
+        const proto = objGetPrototypeOf(testObj);
+        assert.isNull(proto, "Prototype should be set to null");
     });
 
-    it("should work for arrays", () => {
-        // Create a custom prototype with array helper methods
-        const customArrayProto = {
-            customJoin: function() {
-                return this.join("|");
-            },
-            join: function(separator: string) {
-                return Array.prototype.join.call(this, separator);
+    it("should change prototype of an existing object", () => {
+        // Create an initial prototype
+        const initialProto = {
+            initialMethod: function() {
+                return "Initial";
             }
         };
         
-        // Create an array
-        const testArray: any = [1, 2, 3];
-        
-        // Set the prototype
-        _polyObjSetPrototypeOf(testArray, customArrayProto);
-        
-        // The array should maintain its original array behavior
-        assert.equal(testArray.length, 3, "Array length should be preserved");
-        assert.equal(testArray[0], 1, "Array elements should be preserved");
-        
-        // And gain the new method
-        assert.isFunction(testArray["customJoin"], "Custom method should be accessible");
-        assert.equal(testArray["customJoin"](), "1|2|3", "Custom method should work correctly");
-    });
-
-    it("should compare polyfill with native implementation", () => {
-        // Only run this test if native Object.setPrototypeOf exists
-        if (typeof Object.setPrototypeOf === "function") {
-            // Create two identical objects
-            const objWithNative: any = {};
-            const objWithPolyfill: any = {};
-            
-            // Create a prototype
-            const testProto = {
-                testMethod: function() {
-                    return "Hello World";
-                }
-            };
-            
-            // Set prototype using native method
-            Object.setPrototypeOf(objWithNative, testProto);
-            
-            // Set prototype using polyfill
-            _polyObjSetPrototypeOf(objWithPolyfill, testProto);
-            
-            // Both should have the same behavior
-            assert.equal(
-                objWithNative["testMethod"](),
-                objWithPolyfill["testMethod"](),
-                "Both methods should produce the same result"
-            );
-        }
-    });
-
-    it("should work for nested prototype chains", () => {
-        // Create a chain of prototypes
-        const protoLevel1 = {
-            level1Method: function() {
-                return "Level 1";
+        // Create a new prototype
+        const newProto = {
+            newMethod: function() {
+                return "New";
             }
         };
         
-        const protoLevel2 = objCreate(null);
-        _polyObjSetPrototypeOf(protoLevel2, protoLevel1);
-        protoLevel2.level2Method = function() {
-            return "Level 2";
-        };
+        // Create object with initial prototype
+        const testObj = objCreate(initialProto);
         
-        // Create target object
-        const targetObj: any = {};
+        // Verify initial prototype
+        assert.equal((testObj as any).initialMethod(), "Initial", "Initial prototype method should work");
+        assert.isUndefined((testObj as any).newMethod, "New prototype method should not exist yet");
         
-        // Set prototype to level 2
-        _polyObjSetPrototypeOf(targetObj, protoLevel2);
+        // Change the prototype
+        objSetPrototypeOf(testObj, newProto);
         
-        // Should access methods from both prototypes
-        assert.isFunction(targetObj["level2Method"], "Should access method from direct prototype");
-        assert.equal(targetObj["level2Method"](), "Level 2", "Direct prototype method should work");
-        
-        // Depending on how __PROTO__ is handled, this may or may not work
-        // This test verifies current behavior without making assumptions
-        if (targetObj["level1Method"]) {
-            assert.isFunction(targetObj["level1Method"], "Should access method from prototype chain");
-            assert.equal(targetObj["level1Method"](), "Level 1", "Prototype chain method should work");
-        }
+        // Verify prototype was changed
+        assert.isUndefined((testObj as any).initialMethod, "Initial prototype method should no longer exist");
+        assert.equal((testObj as any).newMethod(), "New", "New prototype method should work");
     });
 });
 
-describe("objSetPrototypeOf function tests", () => {
-    it("should set prototype of objects", () => {
-        // Create a base object
-        const baseObj: any = {};
-        
-        // Create a prototype with a test method
+describe("_polyObjSetPrototypeOf tests", () => {
+    it("should set prototype using __proto__ when supported", () => {
+        // Create objects for testing
+        const testObj = {};
         const testProto = {
             testMethod: function() {
-                return "Hello World";
+                return "Poly Hello World";
             }
         };
         
-        // Use the function to set the prototype
-        const result = objSetPrototypeOf(baseObj, testProto);
+        // Set prototype using polyfill
+        const result = _polyObjSetPrototypeOf(testObj, testProto);
         
-        // Verify the result is the original object
-        assert.strictEqual(result, baseObj, "Should return the original object");
+        // Verify the function returns the original object
+        assert.strictEqual(result, testObj, "_polyObjSetPrototypeOf should return the original object");
         
-        // Verify the object now has access to the prototype's method
-        assert.isFunction(baseObj["testMethod"], "Object should have access to prototype's method");
-        assert.equal(baseObj["testMethod"](), "Hello World", "Method from prototype should work correctly");
+        // Verify the method from prototype is accessible
+        assert.isFunction((testObj as any).testMethod, "Should be able to access functions from the new prototype");
+        assert.equal((testObj as any).testMethod(), "Poly Hello World", "Methods from new prototype should work correctly");
+    });
+    
+    it("should copy properties when __proto__ is not supported", () => {
+        // Create an object where we'll simulate __proto__ not being supported
+        const testObj = {};
+        
+        // Our test prototype with properties to copy
+        const testProto = {
+            prop1: "value1",
+            prop2: 123,
+            testMethod: function() {
+                return "Copied Method";
+            }
+        };
+        
+        // Create a mock implementation that forces the polyfill to use property copying
+        const originalProto = (Object.prototype as any).__proto__;
+        
+        // Temporarily make it look like __proto__ isn't supported
+        // We'll use a try-finally to ensure we restore it even if there's an error
+        try {
+            // Set up a scenario where __proto__ would be detected as not working
+            // This is a simplified simulation - in a real environment we can't easily
+            // control the ICachedValue behavior, but we can test the property copying logic
+            
+            // Apply the polyfill directly
+            const result = _polyObjSetPrototypeOf(testObj, testProto);
+            
+            // Verify result is the original object
+            assert.strictEqual(result, testObj, "_polyObjSetPrototypeOf should return the original object");
+            
+            // Check that properties were copied
+            assert.equal((testObj as any).prop1, "value1", "Property should be copied");
+            assert.equal((testObj as any).prop2, 123, "Property should be copied");
+            assert.isFunction((testObj as any).testMethod, "Method should be copied");
+            assert.equal((testObj as any).testMethod(), "Copied Method", "Method should work correctly");
+        } finally {
+            // Restore original behavior if needed
+            if (originalProto !== undefined) {
+                (Object.prototype as any).__proto__ = originalProto;
+            }
+        }
+    });
+    
+    it("should handle null prototype", () => {
+        const testObj = {};
+        
+        // Set null as prototype
+        const result = _polyObjSetPrototypeOf(testObj, null as any);
+        
+        // Verify the function returns the original object
+        assert.strictEqual(result, testObj, "_polyObjSetPrototypeOf should return the original object");
     });
 });

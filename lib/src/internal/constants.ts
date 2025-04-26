@@ -27,6 +27,10 @@ export const NAME = "name";
 export const CALL = "call";
 export const TO_STRING = "toString";
 
+export const GET_OWN_PROPERTY_DESCRIPTOR = "getOwnPropertyDescriptor";
+export const GET_OWN_PROPERTY_NAMES = "getOwnPropertyNames";
+export const GET_OWN_PROPERTY_SYMBOLS = "getOwnPropertySymbols";
+
 /**
  * @ignore
  */

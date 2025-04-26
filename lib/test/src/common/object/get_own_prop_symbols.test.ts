@@ -8,7 +8,7 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { hasSymbol } from "../../../../src/symbol/symbol";
-import { objGetOwnPropertySymbols } from "../../../../src/object/get_own_property_symbols"
+import { objGetOwnPropertySymbols } from "../../../../src/object/get_own_property"
 
 describe("object get_own_prop_symbols tests", () => {
     describe("objGetOwnPropertySymbols", () => {

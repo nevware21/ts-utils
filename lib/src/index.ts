@@ -79,10 +79,7 @@ export {
 export { objCreate } from "./object/create";
 export { ObjDefinePropDescriptor, ObjDefinePropDescriptorMap, objDefine, objDefineProp, objDefineGet, objDefineAccessors, objDefineProperties, objDefineProps } from "./object/define";
 export { objForEachKey } from "./object/for_each_key";
-export { objGetOwnPropertyDescriptor } from "./object/get_own_property_desc";
-export { objGetOwnPropertyDescriptors } from "./object/get_own_property_descs";
-export { objGetOwnPropertyNames } from "./object/get_own_property_names";
-export { objGetOwnPropertySymbols } from "./object/get_own_property_symbols";
+export { objGetOwnPropertyDescriptor, objGetOwnPropertyDescriptors, objGetOwnPropertyNames, objGetOwnPropertySymbols } from "./object/get_own_property";
 export { objHasOwn } from "./object/has_own";
 export { objHasOwnProperty } from "./object/has_own_prop";
 export { isPlainObject } from "./object/is_plain_object";
@@ -130,4 +127,4 @@ export { polyObjIs } from "./polyfills/object/objIs";
 export { polyStrSymSplit } from "./polyfills/split";
 export { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "./polyfills/symbol";
 export { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "./polyfills/trim";
-export { polyObjHasOwn } from "./polyfills/object/objHasOwn";
+export { polyObjHasOwn } from "./object/has_own";

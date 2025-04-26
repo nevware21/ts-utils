@@ -6,9 +6,13 @@
  * Licensed under the MIT license.
  */
 
-import { ObjClass } from "../internal/constants";
+import { GET_OWN_PROPERTY_DESCRIPTOR, ObjClass } from "../internal/constants";
+import { _returnNothing } from "../internal/stubs";
+import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
-import { polyObjHasOwn } from "../polyfills/object/objHasOwn";
+import { objHasOwnProperty } from "./has_own_prop";
+
+const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR)), _returnNothing));
 
 /**
  * The objHasOwn() method returns a boolean indicating whether the object
@@ -47,3 +51,50 @@ import { polyObjHasOwn } from "../polyfills/object/objHasOwn";
  * ```
  */
 export const objHasOwn: <T = any>(obj: T, prop: PropertyKey) => boolean = (/*#__PURE__*/_pureAssign((/* #__PURE__ */_pureRef(ObjClass as any, "hasOwn")), polyObjHasOwn));
+
+
+/**
+ * The polyObjHasOwn() method is a polyfill for {@link objHasOwn} when the native
+ * [Object.hasOwnreturns](https://caniuse.com/?search=hasOwn) is not supported, it returns a
+ * boolean indicating whether the object has the specified property as its own property (as
+ * opposed to inheriting it). If the property is inherited, or does not exist, the method
+ * returns false.
+ *
+ * The objHasOwn() method returns true if the specified property is a direct property
+ * of the object — even if the property value is null or undefined. The method returns
+ * false if the property is inherited, or has not been declared at all. Unlike the in operator,
+ * this method does not check for the specified property in the object's prototype chain.
+ *
+ * It is recommended over objHasOwnProperty() because it works for objects created using
+ * objCreate(null) and with objects that have overridden the inherited hasOwnProperty() method.
+ * While it is possible to workaround these problems by calling Object.prototype.hasOwnProperty()
+ * on an external object, Object.hasOwn() is more intuitive.
+ *
+ * @since 0.4.3
+ * @group Object
+ * @group Polyfill
+ * @param obj - The object being evaluated
+ * @param prop - The String or Symbol of the property to test
+ * @returns `true` if the object has the specified property as own property; otherwise `false`
+ * @example
+ * ```ts
+ * let example = {};
+ * polyObjHasOwn(example, 'prop');   // false
+ *
+ * example.prop = 'exists';
+ * polyObjHasOwn(example, 'prop');   // true - 'prop' has been defined
+ *
+ * example.prop = null;
+ * polyObjHasOwn(example, 'prop');   // true - own property exists with value of null
+ *
+ * example.prop = undefined;
+ * polyObjHasOwn(example, 'prop');   // true - own property exists with value of undefined
+ * ```
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function polyObjHasOwn<T = any>(obj: T, prop: PropertyKey): boolean {
+    // Ensure we're working with an object
+    _throwIfNullOrUndefined(obj);
+        
+    return objHasOwnProperty(obj, prop) || !!_objGetOwnPropertyDescriptor(obj, prop)
+}
