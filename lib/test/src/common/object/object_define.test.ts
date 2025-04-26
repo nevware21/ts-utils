@@ -8,7 +8,7 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { objDefineGet, objDefineAccessors, objDefine, objDefineProps, ObjDefinePropDescriptor } from "../../../../src/object/define";
-import { objGetOwnPropertyDescriptor } from "../../../../src/object/get_own_property_desc";
+import { objGetOwnPropertyDescriptor } from "../../../../src/object/get_own_property";
 import { objKeys } from "../../../../src/object/object";
 import { getLazy, getWritableLazy } from "../../../../src/helpers/lazy";
 import { isFunction } from "../../../../src/helpers/base";
