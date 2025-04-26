@@ -9,9 +9,8 @@
 import { NULL_VALUE, ObjClass, __PROTO__ } from "../internal/constants";
 import { isArray, isFunction, isObject } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
-import { polyObjEntries } from "../polyfills/object/objEntries";
+import { polyObjEntries, polyObjValues } from "../polyfills/object/objKeys";
 import { polyObjIs } from "../polyfills/object/objIs";
-import { polyObjValues } from "../polyfills/object/objValues";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { objIsFrozen } from "./object_state";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";

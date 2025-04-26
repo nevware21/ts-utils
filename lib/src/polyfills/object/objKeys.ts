@@ -10,7 +10,15 @@ import { isObject } from "../../helpers/base";
 import { dumpObj } from "../../helpers/diagnostics";
 import { throwTypeError } from "../../helpers/throw";
 import { _throwIfNullOrUndefined } from "../../internal/throwIf";
-import { objHasOwn } from "../../object/has_own";
+import { objForEachKey } from "../../object/for_each_key";
+
+function _objIterateEntries<T, R>(obj: any, mapper: (key: string, value: T) => R): R[] {
+    const result: R[] = [];
+    objForEachKey(obj, (key, val) => {
+        result.push(mapper(key, val));
+    });
+    return result;
+}
 
 /**
  * Returns the names of the enumerable string properties and methods of an object. This helper exists to avoid adding a polyfil for older browsers
@@ -27,12 +35,57 @@ export function polyObjKeys(obj: any): string[] {
         throwTypeError("non-object " + dumpObj(obj));
     }
 
-    const result: string[] = [];
-    for (const prop in obj) {
-        if (objHasOwn(obj, prop)) {
-            result.push(prop);
-        }
-    }
+    return _objIterateEntries<any, any>(obj, (k, _) => k);
+}
 
-    return result;
+/**
+ * Returns an array of key/values of the enumerable properties of an object
+ * @since 0.9.7
+ * @group Polyfill
+ * @group Object
+ * @group ArrayLike
+ * @param value - Object that contains the properties and methods.
+ * @example
+ * ```ts
+ * polyObjEntries({ Hello: "Darkness", my: "old", friend: "." });
+ * // [ [ "Hello", "Darkness" ], [ "my", "old"], [ "friend", "." ] ]
+ *
+ * // Array-like object
+ * polyObjEntries({ 0: "a", 1: "b", 2: "c" }));
+ * // [ ['0', 'a'], ['1', 'b'], ['2', 'c'] ]
+ *
+ * // Array-like object with random key ordering
+ * polyObjEntries({ 100: "a", 2: "b", 7: "c" });
+ * // [ ['2', 'b'], ['7', 'c'], ['100', 'a'] ]*
+ * ```
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function polyObjEntries<T = any>(value: {} | { [s: string]: T } | ArrayLike<T>): [string, T][] {
+    return _objIterateEntries<T, [string, T]>(value, (k, v) => [k, v]);
+}
+
+/**
+ * Returns an array of key/values of the enumerable properties of an object
+ * @since 0.9.7
+ * @group Polyfill
+ * @group Object
+ * @group ArrayLike
+ * @param value - Object that contains the properties and methods.
+ * @example
+ * ```ts
+ * polyObjValues({ Hello: "Darkness", my: "old", friend: "." });
+ * // [ "Darkness", "old", "." ]
+ *
+ * // Array-like object
+ * polyObjValues({ 0: "a", 1: "b", 2: "c" }));
+ * // [ 'a', 'b', 'c']
+ *
+ * // Array-like object with random key ordering
+ * polyObjValues({ 100: "a", 2: "b", 7: "c" });
+ * // [ 'b', 'c', 'a']
+ * ```
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function polyObjValues<T = any>(value: {} | { [s: string]: T } | ArrayLike<T>): T[] {
+    return _objIterateEntries<T, T>(value, (_, v) => v);
 }

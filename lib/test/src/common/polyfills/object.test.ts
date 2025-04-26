@@ -7,11 +7,9 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
-import { polyObjEntries } from "../../../../src/polyfills/object/objEntries";
 import { polyObjFromEntries } from "../../../../src/polyfills/object/objFromEntries";
 import { polyObjIs } from "../../../../src/polyfills/object/objIs";
-import { polyObjKeys } from "../../../../src/polyfills/object/objKeys";
-import { polyObjValues } from "../../../../src/polyfills/object/objValues";
+import { polyObjKeys, polyObjEntries, polyObjValues } from "../../../../src/polyfills/object/objKeys";
 import { polyObjGetOwnPropertyDescriptors, _polyObjGetOwnPropertySymbols, _polyObjGetOwnPropertyNames } from "../../../../src/polyfills/object/objGetOwnProperty";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isObject, isUndefined } from "../../../../src/helpers/base";

@@ -303,6 +303,8 @@ describe("idle tests", () => {
                 assert.equal(deadline.didTimeout, true, "Expected the deadline to be timed out");
             });
 
+            assert.ok(!!handler, "Expected the handler to be created");
+
             // Should not be called before the timeout period
             clock.tick(199);
             assert.equal(idleCalled, 0, "Callback should not be called before timeout");
@@ -320,6 +322,8 @@ describe("idle tests", () => {
                 idleCalled++;
                 assert.equal(deadline.didTimeout, true, "Expected the deadline to be timed out");
             }, { timeout: 150 }); // But requesting 150ms timeout
+
+            assert.ok(!!handler, "Expected the handler to be created");
 
             // Should not be called before the provided timeout
             clock.tick(149);
@@ -352,6 +356,8 @@ describe("idle tests", () => {
             const handler = scheduleIdleCallback(() => {
                 callCount++;
             });
+
+            assert.ok(!!handler, "Expected the handler to be created");
             
             // Advance time to just before the timeout
             clock.tick(90);
