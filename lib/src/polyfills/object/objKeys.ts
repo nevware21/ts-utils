@@ -77,7 +77,7 @@ export function polyObjEntries<T = any>(value: {} | { [s: string]: T } | ArrayLi
  * // [ "Darkness", "old", "." ]
  *
  * // Array-like object
- * polyObjValues({ 0: "a", 1: "b", 2: "c" }));
+ * polyObjValues({ 0: "a", 1: "b", 2: "c" });
  * // [ 'a', 'b', 'c']
  *
  * // Array-like object with random key ordering
