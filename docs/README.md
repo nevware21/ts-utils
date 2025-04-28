@@ -24,7 +24,6 @@ If you find this library useful, please consider [sponsoring @nevware21](https:/
 
 ### Reference
 - **[API Documentation](./typedoc/index.html)** - Complete API reference generated from source code via TypeDoc
-- **[Module Documentation](./modules/index.md)** - Documentation organized by module categories
 
 ### Advanced Topics
 - **[Advanced Deep Copy Functionality](./advanced-deep-copy.md)** - Using custom handlers with deep copy operations
