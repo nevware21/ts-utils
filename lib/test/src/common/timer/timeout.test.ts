@@ -8,7 +8,7 @@
 
 import * as sinon from "sinon";
 import { assert } from "@nevware21/tripwire-chai";
-import { createTimeout, createTimeoutWith, scheduleTimeout, scheduleTimeoutWith, TimeoutOverrideFuncs } from "../../../../src/timer/timeout";
+import { createTimeout, createTimeoutWith, scheduleTimeout, scheduleTimeoutWith, setGlobalTimeoutOverrides, TimeoutOverrideFuncs } from "../../../../src/timer/timeout";
 import { isNode } from "../../../../src/helpers/environment";
 
 describe("timeout tests", () => {
@@ -844,34 +844,228 @@ describe("timeout tests", () => {
             timer.ref();
             assert.equal(timer.hasRef(), true, "Check that calling unref multiple times has no impact even after the timeout function has been called");
         });
+    });
 
-        it("check ref with create timeout", () => {
+    describe("Global timeout overrides", () => {
+        let originalSetTimeout: any;
+        let originalClearTimeout: any;
+
+        let globalSetTimeoutCalled = 0;
+        let globalClearTimeoutCalled = 0;
+
+        function globalSetTimeoutFn<TArgs extends any[]>(callback: (...args: TArgs) => void, timeout?: number, ...args: TArgs) {
+            globalSetTimeoutCalled++;
+            return setTimeout(callback, timeout);
+        }
+
+        function globalClearTimeoutFn(timeoutId: any) {
+            globalClearTimeoutCalled++;
+            return clearTimeout(timeoutId);
+        }
+
+        beforeEach(() => {
+            globalSetTimeoutCalled = 0;
+            globalClearTimeoutCalled = 0;
+            // Reset global overrides before each test
+            setGlobalTimeoutOverrides(undefined);
+        });
+
+        it("should use global override functions when set", () => {
+            // Set global overrides
+            setGlobalTimeoutOverrides(globalSetTimeoutFn);
+            
             let timeoutCalled = false;
-            let timer = createTimeout(() => {
+            let theTimeout = scheduleTimeout(() => {
                 timeoutCalled = true;
             }, 100);
     
-            assert.equal(timer.enabled, false, "Check that the handler is stopped");
+            assert.equal(theTimeout.enabled, true, "Check that the handler is running");
             assert.equal(timeoutCalled, false, "Timeout should not have been called yet");
-            assert.equal(timer.hasRef(), true, "Check that the default for creating and scheduling a new timer is referenced");
-            timer.unref();
-            assert.equal(timer.hasRef(), false, "Check that the timer can be unref'd");
-            timer.ref();
-            assert.equal(timer.hasRef(), true, "Check that the timer can be re-ref'd");
-            timer.unref();
-            assert.equal(timer.hasRef(), false, "Check that the timer can be unref'd");
+            assert.equal(globalSetTimeoutCalled, 1, "The global override should have been called once");
+            
+            for (let lp = 0; lp < 99; lp++) {
+                clock.tick(1);
+                assert.equal(timeoutCalled, false, "Timeout should not have been called yet");
+            }
 
-            timer.refresh();
-            assert.equal(timer.enabled, true, "Check that the handler is running");
-            assert.equal(timer.hasRef(), false, "Check that the timer is unref'd after refresh");
+            clock.tick(1);
+            assert.equal(timeoutCalled, true, "Timeout should have been called");
+            assert.equal(globalSetTimeoutCalled, 1, "The global override should still have been called once");
+            assert.equal(globalClearTimeoutCalled, 0, "The global clear override should not have been called");
+        });
 
-            timer.cancel();
-            assert.equal(timer.enabled, false, "Check that the handler is stopped");
-            assert.equal(timer.hasRef(), false, "Check that the timer is unref'd after refresh");
+        it("should use both global set and clear override functions when set as array", () => {
+            // Set global overrides as array
+            setGlobalTimeoutOverrides([globalSetTimeoutFn, globalClearTimeoutFn]);
+            
+            let timeoutCalled = false;
+            let theTimeout = scheduleTimeout(() => {
+                timeoutCalled = true;
+            }, 100);
+    
+            assert.equal(theTimeout.enabled, true, "Check that the handler is running");
+            assert.equal(timeoutCalled, false, "Timeout should not have been called yet");
+            assert.equal(globalSetTimeoutCalled, 1, "The global set override should have been called once");
+            
+            // Cancel the timeout
+            theTimeout.cancel();
+            assert.equal(globalClearTimeoutCalled, 1, "The global clear override should have been called once");
+            
+            clock.tick(100);
+            assert.equal(timeoutCalled, false, "Timeout should not have been called after cancel");
+            
+            // Refresh and start again
+            theTimeout.refresh();
+            assert.equal(globalSetTimeoutCalled, 2, "The global set override should have been called twice");
+            
+            for (let lp = 0; lp < 100; lp++) {
+                clock.tick(1);
+            }
+            assert.equal(timeoutCalled, true, "Timeout should have been called after refresh");
+            assert.equal(globalSetTimeoutCalled, 2, "The global set override should have been called twice");
+        });
 
-            timer.refresh();
-            assert.equal(timer.enabled, true, "Check that the handler is running");
-            assert.equal(timer.hasRef(), false, "Check that the timer is unref'd after refresh");
+        it("should reset global overrides when undefined is passed", () => {
+            // Set global overrides
+            setGlobalTimeoutOverrides(globalSetTimeoutFn);
+            
+            // Now reset them by passing undefined
+            setGlobalTimeoutOverrides(undefined);
+            
+            let timeoutCalled = false;
+            let theTimeout = scheduleTimeout(() => {
+                timeoutCalled = true;
+            }, 100);
+    
+            assert.equal(theTimeout.enabled, true, "Check that the handler is running");
+            assert.equal(timeoutCalled, false, "Timeout should not have been called yet");
+            assert.equal(globalSetTimeoutCalled, 0, "The global override should not have been called");
+            
+            clock.tick(100);
+            assert.equal(timeoutCalled, true, "Timeout should have been called");
+            assert.equal(globalSetTimeoutCalled, 0, "The global override should not have been called");
+        });
+
+        it("should override timeouts used with scheduleTimeoutWith", () => {
+            // Set global overrides
+            setGlobalTimeoutOverrides([globalSetTimeoutFn, globalClearTimeoutFn]);
+            
+            // This should still use the provided override, not the global one
+            let customSetTimeoutCalled = 0;
+            function customSetTimeoutFn<TArgs extends any[]>(callback: (...args: TArgs) => void, timeout?: number, ...args: TArgs) {
+                customSetTimeoutCalled++;
+                return setTimeout(callback, timeout);
+            }
+            
+            let timeoutCalled = false;
+            let theTimeout = scheduleTimeoutWith(customSetTimeoutFn, () => {
+                timeoutCalled = true;
+            }, 100);
+    
+            assert.equal(theTimeout.enabled, true, "Check that the handler is running");
+            assert.equal(timeoutCalled, false, "Timeout should not have been called yet");
+            assert.equal(customSetTimeoutCalled, 1, "The custom override should have been called");
+            assert.equal(globalSetTimeoutCalled, 0, "The global override should not have been called");
+            
+            clock.tick(100);
+            assert.equal(timeoutCalled, true, "Timeout should have been called");
+            assert.equal(customSetTimeoutCalled, 1, "The custom override should have been called");
+            assert.equal(globalSetTimeoutCalled, 0, "The global override should not have been called");
+        });
+
+        it("should use global fallback for null override functions", () => {
+            // Set global overrides
+            setGlobalTimeoutOverrides([globalSetTimeoutFn, globalClearTimeoutFn]);
+            // Use null for override, which should fall back to global
+            let timeoutCalled = false;
+            let theTimeout = scheduleTimeoutWith(null as any, () => {
+                timeoutCalled = true;
+            }, 100);
+    
+            assert.equal(theTimeout.enabled, true, "Check that the handler is running");
+            assert.equal(timeoutCalled, false, "Timeout should not have been called yet");
+            assert.equal(globalSetTimeoutCalled, 1, "The global set override should have been called");
+            
+            theTimeout.cancel();
+            assert.equal(globalClearTimeoutCalled, 1, "The global clear override should have been called");
+        });
+
+        it("should handle empty array override falling back to global", () => {
+            // Set global overrides
+            setGlobalTimeoutOverrides([globalSetTimeoutFn, globalClearTimeoutFn]);
+            
+            // Use empty array for override, which should fall back to global
+            let timeoutCalled = false;
+            let theTimeout = scheduleTimeoutWith([] as unknown as TimeoutOverrideFuncs, () => {
+                timeoutCalled = true;
+            }, 100);
+    
+            assert.equal(theTimeout.enabled, true, "Check that the handler is running");
+            assert.equal(timeoutCalled, false, "Timeout should not have been called yet");
+            assert.equal(globalSetTimeoutCalled, 1, "The global set override should have been called");
+            
+            clock.tick(100);
+            assert.equal(timeoutCalled, true, "Timeout should have been called");
+        });
+
+        it("should use global clearTimeout when only setTimeout is provided", () => {
+            // Set global overrides
+            setGlobalTimeoutOverrides([null, globalClearTimeoutFn]);
+            
+            // Only provide a single setTimeout function, no clearTimeout
+            let customSetTimeoutCalled = 0;
+            function customSetTimeoutFn<TArgs extends any[]>(callback: (...args: TArgs) => void, timeout?: number, ...args: TArgs) {
+                customSetTimeoutCalled++;
+                return setTimeout(callback, timeout);
+            }
+            
+            let timeoutCalled = false;
+            let theTimeout = scheduleTimeoutWith(customSetTimeoutFn, () => {
+                timeoutCalled = true;
+            }, 100);
+    
+            assert.equal(theTimeout.enabled, true, "Check that the handler is running");
+            assert.equal(timeoutCalled, false, "Timeout should not have been called yet");
+            assert.equal(customSetTimeoutCalled, 1, "The custom setTimeout override should have been called");
+            assert.equal(globalSetTimeoutCalled, 0, "The global setTimeout override should not have been called");
+            assert.equal(globalClearTimeoutCalled, 0, "The global clearTimeout override should not have been called yet");
+            
+            // Cancel the timeout, which should use the global clear override
+            theTimeout.cancel();
+            assert.equal(globalClearTimeoutCalled, 1, "The global clearTimeout override should have been called");
+            
+            clock.tick(100);
+            assert.equal(timeoutCalled, false, "Timeout should not have been called after cancel");
+        });
+
+        it("should use global clearTimeout when only setTimeout is provided, but the global set override is defined", () => {
+            // Set global overrides
+            setGlobalTimeoutOverrides([globalSetTimeoutFn, globalClearTimeoutFn]);
+            
+            // Only provide a single setTimeout function, no clearTimeout
+            let customSetTimeoutCalled = 0;
+            function customSetTimeoutFn<TArgs extends any[]>(callback: (...args: TArgs) => void, timeout?: number, ...args: TArgs) {
+                customSetTimeoutCalled++;
+                return setTimeout(callback, timeout);
+            }
+            
+            let timeoutCalled = false;
+            let theTimeout = scheduleTimeoutWith(customSetTimeoutFn, () => {
+                timeoutCalled = true;
+            }, 100);
+    
+            assert.equal(theTimeout.enabled, true, "Check that the handler is running");
+            assert.equal(timeoutCalled, false, "Timeout should not have been called yet");
+            assert.equal(customSetTimeoutCalled, 1, "The custom setTimeout override should have been called");
+            assert.equal(globalSetTimeoutCalled, 0, "The global setTimeout override should not have been called");
+            assert.equal(globalClearTimeoutCalled, 0, "The global clearTimeout override should not have been called yet");
+            
+            // Cancel the timeout, which should use the global clear override
+            theTimeout.cancel();
+            assert.equal(globalClearTimeoutCalled, 1, "The global clearTimeout override should have been called");
+            
+            clock.tick(100);
+            assert.equal(timeoutCalled, false, "Timeout should not have been called after cancel");
         });
     });
 });

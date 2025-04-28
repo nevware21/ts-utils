@@ -42,9 +42,7 @@ export {
     getHistory, isNode, isWebWorker
 } from "./helpers/environment";
 export { encodeAsHtml, encodeAsJson, normalizeJsName } from "./helpers/encode";
-export {
-    deepExtend, objExtend
-} from "./helpers/extend";
+export { deepExtend, objExtend } from "./helpers/extend";
 export { getValueByKey, setValueByKey, getValueByIter, setValueByIter } from "./helpers/get_set_value";
 export { ILazyValue, getLazy, setBypassLazyCache, getWritableLazy } from "./helpers/lazy";
 export { IGetLength as GetLengthImpl, getLength } from "./helpers/length";
@@ -73,13 +71,19 @@ export { mathSin, mathCos, mathTan } from "./math/trig";
 export { mathToInt } from "./math/to_int";
 export { mathTrunc } from "./math/trunc";
 export {
-    IObjDeepCopyHandlerDetails, ObjDeepCopyHandler, objDeepCopy, objCopyProps,
-    arrayDeepCopyHandler, dateDeepCopyHandler, functionDeepCopyHandler, plainObjDeepCopyHandler
+    IObjDeepCopyHandlerDetails, ObjDeepCopyHandler, objDeepCopy, objCopyProps, arrayDeepCopyHandler, dateDeepCopyHandler,
+    functionDeepCopyHandler, plainObjDeepCopyHandler
 } from "./object/copy";
 export { objCreate } from "./object/create";
-export { ObjDefinePropDescriptor, ObjDefinePropDescriptorMap, objDefine, objDefineProp, objDefineGet, objDefineAccessors, objDefineProperties, objDefineProps } from "./object/define";
+export { 
+    ObjDefinePropDescriptor, ObjDefinePropDescriptorMap, objDefine, objDefineProp, objDefineGet, objDefineAccessors,
+    objDefineProperties, objDefineProps
+} from "./object/define";
 export { objForEachKey } from "./object/for_each_key";
-export { objGetOwnPropertyDescriptor, objGetOwnPropertyDescriptors, objGetOwnPropertyNames, objGetOwnPropertySymbols } from "./object/get_own_property";
+export { 
+    objGetOwnPropertyDescriptor, objGetOwnPropertyDescriptors, objGetOwnPropertyNames,
+    objGetOwnPropertySymbols
+} from "./object/get_own_property";
 export { objHasOwn } from "./object/has_own";
 export { objHasOwnProperty } from "./object/has_own_prop";
 export { isPlainObject } from "./object/is_plain_object";
@@ -114,7 +118,10 @@ export {
     getIdleCallback, getCancelIdleCallback, RequestIdleCallback, CancelIdleCallback
 } from "./timer/idle";
 export { scheduleInterval } from "./timer/interval";
-export { TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, scheduleTimeout, scheduleTimeoutWith, createTimeout, createTimeoutWith } from "./timer/timeout";
+export {
+    TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, scheduleTimeout, scheduleTimeoutWith,
+    createTimeout, createTimeoutWith, setGlobalTimeoutOverrides
+} from "./timer/timeout";
 
 // Exporting the helpers, but not the "initialization" code to populate any missing values
 // This will enable anyone to "reuse" or create their own polyfills.ts implementation if they want.
