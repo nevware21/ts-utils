@@ -51,7 +51,7 @@ export function polyObjKeys(obj: any): string[] {
  * // [ [ "Hello", "Darkness" ], [ "my", "old"], [ "friend", "." ] ]
  *
  * // Array-like object
- * polyObjEntries({ 0: "a", 1: "b", 2: "c" }));
+ * polyObjEntries({ 0: "a", 1: "b", 2: "c" });
  * // [ ['0', 'a'], ['1', 'b'], ['2', 'c'] ]
  *
  * // Array-like object with random key ordering
