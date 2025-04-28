@@ -121,8 +121,7 @@ export { TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, schedu
 // Not including all of the polyfills as they will be removed in v2.x and beyond, so only including the
 // initial exported ones, even these you should not depend on.
 export { polyIsArray, polyArrFind, polyArrFindIndex, polyArrFindLast, polyArrFindLastIndex, polyArrIncludes, polyArrFrom } from "./polyfills/array";
-export { polyObjKeys } from "./polyfills/object/objKeys";
-export { polyObjEntries } from "./polyfills/object/objEntries";
+export { polyObjKeys, polyObjEntries } from "./polyfills/object/objKeys";
 export { polyObjIs } from "./polyfills/object/objIs";
 export { polyStrSymSplit } from "./polyfills/split";
 export { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "./polyfills/symbol";

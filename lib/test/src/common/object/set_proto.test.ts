@@ -10,7 +10,6 @@ import { assert } from "@nevware21/tripwire-chai";
 import { objCreate } from "../../../../src/object/create";
 import { objGetPrototypeOf } from "../../../../src/object/object";
 import { objSetPrototypeOf, _polyObjSetPrototypeOf } from "../../../../src/object/set_proto";
-import { __PROTO__, NULL_VALUE } from "../../../../src/internal/constants";
 
 describe("objSetPrototypeOf tests", () => {
     it("should set prototype of objects", () => {
