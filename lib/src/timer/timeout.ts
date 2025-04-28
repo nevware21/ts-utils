@@ -11,11 +11,16 @@ import { isArray } from "../helpers/base";
 import { ArrSlice, CALL, UNDEF_VALUE } from "../internal/constants";
 import { ITimerHandler, _createTimerHandler } from "./handler";
 
+// Global override functions
+let _globalSetTimeoutFn: TimeoutOverrideFn | undefined;
+let _globalClearTimeoutFn: ClearTimeoutOverrideFn | undefined;
+
 function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, theArgs: any[]): ITimerHandler {
     let isArr = isArray(overrideFn);
     let len = isArr ? overrideFn.length : 0;
-    let setFn: TimeoutOverrideFn = (len > 0 ? (overrideFn as TimeoutOverrideFuncs)[0] : (!isArr ? overrideFn as TimeoutOverrideFn: UNDEF_VALUE)) || setTimeout;
-    let clearFn: ClearTimeoutOverrideFn = (len > 1 ? (overrideFn as TimeoutOverrideFuncs)[1] : UNDEF_VALUE) || clearTimeout;
+    // Use global override functions if provided and no specific override was given
+    let setFn: TimeoutOverrideFn = (len > 0 ? (overrideFn as TimeoutOverrideFuncs)[0] : (!isArr ? overrideFn as TimeoutOverrideFn: UNDEF_VALUE)) || _globalSetTimeoutFn || setTimeout;
+    let clearFn: ClearTimeoutOverrideFn = (len > 1 ? (overrideFn as TimeoutOverrideFuncs)[1] : UNDEF_VALUE) || _globalClearTimeoutFn || clearTimeout;
 
     let timerFn = theArgs[0];
     theArgs[0] = function () {
@@ -39,6 +44,74 @@ function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn |
     });
 
     return handler.h;
+}
+
+/**
+ * Sets the global setTimeout and clearTimeout override functions to be used by all timeout operations
+ * when no specific override functions are provided. If called with no parameters or undefined,
+ * it will reset both global overrides to undefined, reverting to native implementations.
+ *
+ * @since 0.12.3
+ * @group Timer
+ *
+ * @param overrideFn - setTimeout override function this will be called instead of the `setTimeout`, if the value
+ * of `overrideFn` is null or undefined it will reset both setTimeout and clearTimeout to their native implementations.
+ * May also be an array with both the setTimeout and clearTimeout override functions, if either is not provided the
+ * default native functions will be used
+ * @example
+ * ```ts
+ * // Override with a single function for setTimeout
+ * // The native clearTimeout will still be used
+ * function customSetTimeout<TArgs extends any[]>(callback: (...args: TArgs) => void, ms?: number, ...args: TArgs) {
+ *     console.log(`Setting timeout for ${ms}ms`);
+ *     return setTimeout(callback, ms);
+ * }
+ *
+ * // Set the global override function
+ * setGlobalTimeoutOverrides(customSetTimeout);
+ *
+ * // Now all timeout operations will use the custom setTimeout
+ * let timer = scheduleTimeout(() => {
+ *     console.log("Timer triggered");
+ * }, 100);
+ *
+ * // Reset to native implementations
+ * setGlobalTimeoutOverrides(undefined);
+ * ```
+ * @example
+ * ```ts
+ * // Override both setTimeout and clearTimeout with custom implementations
+ * function customSetTimeout<TArgs extends any[]>(callback: (...args: TArgs) => void, ms?: number, ...args: TArgs) {
+ *     console.log(`Setting timeout for ${ms}ms`);
+ *     return setTimeout(callback, ms);
+ * }
+ *
+ * function customClearTimeout(timeoutId: number) {
+ *     console.log(`Clearing timeout ${timeoutId}`);
+ *     return clearTimeout(timeoutId);
+ * }
+ *
+ * // Set both global override functions
+ * setGlobalTimeoutOverrides([customSetTimeout, customClearTimeout]);
+ *
+ * // Now all timeout operations will use the custom implementations
+ * let timer = scheduleTimeout(() => {
+ *     console.log("Timer triggered");
+ * }, 100);
+ *
+ * // This will use the custom clearTimeout
+ * timer.cancel();
+ *
+ * // Reset to native implementations
+ * setGlobalTimeoutOverrides();
+ * ```
+ */
+export function setGlobalTimeoutOverrides(overrideFn?: TimeoutOverrideFn | TimeoutOverrideFuncs): void {
+    let isArr = isArray(overrideFn);
+    let len = isArr ? overrideFn.length : 0;
+    
+    _globalSetTimeoutFn = (len > 0 ? (overrideFn as TimeoutOverrideFuncs)[0] : (!isArr ? overrideFn as TimeoutOverrideFn: UNDEF_VALUE));
+    _globalClearTimeoutFn = (len > 1 ? (overrideFn as TimeoutOverrideFuncs)[1] : UNDEF_VALUE);
 }
 
 /**
@@ -266,7 +339,7 @@ export function scheduleTimeoutWith<A extends any[]>(overrideFn: TimeoutOverride
  *     return setTimeout(callback, timeout);
  * }
  *
- * let theTimeout = scheduleTimeoutWith(newSetTimeoutFn, () => {
+  * let theTimeout = scheduleTimeoutWith(newSetTimeoutFn, () => {
  *     // This callback will be called after 100ms as this uses setTimeout()
  *     timeoutCalled = true;
  * }, 100);
