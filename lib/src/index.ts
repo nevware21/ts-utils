@@ -75,12 +75,12 @@ export {
     functionDeepCopyHandler, plainObjDeepCopyHandler
 } from "./object/copy";
 export { objCreate } from "./object/create";
-export { 
+export {
     ObjDefinePropDescriptor, ObjDefinePropDescriptorMap, objDefine, objDefineProp, objDefineGet, objDefineAccessors,
     objDefineProperties, objDefineProps
 } from "./object/define";
 export { objForEachKey } from "./object/for_each_key";
-export { 
+export {
     objGetOwnPropertyDescriptor, objGetOwnPropertyDescriptors, objGetOwnPropertyNames,
     objGetOwnPropertySymbols
 } from "./object/get_own_property";
@@ -120,7 +120,7 @@ export {
 export { scheduleInterval } from "./timer/interval";
 export {
     TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, scheduleTimeout, scheduleTimeoutWith,
-    createTimeout, createTimeoutWith, setGlobalTimeoutOverrides
+    createTimeout, createTimeoutWith, setTimeoutOverrides, setGlobalTimeoutOverrides
 } from "./timer/timeout";
 
 // Exporting the helpers, but not the "initialization" code to populate any missing values
