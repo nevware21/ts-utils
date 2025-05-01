@@ -7,6 +7,7 @@
  */
 
 import { safe } from "../helpers/safe";
+import { TimeoutOverrideFuncs } from "../timer/timeout";
 import { UNDEFINED } from "./constants";
 
 const GLOBAL_CONFIG_KEY = "__tsUtils$gblCfg";
@@ -36,6 +37,7 @@ export interface _GlobalTestHooks {
 
 export interface TsUtilsGlobalConfig extends _GlobalTestHooks {
     gblSym?: _GlobalPolySymbols,
+    tmOut?: TimeoutOverrideFuncs,
 }
 
 let _globalCfg: { [key: string ]: any };
