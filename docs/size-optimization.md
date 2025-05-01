@@ -3,7 +3,7 @@
 This guide provides detailed insights into using @nevware21/ts-utils to optimize your bundle size, with concrete measurements and strategies.
 
 ## Table of Contents
-- [NPM Package Sizees](npm-package-sizes)
+- [NPM Package Sizes](#npm-package-sizes)
 - [Bundle Size Impact](#bundle-size-impact)
 - [Detailed Size Comparisons](#detailed-size-comparisons)
 - [Tree-Shaking Optimization](#tree-shaking-optimization)
