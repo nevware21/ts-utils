@@ -48,6 +48,10 @@ module.exports = function (grunt) {
             "ts_utils-test": {
                 tsconfig: "./lib/test/tsconfig.test.json",
                 outDir: "./lib/test/build-es5"
+            },
+            "ts_utils-test_es2017": {
+                tsconfig: "./lib/test/tsconfig.test.2017.json",
+                outDir: "./lib/test/build-es2017"
             }
         },
         "lint": {

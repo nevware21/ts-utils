@@ -10,8 +10,8 @@ module.exports = function (config) {
         hostname: 'localhost',
         frameworks: [ "mocha-webworker" ],
         files: [
-            { pattern: "lib/test/src/worker/**/*.ts", included: false },
-            { pattern: "lib/test/src/common/**/*.ts", included: false }
+            { pattern: "lib/test/src/common/**/*.ts", included: false },
+            { pattern: "lib/test/src/worker/**/*.ts", included: false }
         ],
         preprocessors: {
             "**/*.ts": [ "rollup" ]
@@ -19,7 +19,10 @@ module.exports = function (config) {
         rollupPreprocessor: {
             plugins: [
                 typescript({
-                    tsconfig: "./lib/test/tsconfig.worker.karma.json"
+                    tsconfig: "./lib/test/tsconfig.worker.karma.json",
+                    compilerOptions: {
+                        sourceMap: true
+                    },
                 }),
                 plugin.nodeResolve({
                     browser: true

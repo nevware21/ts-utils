@@ -25,7 +25,8 @@ module.exports = function (config) {
         frameworks: [ "mocha-webworker" ],
         files: [
             { pattern: "lib/test/src/common/**/*.ts", included: false },
-            { pattern: "lib/test/src/worker/**/*.ts", included: false }
+            { pattern: "lib/test/src/worker/**/*.ts", included: false },
+            { pattern: "lib/test/src/esnext/**/*.ts", included: false }
         ],
         preprocessors: {
             "**/*.ts": [ "rollup" ]
@@ -35,6 +36,7 @@ module.exports = function (config) {
                 typescript({
                     tsconfig: "./lib/test/tsconfig.worker.karma.json",
                     compilerOptions: {
+                        target: "ESNext",
                         sourceMap: true
                     },
                 }),
@@ -60,7 +62,7 @@ module.exports = function (config) {
             }
         },
         coverageReporter: {
-            dir: "./coverage/worker",
+            dir: "./coverage/worker_esnext",
             includeAllSources: true,
             reporters: [
                 { type: "text" },
