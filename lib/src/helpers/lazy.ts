@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { fnApply } from "../funcs/funcs";
 import { _GlobalTestHooks, _getGlobalConfig } from "../internal/global";
 import { objDefineProp } from "../object/define";
 import { ICachedValue } from "./cache";
@@ -45,13 +46,20 @@ export interface ILazyValue<T> extends ICachedValue<T> {
  * @since 0.4.5
  * @group Lazy
  * @param cb - The callback function to fetch the value to be lazily evaluated and cached
+ * @param argArray - Optional array of arguments to be passed to the callback function (since 0.12.3)
  * @returns A new readonly {@link ILazyValue} instance which wraps the callback and will be used to cache
  * the result of the callback
  * @example
  * ```ts
  * // This does not cause the evaluation to occur
- * let cachedValue = getLazy(() => callSomeExpensiveFunction());
+ * let cachedValue = getLazy(() =&gt; callSomeExpensiveFunction());
  * let theValue;
+ *
+ * // With arguments - the argument types are inferred from the callback
+ * let cachedValueWithArgs = getLazy(
+ *   (id: number, name: string) =&gt; callSomeExpensiveFunction(id, name),
+ *   [123, "test"]
+ * );
  *
  * // Just checking if there is an object still does not cause the evaluation
  * if (cachedValue) {
@@ -66,7 +74,7 @@ export interface ILazyValue<T> extends ICachedValue<T> {
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function getLazy<T>(cb: () => T): ILazyValue<T> {
+export function getLazy<T, F extends (...args: any[]) => T = () => T>(cb: F, argArray?: Parameters<F>): ILazyValue<T> {
     let lazyValue = { } as ILazyValue<T>;
     !_globalLazyTestHooks && _initTestHooks();
     lazyValue.b = _globalLazyTestHooks.lzy;
@@ -74,7 +82,7 @@ export function getLazy<T>(cb: () => T): ILazyValue<T> {
     objDefineProp(lazyValue, "v", {
         configurable: true,
         get: function () {
-            let result = cb();
+            let result = fnApply(cb, null, argArray);
             if (!_globalLazyTestHooks.lzy) {
                 // Just replace the value
                 objDefineProp(lazyValue, "v", {
@@ -113,13 +121,20 @@ export function setBypassLazyCache(newValue: boolean) {
  * @since 0.11.7
  * @group Lazy
  * @param cb - The callback function to fetch the value to be lazily evaluated and cached
+ * @param argArray - Optional array of arguments to be passed to the callback function (since 0.12.3)
  * @returns A new writable {@link ILazyValue} instance which wraps the callback and will be used to cache
  * the result of the callback
  * @example
  * ```ts
  * // This does not cause the evaluation to occur
- * let cachedValue = getWritableLazy(() => callSomeExpensiveFunction());
+ * let cachedValue = getWritableLazy(() =&gt; callSomeExpensiveFunction());
  * let theValue;
+ *
+ * // With arguments - the argument types are inferred from the callback
+ * let cachedValueWithArgs = getWritableLazy(
+ *   (id: number, name: string) =&gt; callSomeExpensiveFunction(id, name),
+ *   [123, "test"]
+ * );
  *
  * // Just checking if there is an object still does not cause the evaluation
  * if (cachedValue) {
@@ -132,7 +147,7 @@ export function setBypassLazyCache(newValue: boolean) {
  * theValue === cachedValue.v;  // true
  *
  * // Setting the value
- * let cachedValue = getWritableLazy(() => callSomeExpensiveFunction());
+ * let cachedValue = getWritableLazy(() =&gt; callSomeExpensiveFunction());
  * let theValue = "new Value";
  *
  * // Just checking if there is an object still does not cause the evaluation
@@ -146,7 +161,7 @@ export function setBypassLazyCache(newValue: boolean) {
  * theValue === cachedValue.v;  // true
  * ```
  */
-export function getWritableLazy<T>(cb: () => T): ILazyValue<T> {
+export function getWritableLazy<T, F extends (...args: any[]) => T = () => T>(cb: F, argArray?: Parameters<F>): ILazyValue<T> {
     let lazyValue = { } as ILazyValue<T>;
     !_globalLazyTestHooks && _initTestHooks();
     lazyValue.b = _globalLazyTestHooks.lzy;
@@ -166,7 +181,7 @@ export function getWritableLazy<T>(cb: () => T): ILazyValue<T> {
     objDefineProp(lazyValue, "v", {
         configurable: true,
         get: function () {
-            let result = cb();
+            let result = fnApply(cb, null, argArray);
             if (!_globalLazyTestHooks.lzy) {
                 // Just replace the value
                 _setValue(result);

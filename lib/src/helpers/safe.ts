@@ -21,11 +21,11 @@ export type SafeReturnType<T extends (...args: any) => any> = T extends (...args
  * @typeParam T - The type of the function to call
  * @typeParam R - The return type of the function
  */
-export interface ISafeReturn<T extends (...args: any) => any> {
+export interface ISafeReturn<T extends (...args: any) => R, R = SafeReturnType<T>> {
     /**
      * The value returned by the function call
      */
-    v?: SafeReturnType<T>;
+    v?: R;
 
     /**
      * The error thrown by the function call
@@ -40,6 +40,8 @@ export interface ISafeReturn<T extends (...args: any) => any> {
  * property will contain the value returned from the function.
  * @since 0.10.5
  * @group Safe
+ * @typeParam F - The type of the function to call
+ * @typeParam R - The return type of the function to call
  * @param func - The function to call
  * @param argArray - An array of the arguments to pass to the function
  * @returns The return value of the function or undefined if an exception is thrown
@@ -58,7 +60,7 @@ export interface ISafeReturn<T extends (...args: any) => any> {
  * // result2.v === { valid: "json value" }
  * ```
  */
-export function safe<F extends (...args: unknown[]) => any>(func: F, argArray?: any[]): ISafeReturn<F> {
+export function safe<F extends (...args: unknown[]) => R, R = any>(func: F, argArray?: any[]): ISafeReturn<F, R> {
     try {
         return {
             v: func.apply(this, argArray)

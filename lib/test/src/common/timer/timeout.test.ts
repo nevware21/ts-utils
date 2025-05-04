@@ -842,10 +842,9 @@ describe("timeout tests", () => {
             timer.ref();
             assert.equal(timer.hasRef(), true, "Check that calling unref multiple times has no impact even after the timeout function has been called");
         });
-    });    describe("Timeout overrides", () => {
-        let originalSetTimeout: any;
-        let originalClearTimeout: any;
-
+    });
+    
+    describe("Timeout overrides", () => {
         let globalSetTimeoutCalled = 0;
         let globalClearTimeoutCalled = 0;
 
@@ -864,7 +863,9 @@ describe("timeout tests", () => {
             globalClearTimeoutCalled = 0;
             // Reset overrides before each test
             setTimeoutOverrides(undefined);
-        });        it("should use package override functions when set", () => {
+        });
+        
+        it("should use package override functions when set", () => {
             // Set package overrides
             setTimeoutOverrides(globalSetTimeoutFn);
             
@@ -886,7 +887,9 @@ describe("timeout tests", () => {
             assert.equal(timeoutCalled, true, "Timeout should have been called");
             assert.equal(globalSetTimeoutCalled, 1, "The global override should still have been called once");
             assert.equal(globalClearTimeoutCalled, 0, "The global clear override should not have been called");
-        });        it("should use both set and clear override functions when set as array", () => {
+        });
+        
+        it("should use both set and clear override functions when set as array", () => {
             // Set overrides as array
             setTimeoutOverrides([globalSetTimeoutFn, globalClearTimeoutFn]);
             
@@ -915,7 +918,9 @@ describe("timeout tests", () => {
             }
             assert.equal(timeoutCalled, true, "Timeout should have been called after refresh");
             assert.equal(globalSetTimeoutCalled, 2, "The global set override should have been called twice");
-        });        it("should reset overrides when undefined is passed", () => {
+        });
+        
+        it("should reset overrides when undefined is passed", () => {
             // Set overrides
             setTimeoutOverrides(globalSetTimeoutFn);
             
@@ -934,7 +939,9 @@ describe("timeout tests", () => {
             clock.tick(100);
             assert.equal(timeoutCalled, true, "Timeout should have been called");
             assert.equal(globalSetTimeoutCalled, 0, "The global override should not have been called");
-        });        it("should override timeouts used with scheduleTimeoutWith", () => {
+        });
+        
+        it("should override timeouts used with scheduleTimeoutWith", () => {
             // Set package overrides
             setTimeoutOverrides([globalSetTimeoutFn, globalClearTimeoutFn]);
             
@@ -959,7 +966,9 @@ describe("timeout tests", () => {
             assert.equal(timeoutCalled, true, "Timeout should have been called");
             assert.equal(customSetTimeoutCalled, 1, "The custom override should have been called");
             assert.equal(globalSetTimeoutCalled, 0, "The global override should not have been called");
-        });        it("should use package fallback for null override functions", () => {
+        });
+        
+        it("should use package fallback for null override functions", () => {
             // Set package overrides
             setTimeoutOverrides([globalSetTimeoutFn, globalClearTimeoutFn]);
             // Use null for override, which should fall back to global
@@ -974,7 +983,9 @@ describe("timeout tests", () => {
             
             theTimeout.cancel();
             assert.equal(globalClearTimeoutCalled, 1, "The global clear override should have been called");
-        });        it("should handle empty array override falling back to package overrides", () => {
+        });
+        
+        it("should handle empty array override falling back to package overrides", () => {
             // Set package overrides
             setTimeoutOverrides([globalSetTimeoutFn, globalClearTimeoutFn]);
             
@@ -990,7 +1001,9 @@ describe("timeout tests", () => {
             
             clock.tick(100);
             assert.equal(timeoutCalled, true, "Timeout should have been called");
-        });        it("should use package clearTimeout when only setTimeout is provided", () => {
+        });
+        
+        it("should use package clearTimeout when only setTimeout is provided", () => {
             // Set package overrides
             setTimeoutOverrides([null, globalClearTimeoutFn]);
             
@@ -1018,7 +1031,9 @@ describe("timeout tests", () => {
             
             clock.tick(100);
             assert.equal(timeoutCalled, false, "Timeout should not have been called after cancel");
-        });        it("should use package clearTimeout when only setTimeout is provided, but the package set override is defined", () => {
+        });
+        
+        it("should use package clearTimeout when only setTimeout is provided, but the package set override is defined", () => {
             // Set package overrides
             setTimeoutOverrides([globalSetTimeoutFn, globalClearTimeoutFn]);
             
@@ -1320,6 +1335,7 @@ describe("timeout tests", () => {
             
             assert.equal(globalSetTimeoutCalled, 1, "Global set timeout should have been called");
             assert.equal(packageSetTimeoutCalled, 0, "Package set timeout should not have been called");
+            assert.equal(timeout1Called, false, "Timeout 1 should not have been called yet");
             
             // Now set package overrides
             setTimeoutOverrides([packageSetTimeoutFn, packageClearTimeoutFn]);
@@ -1332,6 +1348,7 @@ describe("timeout tests", () => {
             
             assert.equal(globalSetTimeoutCalled, 1, "Global set timeout should not have been called again");
             assert.equal(packageSetTimeoutCalled, 1, "Package set timeout should have been called");
+            assert.equal(timeout2Called, false, "Timeout 2 should not have been called yet");
             
             // Cancel both timeouts
             timeout1.cancel();
@@ -1345,12 +1362,13 @@ describe("timeout tests", () => {
             
             // Call a third timeout to verify we're back to using global overrides
             let timeout3Called = false;
-            let timeout3 = scheduleTimeout(() => {
+            scheduleTimeout(() => {
                 timeout3Called = true;
             }, 100);
             
             assert.equal(globalSetTimeoutCalled, 2, "Global set timeout should have been called again");
             assert.equal(packageSetTimeoutCalled, 1, "Package set timeout count should not change");
+            assert.equal(timeout3Called, false, "Timeout 3 should not have been called yet");
             
             // Let this timeout complete
             clock.tick(100);
@@ -1361,7 +1379,7 @@ describe("timeout tests", () => {
             
             // Call a fourth timeout to verify we're using native functions
             let timeout4Called = false;
-            let timeout4 = scheduleTimeout(() => {
+            scheduleTimeout(() => {
                 timeout4Called = true;
             }, 100);
             

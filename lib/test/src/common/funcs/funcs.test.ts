@@ -87,7 +87,7 @@ describe("function helpers", () => {
             assert.equal(module1.getX(), 21);
             assert.equal(module1.log("Darkness"), "Hello Darkness : 21");
         
-            assert.equal(fnCall(module1.getX, module1, 21), 21);
+            assert.equal(fnCall(module1.getX, module1), 21);
             assert.equal(fnCall(module1.log, module1, "Darkness"), "Hello Darkness : 21");
 
             let module2 = {
