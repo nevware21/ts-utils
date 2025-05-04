@@ -125,7 +125,7 @@ export function fnApply<F extends (...args: any) => any, T>(fn: F, thisArg: T, a
  * fnCall(module1.log, module2, "friend"); // my friend : 42
  * ```
  */
-export function fnCall<F extends (...args: any) => any, T>(fn: F, thisArg: T, ...argArray: any[]): ReturnType<F>;
+export function fnCall<F extends (...args: any) => any, T>(fn: F, thisArg: T, ...args: Parameters<F>): ReturnType<F>;
 
 /**
  * The `fnCall` function calls the function with the given `thisArg` as the `this` value and with

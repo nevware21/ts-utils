@@ -2,7 +2,7 @@
   {
     "name": "es5-full",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "22 kb",
+    "limit": "22.5 kb",
     "brotli": false,
     "running": false
   },

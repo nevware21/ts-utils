@@ -28,7 +28,7 @@ export {
     isStrictNullOrUndefined, isStrictUndefined, isError, isPrimitive, isPrimitiveType, isMap, isMapLike, isSet, isSetLike,
     isWeakMap, isWeakSet, isBigInt
 } from "./helpers/base";
-export { ICachedValue, createCachedValue, createDeferredCachedValue } from "./helpers/cache";
+export { ICachedValue, createCachedValue, createDeferredCachedValue, getDeferred, getWritableDeferred } from "./helpers/cache";
 export { CustomErrorConstructor, createCustomError, throwUnsupported } from "./helpers/customError";
 export { utcNow, polyUtcNow } from "./helpers/date";
 export { isElement, isElementLike } from "./helpers/dom";
@@ -51,7 +51,7 @@ export { getPerformance, hasPerformance, elapsedTime, perfNow } from "./helpers/
 export { createFilenameRegex, createWildcardRegex, makeGlobRegex } from "./helpers/regexp";
 export { safe, ISafeReturn, SafeReturnType } from "./helpers/safe";
 export { safeGet } from "./helpers/safe_get";
-export { safeGetLazy, safeGetWritableLazy } from "./helpers/safe_lazy";
+export { safeGetLazy, safeGetWritableLazy, safeGetDeferred, safeGetWritableDeferred } from "./helpers/safe_lazy";
 export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";
 export { hasValue } from "./helpers/value";
 export { createArrayIterator } from "./iterator/array";

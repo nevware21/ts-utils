@@ -35,17 +35,17 @@ If you find this library useful, please consider [sponsoring @nevware21](https:/
 ## Library Features
 
 - TypeScript-first design with full type definitions
-- Polyfill support for older environments (ES3/IE8)
 - Comprehensive test coverage across Node.js, browsers, and web workers
 - Optimized for tree-shaking and minification
 - Zero dependencies
 - Cross-environment compatibility (Browser, Node.js, Web Workers)
 - Extensive type checking utilities
 - Modern ECMAScript features with backward compatibility
+- Polyfill support for older environments
 
 ## Polyfill Information
 
-Some polyfills are provided for simple backward compatibility to enable the utility functions in older environments (such as ES3 / IE8). These polyfills are **not exported** as part of the main module. If you need them, you will need to:
+Some polyfills are provided for simple backward compatibility to enable the utility functions in older environments. These polyfills are **not exported** as part of the main module. If you need them, you will need to:
 
 1. Import the "polyfill" file directly
 2. Host and load the provided `bundle/ts-polyfills-utils.min.js` 
