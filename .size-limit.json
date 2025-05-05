@@ -16,7 +16,7 @@
   {
     "name": "es5-full-brotli",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "8 kb",
+    "limit": "8.5 kb",
     "brotli": true,
     "running": false
   },

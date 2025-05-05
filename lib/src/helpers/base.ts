@@ -424,6 +424,84 @@ export const isString: (value: any) => value is string = (/*#__PURE__*/_createIs
 export const isFunction: (value: any) => value is Function = (/*#__PURE__*/_createIs<Function>(FUNCTION));
 
 /**
+ * Checks if the provided value is an AsyncFunction
+ * @function
+ * @group Type Identity
+ * @since 0.12.3
+ * @param value - Value to be checked
+ * @returns True if the value is an AsyncFunction, false otherwise
+ * @remarks
+ * This function checks if the provided value is an AsyncFunction, which is a special type of function
+ * that returns a Promise and can be used with the `await` keyword. Note that this function does not
+ * check if the function is a generator or an async generator function. And when using TypeScript
+ * and targetting earlier versions of JavaScript, the type of the function may NOT be AsyncFunction
+ * and instead be a regular function. This is because the type of the function is determined by the
+ * JavaScript engine and not the TypeScript compiler.
+ * @example
+ * ```ts
+ * async function asyncFn() { }
+ * isAsyncFunction(asyncFn);               // true
+ * isAsyncFunction(function() {});         // false
+ * isAsyncFunction(function* () {});       // false
+ * isAsyncFunction(async function* () {}); // false
+ * isAsyncFunction(null);                  // false
+ * isAsyncFunction(undefined);             // false
+ * ```
+ */
+export const isAsyncFunction: (value: any) => value is Function = (/*#__PURE__*/_createObjIs<Function>("AsyncFunction"));
+
+/**
+ * Checks if the provided value is a GeneratorFunction
+ * @function
+ * @group Type Identity
+ * @since 0.12.3
+ * @param value - Value to be checked
+ * @returns True if the value is a GeneratorFunction, false otherwise
+ * @remarks
+ * This function checks if the provided value is a GeneratorFunction, which is a special type of function
+ * that returns a Generator and can be used with the `yield` keyword. Note that this function does not
+ * check if the function is an async function or an async generator function. And when using TypeScript
+ * and targetting earlier versions of JavaScript, the type of the function may NOT be GeneratorFunction
+ * and instead be a regular function.
+ * @example
+ * ```ts
+ * function* genFn() { }
+ * isGenerator(genFn);                     // true
+ * isGenerator(function() {});             // false
+ * isGenerator(async function() {});       // false
+ * isGenerator(async function* () {});     // false
+ * isGenerator(null);                      // false
+ * isGenerator(undefined);                 // false
+ * ```
+ */
+export const isGenerator: (value: any) => value is GeneratorFunction = (/*#__PURE__*/_createObjIs<GeneratorFunction>("GeneratorFunction"));
+
+/**
+ * Checks if the provided value is an AsyncGeneratorFunction
+ * @function
+ * @group Type Identity
+ * @since 0.12.3
+ * @param value - Value to be checked
+ * @returns True if the value is an AsyncGeneratorFunction, false otherwise
+ * @remarks
+ * This function checks if the provided value is an AsyncGeneratorFunction, which is a special type of function
+ * that returns an AsyncGenerator and can be used with the `await` keyword. Note that this function does not
+ * check if the function is a generator or an async function. And when using TypeScript and targetting earlier
+ * versions of JavaScript, the type of the function may NOT be AsyncGeneratorFunction and instead be a regular function.
+ * @example
+ * ```ts
+ * async function* asyncGenFn() { }
+ * isAsyncGenerator(asyncGenFn);           // true
+ * isAsyncGenerator(function() {});        // false
+ * isAsyncGenerator(async function() {});  // false
+ * isAsyncGenerator(function* () {});      // false
+ * isAsyncGenerator(null);                 // false
+ * isAsyncGenerator(undefined);            // false
+ * ```
+ */
+export const isAsyncGenerator: (value: any) => value is AsyncGeneratorFunction = (/*#__PURE__*/_createObjIs<AsyncGeneratorFunction>("AsyncGeneratorFunction"));
+
+/**
  * Checks to see if the past value is an object value
  * @function
  * @group Type Identity

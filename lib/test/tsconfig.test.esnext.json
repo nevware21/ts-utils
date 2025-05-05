@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "sourceMap": true,
+        "inlineSources": true,
+        "noImplicitAny": true,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "target": "ESNext",
+        "forceConsistentCasingInFileNames": true,
+        "importHelpers": true,
+        "noEmitHelpers": false,
+        "alwaysStrict": true,
+        "declaration": false,
+        "declarationDir": "./types",
+        "outDir": "./test-esnext",
+        "allowSyntheticDefaultImports": true,
+        "removeComments": false
+    },
+    "include": [
+        "../src/**/*.ts",
+        "./src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules/"
+    ]
+}
