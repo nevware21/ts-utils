@@ -31,7 +31,7 @@ npm install @nevware21/ts-utils --save
 
 **Recommended Version Specification:**
 ```json
-"@nevware21/ts-utils": ">= 0.12.2 < 2.x"
+"@nevware21/ts-utils": ">= 0.12.3 < 2.x"
 ```
 
 > Note: v0.x and v1.x maintain ES5 compatibility. Future v2.x releases will update the baseline to newer ECMAScript versions.
