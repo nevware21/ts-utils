@@ -1,3 +1,26 @@
+# v0.12.3 May 4th, 2025
+
+## Changelog
+
+### Features
+
+- [#424](https://github.com/nevware21/ts-utils/pull/424) Add additional is function tests (isAsyncFunction, isGenerator, isAsyncGenerator)
+- [#420](https://github.com/nevware21/ts-utils/issues/420) [Feature] Add a new getDeferredValue that gets passed the function and optional parameters
+- [#416](https://github.com/nevware21/ts-utils/pull/416) Add setGlobalTimeoutOverrides
+
+### Commits
+
+- [#412](https://github.com/nevware21/ts-utils/pull/412) Increase code coverage
+- [#413](https://github.com/nevware21/ts-utils/pull/413) Enable CI Merge_Queue
+- [#411](https://github.com/nevware21/ts-utils/pull/411) Add additional size tests for the "isXXX" functions
+- [#410](https://github.com/nevware21/ts-utils/pull/410) Bump glob from 11.0.1 to 11.0.2
+- [#415](https://github.com/nevware21/ts-utils/pull/415) Reduce the code required for polyfills
+- [#417](https://github.com/nevware21/ts-utils/pull/417) Update README.md and documentation
+- [#418](https://github.com/nevware21/ts-utils/pull/418) Remove module documentation link
+- [#419](https://github.com/nevware21/ts-utils/pull/419) Update global and package level default timeout functions
+- [#421](https://github.com/nevware21/ts-utils/pull/421) Update size-optimization.md
+
+
 # v0.12.2 Apr 17th, 2025
 
 ## Changelog
