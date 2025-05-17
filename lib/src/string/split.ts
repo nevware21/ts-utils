@@ -6,10 +6,9 @@
  * Licensed under the MIT license.
  */
 
-import { NULL_VALUE, StrProto } from "../internal/constants";
+import { StrProto } from "../internal/constants";
 import { _unwrapFunction, _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { polyStrSymSplit } from "../polyfills/split";
-import { hasSymbol } from "../symbol/symbol";
 
 /**
  * The `strSplit()` splits a string into substrings using the pattern and divides a String
@@ -89,4 +88,4 @@ export const strSplit: (value: string, separator: string | RegExp, limit?: numbe
  * console.log(strSymSplit(myString, splitByNumber)); // [ "a", "bc", "c5d", "e", "f" ]
  * ```
  */
-export const strSymSplit: (value: string, splitter: { [Symbol.split](string: string, limit?: number): string[]; }, limit?: number) => string[] = (/*#__PURE__*/_unwrapFunctionWithPoly("split", StrProto, !hasSymbol() ? polyStrSymSplit : NULL_VALUE));
+export const strSymSplit: (value: string, splitter: { [Symbol.split](string: string, limit?: number): string[]; }, limit?: number) => string[] = (/*#__PURE__*/_unwrapFunctionWithPoly("split", StrProto, polyStrSymSplit));
