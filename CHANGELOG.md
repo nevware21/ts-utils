@@ -1,3 +1,12 @@
+# v0.12.4 May 17th, 2025
+
+## Changelog
+
+### Issues
+
+- [#428](https://github.com/nevware21/ts-utils/issues/428) [Bug] Tree-Shaking strSymSplit is not always getting tree-shaken
+
+
 # v0.12.3 May 4th, 2025
 
 ## Changelog
