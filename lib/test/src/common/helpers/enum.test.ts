@@ -17,6 +17,13 @@ type IfAny<T, Y, N> = 0 extends (1 & T) ? Y : N;
 type IsAny<T> = IfAny<T, T, never>;
 type IsNotAny<T> = IfAny<T, never, T>;
 
+const enum Animal {
+    Dog = 0,
+    Cat = 1,
+    Butterfly = 2,
+    Bear = 3
+}
+
 // Helper functions which check whether the passed type is any or not
 // Designed to causes a compile error
 const chkNotAny = <T>(x: IsNotAny<T>) => true;
@@ -26,12 +33,6 @@ const chkIs = <E, T = E>(x: Is<E, T>, validator: (arg: T) => boolean) => validat
 
 describe("enum helpers", () => {
     it("createEnum", () => {
-        const enum Animal {
-            Dog = 0,
-            Cat = 1,
-            Butterfly = 2,
-            Bear = 3
-        }
 
         const animalEnum = createEnum<typeof Animal>({
             Dog: Animal.Dog,
@@ -71,12 +72,6 @@ describe("enum helpers", () => {
     });
 
     it("createEnumKeyMap", () => {
-        const enum Animal {
-            Dog = 0,
-            Cat = 1,
-            Butterfly = 2,
-            Bear = 3
-        }
 
         const animalEnum = createEnumKeyMap<typeof Animal>({
             Dog: Animal.Dog,
@@ -116,12 +111,6 @@ describe("enum helpers", () => {
     });
 
     it("createEnumValueMap", () => {
-        const enum Animal {
-            Dog = 0,
-            Cat = 1,
-            Butterfly = 2,
-            Bear = 3
-        }
 
         const animalEnum = createEnumValueMap<typeof Animal>({
             Dog: Animal.Dog,
@@ -157,12 +146,6 @@ describe("enum helpers", () => {
     });
 
     it("createSimpleMap", () => {
-        const enum Animal {
-            Dog = 0,
-            Cat = 1,
-            Butterfly = 2,
-            Bear = 3
-        }
 
         // Creates a simple map where the key maps to the specificed generic type
         const animalFamilyMap = createSimpleMap<typeof Animal, string>({
@@ -199,12 +182,6 @@ describe("enum helpers", () => {
     });
 
     it("createTypeMap", () => {
-        const enum Animal {
-            Dog = 0,
-            Cat = 1,
-            Butterfly = 2,
-            Bear = 3
-        }
 
         // Create a strongly types map
         const animalFamilyMap = createTypeMap<typeof Animal, {
@@ -252,12 +229,6 @@ describe("enum helpers", () => {
     });
 
     it("createTypeMap with weak interface", () => {
-        const enum Animal {
-            Dog = 0,
-            Cat = 1,
-            Butterfly = 2,
-            Bear = 3
-        }
 
         interface IAnimalFamilyMap {
             Dog: string,
@@ -312,12 +283,6 @@ describe("enum helpers", () => {
     });
 
     it("createTypeMap with typed interface", () => {
-        const enum Animal {
-            Dog = 0,
-            Cat = 1,
-            Butterfly = 2,
-            Bear = 3
-        }
 
         interface IAnimalFamilyMap {
             Dog: "Canidae",
