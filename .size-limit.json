@@ -71,5 +71,29 @@
     "limit": "9 kb",
     "brotli": false,
     "running": false
+  },
+  {
+    "name": "es5-strEndsWith",
+    "path": "lib/dist/es5/mod/ts-utils.js",
+    "limit": "700 b",
+    "import": "{ strEndsWith }",
+    "gzip": true,
+    "running": false
+  },
+  {
+    "name": "es5-getWindow",
+    "path": "lib/dist/es5/mod/ts-utils.js",
+    "limit": "500 b",
+    "import": "{ getWindow }",
+    "gzip": true,
+    "running": false
+  },
+  {
+    "name": "es5-simple-string",
+    "path": "lib/dist/es5/mod/ts-utils.js",
+    "limit": "1kb",
+    "import": "{ getWindow, strEndsWith }",
+    "gzip": true,
+    "running": false
   }
 ]
