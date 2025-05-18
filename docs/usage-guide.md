@@ -30,7 +30,7 @@ It is recommended to use the following definition in your `package.json` to main
 ```json
 {
   "dependencies": {
-    "@nevware21/ts-utils": ">= 0.12.3 < 2.x"
+    "@nevware21/ts-utils": ">= 0.12.4 < 2.x"
   }
 }
 ```
