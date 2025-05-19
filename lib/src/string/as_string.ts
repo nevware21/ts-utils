@@ -29,4 +29,4 @@ import { _pureAssign } from "../internal/treeshake_helpers";
  * asString(Symbol.for("Hello"));   // "Symbol(Hello)"
  * ```
  */
-export const asString: (value: any) => string = (/* #__PURE__ */_pureAssign(StrCls));
+export const asString: (value: any) => string = (/*#__PURE__*/_pureAssign(StrCls));

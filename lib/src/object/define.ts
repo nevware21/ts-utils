@@ -15,8 +15,8 @@ import { arrForEach } from "../array/forEach";
 import { objPropertyIsEnumerable } from "./property_is_enumerable";
 import { _returnEmptyArray, _returnNothing } from "../internal/stubs";
 
-const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR)), _returnNothing));
-const _objGetOwnPropertySymbols: (obj: any) => symbol[] = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertySymbols>(ObjClass, GET_OWN_PROPERTY_SYMBOLS)), _returnEmptyArray));
+const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR)), _returnNothing));
+const _objGetOwnPropertySymbols: (obj: any) => symbol[] = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertySymbols>(ObjClass, GET_OWN_PROPERTY_SYMBOLS)), _returnEmptyArray));
 
 /**
  * Definition of the Property Descriptor mappings for the objDefine functions.

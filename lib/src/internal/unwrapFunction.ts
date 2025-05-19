@@ -22,7 +22,7 @@ import { ArrSlice, CALL, NULL_VALUE } from "./constants";
  * @param funcName - The function name to call on the first argument passed to the wrapped function
  * @returns A function which will call the funcName against the first passed argument and pass on the remaining arguments
  */
-export const _unwrapInstFunction:<R, T>(funcName: keyof T) => <T>(this: T, ..._args:any) => R = (/*__PURE__*/_unwrapFunctionWithPoly);
+export const _unwrapInstFunction:<R, T>(funcName: keyof T) => <T>(this: T, ..._args:any) => R = (/*#__PURE__*/_unwrapFunctionWithPoly);
 
 /**
  * @function
@@ -33,7 +33,7 @@ export const _unwrapInstFunction:<R, T>(funcName: keyof T) => <T>(this: T, ..._a
  * @param clsProto - The Class or class prototype to fallback to if the instance doesn't have the function.
  * @returns A function which will call the funcName against the first passed argument and pass on the remaining arguments
  */
-export const _unwrapFunction:<R, T>(funcName: keyof T, clsProto: T) => <T>(this: T, ..._args:any) => R = (/*__PURE__*/_unwrapFunctionWithPoly);
+export const _unwrapFunction:<R, T>(funcName: keyof T, clsProto: T) => <T>(this: T, ..._args:any) => R = (/*#__PURE__*/_unwrapFunctionWithPoly);
 
 /**
  * @internal

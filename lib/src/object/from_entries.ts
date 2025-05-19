@@ -76,5 +76,5 @@ export type ObjFromEntriesFn = {
  * // { a: 2, b: 4, c: 6 }
  * ```
  */
-export const objFromEntries: ObjFromEntriesFn = (/* #__PURE__*/_pureAssign((/* #__PURE__*/_pureRef<typeof Object.fromEntries>(ObjClass, "fromEntries")), polyObjFromEntries));
+export const objFromEntries: ObjFromEntriesFn = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.fromEntries>(ObjClass, "fromEntries")), polyObjFromEntries));
 
