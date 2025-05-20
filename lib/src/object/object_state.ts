@@ -28,7 +28,7 @@ import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
  * console.log(objIsFrozen(frozen)); // true
  * ```
  */
-export const objIsFrozen: (obj: any) => boolean = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.isFrozen>(ObjClass, "isFrozen")), _returnFalse));
+export const objIsFrozen: (obj: any) => boolean = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.isFrozen>(ObjClass, "isFrozen")), _returnFalse));
 
 /**
  * The `objIsSealed()` method determines if an object is sealed. An object is sealed if it is not
@@ -52,4 +52,4 @@ export const objIsFrozen: (obj: any) => boolean = (/* #__PURE__*/_pureAssign((/*
  * console.log(objIsSealed(frozen)); // true
  * ```
  */
-export const objIsSealed: (obj: any) => boolean = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.isSealed>(ObjClass, "isSealed")), _returnFalse));
+export const objIsSealed: (obj: any) => boolean = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.isSealed>(ObjClass, "isSealed")), _returnFalse));

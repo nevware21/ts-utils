@@ -51,7 +51,7 @@ import { polyObjGetOwnPropertyDescriptors } from "../polyfills/object/objGetOwnP
  * ```
  * Note: In ES5, if the first argument to this method is not an object (a primitive), then it will cause a TypeError. In ES2015, a non-object first argument will be coerced to an object at first.
  */
-export const objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR)), _returnNothing));
+export const objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR)), _returnNothing));
 
 /**
  * The objGetOwnPropertyDescriptors() method returns all own property descriptors of a given object.
@@ -92,7 +92,7 @@ export const objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => Pr
  * );
  * ```
  */
-export const objGetOwnPropertyDescriptors: (obj: any) => PropertyDescriptorMap = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyDescriptors>(ObjClass, "getOwnPropertyDescriptors")), polyObjGetOwnPropertyDescriptors));
+export const objGetOwnPropertyDescriptors: (obj: any) => PropertyDescriptorMap = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertyDescriptors>(ObjClass, "getOwnPropertyDescriptors")), polyObjGetOwnPropertyDescriptors));
 
 /**
  * The objGetOwnPropertyNames() method returns an array of all properties (including non-enumerable properties except for
@@ -118,7 +118,7 @@ export const objGetOwnPropertyDescriptors: (obj: any) => PropertyDescriptorMap =
  * objGetOwnPropertyNames(obj); // ['hidden', 'visible']
  * ```
  */
-export const objGetOwnPropertyNames: (obj: any) => string[] = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyNames>(ObjClass, GET_OWN_PROPERTY_NAMES)), _returnEmptyArray));
+export const objGetOwnPropertyNames: (obj: any) => string[] = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertyNames>(ObjClass, GET_OWN_PROPERTY_NAMES)), _returnEmptyArray));
 
 /**
  * The `objGetOwnPropertySymbols()` method returns an array of all symbol properties found directly upon

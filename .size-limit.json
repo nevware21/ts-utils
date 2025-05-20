@@ -44,7 +44,7 @@
   {
     "name": "es5-env",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "2 kb",
+    "limit": "1.5 kb",
     "import": "{ getGlobal, getInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory, getHistory, isNode, isWebWorker }",
     "brotli": false,
     "running": false

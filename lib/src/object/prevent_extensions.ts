@@ -20,7 +20,7 @@ import { _doNothing } from "./object";
  * @param obj - The object which should be made non-extensible.
  * @returns The object being made non-extensible.
  */
-export const objPreventExtensions: <T>(obj: T) => T = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.preventExtensions>(ObjClass, "preventExtensions")), _doNothing));
+export const objPreventExtensions: <T>(obj: T) => T = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.preventExtensions>(ObjClass, "preventExtensions")), _doNothing));
 
 /**
  * The Object.isExtensible() method determines if an object is extensible (whether it can have new
@@ -30,4 +30,4 @@ export const objPreventExtensions: <T>(obj: T) => T = (/* #__PURE__*/_pureAssign
  * @param obj - The object which should be checked.
  * @returns A Boolean indicating whether or not the object is extensible.
  */
-export const objIsExtensible: (obj: any) => boolean = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.isExtensible>(ObjClass, "isExtensible")), _returnFalse));
+export const objIsExtensible: (obj: any) => boolean = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.isExtensible>(ObjClass, "isExtensible")), _returnFalse));
