@@ -1,3 +1,15 @@
+# v0.12.5 May 20th, 2025
+
+## Changelog
+
+### Issues
+
+- [#434](https://github.com/nevware21/ts-utils/issues/434) [Bug] Tree-Shaking: _wellKnownSymbolMap using createEnumKeyMap is not always tree-shaken
+
+### Commits
+
+- [#435](https://github.com/nevware21/ts-utils/pull/435) [Bug] Tree-Shaking: _wellKnownSymbolMap using createEnumKeyMap is not always tree-shaken #434
+
 # v0.12.4 May 17th, 2025
 
 ## Changelog
