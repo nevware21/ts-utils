@@ -265,5 +265,9 @@
         "typedoc-github-theme": "^0.3.0",
         "typescript": "~5.2.2",
         "uglify-js": "^3.15.5"
+    },
+    "overrides": {
+        "@sinonjs/samsam": "8.0.2",
+        "@sinonjs/fake-timers": "10.0.2"
     }
 }
