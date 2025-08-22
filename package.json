@@ -267,7 +267,7 @@
         "uglify-js": "^3.15.5"
     },
     "overrides": {
-        "@sinonjs/samsam": "8.0.2",
+        "@sinonjs/samsam": "7.0.1",
         "@sinonjs/fake-timers": "10.0.2"
     }
 }
