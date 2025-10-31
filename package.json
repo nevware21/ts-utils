@@ -216,7 +216,7 @@
         "@nevware21/grunt-ts-plugin": "^0.5.1",
         "@nevware21/publish-npm": "^0.1.3",
         "@nevware21/tripwire-chai": ">= 0.1.2 && < 2.0.0",
-        "@rollup/plugin-commonjs": "^28.0.0",
+        "@rollup/plugin-commonjs": "^29.0.0",
         "@rollup/plugin-json": "^6.0.0",
         "@rollup/plugin-node-resolve": "^16.0.0",
         "@rollup/plugin-strip": "^3.0.2",
