@@ -2,7 +2,7 @@ name: Dependabot Force Rebase
 on:
   push:
     branches:
-      - main   # 👈 base branch
+      - main
 
 permissions:
   contents: write        # needed to push commits to PR branches
@@ -11,7 +11,6 @@ permissions:
 jobs:
   rebase:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
     steps:
       - uses: peter-evans/rebase@v2
         with:
