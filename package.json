@@ -258,7 +258,7 @@
         "rollup-plugin-minify-es": "^1.1.1",
         "rollup-plugin-sourcemaps": "^0.6.3",
         "sinon": "^15.0.0",
-        "size-limit": "^11.2.0",
+        "size-limit": "^12.0.0",
         "ts-mocha": "^11.1.0",
         "tslib": "^2.6.0",
         "typedoc": "^0.28.2",
