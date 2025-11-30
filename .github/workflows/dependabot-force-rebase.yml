@@ -1,0 +1,19 @@
+name: Dependabot Force Rebase
+on:
+  push:
+    branches:
+      - main   # 👈 base branch
+
+permissions:
+  contents: write        # needed to push commits to PR branches
+  pull-requests: write   # needed to update PR metadata (rebased state)
+
+jobs:
+  rebase:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - uses: peter-evans/rebase@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request: ${{ github.event.pull_request.number }}
