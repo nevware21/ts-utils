@@ -12,7 +12,7 @@ jobs:
   rebase:
     runs-on: ubuntu-latest
     steps:
-      - uses: peter-evans/rebase@v2
+      - uses: peter-evans/rebase@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           pull-request: all
