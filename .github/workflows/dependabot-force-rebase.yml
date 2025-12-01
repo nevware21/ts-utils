@@ -1,28 +1,14 @@
 name: Dependabot Force Rebase
 on:
-  push:
-    branches:
-      - main
-
-permissions:
-  pull-requests: write   # enough to post the comment
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
-  rebase-dependabot:
+  rebase:
     runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    permissions:
+      contents: write        # 👈 allows pushing commits to branches
+      pull-requests: write   # 👈 allows updating PR metadata
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install GitHub CLI
-        uses: cli/cli-action@v2
-
-      - name: Rebase Dependabot PRs
-        run: |
-          set -euo pipefail
-          for pr in $(gh pr list --author dependabot[bot] --json number,headRefName -q '.[] | "\(.number):\(.headRefName)"'); do
-            num=$(echo $pr | cut -d: -f1)
-            branch=$(echo $pr | cut -d: -f2)
-            echo "Rebasing PR #$num ($branch)"
-            gh pr comment $num --body "@dependabot rebase"
-          done
+      - uses: peter-evans/rebase@v2
