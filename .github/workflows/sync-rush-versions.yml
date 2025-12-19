@@ -7,6 +7,10 @@ on:
       - "rush.json"
       - "common-versions.json"
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   detect:
     runs-on: ubuntu-latest
@@ -16,16 +20,17 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 2
-
+          fetch-depth: 2  # Fetch current commit + previous commit
       - name: Detect Rush bump
         id: detect
         run: |
           # Look for @microsoft/rush in the diff
-          if git diff -U0 HEAD~1 -- **/package.json | grep '"@microsoft/rush"'; then
+          if git diff -U0 HEAD~1 -- package.json | grep '"@microsoft/rush"'; then
             echo "rush_changed=true" >> $GITHUB_OUTPUT
+            echo "Rush change detected"
           else
             echo "rush_changed=false" >> $GITHUB_OUTPUT
+            echo "No Rush change detected"
           fi
 
   update:
@@ -37,6 +42,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+          ref: ${{ github.head_ref }}
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -64,14 +70,13 @@ jobs:
         run: |
           git config --global user.name "dependabot-sync[bot]"
           git config --global user.email "dependabot-sync[bot]@users.noreply.github.com"
-          git add rush.json || true
-          git add common-versions.json || true
-          git add pnpm-lock.yaml || true
-          git add yarn.lock || true
-          git add package-lock.json || true
+          # Add files that exist
+          if [ -f rush.json ]; then git add rush.json; fi
+          if [ -f common-versions.json ]; then git add common-versions.json; fi
+          if [ -f common/config/rush/npm-shrinkwrap.json ]; then git add common/config/rush/npm-shrinkwrap.json; fi
           if git diff --staged --quiet; then
             echo "No changes to commit."
           else
             git commit -m "chore: sync rush.json and regenerate lockfiles"
-            git push --force-with-lease
+            git push
           fi
