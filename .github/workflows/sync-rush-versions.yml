@@ -1,0 +1,82 @@
+name: Sync Rush.json Version
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - "**/package.json"
+      - "rush.json"
+      - "common-versions.json"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    outputs:
+      rush_changed: ${{ steps.detect.outputs.rush_changed }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 2  # Fetch current commit + previous commit
+      - name: Detect Rush bump
+        id: detect
+        run: |
+          # Look for @microsoft/rush in the diff
+          if git diff -U0 HEAD~1 -- package.json | grep '"@microsoft/rush"'; then
+            echo "rush_changed=true" >> $GITHUB_OUTPUT
+            echo "Rush change detected"
+          else
+            echo "rush_changed=false" >> $GITHUB_OUTPUT
+            echo "No Rush change detected"
+          fi
+
+  update:
+    runs-on: ubuntu-latest
+    needs: detect
+    if: needs.detect.outputs.rush_changed == 'true'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - name: Install Rush
+        run: npm install -g @microsoft/rush
+
+      - name: Sync rush.json
+        run: |
+          echo "Syncing rush.json with Dependabot bump..."
+          # Extract new Rush version from package.json
+          NEW_VERSION=$(jq -r '.devDependencies["@microsoft/rush"] // .dependencies["@microsoft/rush"]' package.json)
+
+          # Update rush.json version field
+          jq ".rushVersion = \"$NEW_VERSION\"" rush.json > rush.tmp.json
+          mv rush.tmp.json rush.json
+
+      - name: Run rush update
+        run: |
+          rush update --full
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "dependabot-sync[bot]"
+          git config --global user.email "dependabot-sync[bot]@users.noreply.github.com"
+          # Add files that exist
+          if [ -f rush.json ]; then git add rush.json; fi
+          if [ -f common-versions.json ]; then git add common-versions.json; fi
+          if [ -f common/config/rush/npm-shrinkwrap.json ]; then git add common/config/rush/npm-shrinkwrap.json; fi
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: sync rush.json and regenerate lockfiles"
+            git push
+          fi
