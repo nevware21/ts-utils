@@ -11,4 +11,4 @@ jobs:
       contents: write        # 👈 allows pushing commits to branches
       pull-requests: write   # 👈 allows updating PR metadata
     steps:
-      - uses: peter-evans/rebase@v2
+      - uses: peter-evans/rebase@v4
