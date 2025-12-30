@@ -133,8 +133,8 @@ export const asString: (value: any) => string = (/*#__PURE__*/_pureAssign(StrCls
 Use `/*#__NO_SIDE_EFFECTS__*/` for functions without side effects:
 ```typescript
 /*#__NO_SIDE_EFFECTS__*/
-export function isString(value: any): value is string {
-    return typeof value === "string";
+export function examplePureFunction(value: number): number {
+    return value * 2;
 }
 ```
 
