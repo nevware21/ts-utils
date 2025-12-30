@@ -69,7 +69,7 @@ npm run debug:worker          # Debug worker tests
 ## Coding Conventions
 
 ### File Headers
-All source files must include the standard header:
+All source files must include the standard header (replace 2022 with the current year when creating new files):
 ```typescript
 /*
  * @nevware21/ts-utils
@@ -101,7 +101,7 @@ All source files must include the standard header:
   - `poly*` for polyfills (e.g., `polyStrTrim`, `polyObjKeys`)
 
 ### Documentation
-- Use TSDoc/JSDoc comments for all exported functions
+- Use TSDoc comments for all exported functions
 - Include `@group` tags to categorize functions (e.g., `@group String`, `@group Array`)
 - Include `@since` tag to indicate version introduced
 - Provide `@example` sections with practical usage
@@ -142,7 +142,7 @@ export function isString(value: any): value is string {
 
 ### ES5 Support
 - Maintain ES5 compatibility for v0.x and v1.x releases
-- Use polyfills for modern features when targeting ES5
+- Use internal polyfills for modern features when targeting ES5 (never use external packages as this can have negative interactions on consuming projects)
 - Avoid ES6+ syntax in ES5 builds (arrow functions, classes, etc.)
 - Use the `_unwrapFunctionWithPoly` pattern for polyfill fallbacks
 
@@ -184,13 +184,13 @@ Common tests (in `lib/test/src/common/`) run in all environments (Node, browser,
 ## Testing Conventions
 
 ### Test Framework
-- Use `@nevware21/tripwire-chai` for assertions
+- Use `@nevware21/tripwire` for assertions
 - Test files use `.test.ts` suffix
 - Organize tests by functionality (matching `src/` structure)
 
 Example:
 ```typescript
-import { assert } from "@nevware21/tripwire-chai";
+import { assert } from "@nevware21/tripwire";
 import { strTrim } from "../../../../src/string/trim";
 
 describe("strTrim helper", () => {
