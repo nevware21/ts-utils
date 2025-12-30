@@ -101,7 +101,7 @@ export function isTypeof(value: any, theType: string): boolean {
 
 /**
  * Checks if the provided value is undefined or contains the string value "undefined",
- * if you want to consider the string value as undefined see {@link @nevware21/ts-utils#isStrictUndefined}
+ * if you want to consider the string value as undefined see {@link isStrictUndefined}
  * @group Type Identity
  * @group Value Check
  * @param value - The value to check
