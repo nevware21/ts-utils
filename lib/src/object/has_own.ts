@@ -24,7 +24,7 @@ const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => Property
  * false if the property is inherited, or has not been declared at all. Unlike the in operator,
  * this method does not check for the specified property in the object's prototype chain.
  *
- * It is recommended over {@link objHasOwnProperty} () because it works for objects created using
+ * It is recommended over {@link @nevware21/ts-utils#objHasOwnProperty} () because it works for objects created using
  * objCreate(null) and with objects that have overridden the inherited hasOwnProperty() method.
  * While it is possible to workaround these problems by calling Object.prototype.hasOwnProperty()
  * on an external object, Object.hasOwn() is more intuitive.
@@ -54,7 +54,7 @@ export const objHasOwn: <T = any>(obj: T, prop: PropertyKey) => boolean = (/*#__
 
 
 /**
- * The polyObjHasOwn() method is a polyfill for {@link objHasOwn} when the native
+ * The polyObjHasOwn() method is a polyfill for {@link @nevware21/ts-utils#objHasOwn} when the native
  * [Object.hasOwnreturns](https://caniuse.com/?search=hasOwn) is not supported, it returns a
  * boolean indicating whether the object has the specified property as its own property (as
  * opposed to inheriting it). If the property is inherited, or does not exist, the method

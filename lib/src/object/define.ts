@@ -25,7 +25,7 @@ const _objGetOwnPropertySymbols: (obj: any) => symbol[] = (/*#__PURE__*/_pureAss
  * Bear in mind that these attributes are not necessarily the descriptor's own properties. Inherited
  * properties will be considered as well. In order to ensure these defaults are preserved, you might
  * freeze existing objects in the descriptor object's prototype chain upfront, specify all options
- * explicitly, or point to null with {@link objCreate}(null).
+ * explicitly, or point to null with {@link @nevware21/ts-utils#objCreate}(null).
  * @since 0.6.0
  * @group Object
  */
@@ -84,7 +84,7 @@ export interface ObjDefinePropDescriptor<V = any> {
 /**
  * An object whose keys represent the names of properties to be defined or modified and whose values are objects
  * describing those properties. Each value in props must be either a data descriptor or an accessor descriptor;
- * it cannot be both (see {@link ObjDefinePropDescriptor} for more details).
+ * it cannot be both (see {@link @nevware21/ts-utils#ObjDefinePropDescriptor} for more details).
  * @since 0.6.0
  * @group Object
  */
@@ -171,7 +171,7 @@ export const objDefineProp: <T>(target: T, key: PropertyKey, descriptor: Propert
  * @param target - The object on which to define or modify properties.
  * @param props - An object whose keys represent the names of properties to be defined or modified and whose values are
  * objects describing those properties. Each value in props must be either a data descriptor or an accessor descriptor;
- * it cannot be both (see {@link ObjDefinePropDescriptorMap} for more details).
+ * it cannot be both (see {@link @nevware21/ts-utils#ObjDefinePropDescriptorMap} for more details).
  * @returns
  */
 export const objDefineProperties: <T>(target: T, props: PropertyDescriptorMap & ThisType<any>) => T = (/*#__PURE__*/_pureRef<typeof Object.defineProperties>(ObjClass as any, "defineProperties"));
@@ -179,7 +179,7 @@ export const objDefineProperties: <T>(target: T, props: PropertyDescriptorMap & 
 /**
  * Try to define a get object property accessor for the target object, if a function is past as the value this will
  * be assumed to be a getter function and NOT the value.
- * @deprecated It is recommended that you use {@link objDefine} instead {@link objDefineGet} or {@link objDefineAccessors}
+ * @deprecated It is recommended that you use {@link @nevware21/ts-utils#objDefine} instead {@link @nevware21/ts-utils#objDefineGet} or {@link @nevware21/ts-utils#objDefineAccessors}
  * as it provides a deterministic way for identifying whether the value is a value or a function rather than wrapping any
  * function value in another function.
  * @group Object
@@ -202,8 +202,8 @@ export function objDefineGet<T, V = any>(target: T, key: PropertyKey, value: (()
  * Try to define get/set object property accessors for the target object/prototype, this will provide compatibility with
  * existing API definition when run within an ES5+ container that supports accessors but still enable the code to be loaded
  * and executed in an ES3 container, providing basic IE8 compatibility.
- * @deprecated It is recommended that you use {@link objDefine} instead {@link objDefineAccessors} as this internally creates
- * the {@link ObjDefinePropDescriptor} definition based on your provided arguments. And only using a minimum set of functions
+ * @deprecated It is recommended that you use {@link @nevware21/ts-utils#objDefine} instead {@link @nevware21/ts-utils#objDefineAccessors} as this internally creates
+ * the {@link @nevware21/ts-utils#ObjDefinePropDescriptor} definition based on your provided arguments. And only using a minimum set of functions
  * reduces your overall bundle size.
  * @group Object
  * @param target - The object on which to define the property.
@@ -233,8 +233,8 @@ export function objDefineAccessors<T, V = any>(target: T, prop: PropertyKey, get
 
 /**
  * The objDefine() method defines a new or modifies an existing single property accessors for the target object based
- * on the configuration defined for the propDesc argument of type {@link ObjDefinePropDescriptor}. This will call
- * {@link objDefineProp} after creating the required PropertyDescriptor populating defaults for the propDesc values.
+ * on the configuration defined for the propDesc argument of type {@link @nevware21/ts-utils#ObjDefinePropDescriptor}. This will call
+ * {@link @nevware21/ts-utils#objDefineProp} after creating the required PropertyDescriptor populating defaults for the propDesc values.
  * Note, the default values (true) for `configurable` and `enumerable` are different from the defaults provided by objDefineProp.
  * @since 0.6.0
  * @group Object
@@ -249,7 +249,7 @@ export function objDefine<T>(target: T, key: keyof T, propDesc: ObjDefinePropDes
 
 /**
  * The objDefineProps() method defines new or modifies existing properties directly for the target object using the keys
- * and configuration from the propDescMap argument. This will call {@link objDefineProperties} after creating the required
+ * and configuration from the propDescMap argument. This will call {@link @nevware21/ts-utils#objDefineProperties} after creating the required
  * PropertyDescriptorMap from the propDescMap values.
  * Note, the default values (true) for `configurable` and `enumerable` are different from the defaults provided by objDefineProperties.
  * @since 0.6.0

@@ -50,7 +50,7 @@ export function _getProto(value: any) {
  * unsuitable for merging new properties into a prototype if the merge sources contain getters.
  *
  * For copying property definitions (including their enumerability) into prototypes, use
- * {@link objGetOwnPropertyDescriptor} and {@link objDefineProp} instead.
+ * {@link @nevware21/ts-utils#objGetOwnPropertyDescriptor} and {@link @nevware21/ts-utils#objDefineProp} instead.
  *
  * Both String and Symbol properties are copied.
  *
