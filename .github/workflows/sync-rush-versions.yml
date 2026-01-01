@@ -68,8 +68,8 @@ jobs:
 
       - name: Commit changes
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           # Add files that exist
           if [ -f rush.json ]; then git add rush.json; fi
           if [ -f common-versions.json ]; then git add common-versions.json; fi
