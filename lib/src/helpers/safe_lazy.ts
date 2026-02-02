@@ -42,7 +42,7 @@ import { safe } from "./safe";
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function safeGetLazy<T = boolean, F extends (...args: any[]) => T = () => T>(cb: F, defValue: T, argArray?: Parameters<F>): ILazyValue<T> {
+export function safeGetLazy<T = boolean, F extends (...args: any[]) => T = (...args: any[]) => T>(cb: F | ((...args: Parameters<F>) => T), defValue: T, argArray?: Parameters<F>): ILazyValue<T> {
     return getLazy<T>(() => {
         let result = safe(cb, argArray);
         return result.e ? defValue : result.v;
@@ -65,7 +65,7 @@ export function safeGetLazy<T = boolean, F extends (...args: any[]) => T = () =>
  * @example
  * ```ts
  * // This does not cause the evaluation to occur
- * let cachedValue = safeGetWritableLazt(() => callSomeExpensiveFunctionWhichMightThrow(), "someDefaultValue");
+ * let cachedValue = safeGetWritableLazy(() => callSomeExpensiveFunctionWhichMightThrow(), "someDefaultValue");
  * let theValue;
  *
  * // Just checking if there is an object still does not cause the evaluation
@@ -86,7 +86,7 @@ export function safeGetLazy<T = boolean, F extends (...args: any[]) => T = () =>
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function safeGetWritableLazy<T = boolean, F extends (...args: any[]) => T = () => T>(cb: F, defValue: T, argArray?: Parameters<F>): ILazyValue<T> {
+export function safeGetWritableLazy<T = boolean, F extends (...args: any[]) => T = (...args: any[]) => T>(cb: F | ((...args: Parameters<F>) => T), defValue: T, argArray?: Parameters<F>): ILazyValue<T> {
     return getWritableLazy<T>(() => {
         let result = safe(cb, argArray);
         return result.e ? defValue : result.v;
@@ -103,7 +103,7 @@ export function safeGetWritableLazy<T = boolean, F extends (...args: any[]) => T
  * @group Cache
  * @group Safe
  * @typeParam T - The type of the value to be cached
- * @typeParam F - The type of the callback function, defaults to () =&gt; T if not specified
+ * @typeParam F - The type of the callback function, defaults to (...args: any[]) =&gt; T if not specified
  * @param cb - The callback function to fetch the value to be lazily evaluated and cached
  * @param defValue - The default value to return when an exception is thrown
  * @param argArray - An optional array of arguments to be passed to the callback function
@@ -130,7 +130,7 @@ export function safeGetWritableLazy<T = boolean, F extends (...args: any[]) => T
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function safeGetDeferred<T, F extends (...args: any[]) => T = () => T>(cb: F, defValue: T, argArray?: Parameters<F>): ICachedValue<T> {
+export function safeGetDeferred<T, F extends (...args: any[]) => T = (...args: any[]) => T>(cb: F | ((...args: Parameters<F>) => T), defValue: T, argArray?: Parameters<F>): ICachedValue<T> {
     return getDeferred<T, () => T>(() => {
         let result = safe(cb, argArray);
         return result.e ? defValue : result.v;
@@ -148,7 +148,7 @@ export function safeGetDeferred<T, F extends (...args: any[]) => T = () => T>(cb
  * @group Cache
  * @group Safe
  * @typeParam T - The type of the value to be cached
- * @typeParam F - The type of the callback function, defaults to () =&gt; T if not specified
+ * @typeParam F - The type of the callback function, defaults to (...args: any[]) =&gt; T if not specified
  * @param cb - The callback function to fetch the value to be lazily evaluated and cached
  * @param defValue - The default value to return when an exception is thrown
  * @param argArray - An optional array of arguments to be passed to the callback function
@@ -178,7 +178,7 @@ export function safeGetDeferred<T, F extends (...args: any[]) => T = () => T>(cb
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function safeGetWritableDeferred<T, F extends (...args: any[]) => T = () => T>(cb: F, defValue: T, argArray?: Parameters<F>): ICachedValue<T> {
+export function safeGetWritableDeferred<T, F extends (...args: any[]) => T = (...args: any[]) => T>(cb: F | ((...args: Parameters<F>) => T), defValue: T, argArray?: Parameters<F>): ICachedValue<T> {
     return getWritableDeferred<T, () => T>(() => {
         let result = safe(cb, argArray);
         return result.e ? defValue : result.v;
