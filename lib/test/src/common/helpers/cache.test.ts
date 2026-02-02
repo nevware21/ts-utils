@@ -673,7 +673,7 @@ describe("cache helpers", () => {
         });
 
         it("validate with object types", () => {
-            const objValue = getWritableDeferred(() => ({ a: 1, b: 2 }));
+            const objValue = getWritableDeferred<any>(() => ({ a: 1, b: 2 }));
             assert.deepEqual(objValue.v, { a: 1, b: 2 });
             objValue.v = { a: 3, c: 4 };
             assert.deepEqual(objValue.v, { a: 3, c: 4 });

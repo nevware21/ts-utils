@@ -122,7 +122,7 @@ export const createDeferredCachedValue: <T>(cb: () => T) => ICachedValue<T> = ge
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function getDeferred<R, F extends (...args: any[]) => R>(cb: F, argArray?: Parameters<F>): ICachedValue<R> {
+export function getDeferred<R, F extends (...args: any[]) => R = (...args: any[]) => R>(cb: F | ((...args: Parameters<F>) => R), argArray?: Parameters<F>): ICachedValue<R> {
     let theValue: any = {
         toJSON: () => theValue.v
     };
@@ -149,7 +149,7 @@ export function getDeferred<R, F extends (...args: any[]) => R>(cb: F, argArray?
  * @group Helpers
  * @group Cache
  * @typeParam R - The type of the value to be cached
- * @typeParam F - The type of the callback function, defaults to () =&gt; T if not specified
+ * @typeParam F - The type of the callback function, defaults to (...args: any[]) =&gt; R if not specified
  * @param cb - The callback function to fetch the value to be lazily evaluated and cached
  * @param argArray - Optional array of arguments to be passed to the callback function
  * @returns A new writable {@link ICachedValue} instance which wraps the callback and will be used to cache
@@ -182,7 +182,7 @@ export function getDeferred<R, F extends (...args: any[]) => R>(cb: F, argArray?
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function getWritableDeferred<R, F extends (...args: any[]) => R = () => R>(cb: F, argArray?: Parameters<F>): ICachedValue<R> {
+export function getWritableDeferred<R, F extends (...args: any[]) => R = (...args: any[]) => R>(cb: F | ((...args: Parameters<F>) => R), argArray?: Parameters<F>): ICachedValue<R> {
     let theValue: any = {
         toJSON: () => theValue.v
     };
