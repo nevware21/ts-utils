@@ -74,7 +74,7 @@ export interface ILazyValue<T> extends ICachedValue<T> {
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function getLazy<T, F extends (...args: any[]) => T = () => T>(cb: F, argArray?: Parameters<F>): ILazyValue<T> {
+export function getLazy<T, F extends (...args: any[]) => T = (...args: any[]) => T>(cb: F | ((...args: Parameters<F>) => T), argArray?: Parameters<F>): ILazyValue<T> {
     let lazyValue = { } as ILazyValue<T>;
     !_globalLazyTestHooks && _initTestHooks();
     lazyValue.b = _globalLazyTestHooks.lzy;
@@ -161,7 +161,7 @@ export function setBypassLazyCache(newValue: boolean) {
  * theValue === cachedValue.v;  // true
  * ```
  */
-export function getWritableLazy<T, F extends (...args: any[]) => T = () => T>(cb: F, argArray?: Parameters<F>): ILazyValue<T> {
+export function getWritableLazy<T, F extends (...args: any[]) => T = () => T>(cb: F | ((...args: Parameters<F>) => T), argArray?: Parameters<F>): ILazyValue<T> {
     let lazyValue = { } as ILazyValue<T>;
     !_globalLazyTestHooks && _initTestHooks();
     lazyValue.b = _globalLazyTestHooks.lzy;
