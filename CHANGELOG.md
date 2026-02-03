@@ -1,3 +1,52 @@
+# v0.12.6 Feb 2nd, 2026
+
+## Changelog
+
+### Features
+
+- [#497](https://github.com/nevware21/ts-utils/pull/497) Improve generic type signatures for deferred and lazy value functions
+  - Updated `getLazy`, `getWritableLazy`, `getDeferred`, and `getWritableDeferred` with more flexible callback type signatures
+  - Added union type to callback parameters: `cb: F | ((...args: any[]) => T/R)`
+  - Aligned type parameter defaults to `(...args: any[]) => T/R` for consistency
+  - Updated JSDoc to reflect new generic defaults
+- [#498](https://github.com/nevware21/ts-utils/pull/498) Extend generic signature improvements to safe wrapper functions
+  - Updated `safe()` to use `ReturnType<F>` instead of `any` for better type inference
+  - Aligned `safeGet`, `safeGetLazy`, `safeGetWritableLazy`, `safeGetDeferred`, and `safeGetWritableDeferred` with flexible callback signatures
+  - Removed unnecessary default `T = boolean` from `safeGet`
+
+### Bug Fixes
+
+- [#491](https://github.com/nevware21/ts-utils/pull/491) Update incorrect documentation
+  - Fixed TSDoc for `strTrim()` (was incorrectly documented as `trim()`)
+
+### Repository Improvements
+
+- [#490](https://github.com/nevware21/ts-utils/pull/490) Add GitHub Copilot instructions for repository
+- [#486](https://github.com/nevware21/ts-utils/pull/486) Add GitHub Actions workflow for auto-approving PRs
+- [#483](https://github.com/nevware21/ts-utils/pull/483) Add workflow to sync rush.json with Dependabot updates
+- [#481](https://github.com/nevware21/ts-utils/pull/481) Refactor Dependabot rebase workflow
+- [#473](https://github.com/nevware21/ts-utils/pull/473) Enhance Dependabot configuration for GitHub Actions and npm
+
+### Dependency Updates
+
+- [#496](https://github.com/nevware21/ts-utils/pull/496) Bump lewagon/wait-on-check-action from 1.4.1 to 1.5.0
+- [#482](https://github.com/nevware21/ts-utils/pull/482) Bump peter-evans/rebase from 2 to 4
+- [#475](https://github.com/nevware21/ts-utils/pull/475) Bump size-limit from 11.2.0 to 12.0.0
+- [#472](https://github.com/nevware21/ts-utils/pull/472) Bump actions/checkout from 5 to 6
+- [#471](https://github.com/nevware21/ts-utils/pull/471) Bump glob from 11.0.3 to 13.0.0
+- [#468](https://github.com/nevware21/ts-utils/pull/468) Bump @types/sinon from 20.0.0 to 21.0.0
+- [#467](https://github.com/nevware21/ts-utils/pull/467) Bump @types/sinon from 17.0.4 to 20.0.0
+- [#466](https://github.com/nevware21/ts-utils/pull/466) Bump actions/setup-node from 5 to 6
+- [#465](https://github.com/nevware21/ts-utils/pull/465) Bump @rollup/plugin-commonjs from 28.0.9 to 29.0.0
+- [#464](https://github.com/nevware21/ts-utils/pull/464) Bump github/codeql-action from 3 to 4
+- [#463](https://github.com/nevware21/ts-utils/pull/463) Bump cross-env from 7.0.3 to 10.1.0
+- [#461](https://github.com/nevware21/ts-utils/pull/461) Bump actions/setup-node from 4 to 5
+- [#457](https://github.com/nevware21/ts-utils/pull/457) Bump actions/upload-pages-artifact from 3 to 4
+- [#454](https://github.com/nevware21/ts-utils/pull/454) Downgrade @sinonjs/samsam dependency to resolve workflow parsing errors
+- [#451](https://github.com/nevware21/ts-utils/pull/451) Pin @sinonjs/samsam and @sinonjs/fake-timers to fix CI parser errors
+- [#448](https://github.com/nevware21/ts-utils/pull/448) Bump actions/checkout from 4 to 5
+- [#440](https://github.com/nevware21/ts-utils/pull/440) Bump glob from 11.0.2 to 11.0.3
+
 # v0.12.5 May 20th, 2025
 
 ## Changelog
