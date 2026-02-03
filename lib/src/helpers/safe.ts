@@ -60,7 +60,7 @@ export interface ISafeReturn<T extends (...args: any) => R, R = SafeReturnType<T
  * // result2.v === { valid: "json value" }
  * ```
  */
-export function safe<F extends (...args: unknown[]) => R, R = any>(func: F, argArray?: any[]): ISafeReturn<F, R> {
+export function safe<F extends (...args: unknown[]) => R, R = ReturnType<F>>(func: F, argArray?: any[]): ISafeReturn<F, R> {
     try {
         return {
             v: func.apply(this, argArray)
