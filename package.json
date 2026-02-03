@@ -1,7 +1,7 @@
 {
     "name": "@nevware21/ts-utils",
     "description": "Comprehensive TypeScript/JavaScript utility library with cross-environment support (Node.js, browser, web worker) providing helper functions, polyfills (ES5-ES2023), type checking utilities, and optimized implementations for better minification and code readability",
-    "version": "0.12.5",
+    "version": "0.12.6",
     "homepage": "https://github.com/nevware21/ts-utils",
     "license": "MIT",
     "author": {
