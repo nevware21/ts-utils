@@ -262,7 +262,7 @@
         "ts-mocha": "^11.1.0",
         "tslib": "^2.6.0",
         "typedoc": "^0.28.2",
-        "typedoc-github-theme": "^0.3.0",
+        "typedoc-github-theme": "^0.4.0",
         "typescript": "~5.2.2",
         "uglify-js": "^3.15.5"
     },
