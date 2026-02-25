@@ -263,5 +263,122 @@ describe("throw helpers", () => {
             assert.ok(theError instanceof ApplicationError, "Check that the startupError is an ApplicationError");
         });
     });
+
+    describe("createCustomError with superArgsFn", () => {
+        it("reorders arguments before passing to base class", () => {
+            interface HttpErrorConstructor extends CustomErrorConstructor<HttpError> {
+                new(statusCode: number, message: string): HttpError;
+                (statusCode: number, message: string): HttpError;
+            }
+
+            interface HttpError extends Error {
+                readonly statusCode: number;
+            }
+
+            let MyHttpError = createCustomError<HttpErrorConstructor>("HttpError",
+                (self, args) => {
+                    self.statusCode = args[0];
+                },
+                Error,
+                (args) => [ args[1] ]  // pass only the message to base Error constructor
+            );
+
+            let err = _expectThrow<HttpError>(() => {
+                throw new MyHttpError(404, "Not Found");
+            }, "Not Found");
+
+            assert.ok(err instanceof Error, "The custom error is an Error");
+            assert.ok(isError(err), "isError returns true");
+            assert.equal(err.name, "HttpError", "Name is HttpError");
+            assert.equal(err.message, "Not Found", "Message is set from second arg");
+            assert.equal(err.statusCode, 404, "statusCode is set from first arg");
+        });
+
+        it("passes subset of arguments to base class", () => {
+            interface DetailedErrorConstructor extends CustomErrorConstructor<DetailedError> {
+                new(message: string, code: number, detail: string): DetailedError;
+                (message: string, code: number, detail: string): DetailedError;
+            }
+
+            interface DetailedError extends Error {
+                readonly code: number;
+                readonly detail: string;
+            }
+
+            let MyDetailedError = createCustomError<DetailedErrorConstructor>("DetailedError",
+                (self, args) => {
+                    self.code = args[1];
+                    self.detail = args[2];
+                },
+                Error,
+                (args) => [ args[0] ]  // pass only message to base Error
+            );
+
+            let err = _expectThrow<DetailedError>(() => {
+                throw new MyDetailedError("Something failed", 42, "extra detail");
+            }, "Something failed");
+
+            assert.ok(err instanceof Error, "The custom error is an Error");
+            assert.ok(isError(err), "isError returns true");
+            assert.equal(err.name, "DetailedError", "Name is DetailedError");
+            assert.equal(err.message, "Something failed", "Message is set correctly");
+            assert.equal(err.code, 42, "code is set correctly");
+            assert.equal(err.detail, "extra detail", "detail is set correctly");
+        });
+
+        it("works with custom error base class", () => {
+            interface AppErrorConstructor extends CustomErrorConstructor<AppError> {
+                new(message: string): AppError;
+                (message: string): AppError;
+            }
+            interface AppError extends Error {}
+
+            interface ServiceErrorConstructor extends CustomErrorConstructor<ServiceError> {
+                new(service: string, message: string): ServiceError;
+                (service: string, message: string): ServiceError;
+            }
+            interface ServiceError extends AppError {
+                readonly service: string;
+            }
+
+            let AppErrorCls = createCustomError<AppErrorConstructor>("AppError");
+            let ServiceErrorCls = createCustomError<ServiceErrorConstructor>("ServiceError",
+                (self, args) => {
+                    self.service = args[0];
+                },
+                AppErrorCls,
+                (args) => [ args[1] ]  // pass message to AppError base class
+            );
+
+            let err = _expectThrow<ServiceError>(() => {
+                throw new ServiceErrorCls("auth-service", "Unauthorized");
+            }, "Unauthorized");
+
+            assert.ok(err instanceof Error, "is an Error");
+            assert.ok(err instanceof AppErrorCls, "is an AppError");
+            assert.ok(err instanceof ServiceErrorCls, "is a ServiceError");
+            assert.ok(isError(err), "isError returns true");
+            assert.equal(err.name, "ServiceError", "Name is ServiceError");
+            assert.equal(err.message, "Unauthorized", "Message is set from second arg");
+            assert.equal(err.service, "auth-service", "service is set from first arg");
+        });
+
+        it("null superArgsFn behaves like no superArgsFn (passes all args)", () => {
+            interface MyErrorConstructor extends CustomErrorConstructor<MyError> {
+                new(message: string): MyError;
+                (message: string): MyError;
+            }
+            interface MyError extends Error {}
+
+            let MyErrorCls = createCustomError<MyErrorConstructor>("MyNullSuperError", null, Error, null);
+
+            let err = _expectThrow<MyError>(() => {
+                throw new MyErrorCls("hello");
+            }, "hello");
+
+            assert.ok(isError(err), "isError returns true");
+            assert.equal(err.message, "hello", "Message is set correctly");
+        });
+    });
 });
 

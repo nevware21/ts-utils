@@ -55,6 +55,10 @@ function  _setName(baseClass: any, name: string) {
  * @param constructCb - [Optional] An optional callback function to call when a
  * new Customer Error instance is being created.
  * @param errorBase - [Optional] (since v0.9.6) The error class to extend for this class, defaults to Error.
+ * @param superArgsFn - [Optional] An optional function that receives the constructor arguments and
+ * returns the arguments to pass to the base class constructor. When not provided all constructor
+ * arguments are forwarded to the base class. Use this to support a different argument order or
+ * to pass a subset of arguments to the base class (similar to calling `super(...)` in a class).
  * @returns A new Error `class`
  * @example
  * ```ts
@@ -115,13 +119,41 @@ function  _setName(baseClass: any, name: string) {
  * theStartupError instanceof Error;        // true
  * theStartupError instanceof AppError;     // true
  * theStartupError instanceof StartupError; // true
+ *
+ * // ----------------------------------------------------------
+ * // Custom error with reordered / transformed arguments
+ * // (the superArgsFn maps constructor args to base class args)
+ * // ----------------------------------------------------------
+ *
+ * interface HttpErrorConstructor extends CustomErrorConstructor<HttpError> {
+ *     new(statusCode: number, message: string): HttpError;
+ *     (statusCode: number, message: string): HttpError;
+ * }
+ *
+ * interface HttpError extends Error {
+ *     readonly statusCode: number;
+ * }
+ *
+ * // HttpError takes (statusCode, message) but base Error expects (message)
+ * let MyHttpError = createCustomError<HttpErrorConstructor>("HttpError",
+ *     (self, args) => {
+ *         self.statusCode = args[0];
+ *     },
+ *     Error,
+ *     (args) => [ args[1] ]  // pass only the message to base Error constructor
+ * );
+ *
+ * let err = new MyHttpError(404, "Not Found");
+ * err.message;     // "Not Found"
+ * err.statusCode;  // 404
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function createCustomError<T extends ErrorConstructor = CustomErrorConstructor, B extends ErrorConstructor = ErrorConstructor>(
     name: string,
     constructCb?: ((self: any, args: IArguments) => void) | null,
-    errorBase?: B): T {
+    errorBase?: B,
+    superArgsFn?: ((args: IArguments) => any[]) | null): T {
 
     let theBaseClass = errorBase || Error;
     let orgName = theBaseClass[PROTOTYPE][NAME];
@@ -131,7 +163,7 @@ export function createCustomError<T extends ErrorConstructor = CustomErrorConstr
         let theArgs = arguments;
         try {
             safe(_setName, [theBaseClass, name]);
-            let _self = fnApply(theBaseClass, _this, ArrSlice[CALL](theArgs)) || _this;
+            let _self = fnApply(theBaseClass, _this, superArgsFn ? superArgsFn(theArgs) : ArrSlice[CALL](theArgs)) || _this;
             if (_self !== _this) {
                 // Looks like runtime error constructor reset the prototype chain, so restore it
                 let orgProto = objGetPrototypeOf(_this);
