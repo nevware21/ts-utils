@@ -53,7 +53,7 @@ function  _setName(baseClass: any, name: string) {
  * @group Error
  * @param name - The name of the Custom Error
  * @param constructCb - [Optional] An optional callback function to call when a
- * new Customer Error instance is being created.
+ * new Custom Error instance is being created.
  * @param errorBase - [Optional] (since v0.9.6) The error class to extend for this class, defaults to Error.
  * @param superArgsFn - [Optional] (since v0.12.7) An optional function that receives the constructor arguments and
  * returns the arguments to pass to the base class constructor. When not provided all constructor
