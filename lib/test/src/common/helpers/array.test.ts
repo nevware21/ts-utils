@@ -8,8 +8,12 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { arrAppend } from "../../../../src/array/append";
+import { arrChunk } from "../../../../src/array/chunk";
+import { arrCompact } from "../../../../src/array/compact";
 import { arrFind, arrFindIndex, arrFindLast, arrFindLastIndex } from "../../../../src/array/find";
+import { arrFlatten } from "../../../../src/array/flatten";
 import { arrFrom } from "../../../../src/array/from";
+import { arrGroupBy } from "../../../../src/array/groupBy";
 import { arrSome } from "../../../../src/array/some";
 import { arrForEach } from "../../../../src/array/forEach";
 import { arrContains, arrIncludes } from "../../../../src/array/includes";
@@ -18,6 +22,7 @@ import { arrEvery, arrFilter } from "../../../../src/array/every";
 import { arrMap } from "../../../../src/array/map";
 import { arrReduce } from "../../../../src/array/reduce";
 import { arrSlice } from "../../../../src/array/slice";
+import { arrUnique } from "../../../../src/array/unique";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 describe("array helpers", () => {
@@ -970,6 +975,202 @@ describe("array helpers", () => {
             assert.deepEqual(arrSlice(lyrics, 1, 5), [ "Darkness", "my", "old", "friend." ]);
             assert.deepEqual(arrSlice(lyrics, -2), [ "to", "talk" ]);
             assert.deepEqual(arrSlice(lyrics, 2, -1), [ "my", "old", "friend.", "I've", "come", "to" ]);
+        });
+    });
+
+    describe("arrUnique", () => {
+        it("removes duplicate primitives", () => {
+            assert.deepEqual(arrUnique([1, 2, 2, 3, 1, 4]), [1, 2, 3, 4]);
+            assert.deepEqual(arrUnique(["a", "b", "a", "c"]), ["a", "b", "c"]);
+            assert.deepEqual(arrUnique([1, "1", 1, "1"]), [1, "1"]);
+        });
+
+        it("preserves insertion order", () => {
+            assert.deepEqual(arrUnique([3, 1, 2, 1, 3]), [3, 1, 2]);
+            assert.deepEqual(arrUnique(["z", "a", "z", "b"]), ["z", "a", "b"]);
+        });
+
+        it("handles empty and single element arrays", () => {
+            assert.deepEqual(arrUnique([]), []);
+            assert.deepEqual(arrUnique([1]), [1]);
+        });
+
+        it("handles null and undefined", () => {
+            assert.deepEqual(arrUnique(null), []);
+            assert.deepEqual(arrUnique(undefined), []);
+        });
+
+        it("handles array-like objects", () => {
+            assert.deepEqual(arrUnique({ length: 4, 0: 1, 1: 2, 2: 2, 3: 3 }), [1, 2, 3]);
+            assert.deepEqual(arrUnique({ length: 3, 0: "a", 1: "b", 2: "a" }), ["a", "b"]);
+        });
+
+        it("uses strict equality", () => {
+            assert.deepEqual(arrUnique([0, false, 0, false]), [0, false]);
+            assert.deepEqual(arrUnique([null, undefined, null]), [null, undefined]);
+        });
+    });
+
+    describe("arrCompact", () => {
+        it("removes falsy values", () => {
+            assert.deepEqual(arrCompact([0, 1, false, 2, "", 3, null, undefined, 4]), [1, 2, 3, 4]);
+            assert.deepEqual(arrCompact([false, 0, "", null, undefined]), []);
+        });
+
+        it("preserves truthy values", () => {
+            assert.deepEqual(arrCompact([1, 2, 3]), [1, 2, 3]);
+            assert.deepEqual(arrCompact(["a", "b", "c"]), ["a", "b", "c"]);
+            assert.deepEqual(arrCompact([true, true, true]), [true, true, true]);
+        });
+
+        it("handles empty arrays", () => {
+            assert.deepEqual(arrCompact([]), []);
+        });
+
+        it("handles null and undefined", () => {
+            assert.deepEqual(arrCompact(null), []);
+            assert.deepEqual(arrCompact(undefined), []);
+        });
+
+        it("handles array-like objects", () => {
+            assert.deepEqual(arrCompact({ length: 5, 0: 0, 1: 1, 2: false, 3: 2, 4: null }), [1, 2]);
+            assert.deepEqual(arrCompact({ length: 3, 0: "a", 1: "", 2: "b" }), ["a", "b"]);
+        });
+
+        it("preserves numbers and strings properly", () => {
+            assert.deepEqual(arrCompact([1, 0, 2]), [1, 2]);
+            assert.deepEqual(arrCompact(["hello", "", "world"]), ["hello", "world"]);
+        });
+    });
+
+    describe("arrFlatten", () => {
+        it("flattens with default depth of 1", () => {
+            assert.deepEqual(arrFlatten([1, [2, 3], [4, [5, 6]]]), [1, 2, 3, 4, [5, 6]]);
+            assert.deepEqual(arrFlatten([1, [2], 3]), [1, 2, 3]);
+        });
+
+        it("flattens with specified depth", () => {
+            assert.deepEqual(arrFlatten([1, [2, 3], [4, [5, 6]]], 2), [1, 2, 3, 4, 5, 6]);
+            assert.deepEqual(arrFlatten([1, [2, [3, [4]]]], 2), [1, 2, 3, [4]]);
+        });
+
+        it("flattens with infinite depth", () => {
+            assert.deepEqual(arrFlatten([1, [2, 3], [4, [5, 6]]], Infinity), [1, 2, 3, 4, 5, 6]);
+            assert.deepEqual(arrFlatten([1, [2, [3, [4, [5]]]]], Infinity), [1, 2, 3, 4, 5]);
+        });
+
+        it("handles non-arrays when depth is 0", () => {
+            assert.deepEqual(arrFlatten([1, [2, 3]], 0), [1, [2, 3]]);
+        });
+
+        it("preserves non-nested arrays", () => {
+            assert.deepEqual(arrFlatten([1, 2, 3]), [1, 2, 3]);
+        });
+
+        it("handles empty arrays", () => {
+            assert.deepEqual(arrFlatten([]), []);
+        });
+
+        it("handles null and undefined", () => {
+            assert.deepEqual(arrFlatten(null), []);
+            assert.deepEqual(arrFlatten(undefined), []);
+        });
+
+        it("handles array-like objects", () => {
+            assert.deepEqual(arrFlatten({ length: 2, 0: 1, 1: [2, 3] }), [1, 2, 3]);
+        });
+    });
+
+    describe("arrGroupBy", () => {
+        it("groups by simple criteria", () => {
+            const numbers = [1, 2, 3, 4, 5, 6];
+            const grouped = arrGroupBy(numbers, (n) => n % 2 === 0 ? "even" : "odd");
+            assert.deepEqual(grouped["odd"], [1, 3, 5]);
+            assert.deepEqual(grouped["even"], [2, 4, 6]);
+        });
+
+        it("groups objects by property", () => {
+            const people = [
+                { name: "Alice", age: 30 },
+                { name: "Bob", age: 25 },
+                { name: "Charlie", age: 30 }
+            ];
+            const byAge = arrGroupBy(people, (p) => p.age);
+            assert.equal(byAge["25"].length, 1);
+            assert.equal(byAge["30"].length, 2);
+            assert.equal(byAge["25"][0].name, "Bob");
+        });
+
+        it("handles empty arrays", () => {
+            const grouped = arrGroupBy([], (x) => x);
+            assert.deepEqual(grouped, {});
+        });
+
+        it("handles null and undefined input", () => {
+            assert.deepEqual(arrGroupBy(null as any, (x: any) => x), {});
+            assert.deepEqual(arrGroupBy(undefined as any, (x: any) => x), {});
+        });
+
+        it("handles null callback", () => {
+            assert.deepEqual(arrGroupBy([1, 2, 3], null as any), {});
+        });
+
+        it("supports thisArg parameter", () => {
+            const context = { multiplier: 2 };
+            const numbers = [1, 2, 3, 4];
+            const grouped = arrGroupBy(numbers, function(n) {
+                return (n * (this as any).multiplier) % 2 === 0 ? "even" : "odd";
+            }, context);
+            assert.ok(grouped["odd"] || grouped["even"]);
+        });
+
+        it("handles array-like objects", () => {
+            const arrayLike = { length: 4, 0: 1, 1: 2, 2: 3, 3: 4 };
+            const grouped = arrGroupBy(arrayLike, (n) => n % 2 === 0 ? "even" : "odd");
+            assert.equal(grouped["odd"].length, 2);
+            assert.equal(grouped["even"].length, 2);
+        });
+    });
+
+    describe("arrChunk", () => {
+        it("chunks array into specified size", () => {
+            assert.deepEqual(arrChunk([1, 2, 3, 4, 5, 6, 7], 2), [[1, 2], [3, 4], [5, 6], [7]]);
+            assert.deepEqual(arrChunk([1, 2, 3, 4, 5], 3), [[1, 2, 3], [4, 5]]);
+        });
+
+        it("handles chunk size of 1", () => {
+            assert.deepEqual(arrChunk([1, 2, 3], 1), [[1], [2], [3]]);
+        });
+
+        it("handles chunk size larger than array", () => {
+            assert.deepEqual(arrChunk([1, 2, 3], 5), [[1, 2, 3]]);
+        });
+
+        it("handles empty arrays", () => {
+            assert.deepEqual(arrChunk([], 2), []);
+        });
+
+        it("handles null and undefined", () => {
+            assert.deepEqual(arrChunk(null, 2), []);
+            assert.deepEqual(arrChunk(undefined, 2), []);
+        });
+
+        it("handles invalid chunk size", () => {
+            assert.deepEqual(arrChunk([1, 2, 3], 0), []);
+            assert.deepEqual(arrChunk([1, 2, 3], -1), []);
+        });
+
+        it("handles array-like objects", () => {
+            const arrayLike = { length: 5, 0: "a", 1: "b", 2: "c", 3: "d", 4: "e" };
+            assert.deepEqual(arrChunk(arrayLike, 2), [["a", "b"], ["c", "d"], ["e"]]);
+        });
+
+        it("preserves exact chunk boundaries", () => {
+            const data = [10, 20, 30, 40, 50, 60];
+            const chunks = arrChunk(data, 3);
+            assert.equal(chunks.length, 2);
+            assert.deepEqual(chunks[0], [10, 20, 30]);
+            assert.deepEqual(chunks[1], [40, 50, 60]);
         });
     });
 

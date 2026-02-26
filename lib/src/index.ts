@@ -8,22 +8,27 @@
 
 export { arrAppend } from "./array/append";
 export { ArrPredicateCallbackFn, ArrPredicateCallbackFn2, ArrMapCallbackFn, ArrFromMapFn } from "./array/callbacks";
+export { arrChunk } from "./array/chunk";
+export { arrCompact } from "./array/compact";
 export { arrEvery, arrFilter } from "./array/every";
 export { arrFind, arrFindIndex, arrFindLast, arrFindLastIndex } from "./array/find";
+export { arrFlatten } from "./array/flatten";
 export { arrForEach } from "./array/forEach";
 export { arrFrom } from "./array/from";
+export { ArrGroupByCallbackFn, arrGroupBy } from "./array/groupBy";
 export { arrContains, arrIncludes } from "./array/includes";
 export { arrIndexOf, arrLastIndexOf } from "./array/indexOf";
 export { arrMap } from "./array/map";
 export { ArrReduceCallbackFn, arrReduce } from "./array/reduce";
 export { arrSlice } from "./array/slice";
 export { arrSome } from "./array/some";
+export { arrUnique } from "./array/unique";
 export { fnApply, fnBind, fnCall } from "./funcs/funcs";
 export { createFnDeferredProxy, createProxyFuncs } from "./funcs/fnProxy";
 export { readArgs } from "./funcs/readArgs";
 export { ProxyFunctionDef, TypeFuncNames } from "./funcs/types";
 export {
-    isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isDate, isNumber, isBoolean,
+    isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isArrayLike, isDate, isNumber, isBoolean,
     isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isThenable, isNotTruthy, isTruthy, objToString,
     isStrictNullOrUndefined, isStrictUndefined, isError, isPrimitive, isPrimitiveType, isMap, isMapLike, isSet, isSetLike,
     isWeakMap, isWeakSet, isBigInt, isAsyncFunction, isGenerator, isAsyncGenerator
