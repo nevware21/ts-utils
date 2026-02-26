@@ -153,7 +153,7 @@ export function createCustomError<T extends ErrorConstructor = CustomErrorConstr
     name: string,
     constructCb?: ((self: any, args: IArguments) => void) | null,
     errorBase?: B,
-    superArgsFn?: ((args: IArguments) => any[]) | null): T {
+    superArgsFn?: ((args: IArguments) => ArrayLike<any>) | null): T {
 
     let theBaseClass = errorBase || Error;
     let orgName = theBaseClass[PROTOTYPE][NAME];
