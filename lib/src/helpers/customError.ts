@@ -55,7 +55,7 @@ function  _setName(baseClass: any, name: string) {
  * @param constructCb - [Optional] An optional callback function to call when a
  * new Customer Error instance is being created.
  * @param errorBase - [Optional] (since v0.9.6) The error class to extend for this class, defaults to Error.
- * @param superArgsFn - [Optional] An optional function that receives the constructor arguments and
+ * @param superArgsFn - [Optional] (since v0.12.7) An optional function that receives the constructor arguments and
  * returns the arguments to pass to the base class constructor. When not provided all constructor
  * arguments are forwarded to the base class. Use this to support a different argument order or
  * to pass a subset of arguments to the base class (similar to calling `super(...)` in a class).
