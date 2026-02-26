@@ -13,6 +13,7 @@ import {
     _decodeBase64Polyfill
 } from "../../../../src/helpers/encode";
 import { arrContains } from "../../../../src/array/includes";
+import { strRepeat } from "../../../../src/string/repeat";
 
 describe("encodeAsJson helper", () => {
     it("null/undefined", () => {
@@ -401,15 +402,6 @@ describe("Base64 Polyfill Coverage - Iteration & Padding", () => {
         }
     });
 });
-
-// Helper function
-function strRepeat(str: string, count: number): string {
-    let result = "";
-    for (let i = 0; i < count; i++) {
-        result += str;
-    }
-    return result;
-}
 
 describe("Base64 Polyfill Verification Against Native Implementation", () => {
     // Check if native implementations are available
