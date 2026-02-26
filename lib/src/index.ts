@@ -41,7 +41,10 @@ export {
     getGlobal, getInst, lazySafeGetInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory,
     getHistory, isNode, isWebWorker
 } from "./helpers/environment";
-export { encodeAsHtml, encodeAsJson, normalizeJsName } from "./helpers/encode";
+export {
+    encodeAsHtml, encodeAsJson, normalizeJsName, encodeAsBase64, decodeBase64, encodeAsBase64Url,
+    decodeBase64Url, encodeAsHex, decodeHex, encodeAsUri, decodeUri
+} from "./helpers/encode";
 export { deepExtend, objExtend } from "./helpers/extend";
 export { getValueByKey, setValueByKey, getValueByIter, setValueByIter } from "./helpers/get_set_value";
 export { ILazyValue, getLazy, setBypassLazyCache, getWritableLazy } from "./helpers/lazy";
