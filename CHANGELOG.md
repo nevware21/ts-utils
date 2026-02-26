@@ -1,3 +1,28 @@
+# v0.13.0 Feb 26th, 2026
+
+## Changelog
+
+### Features
+
+- Added comprehensive encoding and decoding functions for multiple formats:
+  - **Base64 Encoding/Decoding**: `encodeAsBase64()` and `decodeBase64()` with native fallbacks and ES5 polyfill support
+  - **URL-Safe Base64**: `encodeAsBase64Url()` and `decodeBase64Url()` for safe Base64 encoding in URLs (replaces `+` with `-`, `/` with `_`, removes padding)
+  - **Hexadecimal Encoding/Decoding**: `encodeAsHex()` and `decodeHex()` for hex string conversion
+  - **URI Encoding/Decoding**: `encodeAsUri()` and `decodeUri()` for URL component encoding
+  - All encoding functions include internal polyfills (`_encodeBase64Polyfill`, `_decodeBase64Polyfill`) for ES5 environment compatibility
+  - Consistent handling of null/undefined values across all encoding functions
+
+- Enhanced `createCustomError()` with `superArgsFn` parameter:
+  - New optional `superArgsFn` parameter allows custom transformation of constructor arguments before passing to base class
+  - Enables support for different argument orders and subsetting arguments passed to the base class constructor
+  - Useful for creating custom error subclasses with different constructor signatures than their base classes
+  - Example: HTTP error with `(statusCode, message)` signature can map to base `Error(message)` constructor
+
+### Performance Improvements
+
+- Improved performance of worker test execution
+  - Optimized test runner for faster execution in web worker environments
+
 # v0.12.6 Feb 2nd, 2026
 
 ## Changelog
