@@ -8,22 +8,45 @@
 
 export { arrAppend } from "./array/append";
 export { ArrPredicateCallbackFn, ArrPredicateCallbackFn2, ArrMapCallbackFn, ArrFromMapFn } from "./array/callbacks";
+export { arrAt } from "./array/at";
+export { arrChunk } from "./array/chunk";
+export { arrCompact } from "./array/compact";
+export { arrDifference } from "./array/difference";
+export { arrDrop } from "./array/drop";
+export { arrDropWhile } from "./array/drop_while";
 export { arrEvery, arrFilter } from "./array/every";
+export { arrFill } from "./array/fill";
 export { arrFind, arrFindIndex, arrFindLast, arrFindLastIndex } from "./array/find";
+export { arrFlatten } from "./array/flatten";
 export { arrForEach } from "./array/forEach";
 export { arrFrom } from "./array/from";
+export { ArrGroupByCallbackFn, arrGroupBy } from "./array/groupBy";
 export { arrContains, arrIncludes } from "./array/includes";
 export { arrIndexOf, arrLastIndexOf } from "./array/indexOf";
+export { arrIntersection } from "./array/intersection";
 export { arrMap } from "./array/map";
+export { arrPartition } from "./array/partition";
 export { ArrReduceCallbackFn, arrReduce } from "./array/reduce";
+export { arrReverse } from "./array/reverse";
+export { arrRotate } from "./array/rotate";
+export { arrSample } from "./array/sample";
+export { arrShuffle } from "./array/shuffle";
 export { arrSlice } from "./array/slice";
 export { arrSome } from "./array/some";
+export { arrTake } from "./array/take";
+export { arrTakeWhile } from "./array/take_while";
+export { arrUnion } from "./array/union";
+export { arrUnique } from "./array/unique";
+export { arrUnzip } from "./array/unzip";
+export { arrWith } from "./array/with";
+export { arrZip } from "./array/zip";
 export { fnApply, fnBind, fnCall } from "./funcs/funcs";
 export { createFnDeferredProxy, createProxyFuncs } from "./funcs/fnProxy";
 export { readArgs } from "./funcs/readArgs";
 export { ProxyFunctionDef, TypeFuncNames } from "./funcs/types";
+export { WritableArrayLike } from "./helpers/arrayLike";
 export {
-    isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isDate, isNumber, isBoolean,
+    isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isArrayLike, isDate, isNumber, isBoolean,
     isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isThenable, isNotTruthy, isTruthy, objToString,
     isStrictNullOrUndefined, isStrictUndefined, isError, isPrimitive, isPrimitiveType, isMap, isMapLike, isSet, isSetLike,
     isWeakMap, isWeakSet, isBigInt, isAsyncFunction, isGenerator, isAsyncGenerator

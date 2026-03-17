@@ -8,7 +8,7 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import {
-    isArray, isBoolean, isDate, isDefined, isFunction, isNullOrUndefined, isNumber, isObject, isString, isTypeof,
+    isArray, isArrayLike, isBoolean, isDate, isDefined, isFunction, isNullOrUndefined, isNumber, isObject, isString, isTypeof,
     isUndefined, isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isError, isPromiseLike, isPromise, isNotTruthy,
     isTruthy, isStrictUndefined, isStrictNullOrUndefined, isPrimitive, isPrimitiveType, isMap
 } from "../../../../src/helpers/base";
@@ -636,6 +636,75 @@ describe("base helpers", () => {
             assert.equal(isArray(_simplePromiseLike()), false, "Checking _simplePromiseLike");
             assert.equal(isArray(Object.create(null)), false, "Checking Object.create(null)");
             assert.equal(isArray(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
+        });
+    });
+
+    describe("isArrayLike", () => {
+        it("Validate values", () => {
+            assert.equal(isArrayLike(null), false, "Checking null");
+            assert.equal(isArrayLike(undefined), false, "Checking undefined");
+            assert.equal(isArrayLike("null"), true, "Checking 'null' (strings are array-like)");
+            assert.equal(isArrayLike("undefined"), true, "Checking 'undefined' (strings are array-like)");
+            assert.equal(isArrayLike("hello"), true, "Checking 'hello' (strings are array-like)");
+            assert.equal(isArrayLike(""), true, "Checking '' (empty string is array-like)");
+            assert.equal(isArrayLike(new Date()), false, "Checking Date");
+            assert.equal(isArrayLike(1), false, "Checking 1");
+            assert.equal(isArrayLike(0), false, "Checking 0");
+            assert.equal(isArrayLike(_dummyFunction), false, "Checking _dummyFunction");
+            assert.equal(isArrayLike([]), true, "Checking []");
+            assert.equal(isArrayLike([1, 2, 3]), true, "Checking [1, 2, 3]");
+            assert.equal(isArrayLike(new Array(1)), true, "Checking new Array(1)");
+            assert.equal(isArrayLike(true), false, "Checking true");
+            assert.equal(isArrayLike(false), false, "Checking false");
+            assert.equal(isArrayLike("true"), true, "Checking 'true'");
+            assert.equal(isArrayLike("false"), true, "Checking 'false'");
+            assert.equal(isArrayLike(new Boolean(true)), false, "Checking new Boolean(true)");
+            assert.equal(isArrayLike(new Boolean(false)), false, "Checking new Boolean(false)");
+            assert.equal(isArrayLike(new Boolean("true")), false, "Checking new Boolean('true')");
+            assert.equal(isArrayLike(new Boolean("false")), false, "Checking new Boolean('false')");
+            assert.equal(isArrayLike(/[a-z]/g), false, "Checking '/[a-z]/g'");
+            assert.equal(isArrayLike(new RegExp("")), false, "Checking new RegExp('')");
+            _isFileCheck(isArrayLike, false);
+            _isFormDataCheck(isArrayLike, false);
+            _isBlobCheck(isArrayLike, false);
+            assert.equal(isArrayLike(new ArrayBuffer(0)), false, "Checking new ArrayBuffer([])");
+            assert.equal(isArrayLike(new Error("Test Error")), false, "Checking new Error('')");
+            assert.equal(isArrayLike(new TypeError("Test TypeError")), false, "Checking new TypeError('')");
+            assert.equal(isArrayLike(new TestError("Test TestError")), false, "Checking new TestError('')");
+            assert.equal(isArrayLike(_dummyError()), false, "Checking dummy error (object that looks like an error)");
+            assert.equal(isArrayLike(Promise.reject()), false, "Checking Promise.reject");
+            assert.equal(isArrayLike(Promise.resolve()), false, "Checking Promise.resolve");
+            assert.equal(isArrayLike(new Promise(() => {})), false, "Checking new Promise(() => {})");
+            assert.equal(isArrayLike(_simplePromise()), false, "Checking _simplePromise");
+            assert.equal(isArrayLike(_simplePromiseLike()), false, "Checking _simplePromiseLike");
+            assert.equal(isArrayLike(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isArrayLike(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
+        });
+
+        it("Validate array-like objects", () => {
+            // Object with length property
+            const arrayLike = { length: 3, 0: "a", 1: "b", 2: "c" };
+            assert.equal(isArrayLike(arrayLike), true, "Checking array-like object");
+
+            // Object with length but no numeric indices
+            const hasLength = { length: 5 };
+            assert.equal(isArrayLike(hasLength), true, "Checking object with length property");
+
+            // Object with length but it's not a number
+            const lengthNotNumber = { length: "3" };
+            assert.equal(isArrayLike(lengthNotNumber), false, "Checking object with non-numeric length");
+
+            // Object with no length property
+            const noLength = { 0: "a", 1: "b" };
+            assert.equal(isArrayLike(noLength), false, "Checking object with numeric indices but no length");
+
+            // Object with negative length
+            const negativeLength = { length: -1 };
+            assert.equal(isArrayLike(negativeLength), false, "Checking object with negative length");
+
+            // Object with length 0
+            const emptyLength = { length: 0 };
+            assert.equal(isArrayLike(emptyLength), true, "Checking object with length 0");
         });
     });
 
