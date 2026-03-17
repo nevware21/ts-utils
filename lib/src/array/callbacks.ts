@@ -14,8 +14,8 @@
  * @group ArrayLike
  * @typeParam T - Identifies the type of array elements
  * @typeParam E - Identifies the type of the return array elements (defaults to T)
- * @param value - The cuirrent element of the array being processed.
- * @param index - The index of the current elemety of the array being processed.
+ * @param value - The current element of the array being processed.
+ * @param index - The index of the current element of the array being processed.
  * @param array - The array being processed.
  * @returns A boolean value indicating that the value is of the type expected (the test is true)
  */
@@ -29,8 +29,8 @@ export type ArrPredicateCallbackFn<T, E extends T> = (value: T, index: number, a
  * @group ArrayLike
  * @typeParam T - Identifies the type of array elements
  * @typeParam E - Identifies the type of the return array elements (defaults to T)
- * @param value - The cuirrent element of the array being processed.
- * @param index - The index of the current elemety of the array being processed.
+ * @param value - The current element of the array being processed.
+ * @param index - The index of the current element of the array being processed.
  * @param array - The array being processed.
  */
 export type ArrPredicateCallbackFn2<T> = (value: T, index: number, array: T[]) => unknown;

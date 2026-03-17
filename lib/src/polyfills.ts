@@ -25,6 +25,9 @@ import { polyObjIsExtensible } from "./polyfills/object/objIsExtensible";
 import { polyObjIsFrozen } from "./polyfills/object/objIsFrozen";
 import { polyObjIsSealed } from "./polyfills/object/objIsSealed";
 import { polyObjHasOwn } from "./object/has_own";
+import { polyArrAt } from "./array/at";
+import { polyArrFill } from "./array/fill";
+import { polyArrWith } from "./array/with";
 
 (function () {
 
@@ -64,11 +67,14 @@ import { polyObjHasOwn } from "./object/has_own";
     };
 
     const arrayPolyfills = {
+        "at": polyArrAt,
+        "fill": polyArrFill,
         "includes": polyArrIncludes,
         "find": polyArrFind,
         "findIndex": polyArrFindIndex,
         "findLast": polyArrFindLast,
-        "findLastIndex": polyArrFindLastIndex
+        "findLastIndex": polyArrFindLastIndex,
+        "with": polyArrWith
     };
 
     // Add Object polyfills
@@ -97,3 +103,5 @@ import { polyObjHasOwn } from "./object/has_own";
         }
     });
 })();
+
+export { polyArrAt, polyArrFill, polyArrWith };

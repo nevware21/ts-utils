@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { ArrCls, FUNCTION, NULL_VALUE, OBJECT, ObjProto, TO_STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
+import { ArrCls, FUNCTION, LENGTH, NULL_VALUE, OBJECT, ObjProto, TO_STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
 import { _isPolyfillType } from "../internal/poly_helpers";
 import { _pureRef } from "../internal/treeshake_helpers";
 import { safeGet } from "./safe_get";
@@ -541,6 +541,32 @@ export function isObject<T>(value: T): value is T {
  * ```
  */
 export const isArray: <T = any>(arg: any) => arg is Array<T> = (/* #__PURE__*/_pureRef<typeof ArrCls.isArray>(ArrCls as any, "isArray"));
+
+/**
+ * Checks if the type of value is array-like (has a numeric length property and numeric indices).
+ * @since 0.14.0
+ * @function
+ * @group Type Identity
+ * @group Array
+ * @param arg - Value to be checked.
+ * @return True if the value is array-like, false otherwise.
+ * @example
+ * ```ts
+ * import { isArrayLike } from "@nevware21/ts-utils";
+ *
+ * isArrayLike([1, 2, 3]);                              // true
+ * isArrayLike("hello");                                 // true
+ * isArrayLike({ length: 3, 0: "a", 1: "b", 2: "c" }); // true
+ * isArrayLike({ length: "3" });                         // false (length is not a number)
+ * isArrayLike({ 0: "a", 1: "b" });                      // false (no length property)
+ * isArrayLike(null);                                    // false
+ * isArrayLike(undefined);                               // false
+ * ```
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function isArrayLike(arg: any): arg is ArrayLike<any> {
+    return !isStrictNullOrUndefined(arg) && !isFunction(arg) && isNumber(arg[LENGTH]) && arg[LENGTH] >= 0;
+}
 
 /**
  * Check if an object is of type Date
