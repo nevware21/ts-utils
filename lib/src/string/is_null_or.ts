@@ -8,6 +8,7 @@
 
 import { isNullOrUndefined, isString } from "../helpers/base";
 import { EMPTY } from "../internal/constants";
+import { strReplace } from "./replace";
 
 /**
  * This method checks if the string `value` is null, undefined, an empty string or only contains
@@ -19,7 +20,7 @@ import { EMPTY } from "../internal/constants";
 /*#__NO_SIDE_EFFECTS__*/
 export function strIsNullOrWhiteSpace(value: string): boolean {
     if (isString(value)) {
-        return value.replace(/[\s\t\r\n\f]+/g, EMPTY) === EMPTY;
+        return strReplace(value, /[\s\t\r\n\f]+/g, EMPTY) === EMPTY;
     }
 
     return isNullOrUndefined(value)

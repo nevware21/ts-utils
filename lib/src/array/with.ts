@@ -11,6 +11,7 @@ import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { isArrayLike } from "../helpers/base";
 import { getLength } from "../helpers/length";
 import { arrSlice } from "./slice";
+import { throwRangeError } from "../helpers/throw";
 
 /**
  * The arrWith() method is the copying version of using the bracket notation to change the value
@@ -60,7 +61,7 @@ export function polyArrWith<T>(theArray: ArrayLike<T>, index: number, value: T):
     let result: T[];
     
     if (!isArrayLike(theArray)) {
-        throw new RangeError("Invalid array");
+        throwRangeError("Invalid array");
     }
     
     const len = getLength(theArray);
@@ -73,7 +74,7 @@ export function polyArrWith<T>(theArray: ArrayLike<T>, index: number, value: T):
     
     // Check bounds
     if (idx < 0 || idx >= len) {
-        throw new RangeError("Index out of bounds");
+        throwRangeError("Index out of bounds");
     }
     
     // Create a copy and set value

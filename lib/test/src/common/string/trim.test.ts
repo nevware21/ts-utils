@@ -43,6 +43,36 @@ describe("string helpers", () => {
         _checkPolyTrimEnd(undefined);
     });
 
+    describe("trim with non-nullish falsy values", () => {
+        _checkTrim(0);
+        _checkTrim(false);
+    });
+
+    describe("polyTrim with non-nullish falsy values", () => {
+        _checkPolyTrim(0);
+        _checkPolyTrim(false);
+    });
+
+    describe("trimStart with non-nullish falsy values", () => {
+        _checkTrimStart(0);
+        _checkTrimStart(false);
+    });
+
+    describe("polyTrimStart with non-nullish falsy values", () => {
+        _checkPolyTrimStart(0);
+        _checkPolyTrimStart(false);
+    });
+
+    describe("trimEnd with non-nullish falsy values", () => {
+        _checkTrimEnd(0);
+        _checkTrimEnd(false);
+    });
+
+    describe("polyTrimEnd with non-nullish falsy values", () => {
+        _checkPolyTrimEnd(0);
+        _checkPolyTrimEnd(false);
+    });
+
     describe("trim With values", () => {
         _checkTrim("null");
         _checkTrim("undefined");
@@ -160,7 +190,7 @@ describe("string helpers", () => {
         _checkTrimEnd(" abba     ");
         _checkTrimEnd("zyxyvutsrqponmlkjihgfedcba");
         _checkTrimEnd(" zyxyvutsrqponmlkjihgfedcba");
-        _checkTrimStart(" abba     ");
+        _checkTrimEnd(" abba     ");
     });
 
     describe("polyTrimEnd With values", () => {

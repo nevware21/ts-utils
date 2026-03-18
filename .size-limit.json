@@ -37,7 +37,7 @@
   {
     "name": "es6-zip",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "10.5 Kb",
+    "limit": "10.75 Kb",
     "gzip": true,
     "running": false
   },

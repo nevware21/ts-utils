@@ -65,8 +65,8 @@ describe("arrWith", () => {
 
     it("should throw for null and undefined array", () => {
         // Native .with() throws TypeError for null/undefined
-        assert.throws(() => arrWith(null, 0, 99));
-        assert.throws(() => arrWith(undefined, 0, 99));
+        assert.throws(() => arrWith(null as any, 0, 99));
+        assert.throws(() => arrWith(undefined as any, 0, 99));
     });
 
     it("should work with array-like objects", () => {
@@ -84,6 +84,13 @@ describe("arrWith", () => {
 });
 
 describe("polyArrWith", () => {
+    it("should throw RangeError for invalid array-like input", () => {
+        assert.throws(() => polyArrWith(null as any, 0, 99), RangeError);
+        assert.throws(() => polyArrWith(undefined as any, 0, 99), RangeError);
+        assert.throws(() => polyArrWith(123 as any, 0, 99), RangeError);
+        assert.throws(() => polyArrWith({} as any, 0, 99), RangeError);
+    });
+
     it("should match native Array.prototype.with for valid indices", () => {
         const arr: any = [1, 2, 3, 4, 5];
         
