@@ -18,6 +18,7 @@ import { polyStrPadEnd, polyStrPadStart } from "./string/pad";
 import { makePolyFn } from "./internal/poly_helpers";
 import { polyStrSubstr } from "./string/substring";
 import { polyStrIncludes } from "./string/includes";
+import { polyStrReplaceAll } from "./string/replace_all";
 import { polyObjFromEntries } from "./polyfills/object/objFromEntries";
 import { polyObjGetOwnPropertyDescriptors, _polyObjGetOwnPropertySymbols, _polyObjGetOwnPropertyNames } from "./polyfills/object/objGetOwnProperty";
 import { polyObjPreventExtensions } from "./polyfills/object/objPreventExtensions";
@@ -58,7 +59,8 @@ import { polyArrWith } from "./array/with";
         "trimEnd": polyStrTrimEnd,
         "trimRight": polyStrTrimEnd,
         "substr": polyStrSubstr,
-        "includes": polyStrIncludes
+        "includes": polyStrIncludes,
+        "replaceAll": polyStrReplaceAll
     };
 
     const arrayClsPolyfills = {
@@ -104,4 +106,4 @@ import { polyArrWith } from "./array/with";
     });
 })();
 
-export { polyArrAt, polyArrFill, polyArrWith };
+export { polyArrAt, polyArrFill, polyArrWith, polyStrReplaceAll };

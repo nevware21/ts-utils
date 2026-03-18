@@ -10,6 +10,7 @@ import { EMPTY, NULL_VALUE, TO_STRING, UNDEF_VALUE } from "../internal/constants
 import { asString } from "../string/as_string";
 import { strCamelCase } from "../string/conversion";
 import { strPadStart } from "../string/pad";
+import { strReplace } from "../string/replace";
 import { strRepeat } from "../string/repeat";
 import { strSubstr } from "../string/substring";
 import { strUpper } from "../string/upper_lower";
@@ -79,7 +80,7 @@ let _base64Cache: { [key: string]: number };
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function normalizeJsName(jsName: string, camelCase?: boolean): string {
-    let result = asString(jsName).replace(INVALID_JS_NAME, "_");
+    let result = strReplace(asString(jsName), INVALID_JS_NAME, "_");
 
     return !isUndefined(camelCase) ? strCamelCase(result, !camelCase) : result;
 }
@@ -129,7 +130,7 @@ export function encodeAsJson<T>(value: T, format?: boolean | number): string {
 
     if (isString(value)) {
         // encode if a character is not an alpha, numeric, space or some special characters
-        result = DBL_QUOTE + value.replace(/[^\w .,\-!@#$%\^&*\(\)_+={}\[\]:;|<>?]/g, (match) => {
+        result = DBL_QUOTE + strReplace(value, /[^\w .,\-!@#$%\^&*\(\)_+={}\[\]:;|<>?]/g, (match) => {
             if(match === DBL_QUOTE || match === "\\") {
                 return "\\" + match;
             }
@@ -184,7 +185,7 @@ export function encodeAsHtml(value: string) {
         "'": "#39"
     });
     
-    return asString(value).replace(/[&<>"']/g, match => "&" + _htmlEntityCache[match] + ";");
+    return strReplace(asString(value), /[&<>"']/g, match => "&" + _htmlEntityCache[match] + ";");
 }
 
 /**
@@ -273,7 +274,7 @@ export function encodeAsBase64Url(value: string): string {
     let encoded = encodeAsBase64(value);
 
     if (encoded) {
-        encoded = encoded.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+        encoded = strReplace(strReplace(strReplace(encoded, /\+/g, "-"), /\//g, "_"), /=/g, "");
     }
 
     return encoded || EMPTY;
@@ -304,7 +305,7 @@ export function decodeBase64Url(value: string): string {
             result = result + strRepeat("=", pad);
         }
 
-        result = decodeBase64(result.replace(/-/g, "+").replace(/_/g, "/")) || EMPTY;
+        result = decodeBase64(strReplace(strReplace(result, /-/g, "+"), /_/g, "/")) || EMPTY;
     }
 
     return result || value || EMPTY;

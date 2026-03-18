@@ -8,6 +8,7 @@
 
 import { EMPTY } from "../internal/constants";
 import { asString } from "../string/as_string";
+import { strReplace } from "../string/replace";
 
 const MATCH_ANY = "(.*)";
 const MATCH_SINGLE = "(.)";
@@ -27,7 +28,7 @@ const MATCH_SINGLE = "(.)";
 function _createRegExp(value: string, escapeRgx: RegExp, replaceFn: (value: string) => string, ignoreCase: boolean, fullMatch?: boolean) {
     // eslint-disable-next-line security/detect-non-literal-regexp
     return new RegExp(
-        (fullMatch ? "^" : EMPTY) + replaceFn(value.replace(escapeRgx, "\\$1")) + (fullMatch ? "$" : EMPTY),
+        (fullMatch ? "^" : EMPTY) + replaceFn(strReplace(value, escapeRgx, "\\$1")) + (fullMatch ? "$" : EMPTY),
         ignoreCase ? "i" : "");
 }
 
@@ -70,7 +71,7 @@ function _createRegExp(value: string, escapeRgx: RegExp, replaceFn: (value: stri
 /*#__NO_SIDE_EFFECTS__*/
 export function createWildcardRegex(value: string, ignoreCase?: boolean, fullMatch?: boolean) {
     return _createRegExp(asString(value), /([-+|^$#\.\?{}()\[\]\\\/\"\'])/g, (value: string) => {
-        return value.replace(/\*/g, MATCH_ANY);
+        return strReplace(value, /\*/g, MATCH_ANY);
     }, !!ignoreCase, fullMatch);
 }
 
@@ -120,7 +121,7 @@ export function createWildcardRegex(value: string, ignoreCase?: boolean, fullMat
 /*#__NO_SIDE_EFFECTS__*/
 export function createFilenameRegex(value: string, ignoreCase?: boolean, fullMatch?: boolean) {
     return _createRegExp(asString(value), /([-+|^$#\.{}()\\\/\[\]\"\'])/g, (value: string) => {
-        return value.replace(/(\\\\|\\\/|\*|\?)/g, function (_all, g1) {
+        return strReplace(value, /(\\\\|\\\/|\*|\?)/g, function (_all, g1) {
             if (g1 == "\\/" || g1 == "\\\\") {
                 return "[\\\\\\/]{1}";
             }
@@ -195,7 +196,7 @@ export function createFilenameRegex(value: string, ignoreCase?: boolean, fullMat
 export function makeGlobRegex(value: string, ignoreCase?: boolean, fullMatch?: boolean) {
     return _createRegExp(asString(value), /([-+|^$#\.{}()\\\/\[\]\"\'])/g, (value: string) => {
         //"**\/*\.txt"
-        return value.replace(/(\*\*\\[\\\/]|\\\\|\\\/|\*\*|\*|\?)/g, function (_all, g1) {
+        return strReplace(value, /(\*\*\\[\\\/]|\\\\|\\\/|\*\*|\*|\?)/g, function (_all, g1) {
             if (g1 == "**\\/" || g1 == "**\\\\") {
                 return "(.*[\\\\\\/])*";
             }

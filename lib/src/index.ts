@@ -128,6 +128,8 @@ export { strContains, strIncludes, polyStrIncludes } from "./string/includes";
 export { strIndexOf, strLastIndexOf } from "./string/index_of";
 export { strIsNullOrWhiteSpace, strIsNullOrEmpty } from "./string/is_null_or";
 export { strPadEnd, strPadStart } from "./string/pad";
+export { strReplace } from "./string/replace";
+export { strReplaceAll } from "./string/replace_all";
 export { strRepeat } from "./string/repeat";
 export { strSlice } from "./string/slice";
 export { strStartsWith } from "./string/starts_with";

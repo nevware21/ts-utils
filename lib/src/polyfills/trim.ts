@@ -8,14 +8,17 @@
 
 import { EMPTY } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
+import { asString } from "../string/as_string";
+import { strReplace } from "../string/replace";
 
 /*#__NO_SIDE_EFFECTS__*/
 function _createTrimFn(exp: RegExp): (value: string) => string {
     return function _doTrim(value: string): string {
         _throwIfNullOrUndefined(value);
+        value = asString(value);
     
-        if (value && value.replace) {
-            value = value.replace(exp, EMPTY);
+        if (value) {
+            value = strReplace(value, exp, EMPTY);
         }
     
         return value;

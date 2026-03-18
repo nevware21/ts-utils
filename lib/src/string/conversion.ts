@@ -8,6 +8,7 @@
 
 import { EMPTY } from "../internal/constants";
 import { asString } from "./as_string";
+import { strReplace } from "./replace";
 import { strTrim } from "./trim";
 import { strLower, strUpper } from "./upper_lower";
 
@@ -22,7 +23,7 @@ import { strLower, strUpper } from "./upper_lower";
  */
 /*#__NO_SIDE_EFFECTS__*/
 function _convertCase<T>(value: T, newPrefix: string, upperWord?: boolean): string {
-    return strTrim(asString(value)).replace(/((_|\W)+(\w){0,1}|([a-z])([A-Z]))/g,
+    return strReplace(strTrim(asString(value)), /((_|\W)+(\w){0,1}|([a-z])([A-Z]))/g,
         (_match, _g1, _g2, wordStart, upperPrefix, upperLetter) => {
             let convertMatch = wordStart || upperLetter|| EMPTY;
             if (upperWord) {
@@ -53,7 +54,7 @@ function _convertCase<T>(value: T, newPrefix: string, upperWord?: boolean): stri
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function strLetterCase<T>(value: T): string {
-    return asString(value).replace(/(_|\b)\w/g, strUpper);
+    return strReplace(asString(value), /(_|\b)\w/g, strUpper);
 }
 
 /**
@@ -92,7 +93,7 @@ export function strLetterCase<T>(value: T): string {
 export function strCamelCase<T>(value: T, upperFirst?: boolean): string {
     let result = _convertCase(value, "", true);
 
-    return result.replace(/^\w/, upperFirst ? strUpper : strLower);
+    return strReplace(result, /^\w/, upperFirst ? strUpper : strLower);
 }
 
 /**
