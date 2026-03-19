@@ -7,7 +7,7 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
-import { strCamelCase, strKebabCase, strLetterCase, strSnakeCase } from "../../../../src/string/conversion";
+import { strCamelCase, strCapitalizeWords, strKebabCase, strLetterCase, strSnakeCase } from "../../../../src/string/conversion";
 
 describe("strLetterCase", () => {
     it("null/undefined", () => {
@@ -41,6 +41,46 @@ describe("strLetterCase", () => {
         assert.equal(strLetterCase(strCamelCase("hello_darkness")), "HelloDarkness");
         assert.equal(strLetterCase(strCamelCase("_hello_darkness")), "HelloDarkness");
         assert.equal(strLetterCase(strCamelCase("hello darkness, my old friend.")), "HelloDarknessMyOldFriend");
+    });
+});
+
+describe("strCapitalizeWords", () => {
+    it("null/undefined", () => {
+        assert.equal(strCapitalizeWords(null), "Null");
+        assert.equal(strCapitalizeWords(undefined), "Undefined");
+    });
+
+    it("Basic", () => {
+        assert.equal(strCapitalizeWords("hello darkness"), "Hello Darkness");
+        assert.equal(strCapitalizeWords("hELLo dARKness"), "Hello Darkness");
+        assert.equal(strCapitalizeWords("hello_darkness"), "Hello_Darkness");
+        assert.equal(strCapitalizeWords("_hello_darkness"), "_Hello_Darkness");
+        assert.equal(strCapitalizeWords("hello-darkness"), "Hello-Darkness");
+        assert.equal(strCapitalizeWords("hello darkness, my old friend."), "Hello Darkness, My Old Friend.");
+    });
+
+    it("Reverse kebabcase Basic", () => {
+        assert.equal(strCapitalizeWords(strKebabCase("hello darkness")), "Hello-Darkness");
+        assert.equal(strCapitalizeWords(strKebabCase("hello_darkness")), "Hello-Darkness");
+        assert.equal(strCapitalizeWords(strKebabCase("_hello_darkness")), "-Hello-Darkness");
+        assert.equal(strCapitalizeWords(strKebabCase("hello darkness, my old friend.")), "Hello-Darkness-My-Old-Friend-");
+    });
+
+    it("Reverse snakecase Basic", () => {
+        assert.equal(strCapitalizeWords(strSnakeCase("hello darkness")), "Hello_Darkness");
+        assert.equal(strCapitalizeWords(strSnakeCase("hello_darkness")), "Hello_Darkness");
+        assert.equal(strCapitalizeWords(strSnakeCase("_hello_darkness")), "_Hello_Darkness");
+        assert.equal(strCapitalizeWords(strSnakeCase("hello darkness, my old friend.")), "Hello_Darkness_My_Old_Friend_");
+    });
+
+    it("Differs from strLetterCase by normalizing word casing", () => {
+        assert.equal(strLetterCase("hELLo dARKness"), "HELLo DARKness");
+        assert.equal(strCapitalizeWords("hELLo dARKness"), "Hello Darkness");
+    });
+
+    it("Differs from strCamelCase by preserving separators", () => {
+        assert.equal(strCamelCase("hello-darkness"), "helloDarkness");
+        assert.equal(strCapitalizeWords("hello-darkness"), "Hello-Darkness");
     });
 });
 

@@ -60,8 +60,6 @@ Notes:
 
 - `strTruncate` (with optional suffix)
 - `strCount` (substring occurrences)
-- `strReplaceAll` wrapper/polyfill path **(ECMAScript 2021 / ES12 language feature wrapper)**
-- `strCapitalizeWords`
 
 ### D. Iterator and Collection Helpers (Medium Value)
 

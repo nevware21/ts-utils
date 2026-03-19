@@ -58,6 +58,34 @@ export function strLetterCase<T>(value: T): string {
 }
 
 /**
+ * Convert the provided value to `Capitalized Words`, where each detected word starts with an
+ * uppercase character and the remaining characters of that word are lowercased.
+ *
+ * Word boundaries are detected using standard `\b` boundaries and `_` separators, so existing
+ * separators (spaces, punctuation, `_`, and `-`) are retained.
+ * If the value is not a string it will be converted.
+ * @since 0.14.0
+ * @group String
+ * @group Conversion
+ * @param value - The value to be converted to capitalized words
+ * @returns The Capitalized Words version of the provided value
+ * @example
+ * ```ts
+ * strCapitalizeWords(null);                      // "Null"
+ * strCapitalizeWords(undefined);                 // "Undefined"
+ * strCapitalizeWords("hello darkness");         // "Hello Darkness"
+ * strCapitalizeWords("hELLo dARKness");         // "Hello Darkness"
+ * strCapitalizeWords("hello_darkness");         // "Hello_Darkness"
+ * strCapitalizeWords("hello-darkness");         // "Hello-Darkness"
+ * strCapitalizeWords("hello darkness, my old friend."); // "Hello Darkness, My Old Friend."
+ * ```
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function strCapitalizeWords<T>(value: T): string {
+    return strLetterCase(strLower(asString(value)));
+}
+
+/**
  * Convert the provided value to `camelCased` string, you can optionally specifify whether the
  * first caracter is upper cased (lowercase by default)from kebab `-` or snake `_` case.
  * All whitespace characters are removed
