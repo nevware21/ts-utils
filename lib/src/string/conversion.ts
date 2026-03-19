@@ -87,7 +87,7 @@ export function strCapitalizeWords<T>(value: T): string {
 
 /**
  * Convert the provided value to `camelCased` string, you can optionally specifify whether the
- * first caracter is upper cased (lowercase by default)from kebab `-` or snake `_` case.
+ * first character is upper cased (lowercase by default) from kebab `-` or snake `_` case.
  * All whitespace characters are removed
  * If the value is not a string it will be converted.
  * @since 0.9.0
