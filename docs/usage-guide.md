@@ -149,7 +149,7 @@ String manipulation with built-in polyfill support:
 import { 
   strTrim, strStartsWith, strEndsWith, strIncludes,
   strLeft, strRight, strSubstring, strIsNullOrEmpty,
-  strCamelCase, strKebabCase, strSnakeCase
+  strCamelCase, strCapitalizeWords, strKebabCase, strSnakeCase
 } from "@nevware21/ts-utils";
 
 const text = "  Hello World!  ";
@@ -166,8 +166,14 @@ const rightPart = strRight(trimmed, 7);  // "World!"
 
 // Case transformations
 const camelCase = strCamelCase("hello-world");  // "helloWorld"
+const titleCase = strCapitalizeWords("hELLo-world from_ts-utils"); // "Hello-World From_Ts-Utils"
 const kebabCase = strKebabCase("helloWorld");   // "hello-world"
 const snakeCase = strSnakeCase("helloWorld");   // "hello_world"
+
+// Conversion behavior differences
+// strCapitalizeWords: keeps separators and lowercases the rest of each word
+// strCamelCase: removes separators and joins words
+// strKebabCase / strSnakeCase: normalize into a single delimiter style
 
 // Check for empty strings
 if (!strIsNullOrEmpty(text)) {

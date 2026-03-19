@@ -122,7 +122,7 @@ export { objPreventExtensions, objIsExtensible } from "./object/prevent_extensio
 export { objPropertyIsEnumerable } from "./object/property_is_enumerable";
 export { objSetPrototypeOf } from "./object/set_proto";
 export { objIsFrozen, objIsSealed } from "./object/object_state";
-export { strCamelCase, strKebabCase, strLetterCase, strSnakeCase } from "./string/conversion";
+export { strCamelCase, strCapitalizeWords, strKebabCase, strLetterCase, strSnakeCase } from "./string/conversion";
 export { strEndsWith } from "./string/ends_with";
 export { strContains, strIncludes, polyStrIncludes } from "./string/includes";
 export { strIndexOf, strLastIndexOf } from "./string/index_of";
