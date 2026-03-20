@@ -53,12 +53,11 @@ describe("strTruncate helper", () => {
         const numResult = strTruncate("abcdefghij", 5, 999 as any);
         assert.equal(numResult.length, 5, "Result length must not exceed maxLength");
         assert.equal(numResult, "ab999", "Number suffix coerced correctly");
-        
+
         // Test with boolean suffix - must coerce and respect maxLength
         const boolResult = strTruncate("abcdefghij", 7, false as any);
         assert.equal(boolResult.length, 7, "Result length must not exceed maxLength");
         assert.equal(boolResult, "abfalse", "Boolean suffix coerced correctly");
-        
         // Test with number suffix longer than maxLength - suffix itself truncated
         const truncSuffixResult = strTruncate("hello", 3, 123456 as any);
         assert.equal(truncSuffixResult.length, 3, "Result length must not exceed maxLength even when suffix exceeds it");
