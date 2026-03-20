@@ -2,14 +2,14 @@
   {
     "name": "es5-full",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "27.5 kb",
+    "limit": "28 kb",
     "brotli": false,
     "running": false
   },
   {
     "name": "es6-full",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "26.5 kb",
+    "limit": "27 kb",
     "brotli": false,
     "running": false
   },

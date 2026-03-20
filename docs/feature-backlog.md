@@ -22,20 +22,33 @@ Identify practical, minification-friendly, cross-environment additions that fit 
 
 ### Language-Native Suggestions (with ECMAScript Version)
 
-The following suggestions map directly to JavaScript language / standard library features:
+#### String Methods (ES6+)
+- `strMatchAll` – ES2020 (String.prototype.matchAll for iterator over all regex matches)
+- `strAt` – ES2022 (String.prototype.at, supports negative indexing)
 
-- `strReplaceAll` wrapper/polyfill path
-	- JavaScript feature: `String.prototype.replaceAll()`
-	- Added in: **ECMAScript 2021 (ES12)**
+#### Array Methods (ES6+)
+- `arrWith` – ES2023 (Array.prototype.with for immutable element replacement)
+- `arrFlatMap` – ES2019 (Array.prototype.flatMap)
 
-| Suggestion | JavaScript Feature | ECMAScript Version |
-| --- | --- | --- |
-| `strReplaceAll` wrapper/polyfill path | `String.prototype.replaceAll()` | ECMAScript 2021 (ES12) |
+#### Object Utilities (ES6+)
+(All major Object utilities currently implemented)
+
+#### Set/Map Utilities (ES6+ Data Structures)
+- `setFrom` – Safe Set construction from iterables
+- `mapFrom` – Safe Map construction from key-value pairs
+- `setIntersection` / `setUnion` / `setDifference` – Set algebra helpers
+- `mapMerge` – Map concatenation helper
+
+#### Type/Value Inspection (ES6+)
+- `isGenerator` / `isAsyncIterable` – ES6+ type checks
+- `isIntegerInRange` – Safe integer range validation
 
 Notes:
 
+- These are direct language-native wrappers with ES version markers for polyfill candidates
 - Other suggestions below are library-level utilities (not direct language features).
 - Iterator helpers are intentionally listed as utility suggestions here rather than standard-language mappings.
+- Implementations should include ES5 polyfills where applicable for v0.x/v1.x compatibility
 
 ### A. Typing Improvements (High Value)
 
@@ -43,6 +56,9 @@ Notes:
 - `DeepPartial<T>` utility type
 - `DeepReadonly<T>` utility type
 - `Mutable<T>` utility type for controlled writable transformations
+- `DeepRequired<T>` utility type for normalized configuration and defaults handling
+- `ValueOf<T>` helper type for extracting union values from object maps
+- `NonEmptyArray<T>` helper type for APIs that require at least one entry
 
 ### B. Object Utilities (Medium Value)
 
@@ -50,6 +66,8 @@ Notes:
 - `objMapValues`
 - `objMergeIf`
 - `objDiff`
+- `objPickBy` / `objOmitBy`
+- `objDefaults` for shallow default assignment without overriding defined values
 
 Notes:
 
@@ -58,12 +76,20 @@ Notes:
 
 ### C. String Utilities (Medium Value)
 
-- `strTruncate` (with optional suffix)
-- `strCount` (substring occurrences)
+- `strStartsWithAny` / `strEndsWithAny`
+- `strWrap` / `strUnwrap`
+- `strNormalizeNewlines`
+
+Notes:
+
+- prefer helpers that avoid locale-sensitive behavior unless explicitly documented
+- keep semantics predictable for ES5 runtimes and string coercion patterns
 
 ### D. Iterator and Collection Helpers (Medium Value)
 
-- `iterMap`, `iterFilter`, `iterTake`
+- `iterMap`, `iterFilter`, `iterTake` – Iterator transformation helpers
+- `iterReduce`, `iterSome`, `iterEvery` – Iterator reduction/testing
+- `iterToArray` for predictable materialization of iterables / iterators
 - `arrToMap` helpers with stable key selection
 - lightweight set operations for iterables
 
@@ -72,6 +98,8 @@ Notes:
 - keep bundle-size thresholds justified with measured report
 - require test parity for polyfill vs native behavior
 - ensure newly exported functions are reflected in README utility matrix
+- add targeted coverage checks for newly introduced leaf utilities
+- document explicit null / undefined coercion or throw behavior for new helpers
 
 ## Acceptance Criteria for this Request
 
