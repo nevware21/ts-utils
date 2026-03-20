@@ -213,3 +213,35 @@ export function makeGlobRegex(value: string, ignoreCase?: boolean, fullMatch?: b
         });
     }, !!ignoreCase, fullMatch);
 }
+
+
+/**
+ * Create a regular expression that escapes all special regex characters in the input string,
+ * treating it as a literal string to match.
+ * @since 0.14.0
+ * @group RegExp
+ * @param matcher - The string value to be escaped and converted into a RegExp for literal matching.
+ * @returns A new Regular Expression that matches the literal string value.
+ * @example
+ * ```ts
+ * let regex = createLiteralRegex("Hello.World");
+ *
+ * let matches = regex.exec("Hello.World");
+ * matches[0]; // "Hello.World"
+ *
+ * let matches = regex.exec("HelloXWorld");
+ * matches; // null - dot does not match as wildcard
+ *
+ * let regex = createLiteralRegex("(test)");
+ * let matches = regex.exec("(test)");
+ * matches[0]; // "(test)"
+ *
+ * let matches = regex.exec("test");
+ * matches; // null
+ * ```
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function createLiteralRegex(matcher: string) {
+    // eslint-disable-next-line security/detect-non-literal-regexp
+    return new RegExp(strReplace(asString(matcher), /[.*+?^${}()|[\]\\]/g, "\\$&") || "(?:)", "g");
+}

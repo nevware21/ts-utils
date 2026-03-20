@@ -8,6 +8,7 @@
 
 import { isFunction, isRegExp, isStrictNullOrUndefined, isString } from "../helpers/base";
 import { throwTypeError } from "../helpers/throw";
+import { createLiteralRegex } from "../helpers/regexp";
 import { StrProto } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
@@ -37,15 +38,52 @@ import { strReplace } from "./replace";
 export const strReplaceAll: (value: string, searchValue: string | RegExp, replaceValue: string | ((substring: string, ...args: any[]) => string)) => string = (/*#__PURE__*/_unwrapFunctionWithPoly("replaceAll", StrProto as any, polyStrReplaceAll));
 
 /**
- * Polyfill implementation of String.prototype.replaceAll().
+ * Polyfill implementation of `String.prototype.replaceAll()` that returns a new string with all
+ * matches of a pattern replaced by a replacement.
+ *
+ * Matches the behaviour of the native `String.prototype.replaceAll()` method:
+ * - A `RegExp` `searchValue` **must** carry the global (`g`) flag; a non-global `RegExp` throws a
+ *   `TypeError`.
+ * - A string `searchValue` is treated as a literal pattern (special regex characters are escaped)
+ *   and all occurrences are replaced.
+ * - If `searchValue` exposes a `[Symbol.replace]` method, that method is called with the coerced
+ *   string value and `replaceValue`, mirroring the native delegation behaviour.
+ * - If `replaceValue` is a function it is invoked for each match with the matched substring,
+ *   captured groups, the match index, and the original string.
+ *
  * @since 0.14.0
  * @group String
  * @group Polyfill
  * @param value - The string value to search and replace within.
- * @param searchValue - The value to search for. Can be a string or a global regular expression.
- * @param replaceValue - The replacement string or replacer function.
- * @returns A new string with every occurrence of searchValue replaced.
- * @throws TypeError if searchValue is a regular expression without the global flag.
+ * @param searchValue - The value to search for. Can be a string, a global `RegExp`, or any object
+ * with a `[Symbol.replace]` method.
+ * @param replaceValue - The replacement string (may use `$&`, `$1`…`$n`, `$\`` and `$'` patterns)
+ * or a replacer function called once per match.
+ * @returns A new string with every occurrence of `searchValue` replaced by `replaceValue`.
+ * @throws `TypeError` if `searchValue` is a `RegExp` without the global (`g`) flag.
+ * @throws `TypeError` if `value` is `null` or `undefined`.
+ * @example
+ * ```ts
+ * // String literal replacement — replaces every occurrence
+ * polyStrReplaceAll("aabbcc", "b", "x");       // "aaxxcc"
+ * polyStrReplaceAll("a-b-a", "a", "x");        // "x-b-x"
+ * ```
+ * @example
+ * ```ts
+ * // Global RegExp replacement
+ * polyStrReplaceAll("abc123abc", /abc/g, "X"); // "X123X"
+ * ```
+ * @example
+ * ```ts
+ * // Replacer function
+ * polyStrReplaceAll("abca", "a", (match, offset) => match.toUpperCase() + offset);
+ * // "A0bcA3"
+ * ```
+ * @example
+ * ```ts
+ * // Special regex characters in search string are escaped
+ * polyStrReplaceAll("a.b.c", ".", "-");  // "a-b-c"  (dot is literal)
+ * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyStrReplaceAll(value: string, searchValue: string | RegExp, replaceValue: string | ((substring: string, ...args: any[]) => string)): string {
@@ -77,8 +115,7 @@ export function polyStrReplaceAll(value: string, searchValue: string | RegExp, r
 
         let search = isString(searchValue) ? searchValue : asString(searchValue);
 
-        // eslint-disable-next-line security/detect-non-literal-regexp
-        matcher = new RegExp(strReplace(search, /[.*+?^${}()|[\]\\]/g, "\\$&") || "(?:)", "g");
+        matcher = createLiteralRegex(search);
     }
 
     return strReplace(theValue, matcher, replaceValue as any);

@@ -29,6 +29,8 @@ import { polyObjHasOwn } from "./object/has_own";
 import { polyArrAt } from "./array/at";
 import { polyArrFill } from "./array/fill";
 import { polyArrWith } from "./array/with";
+import { polyStrAt } from "./string/at";
+import { polyStrMatchAll } from "./string/match_all";
 
 (function () {
 
@@ -60,7 +62,9 @@ import { polyArrWith } from "./array/with";
         "trimRight": polyStrTrimEnd,
         "substr": polyStrSubstr,
         "includes": polyStrIncludes,
-        "replaceAll": polyStrReplaceAll
+        "replaceAll": polyStrReplaceAll,
+        "at": polyStrAt,
+        "matchAll": polyStrMatchAll
     };
 
     const arrayClsPolyfills = {

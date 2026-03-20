@@ -10,8 +10,10 @@ import { assert } from "@nevware21/tripwire-chai";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { throwError } from "../../../../src/helpers/throw";
 import { createArrayIterator } from "../../../../src/iterator/array";
-import { createIterable, createIterator, CreateIteratorContext } from "../../../../src/iterator/create";
 import { iterForOf } from "../../../../src/iterator/forOf";
+import { createIterable, createIterableIterator, createIterator, CreateIteratorContext } from "../../../../src/iterator/create";
+import { getKnownSymbol } from "../../../../src/symbol/symbol";
+import { WellKnownSymbols } from "../../../../src/symbol/well_known";
 import { objKeys } from "../../../../src/object/object";
 
 
@@ -179,8 +181,7 @@ describe("create iterator helpers", () => {
             iterForOf(createIterable(fibCtx), (value) => {
                 assert.ok(false, "Should not be called");
             });
-
-            assert.equal(done, false, "Check that the return was not called as it doesn't need to be");
+            assert.equal(done, false, "Check that the return was called");
         });
 
         it("with throw", () => {
@@ -233,6 +234,204 @@ describe("create iterator helpers", () => {
             assert.equal(values[7], 13, "7:" + dumpObj(values));
             assert.equal(values[8], 21, "8:" + dumpObj(values));
             assert.equal(values[9], 34, "9:" + dumpObj(values));
+        });
+    });
+
+    describe("createIterableIterator", () => {
+        it("satisfies Iterator protocol via next()", () => {
+            let theValues = [5, 10, 15];
+            let idx = -1;
+            let theIterator = createIterableIterator<number>({
+                n: function() {
+                    idx++;
+                    let isDone = idx >= theValues.length;
+                    if (!isDone) {
+                        this.v = theValues[idx];
+                    }
+                    return isDone;
+                }
+            });
+
+            let r1 = theIterator.next();
+            assert.equal(r1.done, false);
+            assert.equal(r1.value, 5);
+
+            let r2 = theIterator.next();
+            assert.equal(r2.done, false);
+            assert.equal(r2.value, 10);
+
+            let r3 = theIterator.next();
+            assert.equal(r3.done, false);
+            assert.equal(r3.value, 15);
+
+            let r4 = theIterator.next();
+            assert.equal(r4.done, true);
+        });
+
+        it("Symbol.iterator() returns itself", () => {
+            let theIterator = createIterableIterator<number>({
+                n: function() {
+                    return true;
+                }
+            });
+
+            let itSymbol = getKnownSymbol(WellKnownSymbols.iterator);
+            let iterFn = (theIterator as any)[itSymbol];
+            assert.ok(typeof iterFn === "function", "[Symbol.iterator] must be a function");
+            assert.strictEqual(iterFn.call(theIterator), theIterator,
+                "[Symbol.iterator]() must return the iterator itself");
+        });
+
+        it("satisfies Iterable protocol via iterForOf", () => {
+            let theValues = [5, 10, 15, 20, 25, 30];
+            let idx = -1;
+            let theIterator = createIterableIterator<number>({
+                n: function() {
+                    idx++;
+                    let isDone = idx >= theValues.length;
+                    if (!isDone) {
+                        this.v = theValues[idx];
+                    }
+                    return isDone;
+                }
+            });
+
+            let values: number[] = [];
+            iterForOf(theIterator, (value) => {
+                values.push(value);
+            });
+
+            assert.equal(values.length, 6, "" + dumpObj(values));
+            assert.equal(values[0], 5);
+            assert.equal(values[1], 10);
+            assert.equal(values[2], 15);
+            assert.equal(values[3], 20);
+            assert.equal(values[4], 25);
+            assert.equal(values[5], 30);
+        });
+
+        it("partial next() then iterForOf continues from same position", () => {
+            // [Symbol.iterator]() returns self, so the iterable and iterator share state.
+            let theValues = [1, 2, 3, 4, 5];
+            let idx = -1;
+            let theIterator = createIterableIterator<number>({
+                n: function() {
+                    idx++;
+                    let isDone = idx >= theValues.length;
+                    if (!isDone) {
+                        this.v = theValues[idx];
+                    }
+                    return isDone;
+                }
+            });
+
+            // Consume first two elements via direct next() calls.
+            assert.equal(theIterator.next().value, 1);
+            assert.equal(theIterator.next().value, 2);
+
+            // iterForOf should see only the remaining three elements.
+            let remaining: number[] = [];
+            iterForOf(theIterator, (value) => {
+                remaining.push(value);
+            });
+
+            assert.equal(remaining.length, 3);
+            assert.equal(remaining[0], 3);
+            assert.equal(remaining[1], 4);
+            assert.equal(remaining[2], 5);
+        });
+
+        it("return callback is invoked on early iterForOf exit", () => {
+            let done = false;
+            let idx = -1;
+            let theValues = [1, 2, 3, 4, 5];
+            let theIterator = createIterableIterator<number>({
+                n: function() {
+                    idx++;
+                    let isDone = idx >= theValues.length;
+                    if (!isDone) {
+                        this.v = theValues[idx];
+                    }
+                    return isDone;
+                },
+                r: function(value) {
+                    done = true;
+                    return value;
+                }
+            });
+
+            let values: number[] = [];
+            iterForOf(theIterator, (value) => {
+                values.push(value);
+                if (values.length === 2) {
+                    return -1; // signal early exit
+                }
+            });
+
+            assert.equal(done, true, "return callback must be called on early exit");
+            assert.equal(values.length, 2);
+        });
+
+        it("throw callback is invoked on iterForOf error", () => {
+            let thrown = false;
+            let idx = -1;
+            let theValues = [1, 2, 3];
+            let theIterator = createIterableIterator<number>({
+                n: function() {
+                    idx++;
+                    let isDone = idx >= theValues.length;
+                    if (!isDone) {
+                        this.v = theValues[idx];
+                    }
+                    return isDone;
+                },
+                t: function(value) {
+                    thrown = true;
+                    return value;
+                }
+            });
+
+            try {
+                iterForOf(theIterator, (value) => {
+                    if (value === 2) {
+                        throwError("stop!");
+                    }
+                });
+                assert.ok(false, "exception should have propagated");
+            } catch (e) {
+                assert.ok(true, "expected exception caught");
+            }
+
+            assert.equal(thrown, true, "throw callback must be called when iterForOf body throws");
+        });
+
+        it("empty sequence returns done immediately", () => {
+            let theIterator = createIterableIterator<number>({
+                n: function() {
+                    return true;
+                }
+            });
+
+            let values: number[] = [];
+            iterForOf(theIterator, (value) => {
+                values.push(value);
+            });
+
+            assert.equal(values.length, 0, "no values should have been produced");
+            assert.equal(theIterator.next().done, true, "next() must also be done");
+        });
+
+        it("with no next function returns done immediately", () => {
+            let theIterator = createIterableIterator<number>({
+                n: null as any
+            });
+
+            let values: number[] = [];
+            iterForOf(theIterator, (value) => {
+                values.push(value);
+            });
+
+            assert.equal(values.length, 0, "null next should produce no values");
         });
     });
 });
