@@ -148,7 +148,7 @@ String manipulation with built-in polyfill support:
 ```typescript
 import { 
   strTrim, strStartsWith, strEndsWith, strIncludes,
-  strLeft, strRight, strSubstring, strIsNullOrEmpty,
+  strCount, strLeft, strRight, strSubstring, strTruncate, strIsNullOrEmpty,
   strCamelCase, strCapitalizeWords, strKebabCase, strSnakeCase
 } from "@nevware21/ts-utils";
 
@@ -163,6 +163,8 @@ const includes = strIncludes(text, "World");    // true
 // Get substrings
 const leftPart = strLeft(trimmed, 5);    // "Hello"
 const rightPart = strRight(trimmed, 7);  // "World!" 
+const truncated = strTruncate(trimmed, 8, "..."); // "Hello..."
+const worldCount = strCount(trimmed, "l"); // 3
 
 // Case transformations
 const camelCase = strCamelCase("hello-world");  // "helloWorld"
