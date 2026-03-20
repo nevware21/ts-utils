@@ -19,13 +19,20 @@ import { strLeft } from "./substring";
  * When the value is already within `maxLength`, the original string is returned unchanged. When a
  * suffix is supplied, the result length remains capped at `maxLength`, so the original value is
  * shortened further as needed to make room for the suffix.
+ *
+ * Both `value` and `suffix` are coerced to strings via {@link asString} before processing.
+ * Passing `null` or `undefined` for `value` will cause this function to throw, while a
+ * `null`/`undefined` `suffix` is treated as an empty string (no suffix is appended).
+ *
  * @since 0.14.0
  * @group String
  * @group Conversion
- * @param value - The string value to truncate.
+ * @param value - The value to truncate. This is coerced to a string and must not be `null` or `undefined`.
  * @param maxLength - The maximum length of the returned value.
- * @param suffix - An optional suffix to append when truncation occurs.
+ * @param suffix - An optional suffix to append when truncation occurs. When provided, it is coerced to a
+ * string; if `null` or `undefined`, it is treated as an empty string.
  * @returns A truncated string that does not exceed `maxLength`.
+ * @throws TypeError If `value` is `null` or `undefined`.
  * @example
  * ```ts
  * strTruncate("hello world", 5); // "hello"
