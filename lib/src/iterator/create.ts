@@ -151,6 +151,63 @@ export function makeIterable<T, I>(target: T, ctx: CreateIteratorContext<I>): T 
 }
 
 /**
+ * Create an iterable iterator which conforms to both the `Iterator` and `Iterable` protocols,
+ * it uses the provided `ctx` to manage moving to the `next` value and can be used directly in
+ * `for...of` loops or consumed via `.next()` calls.
+ *
+ * The returned object satisfies both protocols: its `[Symbol.iterator]()` method returns itself,
+ * making it usable anywhere an `Iterable` is expected, while also exposing the `next()` method
+ * of the `Iterator` protocol.
+ *
+ * @see [Iterator protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#the_iterator_protocol)
+ * @see [Iterable protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#the_iterable_protocol)
+ * @since 0.14.0
+ * @group Iterator
+ * @typeParam T - Identifies the type that will be returned by the iterator
+ * @param ctx - The context used to manage the iteration over the items.
+ * @returns A new IterableIterator instance
+ * @example
+ * ```ts
+ * let idx = -1;
+ * let theValues = [ 5, 10, 15, 20, 25, 30 ];
+ *
+ * let theIterator = createIterableIterator<number>({
+ *     n: function() {
+ *         idx++;
+ *         let isDone = idx >= theValues.length;
+ *         if (!isDone) {
+ *             this.v = theValues[idx];
+ *         }
+ *         return isDone;
+ *     }
+ * });
+ *
+ * // Can be consumed as an iterator
+ * theIterator.next(); // { value: 5, done: false }
+ *
+ * // Or used in a for...of loop (Iterable protocol)
+ * let values: number[] = [];
+ * for (const value of theIterator) {
+ *     values.push(value);
+ * }
+ * // Values: [10, 15, 20, 25, 30]
+ * ```
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function createIterableIterator<T>(ctx: CreateIteratorContext<T>): IterableIterator<T> {
+    let iterator = createIterator(ctx);
+    let itSymbol = getKnownSymbol(WellKnownSymbols.iterator);
+
+    function _createIterator() {
+        return iterator;
+    }
+
+    (iterator as any)[itSymbol] = _createIterator;
+
+    return iterator as IterableIterator<T>;
+}
+
+/**
  * Create an iterator which conforms to the `Iterator` protocol, it uses the provided `ctx` to
  * managed moving to the `next`.
  *

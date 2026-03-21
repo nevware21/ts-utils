@@ -23,11 +23,9 @@ Identify practical, minification-friendly, cross-environment additions that fit 
 ### Language-Native Suggestions (with ECMAScript Version)
 
 #### String Methods (ES6+)
-- `strMatchAll` – ES2020 (String.prototype.matchAll for iterator over all regex matches)
-- `strAt` – ES2022 (String.prototype.at, supports negative indexing)
+(All major String methods currently implemented)
 
 #### Array Methods (ES6+)
-- `arrWith` – ES2023 (Array.prototype.with for immutable element replacement)
 - `arrFlatMap` – ES2019 (Array.prototype.flatMap)
 
 #### Object Utilities (ES6+)
@@ -40,7 +38,7 @@ Identify practical, minification-friendly, cross-environment additions that fit 
 - `mapMerge` – Map concatenation helper
 
 #### Type/Value Inspection (ES6+)
-- `isGenerator` / `isAsyncIterable` – ES6+ type checks
+- `isAsyncIterable` – ES6+ type checks
 - `isIntegerInRange` – Safe integer range validation
 
 Notes:

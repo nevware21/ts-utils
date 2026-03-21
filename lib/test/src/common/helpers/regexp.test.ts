@@ -9,7 +9,7 @@
 import { assert } from "@nevware21/tripwire-chai";
 import { arrForEach } from "../../../../src/array/forEach";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
-import { createFilenameRegex, createWildcardRegex, makeGlobRegex } from "../../../../src/helpers/regexp";
+import { createFilenameRegex, createLiteralRegex, createWildcardRegex, makeGlobRegex } from "../../../../src/helpers/regexp";
 import { EMPTY } from "../../../../src/internal/constants";
 
 function _checkResult(theRegEx: RegExp, theValue: any, isMatch: boolean, expected: Array<string|undefined> | null) {
@@ -438,5 +438,109 @@ describe("makeGlobRegex", () => {
     
         regex = makeGlobRegex("**[-+|^$#.?{}()]**\\\\/\"\'*", true, true);
         assert.equal(regex.source, "^(.*)\\[\\-\\+\\|\\^\\$\\#\\.([^\\\\\\/]{1})\\{\\}\\(\\)\\](.*[\\\\\\/])*[\\\\\\/]{1}[\\\\\\/]{1}\\\"\\'([^\\\\\\/]*)$");
+    });
+});
+
+describe("createLiteralRegex", () => {
+    it("null/undefined coerced to string", () => {
+        let regex = createLiteralRegex(null as any);
+        assert.equal(regex.source, "null", dumpObj(regex));
+        assert.equal(regex.global, true, "should be global");
+        let result = regex.exec("null");
+        assert.notEqual(result, null);
+        assert.equal(result[0], "null");
+
+        regex = createLiteralRegex(undefined as any);
+        assert.equal(regex.source, "undefined", dumpObj(regex));
+        result = regex.exec("undefined");
+        assert.notEqual(result, null);
+        assert.equal(result[0], "undefined");
+    });
+
+    it("empty string produces (?:) which matches everywhere", () => {
+        let regex = createLiteralRegex(EMPTY);
+        assert.equal(regex.source, "(?:)", dumpObj(regex));
+        assert.notEqual(regex.exec(""), null);
+
+        regex = createLiteralRegex(EMPTY);
+        assert.notEqual(regex.exec("hello"), null);
+    });
+
+    it("matches literal dot — not as a wildcard", () => {
+        let result = createLiteralRegex("Hello.World").exec("Hello.World");
+        assert.notEqual(result, null, "should match the literal dot");
+        assert.equal(result[0], "Hello.World");
+
+        assert.equal(createLiteralRegex("Hello.World").exec("HelloXWorld"), null, "dot must NOT match any char");
+    });
+
+    it("matches literal parentheses", () => {
+        let result = createLiteralRegex("(test)").exec("(test)");
+        assert.notEqual(result, null);
+        assert.equal(result[0], "(test)");
+
+        assert.equal(createLiteralRegex("(test)").exec("test"), null, "parens are literal, not grouping");
+    });
+
+    it("treats + as a literal character", () => {
+        let result = createLiteralRegex("a+b").exec("a+b");
+        assert.notEqual(result, null);
+        assert.equal(result[0], "a+b");
+
+        assert.equal(createLiteralRegex("a+b").exec("ab"), null, "should not match ab");
+        assert.equal(createLiteralRegex("a+b").exec("aab"), null, "should not match aab");
+    });
+
+    it("treats ^ and $ as literals, not anchors", () => {
+        assert.equal(createLiteralRegex("^start").exec("start"), null, "^ is not an anchor");
+
+        let result = createLiteralRegex("^start").exec("^start");
+        assert.notEqual(result, null);
+        assert.equal(result[0], "^start");
+
+        assert.equal(createLiteralRegex("end$").exec("end"), null, "$ is not an anchor");
+
+        result = createLiteralRegex("end$").exec("end$");
+        assert.notEqual(result, null);
+        assert.equal(result[0], "end$");
+    });
+
+    it("is global — exec loop finds all matches", () => {
+        let regex = createLiteralRegex("an");
+        let matches: string[] = [];
+        let m: RegExpExecArray;
+        while ((m = regex.exec("banana")) !== null) {
+            matches.push(m[0]);
+        }
+        assert.equal(matches.length, 2, "banana contains 'an' twice");
+        assert.equal(matches[0], "an");
+        assert.equal(matches[1], "an");
+    });
+
+    it("literal dot matched globally", () => {
+        let regex = createLiteralRegex(".");
+        let matches: string[] = [];
+        let m: RegExpExecArray;
+        while ((m = regex.exec("a.b.c")) !== null) {
+            matches.push(m[0]);
+        }
+        assert.equal(matches.length, 2, "two literal dots in a.b.c");
+        assert.equal(matches[0], ".");
+        assert.equal(matches[1], ".");
+    });
+
+    it("escapes all special regex metacharacters", () => {
+        // Each character is a regex metachar; createLiteralRegex should match them all literally
+        let specials = [".", "*", "+", "?", "^", "$", "{", "}", "(", ")", "|", "[", "]", "\\"];
+        arrForEach(specials, (ch) => {
+            let regex = createLiteralRegex(ch);
+            let result = regex.exec(ch);
+            assert.notEqual(result, null, "should match literal " + ch);
+            assert.equal(result[0], ch);
+        });
+    });
+
+    it("no match returns null", () => {
+        assert.equal(createLiteralRegex("xyz").exec("hello world"), null);
     });
 });

@@ -2,42 +2,42 @@
   {
     "name": "es5-full",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "28 kb",
+    "limit": "28.5 kb",
     "brotli": false,
     "running": false
   },
   {
     "name": "es6-full",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "27 kb",
+    "limit": "27.5 kb",
     "brotli": false,
     "running": false
   },
   {
     "name": "es5-full-brotli",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "10 kb",
+    "limit": "10.5 kb",
     "brotli": true,
     "running": false
   },
   {
     "name": "es6-full-brotli",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "9.75 kb",
+    "limit": "10.5 kb",
     "brotli": true,
     "running": false
   },
   {
     "name": "es5-zip",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "11 Kb",
+    "limit": "11.5 Kb",
     "gzip": true,
     "running": false
   },
   {
     "name": "es6-zip",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "10.75 Kb",
+    "limit": "11.5 Kb",
     "gzip": true,
     "running": false
   },
@@ -68,7 +68,7 @@
   {
     "name": "es5-poly",
     "path": "lib/bundle/es5/ts-polyfills-utils.js",
-    "limit": "10 kb",
+    "limit": "11.5 kb",
     "brotli": false,
     "running": false
   },
