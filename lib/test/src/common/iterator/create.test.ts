@@ -181,7 +181,7 @@ describe("create iterator helpers", () => {
             iterForOf(createIterable(fibCtx), (value) => {
                 assert.ok(false, "Should not be called");
             });
-            assert.equal(done, false, "Check that the return was called");
+            assert.equal(done, false, "Check that the return was not called");
         });
 
         it("with throw", () => {
