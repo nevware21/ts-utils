@@ -28,6 +28,7 @@ import { polyObjIsSealed } from "./polyfills/object/objIsSealed";
 import { polyObjHasOwn } from "./object/has_own";
 import { polyArrAt } from "./array/at";
 import { polyArrFill } from "./array/fill";
+import { polyArrFlatMap } from "./array/flatMap";
 import { polyArrWith } from "./array/with";
 import { polyStrAt } from "./string/at";
 import { polyStrMatchAll } from "./string/match_all";
@@ -80,6 +81,7 @@ import { polyStrMatchAll } from "./string/match_all";
         "findIndex": polyArrFindIndex,
         "findLast": polyArrFindLast,
         "findLastIndex": polyArrFindLastIndex,
+        "flatMap": polyArrFlatMap,
         "with": polyArrWith
     };
 
@@ -110,4 +112,4 @@ import { polyStrMatchAll } from "./string/match_all";
     });
 })();
 
-export { polyArrAt, polyArrFill, polyArrWith, polyStrReplaceAll };
+export { polyArrAt, polyArrFill, polyArrFlatMap, polyArrWith, polyStrReplaceAll };

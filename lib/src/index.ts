@@ -7,7 +7,7 @@
  */
 
 export { arrAppend } from "./array/append";
-export { ArrPredicateCallbackFn, ArrPredicateCallbackFn2, ArrMapCallbackFn, ArrFromMapFn } from "./array/callbacks";
+export { ArrPredicateCallbackFn, ArrPredicateCallbackFn2, ArrMapCallbackFn, ArrFlatMapCallbackFn, ArrFromMapFn } from "./array/callbacks";
 export { arrAt } from "./array/at";
 export { arrChunk } from "./array/chunk";
 export { arrCompact } from "./array/compact";
@@ -17,6 +17,7 @@ export { arrDropWhile } from "./array/drop_while";
 export { arrEvery, arrFilter } from "./array/every";
 export { arrFill } from "./array/fill";
 export { arrFind, arrFindIndex, arrFindLast, arrFindLastIndex } from "./array/find";
+export { arrFlatMap } from "./array/flatMap";
 export { arrFlatten } from "./array/flatten";
 export { arrForEach } from "./array/forEach";
 export { arrFrom } from "./array/from";
