@@ -26,7 +26,7 @@ Identify practical, minification-friendly, cross-environment additions that fit 
 (All major String methods currently implemented)
 
 #### Array Methods (ES6+)
-- `arrFlatMap` – ES2019 (Array.prototype.flatMap)
+(All major Array methods currently implemented)
 
 #### Object Utilities (ES6+)
 (All major Object utilities currently implemented)

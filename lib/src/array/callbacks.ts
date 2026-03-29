@@ -51,6 +51,21 @@ export type ArrPredicateCallbackFn2<T> = (value: T, index: number, array: T[]) =
 export type ArrMapCallbackFn<T, R = T> = (value: T, index?: number, array?: T[]) => R;
 
 /**
+ * Callback signature for {@link arrFlatMap}. Each invocation may return either a single value or
+ * an array of values to be flattened into the result by one level.
+ *
+ * @since 0.14.0
+ * @group Array
+ * @group ArrayLike
+ * @typeParam T - Identifies the type of the array elements
+ * @typeParam R - Identifies the type of the flattened output values, defaults to T.
+ * @param value - The current element being processed in the array.
+ * @param index - The index of the current element being processed in the array.
+ * @param array - The array-like object that the `flatMap` function was called on.
+ */
+export type ArrFlatMapCallbackFn<T, R = T> = (value: T, index?: number, array?: ArrayLike<T>) => R | ReadonlyArray<R>;
+
+/**
  * Callback signature for {@link arrFrom} mapFn that is called for every element of array. Each time mapFn
  * executes, the returned value is added to newArray.
  *

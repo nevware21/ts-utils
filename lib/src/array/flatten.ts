@@ -29,6 +29,13 @@ function _addItems(result: any[], arr: any, d: number): void {
 /**
  * The arrFlatten() method returns a new array with all sub-array elements flattened
  * up to the specified depth (default 1).
+ *
+ * Use this helper when the input already contains nested arrays and you only need to
+ * control how deeply to flatten. Flattening is depth-based and only applies to values
+ * that are arrays; non-array values are copied into the output unchanged.
+ *
+ * For map-then-flatten workflows, use `arrFlatMap()` which always flattens mapped
+ * results by exactly one level.
  * @function
  * @since 0.14.0
  * @group Array
