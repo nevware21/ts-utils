@@ -7,6 +7,7 @@ This document tracks suggested additions for `@nevware21/ts-utils`.
 - Request: Identify what additions could be added to ts-utils
 - Requested by: Maintainer discussion
 - Priority: High
+- Target Version: 0.14.0
 - Scope: Array, object, string, iterator, typing, and documentation improvements
 
 ### Objective
@@ -48,17 +49,7 @@ Notes:
 - Iterator helpers are intentionally listed as utility suggestions here rather than standard-language mappings.
 - Implementations should include ES5 polyfills where applicable for v0.x/v1.x compatibility
 
-### A. Typing Improvements (High Value)
-
-- `ReadonlyRecord<K, V>` helper type alias for API ergonomics
-- `DeepPartial<T>` utility type
-- `DeepReadonly<T>` utility type
-- `Mutable<T>` utility type for controlled writable transformations
-- `DeepRequired<T>` utility type for normalized configuration and defaults handling
-- `ValueOf<T>` helper type for extracting union values from object maps
-- `NonEmptyArray<T>` helper type for APIs that require at least one entry
-
-### B. Object Utilities (Medium Value)
+### A. Object Utilities (Medium Value)
 
 - `objPick` / `objOmit`
 - `objMapValues`
@@ -72,7 +63,7 @@ Notes:
 - maintain plain-object safety patterns
 - avoid behavior changes to existing deep copy helpers
 
-### C. String Utilities (Medium Value)
+### B. String Utilities (Medium Value)
 
 - `strStartsWithAny` / `strEndsWithAny`
 - `strWrap` / `strUnwrap`
@@ -83,7 +74,7 @@ Notes:
 - prefer helpers that avoid locale-sensitive behavior unless explicitly documented
 - keep semantics predictable for ES5 runtimes and string coercion patterns
 
-### D. Iterator and Collection Helpers (Medium Value)
+### C. Iterator and Collection Helpers (Medium Value)
 
 - `iterMap`, `iterFilter`, `iterTake` – Iterator transformation helpers
 - `iterReduce`, `iterSome`, `iterEvery` – Iterator reduction/testing
@@ -91,7 +82,7 @@ Notes:
 - `arrToMap` helpers with stable key selection
 - lightweight set operations for iterables
 
-### E. Reliability and Tooling (High Value)
+### D. Reliability and Tooling (High Value)
 
 - keep bundle-size thresholds justified with measured report
 - require test parity for polyfill vs native behavior
@@ -99,15 +90,6 @@ Notes:
 - add targeted coverage checks for newly introduced leaf utilities
 - document explicit null / undefined coercion or throw behavior for new helpers
 
-## Acceptance Criteria for this Request
-
-- [x] Identify additions by category
-- [x] Prioritize additions by value and fit
-- [ ] Create follow-up issue list for proposed items
-- [ ] Add ownership and target milestone per item
-
 ## Next Actions
 
-1. Open GitHub issues for sections A-D candidates.
-2. Add milestone tags for upcoming releases.
-3. Keep this document focused on proposed additions only.
+1. Keep this document focused on proposed additions only.

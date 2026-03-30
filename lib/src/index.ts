@@ -80,6 +80,7 @@ export { safe, ISafeReturn, SafeReturnType } from "./helpers/safe";
 export { safeGet } from "./helpers/safe_get";
 export { safeGetLazy, safeGetWritableLazy, safeGetDeferred, safeGetWritableDeferred } from "./helpers/safe_lazy";
 export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";
+export { ReadonlyRecord, DeepPartial, DeepReadonly, Mutable, DeepRequired, ValueOf, NonEmptyArray } from "./helpers/types";
 export { hasValue } from "./helpers/value";
 export { createArrayIterator } from "./iterator/array";
 export { CreateIteratorContext, createIterator, createIterable, createIterableIterator, makeIterable } from "./iterator/create";

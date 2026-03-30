@@ -16,10 +16,18 @@ let _defaultIdleTimeout = 100;
 let _maxExecutionTime = 50;
 
 /**
- * Type that represents the global `requestIdleCallback` function, which can be used to
- * schedule work when there is free time in the event loop. Defined as a type alias for
- * easier reference and to support older TypeScript versions.
+ * Type alias for the global `requestIdleCallback` function, which schedules a callback to
+ * be invoked during the browser's idle periods. Using a type alias makes it easier to
+ * reference and annotate the function, and supports older TypeScript versions that may not
+ * include the global declaration.
+ *
+ * Prefer using {@link scheduleIdleCallback} over calling `requestIdleCallback` directly,
+ * as it provides a cross-environment fallback and returns a cancellable {@link ITimerHandler}.
+ * Use this type (via {@link getIdleCallback}) only when you need the raw browser API.
  * @since 0.11.2
+ * @group Timer
+ * @group Idle
+ * @group Environment
  * @param callback - A callback function that should be called in the near future, when
  * the event loop is idle. The callback function is passed an [IdleDeadline](https://developer.mozilla.org/en-US/docs/Web/API/IdleDeadline)
  * object describing the amount of time available and whether or not the callback has
@@ -30,16 +38,74 @@ let _maxExecutionTime = 50;
  * if doing so risks causing a negative performance impact). timeout must be a positive value or it
  * is ignored.
  * @returns A handle which can be used to cancel the callback by passing it into the `cancelIdleCallback()` method.
+ * @example
+ * ```ts
+ * // Obtain the native function via the helper (returns null when unavailable)
+ * const reqIdle: RequestIdleCallback | null = getIdleCallback();
+ *
+ * if (reqIdle) {
+ *     const handle = reqIdle((deadline) => {
+ *         while (deadline.timeRemaining() > 0) {
+ *             // perform low-priority background work
+ *         }
+ *     }, { timeout: 2000 });
+ *
+ *     // cancel later if needed
+ *     const cancelIdle = getCancelIdleCallback();
+ *     cancelIdle && cancelIdle(handle);
+ * }
+ * ```
+ * @example
+ * ```ts
+ * // Annotate a helper that wraps requestIdleCallback with a typed variable
+ * let _reqIdle: RequestIdleCallback | null = null;
+ *
+ * function getReqIdle(): RequestIdleCallback | null {
+ *     return _reqIdle || (_reqIdle = getIdleCallback());
+ * }
+ * ```
  */
 export type RequestIdleCallback = (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
 
 /**
- * Type that represents the global `cancelIdleCallback` function, which can be used to
- * cancel a previously scheduled idle callback. Defined as a type alias for easier reference
- * and to support older TypeScript versions.
+ * Type alias for the global `cancelIdleCallback` function, which cancels a previously
+ * scheduled idle callback. Using a type alias makes it easier to reference and annotate
+ * the function, and supports older TypeScript versions that may not include the global
+ * declaration.
+ *
+ * When using {@link scheduleIdleCallback} you can cancel the scheduled work through the
+ * returned {@link ITimerHandler} instead of calling `cancelIdleCallback` directly.
+ * Use this type (via {@link getCancelIdleCallback}) only when you need the raw browser API.
  * @since 0.11.2
- * @param handle - The handle returned by the `requestIdleCallback` function that identifies
- * the idle callback to cancel.
+ * @group Timer
+ * @group Idle
+ * @group Environment
+ * @param handle - The handle returned by `requestIdleCallback` that identifies the idle
+ * callback to cancel. Passing an invalid or already-consumed handle is a no-op.
+ * @example
+ * ```ts
+ * // Schedule then immediately cancel an idle callback
+ * const reqIdle  = getIdleCallback();
+ * const cancelIdle: CancelIdleCallback | null = getCancelIdleCallback();
+ *
+ * if (reqIdle && cancelIdle) {
+ *     const handle = reqIdle((deadline) => {
+ *         // background work
+ *     });
+ *
+ *     // cancel before the callback fires
+ *     cancelIdle(handle);
+ * }
+ * ```
+ * @example
+ * ```ts
+ * // Store a typed reference for later use
+ * let _cancelIdle: CancelIdleCallback | null = null;
+ *
+ * function ensureCancelIdle(): CancelIdleCallback | null {
+ *     return _cancelIdle || (_cancelIdle = getCancelIdleCallback());
+ * }
+ * ```
  */
 export type CancelIdleCallback = (handle: number) => void;
 

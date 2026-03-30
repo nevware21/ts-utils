@@ -6,6 +6,7 @@ This guide provides practical examples for using the @nevware21/ts-utils library
 - [Installation](#installation)
 - [Basic Usage](#basic-usage)
   - [Type Checking Functions](#type-checking-functions)
+  - [Type Utility Aliases](#type-utility-aliases)
   - [Array Operations](#array-operations)
   - [Object Manipulations](#object-manipulations)
   - [String Functions](#string-functions)
@@ -68,6 +69,40 @@ if (!isNullOrUndefined(value)) {
 if (isTruthy(value)) {
   // Value is not false, 0, "", null, undefined, etc.
 }
+```
+
+### Type Utility Aliases
+
+Type-only aliases help define stronger contracts for APIs and config models:
+
+```typescript
+import type {
+  DeepPartial,
+  DeepReadonly,
+  DeepRequired,
+  Mutable,
+  NonEmptyArray,
+  ReadonlyRecord,
+  ValueOf
+} from "@nevware21/ts-utils";
+
+type ThemeMap = ReadonlyRecord<"light" | "dark", { primary: string }>;
+type ThemeName = ValueOf<{ light: "light"; dark: "dark" }>;
+
+type User = {
+  readonly id: string;
+  profile?: {
+    email?: string;
+    tags?: string[];
+  };
+};
+
+type UserPatch = DeepPartial<User>;
+type FrozenUser = DeepReadonly<User>;
+type NormalizedUser = DeepRequired<User>;
+type WritableUser = Mutable<User>;
+
+const batch: NonEmptyArray<User> = [{ id: "u1" }];
 ```
 
 ### Array Operations
