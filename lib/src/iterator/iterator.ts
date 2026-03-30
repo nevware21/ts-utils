@@ -56,3 +56,25 @@ export function isIterator<T = any>(value: any): value is Iterator<T> {
 export function isIterable<T = any>(value: any): value is Iterable<T> {
     return !isStrictNullOrUndefined(value) && isFunction(value[getKnownSymbol(WellKnownSymbols.iterator)]);
 }
+
+/**
+ * Checks if the value looks like it is async iterable, contains a [symbol.asyncIterator].
+ *
+ * @since 0.14.0
+ * @group Type Identity
+ * @group Iterator
+ * @typeParam T - Identifies the return type of the async iterator
+ * @param value - The value to be checked
+ * @returns True if the value is an AsyncIterable, otherwise false
+ * @example
+ * ```ts
+ * isAsyncIterable(null);        // false
+ * isAsyncIterable(undefined);   // false
+ * isAsyncIterable("null");      // false
+ * isAsyncIterable([]);          // false
+ * ```
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function isAsyncIterable<T = any>(value: any): value is AsyncIterable<T> {
+    return !isStrictNullOrUndefined(value) && isFunction(value[getKnownSymbol(WellKnownSymbols.asyncIterator)]);
+}

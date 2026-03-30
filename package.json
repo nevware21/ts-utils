@@ -210,7 +210,7 @@
     },
     "devDependencies": {
         "@istanbuljs/nyc-config-typescript": "^1.0.2",
-        "@microsoft/api-extractor": "^7.34.4",
+        "@microsoft/api-extractor": "^7.57.7",
         "@nevware21/coverage-tools": ">= 0.1.4 < 2.x",
         "@nevware21/grunt-eslint-ts": "^0.5.1",
         "@nevware21/grunt-ts-plugin": "^0.5.1",
@@ -257,7 +257,7 @@
         "size-limit": "^12.0.0",
         "ts-mocha": "^11.1.0",
         "tslib": "^2.6.0",
-        "typedoc": "^0.28.2",
+        "typedoc": "^0.28.18",
         "typedoc-github-theme": "^0.4.0",
         "typescript": "~5.2.2",
         "uglify-js": "^3.15.5"

@@ -40,6 +40,7 @@ If you find this library useful, please consider [sponsoring @nevware21](https:/
 - Zero dependencies
 - Cross-environment compatibility (Browser, Node.js, Web Workers)
 - Extensive type checking utilities
+- ESNext-aware inspection helpers for async iterables and integer range validation (for example isAsyncIterable() and isIntegerInRange())
 - Modern ECMAScript features with backward compatibility
 - Polyfill support for older environments
 

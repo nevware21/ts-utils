@@ -7,7 +7,7 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
-import { isFiniteNumber, isInteger, _polyNumberIsInteger, getIntValue } from "../../../../src/helpers/number";
+import { isFiniteNumber, isInteger, isIntegerInRange, _polyNumberIsInteger, getIntValue } from "../../../../src/helpers/number";
 
 describe("number helpers", () => {
     describe("getIntValue", () => {
@@ -76,6 +76,33 @@ describe("number helpers", () => {
             assert.equal(isInteger(NaN), false, "Should return false for NaN");
             assert.equal(isInteger(Infinity), false, "Should return false for Infinity");
             assert.equal(isInteger(-Infinity), false, "Should return false for -Infinity");
+        });
+    });
+
+    describe("isIntegerInRange", () => {
+        it("should return true for integers within inclusive bounds", () => {
+            assert.equal(isIntegerInRange(0, 0, 10), true, "Should include min bound");
+            assert.equal(isIntegerInRange(10, 0, 10), true, "Should include max bound");
+            assert.equal(isIntegerInRange(5, 0, 10), true, "Should include middle values");
+            assert.equal(isIntegerInRange(-5, -10, -1), true, "Should support negative ranges");
+        });
+
+        it("should return false for values outside the range", () => {
+            assert.equal(isIntegerInRange(-1, 0, 10), false, "Should fail below min");
+            assert.equal(isIntegerInRange(11, 0, 10), false, "Should fail above max");
+        });
+
+        it("should return false for non-integer values", () => {
+            assert.equal(isIntegerInRange(3.14, 0, 10), false, "Should fail non-integer value");
+            assert.equal(isIntegerInRange("5" as any, 0, 10), false, "Should fail string value");
+            assert.equal(isIntegerInRange(NaN, 0, 10), false, "Should fail NaN");
+            assert.equal(isIntegerInRange(Infinity, 0, 10), false, "Should fail Infinity");
+        });
+
+        it("should return false for invalid range bounds", () => {
+            assert.equal(isIntegerInRange(5, 10, 0), false, "Should fail when min > max");
+            assert.equal(isIntegerInRange(5, 0.1, 10), false, "Should fail non-integer min");
+            assert.equal(isIntegerInRange(5, 0, 10.1), false, "Should fail non-integer max");
         });
     });
 
