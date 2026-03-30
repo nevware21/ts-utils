@@ -124,8 +124,8 @@ export type Mutable<T> = {
  * ```
  */
 export type DeepRequired<T> = T extends Function ? T :
-    T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepRequired<U>> :
-    T extends object ? { [P in keyof T]-?: DeepRequired<T[P]> } : T;
+    T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepRequired<NonNullable<U>>> :
+    T extends object ? { [P in keyof T]-?: DeepRequired<NonNullable<T[P]>> } : NonNullable<T>;
 
 /**
  * Creates a union of all property values of a type.

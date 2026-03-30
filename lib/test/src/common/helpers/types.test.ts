@@ -38,7 +38,7 @@ describe("typing helper aliases", () => {
 
         type DeepPartialExample = DeepPartial<ExampleType>;
         type _deepPartialCheck = AssertTrue<IsEqual<DeepPartialExample["profile"], {
-            tags?: ReadonlyArray<string | undefined> | undefined;
+            tags?: ReadonlyArray<string> | undefined;
             contact?: {
                 email?: string | undefined;
             } | undefined;
