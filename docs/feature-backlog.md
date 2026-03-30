@@ -21,26 +21,13 @@ Identify practical, minification-friendly, cross-environment additions that fit 
 
 ## Suggested Additions (Proposed Only)
 
-### Language-Native Suggestions (with ECMAScript Version)
-
-#### String Methods (ES6+)
-(All major String methods currently implemented)
-
-#### Array Methods (ES6+)
-(All major Array methods currently implemented)
-
-#### Object Utilities (ES6+)
-(All major Object utilities currently implemented)
+### Additional Language-Native Suggestions (with ECMAScript Version)
 
 #### Set/Map Utilities (ES6+ Data Structures)
 - `setFrom` – Safe Set construction from iterables
 - `mapFrom` – Safe Map construction from key-value pairs
 - `setIntersection` / `setUnion` / `setDifference` – Set algebra helpers
 - `mapMerge` – Map concatenation helper
-
-#### Type/Value Inspection (ES6+)
-- `isAsyncIterable` – ES6+ type checks
-- `isIntegerInRange` – Safe integer range validation
 
 Notes:
 

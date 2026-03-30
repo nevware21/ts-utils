@@ -63,6 +63,29 @@ export function getIntValue(value?: string | number, defValue?: number): number 
 export const isInteger: (value: unknown) => value is number = (/* #__PURE__*/_pureAssign((/* #__PURE__*/_pureRef<(value: unknown) => value is number>(NumberCls as any, "isInteger")), _polyNumberIsInteger));
 
 /**
+ * Checks if a value is an integer and within the provided inclusive range.
+ * @function
+ * @since 0.14.0
+ * @group Type Identity
+ * @group Number
+ * @param value - The value to check
+ * @param min - The minimum inclusive integer value
+ * @param max - The maximum inclusive integer value
+ * @returns True if the value is an integer and min <= value <= max, false otherwise
+ * @example
+ * ```ts
+ * isIntegerInRange(5, 0, 10);      // true
+ * isIntegerInRange(10, 0, 10);     // true
+ * isIntegerInRange(11, 0, 10);     // false
+ * isIntegerInRange(3.14, 0, 10);   // false
+ * ```
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function isIntegerInRange(value: unknown, min: number, max: number): value is number {
+    return isInteger(value) && isInteger(min) && isInteger(max) && min <= max && value >= min && value <= max;
+}
+
+/**
  * A polyfill implementation of Number.isInteger that checks if a value is an integer.
  * @internal
  * @group Polyfill
