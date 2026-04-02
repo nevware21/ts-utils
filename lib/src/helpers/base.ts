@@ -210,12 +210,12 @@ export function isNullOrUndefined(value:  any): boolean {
 }
 
 /**
- * Checks if the provided value is null, undefined only, a string value of "undefined" is NOT considered
- * to be undefined.
+ * Checks if the provided value is strictly `null` or `undefined`. A string value of `"undefined"` is NOT
+ * considered to be undefined. When this function returns `true`, TypeScript narrows the type to `null | undefined`.
  * @group Type Identity
  * @group Value Check
  * @param value - The value to check
- * @returns
+ * @returns `true` if the value is strictly `null` or `undefined`, narrowing the type to `null | undefined`.
  * @example
  * ```ts
  * isStrictNullOrUndefined(null);         // true
@@ -235,16 +235,19 @@ export function isNullOrUndefined(value:  any): boolean {
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function isStrictNullOrUndefined(value: any): boolean {
+export function isStrictNullOrUndefined(value: any): value is null | undefined {
     return value === NULL_VALUE || value === UNDEF_VALUE;
 }
 
 /**
- * Checks if the passed value is defined, which means it has any value and is not undefined.
- * A string value of "undefined" is considered to be defined.
+ * Checks if the passed value is defined, which means it is not strictly `undefined` (and not `null`).
+ * A string value of `"undefined"` is considered to be defined. When this returns `true`, TypeScript narrows
+ * the type to `Exclude<T, undefined>`, removing `undefined` from the type.
+ * @group Type Identity
  * @group Value Check
+ * @typeParam T - The expected type of the value when it is defined.
  * @param arg - The value to check
- * @returns true if arg has a value (is not === undefined)
+ * @returns `true` if the value is defined (not `null` and not `undefined`), narrowing the type to `Exclude<T, undefined>`.
  * @example
  * ```ts
  * isDefined(null);         // false
@@ -264,7 +267,7 @@ export function isStrictNullOrUndefined(value: any): boolean {
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function isDefined(arg: any): boolean {
+export function isDefined<T>(arg: any): arg is Exclude<T, undefined> {
     return !!arg || arg !== UNDEF_VALUE;
 }
 
