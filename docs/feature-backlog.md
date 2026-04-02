@@ -50,18 +50,7 @@ Notes:
 - maintain plain-object safety patterns
 - avoid behavior changes to existing deep copy helpers
 
-### B. String Utilities (Medium Value)
-
-- `strStartsWithAny` / `strEndsWithAny`
-- `strWrap` / `strUnwrap`
-- `strNormalizeNewlines`
-
-Notes:
-
-- prefer helpers that avoid locale-sensitive behavior unless explicitly documented
-- keep semantics predictable for ES5 runtimes and string coercion patterns
-
-### C. Iterator and Collection Helpers (Medium Value)
+### B. Iterator and Collection Helpers (Medium Value)
 
 - `iterMap`, `iterFilter`, `iterTake` – Iterator transformation helpers
 - `iterReduce`, `iterSome`, `iterEvery` – Iterator reduction/testing
@@ -69,7 +58,7 @@ Notes:
 - `arrToMap` helpers with stable key selection
 - lightweight set operations for iterables
 
-### D. Reliability and Tooling (High Value)
+### C. Reliability and Tooling (High Value)
 
 - keep bundle-size thresholds justified with measured report
 - require test parity for polyfill vs native behavior
