@@ -23,6 +23,10 @@
 - Improved performance of worker test execution
   - Optimized test runner for faster execution in web worker environments
 
+### Repository Improvements
+
+- [#548](https://github.com/nevware21/ts-utils/issues/548) Updated the CI Node.js matrix to remove Node.js 16 (EOL and no longer supported by dependencies requiring Node.js 18+) and add Node.js 24.
+
 # v0.12.6 Feb 2nd, 2026
 
 ## Changelog
