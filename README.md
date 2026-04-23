@@ -255,7 +255,7 @@ if (isBigInt(someValue)) {
 
 This library is thoroughly tested in:
 
-- Node.js (16, 18, 20, 22)
+- Node.js (18, 20, 22, 24)
 - Modern browsers (via Chromium headless)
 - Web Workers (via Chromium headless)
 
