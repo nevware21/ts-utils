@@ -238,7 +238,7 @@
         "eslint-formatter-codeframe": "^7.32.1",
         "eslint-plugin-security": "^1.5.0",
         "glob": "13.0.6",
-        "grunt": "^1.5.3",
+        "grunt": "^1.6.2",
         "grunt-cli": "^1.4.3",
         "karma": "^6.4.3",
         "karma-chrome-launcher": "^3.2.0",
