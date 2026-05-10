@@ -11,6 +11,24 @@ import * as fs from "fs";
 import { assert } from "@nevware21/tripwire-chai";
 
 describe("funding metadata references", () => {
+    function _hasGitHubSponsorLink(content: string): boolean {
+        let markdownLinkRegex = /\[[^\]]+\]\((https?:\/\/[^)]+)\)/g;
+        let match: RegExpExecArray | null;
+        while ((match = markdownLinkRegex.exec(content))) {
+            let linkUrl = match[1];
+            try {
+                let parsed = new URL(linkUrl);
+                if (parsed.hostname === "github.com" && parsed.pathname === "/sponsors/nevware21") {
+                    return true;
+                }
+            } catch (e) {
+                // Ignore invalid URLs while scanning links
+            }
+        }
+
+        return false;
+    }
+
     function _getFundingUrls(packageJson: any): string[] {
         let funding = packageJson && packageJson.funding;
         if (!funding) {
@@ -33,8 +51,8 @@ describe("funding metadata references", () => {
         ];
 
         expectedUrls.forEach((expectedUrl) => {
-            assert.equal(_getFundingUrls(rootPackage).indexOf(expectedUrl) !== -1, true, "Expected root package.json funding to contain " + expectedUrl);
-            assert.equal(_getFundingUrls(publishPackage).indexOf(expectedUrl) !== -1, true, "Expected lib/package.json funding to contain " + expectedUrl);
+            assert.equal(_getFundingUrls(rootPackage).includes(expectedUrl), true, "Expected root package.json funding to contain " + expectedUrl);
+            assert.equal(_getFundingUrls(publishPackage).includes(expectedUrl), true, "Expected lib/package.json funding to contain " + expectedUrl);
         });
     });
 
@@ -43,9 +61,9 @@ describe("funding metadata references", () => {
         let docsReadme = fs.readFileSync("docs/README.md", "utf8");
         let githubFunding = fs.readFileSync(".github/FUNDING.yml", "utf8");
 
-        assert.equal(readme.indexOf("https://github.com/sponsors/nevware21") !== -1, true, "Expected README.md sponsor link to exist");
-        assert.equal(docsReadme.indexOf("https://github.com/sponsors/nevware21") !== -1, true, "Expected docs/README.md sponsor link to exist");
-        assert.equal(githubFunding.indexOf("github: [nevware21]") !== -1, true, "Expected .github/FUNDING.yml GitHub Sponsors entry to exist");
-        assert.equal(githubFunding.indexOf("buy_me_a_coffee: nevware21") !== -1, true, "Expected .github/FUNDING.yml Buy Me a Coffee entry to exist");
+        assert.equal(_hasGitHubSponsorLink(readme), true, "Expected README.md sponsor link to exist");
+        assert.equal(_hasGitHubSponsorLink(docsReadme), true, "Expected docs/README.md sponsor link to exist");
+        assert.equal(githubFunding.includes("github: [nevware21]"), true, "Expected .github/FUNDING.yml GitHub Sponsors entry to exist");
+        assert.equal(githubFunding.includes("buy_me_a_coffee: nevware21"), true, "Expected .github/FUNDING.yml Buy Me a Coffee entry to exist");
     });
 });
