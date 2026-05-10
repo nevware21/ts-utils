@@ -164,6 +164,16 @@
     "bugs": {
         "url": "https://github.com/nevware21/ts-utils/issues"
     },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/nevware21"
+        },
+        {
+            "type": "other",
+            "url": "https://buymeacoffee.com/nevware21"
+        }
+    ],
     "licenses": [
         {
             "type": "MIT",
