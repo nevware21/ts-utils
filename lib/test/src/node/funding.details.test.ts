@@ -12,10 +12,10 @@ import { assert } from "@nevware21/tripwire-chai";
 
 describe("funding metadata references", () => {
     function _hasGitHubSponsorLink(content: string): boolean {
-        const markdownLinkRegex = /\[[^\]]+\]\((https?:\/\/[^)]+)\)/g;
+        let markdownLinkRegex = /\[[^\]]+\]\((https?:\/\/[^)]+)\)/g;
         let match: RegExpExecArray | null;
         while ((match = markdownLinkRegex.exec(content))) {
-            const linkUrl = match[1];
+            let linkUrl = match[1];
             try {
                 let parsed = new URL(linkUrl);
                 if (parsed.hostname === "github.com" && parsed.pathname === "/sponsors/nevware21") {
@@ -35,7 +35,7 @@ describe("funding metadata references", () => {
             return [];
         }
 
-        const fundingEntries = Array.isArray(funding) ? funding : [funding];
+        let fundingEntries = Array.isArray(funding) ? funding : [funding];
         return fundingEntries.map((entry) => {
             return typeof entry === "string" ? entry : entry && entry.url;
         }).filter((entry) => !!entry);
