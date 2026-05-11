@@ -279,6 +279,89 @@ When making changes:
 9. **Never remove or break existing public APIs** without major version bump
 10. **Security scan results** must be addressed before merging
 
+## Creating a Release PR
+
+When creating a release PR, follow these steps carefully:
+
+### PR Title
+The PR title **must** follow this format:
+```
+[Release] Increase version to <new-version>
+```
+For example: `[Release] Increase version to 0.14.0`
+
+### Files to Update
+
+#### 1. `package.json` (root)
+Update the `version` field to the new version number:
+```json
+{
+    "version": "<new-version>"
+}
+```
+
+#### 2. `lib/package.json`
+Update the `version` field to match the new version:
+```json
+{
+    "version": "<new-version>"
+}
+```
+
+#### 3. `README.md`
+Update the recommended version specification to reference the new version:
+```json
+"@nevware21/ts-utils": ">= <new-version> < 2.x"
+```
+
+#### 4. `CHANGELOG.md`
+Add a new version entry at the top of the file. Follow these rules:
+- Include only **significant changes** (features, bug fixes, breaking changes, notable repository improvements)
+- Omit minor dependency bumps or trivial commits unless they are notable
+- Include a link to the full changelist using the GitHub compare URL:
+  ```
+  [Full Changelog](https://github.com/nevware21/ts-utils/compare/v<previous-version>...v<new-version>)
+  ```
+- If there are any existing "Unreleased" sections already in the CHANGELOG.md, **include them as-is** and do not remove or merge them into the new version entry
+
+#### CHANGELOG.md Entry Format
+The date format should use the full month name followed by the day with ordinal suffix and the four-digit year (e.g., `February 26th, 2026`):
+```markdown
+# v<new-version> <Month> <ordinal-day>, <Year>
+
+## Changelog
+
+### Features
+
+- Description of new features
+
+### Bug Fixes
+
+- Description of bug fixes
+
+### Breaking Changes
+
+- Description of any breaking changes (if applicable)
+
+### Repository Improvements
+
+- Description of any significant repository/CI improvements (if applicable)
+
+[Full Changelog](https://github.com/nevware21/ts-utils/compare/v<previous-version>...v<new-version>)
+```
+
+For example: `# v0.14.0 May 15th, 2026`
+
+### Release Checklist
+Before submitting the release PR, verify:
+- [ ] PR title uses the `[Release] Increase version to <new-version>` format
+- [ ] `package.json` (root) version is updated
+- [ ] `lib/package.json` version is updated
+- [ ] `README.md` recommended version specification is updated
+- [ ] `CHANGELOG.md` has a new entry with significant changes only
+- [ ] `CHANGELOG.md` includes the full changelist link
+- [ ] Any existing "Unreleased" sections in `CHANGELOG.md` are preserved as-is
+
 ## Getting Help
 
 - Review existing similar functions for patterns
