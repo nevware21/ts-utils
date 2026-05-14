@@ -2,6 +2,13 @@
 
 ## Changelog
 
+### Bug Fixes
+
+- [#565](https://github.com/nevware21/ts-utils/issues/565) Fixed compilation errors for consumers using ES5-only TypeScript lib settings.
+  - Added `/// <reference lib="es2015" />` directive to the published `.d.ts` declaration file so that consumers with `"lib": ["ES5", "DOM"]` (or no explicit `lib`) can compile without "Cannot find name 'Symbol'" / "Cannot find name 'Iterator'" errors.
+  - The fix includes a post-processing step (`lib/scripts/setTsReferences.js`) that adds the reference directive to the api-extractor bundled output, since api-extractor strips `/// <reference lib="..." />` from its rollup.
+  - Also added `"lib": ["ES2015", "DOM"]` to the library build and test tsconfig files for consistent compile-time validation.
+
 ### Features
 
 - Added comprehensive encoding and decoding functions for multiple formats:

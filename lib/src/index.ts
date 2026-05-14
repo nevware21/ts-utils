@@ -6,6 +6,8 @@
  * Licensed under the MIT license.
  */
 
+/// <reference lib="es2015" />
+
 export { arrAppend } from "./array/append";
 export { ArrPredicateCallbackFn, ArrPredicateCallbackFn2, ArrMapCallbackFn, ArrFlatMapCallbackFn, ArrFromMapFn } from "./array/callbacks";
 export { arrAt } from "./array/at";
