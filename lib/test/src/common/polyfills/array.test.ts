@@ -143,6 +143,25 @@ describe("array polyfills", () => {
             assert.equal(polyArrFindIndex([4, 6, 7, 9, 12], isPrime), 2);
             assert.equal(called, 3);
         });
+
+        it("supports callback thisArg and defaults to the array", () => {
+            const values = [1, 2, 3];
+            const thisArg = { match: 2 };
+            let cbThis: any = null;
+
+            assert.equal(polyArrFindIndex(values, function(value) {
+                cbThis = this;
+                return value === this.match;
+            }, thisArg), 1);
+            assert.equal(cbThis, thisArg);
+
+            cbThis = null;
+            assert.equal(polyArrFindIndex(values, function(value) {
+                cbThis = this;
+                return value === 3;
+            }), 2);
+            assert.equal(cbThis, values);
+        });
     });
 
     describe("polyArrFindLast", () => {
@@ -227,6 +246,25 @@ describe("array polyfills", () => {
             called = 0;
             assert.equal(polyArrFindLastIndex([4, 6, 7, 9, 12], isPrime), 2);
             assert.equal(called, 3);
+        });
+
+        it("supports callback thisArg and defaults to the array", () => {
+            const values = [1, 2, 3];
+            const thisArg = { match: 2 };
+            let cbThis: any = null;
+
+            assert.equal(polyArrFindLastIndex(values, function(value) {
+                cbThis = this;
+                return value === this.match;
+            }, thisArg), 1);
+            assert.equal(cbThis, thisArg);
+
+            cbThis = null;
+            assert.equal(polyArrFindLastIndex(values, function(value) {
+                cbThis = this;
+                return value === 1;
+            }), 0);
+            assert.equal(cbThis, values);
         });
     });
 

@@ -158,7 +158,7 @@ export function polyArrFind<T, E extends T>(theArray: ArrayLike<T>, callbackFn: 
 export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
     let result = -1;
     arrForEach(theArray, (value, index) => {
-        if (callbackFn[CALL](thisArg | theArray as any, value, index, theArray)) {
+        if (callbackFn[CALL](thisArg || theArray as any, value, index, theArray)) {
             result = index;
             return -1;
         }
@@ -272,7 +272,7 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
     let result = -1;
     let len = theArray[LENGTH] >>> 0;
     for (let idx = len - 1; idx >= 0; idx--) {
-        if (idx in theArray && callbackFn[CALL](thisArg | theArray as any, theArray[idx], idx, theArray)) {
+        if (idx in theArray && callbackFn[CALL](thisArg || theArray as any, theArray[idx], idx, theArray)) {
             result = idx;
             break;
         }
