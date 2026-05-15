@@ -185,7 +185,7 @@
         "prep-release": "npm run cleanBuild && npm run npm-pack",
         "npm-pack": "copyfiles README.md LICENSE lib && cd lib && npm pack",
         "npm-publish": "publish-npm",
-        "dtsgen": "api-extractor run --local --verbose",
+        "dtsgen": "api-extractor run --local --verbose && node lib/scripts/setTsReferences.js",
         "size": "size-limit",
         "size-save": "size-limit --clean-dir --save-bundle build/size",
         "size-check": "node lib/test/bundle-size-check.js",

@@ -6,6 +6,7 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "target": "ESNext",
+        "lib": ["ESNext", "DOM"],
         "forceConsistentCasingInFileNames": true,
         "importHelpers": true,
         "noEmitHelpers": false,

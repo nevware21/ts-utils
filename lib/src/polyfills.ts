@@ -6,6 +6,8 @@
  * Licensed under the MIT license.
  */
 
+/// <reference lib="es2015" />
+
 import { arrForEach } from "./array/forEach";
 import { ArrCls, ArrProto, ObjClass, StrProto } from "./internal/constants";
 import { polyIsArray, polyArrIncludes, polyArrFind, polyArrFindIndex, polyArrFindLastIndex, polyArrFindLast, polyArrFrom } from "./polyfills/array";
