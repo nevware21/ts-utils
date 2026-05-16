@@ -8,8 +8,9 @@
 
 import { arrForEach } from "../array/forEach";
 import { isArray, isDate, isNullOrUndefined, isPrimitiveType } from "../helpers/base";
-import { CALL, FUNCTION, NULL_VALUE, OBJECT } from "../internal/constants";
+import { __PROTO__, CALL, CONSTRUCTOR, FUNCTION, NULL_VALUE, OBJECT, PROTOTYPE } from "../internal/constants";
 import { objDefine } from "./define";
+import { objHasOwnProperty } from "./has_own_prop";
 import { isPlainObject } from "./is_plain_object";
 
 /**
@@ -184,10 +185,11 @@ function _deepCopy<T>(visitMap: _RecursiveVisitMap[], value: T, ctx: _DeepCopyCo
  */
 function _copyProps<T>(visitMap: _RecursiveVisitMap[], target: T, source: T, ctx: _DeepCopyContext) {
     if (!isNullOrUndefined(source)) {
-        // Copy all properties (not just own properties)
         for (const key in source) {
-            // Perform a deep copy of the object
-            target[key] = _deepCopy(visitMap, source[key], ctx, key);
+            // Only copy own properties and skip dangerous keys to prevent prototype pollution
+            if (objHasOwnProperty(source, key) && key !== __PROTO__ && key !== CONSTRUCTOR && key !== PROTOTYPE) {
+                target[key] = _deepCopy(visitMap, source[key], ctx, key);
+            }
         }
     }
 
