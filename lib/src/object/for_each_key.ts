@@ -14,6 +14,11 @@ import { objHasOwn } from "./has_own";
  * Calls the provided `callbackFn` function once for each key in an object. This is equivelent to `arrForEach(Object.keys(theObject), callbackFn)` or
  * if not using the array helper `Object.keys(theObject).forEach(callbackFn)` except that this helper avoid creating a temporary of the object
  * keys before iterating over them and like the `arrForEach` helper you CAN stop or break the iteration by returning -1 from the `callbackFn` function.
+ *
+ * Caution: this helper does not filter unsafe keys like `__proto__`, `constructor`, or `prototype`.
+ * If your callback uses the returned key to assign directly to another object (for example
+ * `target[key] = value`), validate keys first (for example with {@link isUnsafePropKey}) or
+ * use {@link forEachOwnKeySafe} when iterating untrusted input.
  * @group Object
  * @typeParam T - The object type
  * @param callbackfn - A function that accepts up to two arguments, the key name and the current value of the property represented by the key.
@@ -37,7 +42,7 @@ export function objForEachKey<T>(theObject: T, callbackfn: (key: string, value: 
     if (theObject && (isObject(theObject) || isFunction(theObject))) {
         for (const prop in theObject) {
             if (objHasOwn(theObject, prop)) {
-                if (callbackfn[CALL](thisArg || theObject, prop, theObject[prop]) === -1) {
+                if (callbackfn[CALL](thisArg || theObject, prop, theObject[prop as keyof T]) === -1) {
                     break;
                 }
             }

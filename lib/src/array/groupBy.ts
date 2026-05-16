@@ -7,7 +7,9 @@
  */
 
 import { isArrayLike, isFunction } from "../helpers/base";
+import { objDefine } from "../object/define";
 import { objHasOwn } from "../object/has_own";
+import { isUnsafePropKey } from "../object/isUnsafePropKey";
 import { asString } from "../string/as_string";
 import { isSymbol } from "../symbol/symbol";
 import { arrForEach } from "./forEach";
@@ -104,7 +106,11 @@ export function arrGroupBy<T>(
             const theKey = isSymbol(keyVal) ? keyVal : asString(keyVal);
            
             if (!objHasOwn(result, theKey)) {
-                result[theKey] = [];
+                if (isUnsafePropKey(theKey)) {
+                    objDefine(result, theKey, { v: [] });
+                } else {
+                    result[theKey] = [];
+                }
             }
 
             result[theKey].push(item);

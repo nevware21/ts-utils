@@ -10,7 +10,9 @@ import { arrForEach } from "../array/forEach";
 import { isArray, isDate, isNullOrUndefined, isPrimitiveType } from "../helpers/base";
 import { CALL, FUNCTION, NULL_VALUE, OBJECT } from "../internal/constants";
 import { objDefine } from "./define";
+import { forEachOwnKeySafe } from "./forEachOwnKeySafe";
 import { isPlainObject } from "./is_plain_object";
+import { isUnsafeTarget } from "./isUnsafeTarget";
 
 /**
  * @internal
@@ -157,7 +159,7 @@ function _deepCopy<T>(visitMap: _RecursiveVisitMap[], value: T, ctx: _DeepCopyCo
             });
 
             let idx = 0;
-            let handler = userHandler;
+            let handler: ObjDeepCopyHandler | null = userHandler;
             while (!(handler || (idx < defaultDeepCopyHandlers.length ? defaultDeepCopyHandlers[idx++] : _defaultDeepCopyHandler))[CALL](ctx, details)) {
                 handler = NULL_VALUE;
             }
@@ -183,12 +185,11 @@ function _deepCopy<T>(visitMap: _RecursiveVisitMap[], value: T, ctx: _DeepCopyCo
  * @returns The populated target object
  */
 function _copyProps<T>(visitMap: _RecursiveVisitMap[], target: T, source: T, ctx: _DeepCopyContext) {
-    if (!isNullOrUndefined(source)) {
-        // Copy all properties (not just own properties)
-        for (const key in source) {
-            // Perform a deep copy of the object
-            target[key] = _deepCopy(visitMap, source[key], ctx, key);
-        }
+    if (!isUnsafeTarget(source)) {
+        // Copy own enumerable properties while skipping special object poisoning keys.
+        forEachOwnKeySafe(source, (key, value) => {
+            (target as any)[key] = _deepCopy(visitMap, value, ctx, key);
+        });
     }
 
     return target;

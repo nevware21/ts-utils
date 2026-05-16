@@ -334,6 +334,17 @@ describe("object polyfills", () => {
             assert.equal(result["2"], "third");
         });
 
+        it("should treat __proto__ as a normal own property", () => {
+            const protoValue = { safe: true };
+            const result = polyObjFromEntries([["__proto__", protoValue], ["a", 1]]);
+
+            assert.isTrue(Object.prototype.hasOwnProperty.call(result, "__proto__"), "__proto__ should be an own property");
+            assert.strictEqual(result["__proto__"], protoValue, "__proto__ value should be preserved");
+            assert.strictEqual(Object.getPrototypeOf(result), Object.prototype, "Result prototype should remain Object.prototype");
+            assert.isUndefined(({} as any).safe, "Global Object prototype must not be polluted");
+            assert.equal(result.a, 1);
+        });
+
         // Test equivalence between the two implementations
         describe("polyfill equivalence", () => {
             it("objFromEntries and polyObjFromEntries should be equivalent for valid inputs", () => {

@@ -9,6 +9,7 @@
 import { assert } from "@nevware21/tripwire-chai";
 import { getValueByIter, getValueByKey, setValueByIter, setValueByKey } from "../../../../src/helpers/get_set_value";
 import { encodeAsJson } from "../../../../src/helpers/encode";
+import { isNullOrUndefined } from "../../../../src/helpers/base";
 
 describe("getValueByKey", () => {
     it("null/undefined", () => {
@@ -68,6 +69,85 @@ describe("setValueByKey", () => {
         setValueByKey(theValue, "come.to.see", "again");
         assert.equal(encodeAsJson(theValue),
             "{\"Hello\":{\"Darkness\":{\"my\":\"old\"}},\"friend\":\"I've\",\"come\":{\"to\":{\"see\":\"again\"}}}");
+    });
+
+    it("should ignore unsafe path keys", () => {
+        let theValue = {} as any;
+        let prevPolluted = (Object.prototype as any).polluted;
+
+        try {
+            delete (Object.prototype as any).polluted;
+
+            setValueByKey(theValue, "__proto__.polluted", "bad");
+            setValueByKey(theValue, "constructor.prototype.polluted", "bad");
+            setValueByKey(theValue, "safe.prototype", "bad");
+
+            assert.isUndefined((Object.prototype as any).polluted, "Object prototype should not be polluted");
+            assert.isUndefined(theValue.safe, "Unsafe paths should not create intermediate objects");
+            assert.equal(encodeAsJson(theValue), "{}");
+        } finally {
+            if (isNullOrUndefined(prevPolluted)) {
+                delete (Object.prototype as any).polluted;
+            } else {
+                (Object.prototype as any).polluted = prevPolluted;
+            }
+        }
+    });
+
+    it("should rollback a created intermediate key when the path becomes unsafe", () => {
+        let theValue = {
+            keep: {
+                existing: true
+            }
+        } as any;
+
+        setValueByKey(theValue, "keep.safe.prototype", "bad");
+
+        assert.deepEqual(theValue, {
+            keep: {
+                existing: true
+            }
+        }, "The created intermediate key should be removed when the path is rejected");
+        assert.isUndefined(theValue.keep.safe, "The unsafe intermediate should not remain on the target");
+    });
+
+    it("should not write through unsafe prototype targets", () => {
+        let propName = "__ts_utils_polluted_key__";
+        let theValue = {
+            objectProto: Object.prototype,
+            functionProto: Function.prototype,
+            arrayProto: Array.prototype,
+            dateProto: Date.prototype,
+            errorProto: Error.prototype
+        } as any;
+        let targets = [
+            theValue.objectProto,
+            theValue.functionProto,
+            theValue.arrayProto,
+            theValue.dateProto,
+            theValue.errorProto
+        ];
+
+        try {
+            for (let lp = 0; lp < targets.length; lp++) {
+                delete targets[lp][propName];
+            }
+
+            setValueByKey(theValue, "objectProto." + propName, "bad");
+            setValueByKey(theValue, "functionProto." + propName, "bad");
+            setValueByKey(theValue, "arrayProto." + propName, "bad");
+            setValueByKey(theValue, "dateProto." + propName, "bad");
+            setValueByKey(theValue, "errorProto." + propName, "bad");
+
+            for (let lp = 0; lp < targets.length; lp++) {
+                assert.isUndefined(targets[lp][propName], "Unsafe prototype target should not be polluted");
+                assert.isFalse(Object.prototype.hasOwnProperty.call(targets[lp], propName), "Unsafe prototype target should not gain an own property");
+            }
+        } finally {
+            for (let lp = 0; lp < targets.length; lp++) {
+                delete targets[lp][propName];
+            }
+        }
     });
 });
 
@@ -129,5 +209,84 @@ describe("setValueByIter", () => {
         setValueByIter(theValue, ["come", "to", "see"], "again");
         assert.equal(encodeAsJson(theValue),
             "{\"Hello\":{\"Darkness\":{\"my\":\"old\"}},\"friend\":\"I've\",\"come\":{\"to\":{\"see\":\"again\"}}}");
+    });
+
+    it("should ignore unsafe iterator keys", () => {
+        let theValue = {} as any;
+        let prevPolluted = (Object.prototype as any).polluted;
+
+        try {
+            delete (Object.prototype as any).polluted;
+
+            setValueByIter(theValue, ["__proto__", "polluted"], "bad");
+            setValueByIter(theValue, ["constructor", "prototype", "polluted"], "bad");
+            setValueByIter(theValue, ["safe", "prototype"], "bad");
+
+            assert.isUndefined((Object.prototype as any).polluted, "Object prototype should not be polluted");
+            assert.isUndefined(theValue.safe, "Unsafe paths should not create intermediate objects");
+            assert.equal(encodeAsJson(theValue), "{}");
+        } finally {
+            if (isNullOrUndefined(prevPolluted)) {
+                delete (Object.prototype as any).polluted;
+            } else {
+                (Object.prototype as any).polluted = prevPolluted;
+            }
+        }
+    });
+
+    it("should rollback a created intermediate key when the iterator path becomes unsafe", () => {
+        let theValue = {
+            keep: {
+                existing: true
+            }
+        } as any;
+
+        setValueByIter(theValue, ["keep", "safe", "prototype"], "bad");
+
+        assert.deepEqual(theValue, {
+            keep: {
+                existing: true
+            }
+        }, "The created intermediate key should be removed when the iterator path is rejected");
+        assert.isUndefined(theValue.keep.safe, "The unsafe intermediate should not remain on the target");
+    });
+
+    it("should not write through unsafe prototype targets", () => {
+        let propName = "__ts_utils_polluted_iter__";
+        let theValue = {
+            objectProto: Object.prototype,
+            functionProto: Function.prototype,
+            arrayProto: Array.prototype,
+            dateProto: Date.prototype,
+            errorProto: Error.prototype
+        } as any;
+        let targets = [
+            theValue.objectProto,
+            theValue.functionProto,
+            theValue.arrayProto,
+            theValue.dateProto,
+            theValue.errorProto
+        ];
+
+        try {
+            for (let lp = 0; lp < targets.length; lp++) {
+                delete targets[lp][propName];
+            }
+
+            setValueByIter(theValue, ["objectProto", propName], "bad");
+            setValueByIter(theValue, ["functionProto", propName], "bad");
+            setValueByIter(theValue, ["arrayProto", propName], "bad");
+            setValueByIter(theValue, ["dateProto", propName], "bad");
+            setValueByIter(theValue, ["errorProto", propName], "bad");
+
+            for (let lp = 0; lp < targets.length; lp++) {
+                assert.isUndefined(targets[lp][propName], "Unsafe prototype target should not be polluted");
+                assert.isFalse(Object.prototype.hasOwnProperty.call(targets[lp], propName), "Unsafe prototype target should not gain an own property");
+            }
+        } finally {
+            for (let lp = 0; lp < targets.length; lp++) {
+                delete targets[lp][propName];
+            }
+        }
     });
 });

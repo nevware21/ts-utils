@@ -28,6 +28,7 @@ If you find this library useful, please consider [sponsoring @nevware21](https:/
 
 ### Advanced Topics
 - **[Advanced Deep Copy Functionality](./advanced-deep-copy.md)** - Using custom handlers with deep copy operations
+- **[Security Helpers](./security-helpers.md)** - Preventing prototype pollution during object copy and merge operations
 - **[Performance and Minification Benefits](./usage-guide.md#performance-and-minification-benefits)** - Understanding how the library optimizes for performance
 - **[Timeout Overrides](./timeout-overrides.md)** - Using Timeout overrides for custom scheduling behavior
 - **[Bundle Size Optimization](./size-optimization.md)** - Detailed byte-level measurements and strategies for reducing bundle size

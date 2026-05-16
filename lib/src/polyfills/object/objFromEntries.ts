@@ -8,6 +8,7 @@
 
 import { arrForEach } from "../../array/forEach";
 import { isArray } from "../../helpers/base";
+import { __PROTO__ } from "../../internal/constants";
 import { iterForOf } from "../../iterator/forOf";
 import { isIterable } from "../../iterator/iterator";
 
@@ -25,10 +26,23 @@ export function polyObjFromEntries<T = any>(entries: Iterable<readonly [Property
 export function polyObjFromEntries(entries: Iterable<readonly any[]>): any;
 export function polyObjFromEntries<T = any>(entries: any): T {
     const result = {} as any;
+
+    function _defineProtoValue(value: any) {
+        Object.defineProperty(result, __PROTO__, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    }
     
     function addEntry(entry: any) {
         if (isArray(entry) && entry.length >= 2) {
-            result[entry[0]] = entry[1];
+            if (entry[0] === __PROTO__) {
+                _defineProtoValue(entry[1]);
+            } else {
+                result[entry[0]] = entry[1];
+            }
         }
     }
     
