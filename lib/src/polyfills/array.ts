@@ -158,7 +158,7 @@ export function polyArrFind<T, E extends T>(theArray: ArrayLike<T>, callbackFn: 
 export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
     let result = -1;
     arrForEach(theArray, (value, index) => {
-        if (callbackFn[CALL](thisArg || theArray as any, value, index, theArray)) {
+        if (callbackFn[CALL](isNullOrUndefined(thisArg) ? theArray as any : thisArg, value, index, theArray)) {
             result = index;
             return -1;
         }
