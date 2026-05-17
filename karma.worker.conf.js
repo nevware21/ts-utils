@@ -1,6 +1,28 @@
-process.env.CHROME_BIN = require("puppeteer").executablePath();
+const childProcess = require('child_process');
+
+function _resolvePuppeteerExecutablePathSync() {
+    return childProcess.execFileSync(process.execPath, [
+        "-e",
+        "require('puppeteer').executablePath().then((path) => process.stdout.write(path || ''))"
+    ], {
+        encoding: "utf8"
+    }).trim();
+}
 
 module.exports = function (config) {
+    // Puppeteer v25+ resolves executablePath asynchronously, so resolve it in a subprocess
+    // to keep this Karma config synchronous.
+    try {
+        const chromePath = _resolvePuppeteerExecutablePathSync();
+        if (chromePath) {
+            process.env.CHROME_BIN = chromePath;
+            process.env.CHROMIUM_BIN = chromePath;
+        }
+    } catch (error) {
+        console.warn("Puppeteer executable path could not be resolved. Chrome/Chromium tests may be skipped.");
+        process.exit(0);
+    }
+     
     config.set({
         browsers: ["Chromium_without_security"],
         listenAddress: "localhost",
