@@ -27,7 +27,9 @@ export { ArrGroupByCallbackFn, arrGroupBy } from "./array/groupBy";
 export { arrContains, arrIncludes } from "./array/includes";
 export { arrIndexOf, arrLastIndexOf } from "./array/indexOf";
 export { arrIntersection } from "./array/intersection";
+export { arrIndexKeys } from "./array/arrIndexKeys";
 export { arrMap } from "./array/map";
+export { arrKeys } from "./array/arrKeys";
 export { arrPartition } from "./array/partition";
 export { ArrReduceCallbackFn, arrReduce } from "./array/reduce";
 export { arrReverse } from "./array/reverse";
@@ -110,6 +112,8 @@ export {
     objDefineProperties, objDefineProps
 } from "./object/define";
 export { objForEachKey } from "./object/for_each_key";
+export { forEachOwnKeySafe } from "./object/forEachOwnKeySafe";
+export { isUnsafePropKey } from "./object/isUnsafePropKey";
 export {
     objGetOwnPropertyDescriptor, objGetOwnPropertyDescriptors, objGetOwnPropertyNames,
     objGetOwnPropertySymbols
@@ -117,6 +121,7 @@ export {
 export { objHasOwn } from "./object/has_own";
 export { objHasOwnProperty } from "./object/has_own_prop";
 export { isPlainObject } from "./object/is_plain_object";
+export { isUnsafeTarget } from "./object/isUnsafeTarget";
 export {
     objAssign, objKeys, objDeepFreeze, objFreeze, objSeal, objGetPrototypeOf, objEntries,
     objIs, objValues

@@ -33,5 +33,5 @@ export function _pureAssign<F>(func1: F, func2?: F): F {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function _pureRef<R extends T[keyof T], T = any>(value: T, name: keyof T): R {
-    return value[name] as R;
+    return value !== null && value !== undefined ? value[name] as R : undefined as unknown as R;
 }

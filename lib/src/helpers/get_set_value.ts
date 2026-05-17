@@ -7,9 +7,11 @@
  */
 
 import { arrForEach } from "../array/forEach";
-import { isNullOrUndefined } from "./base";
+import { isNullOrUndefined, isStrictNullOrUndefined } from "./base";
 import { strSplit } from "../string/split";
 import { iterForOf } from "../iterator/forOf";
+import { isUnsafeTarget } from "../object/isUnsafeTarget";
+import { isUnsafePropKey } from "../object/isUnsafePropKey";
 
 /**
  * Get the named value from the target object where the path may be presented by a string which
@@ -131,6 +133,10 @@ export function getValueByIter<V, T extends object = any>(target: T, iter: Itera
 /**
  * Set the named value on the target object where the path may be presented by a string which
  * contains "." characters to separate the nested objects of the heirarchy / path to the value.
+ *
+ * For safety, this helper blocks setting any path that includes unsafe keys (`__proto__`,
+ * `constructor`, or `prototype`) and will also stop if the traversal reaches an unsafe target
+ * such as a built-in prototype object, without writing the final value.
  * @since 0.9.1
  * @group Value
  * @param target - The target object
@@ -151,23 +157,52 @@ export function setValueByKey<T>(target: any, path: string, value: T) {
     if (target && path) {
         let parts = strSplit(path, ".");
         let lastKey = parts.pop();
+        let isValidPath = true;
+        let addedTarget: any;
+        let addedKey: string | undefined;
     
         arrForEach(parts, (key) => {
+            if (isUnsafeTarget(target) || isUnsafePropKey(key)) {
+                isValidPath = false;
+                return -1;
+            }
+
             if (isNullOrUndefined(target[key])) {
                 // Add an empty object / map
                 target[key] = {};
+
+                if (!addedTarget) {
+                    // Track the first added target and key for cleanup if we end up with an invalid path
+                    // We only track the first added key as if the path is invalid we know we won't have
+                    // written any further keys and this allows us to preserve any existing intermediate
+                    // objects that may have been present on the target.
+                    addedTarget = target;
+                    addedKey = key;
+                }
             }
     
             target = target[key];
         });
-    
-        target[lastKey] = value;
+
+        if (isValidPath && !isStrictNullOrUndefined(lastKey) && !isUnsafeTarget(target) && !isUnsafePropKey(lastKey)) {
+            target[lastKey] = value;
+        } else if (addedTarget) {
+            try {
+                delete addedTarget[addedKey as any];
+            } catch (e) {
+                // Ignore cleanup failures and preserve existing behavior.
+            }
+        }
     }
 }
 
 /**
  * Set the named value on the target object where the path is represented by the string iterator
  * or iterable to separate the nested objects of the heirarchy / path to the value.
+ *
+ * For safety, this helper blocks setting any path that includes unsafe keys (`__proto__`,
+ * `constructor`, or `prototype`) and will also stop if the traversal reaches an unsafe target
+ * such as a built-in prototype object, without writing the final value.
  *
  * The order of processing of the iterator is not reset if you add or remove elements to the iterator,
  * the actual behavior will depend on the iterator imeplementation.
@@ -191,13 +226,26 @@ export function setValueByKey<T>(target: any, path: string, value: T) {
  */
 export function setValueByIter<T>(target: any, iter: Iterator<string> | Iterable<string>, value: T) {
     if (target && iter) {
-        let lastKey: string;
+        let lastKey: string | undefined;
+        let isValidPath = true;
+        let firstAddedTarget: any;
+        let firstAddedKey: string | undefined;
     
         iterForOf(iter, (key: string) => {
+            if (isUnsafeTarget(target) || isUnsafePropKey(key)) {
+                isValidPath = false;
+                return -1;
+            }
+
             if (lastKey) {
                 if (isNullOrUndefined(target[lastKey])) {
                     // Add an empty object / map
                     target[lastKey] = {};
+
+                    if (isNullOrUndefined(firstAddedTarget)) {
+                        firstAddedTarget = target;
+                        firstAddedKey = lastKey;
+                    }
                 }
         
                 target = target[lastKey];
@@ -205,7 +253,15 @@ export function setValueByIter<T>(target: any, iter: Iterator<string> | Iterable
 
             lastKey = key;
         });
-    
-        target[lastKey] = value;
+
+        if (isValidPath && !isUnsafeTarget(target) && typeof lastKey === "string" && !isUnsafePropKey(lastKey)) {
+            target[lastKey] = value;
+        } else if (!isNullOrUndefined(firstAddedTarget) && typeof firstAddedKey === "string") {
+            try {
+                delete firstAddedTarget[firstAddedKey];
+            } catch (e) {
+                // Ignore cleanup failures and preserve existing behavior.
+            }
+        }
     }
 }

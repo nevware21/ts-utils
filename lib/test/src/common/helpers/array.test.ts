@@ -1130,6 +1130,35 @@ describe("array helpers", () => {
             assert.equal(grouped["odd"].length, 2);
             assert.equal(grouped["even"].length, 2);
         });
+
+        it("should preserve unsafe group keys as safe own properties", () => {
+            const grouped = arrGroupBy([1, 2, 3, 4], (n) => {
+                if (n === 1) {
+                    return "__proto__";
+                }
+
+                if (n === 2) {
+                    return "constructor";
+                }
+
+                if (n === 3) {
+                    return "prototype";
+                }
+
+                return "safe";
+            });
+
+            assert.isTrue(Object.prototype.hasOwnProperty.call(grouped, "__proto__"), "Unsafe __proto__ key should be preserved as own property");
+            assert.isTrue(Object.prototype.hasOwnProperty.call(grouped, "constructor"), "Unsafe constructor key should be preserved as own property");
+            assert.isTrue(Object.prototype.hasOwnProperty.call(grouped, "prototype"), "Unsafe prototype key should be preserved as own property");
+            
+            assert.deepEqual(grouped["__proto__"], [1]);
+            assert.deepEqual(grouped["constructor"], [2] as any);
+            assert.deepEqual(grouped["prototype"], [3]);
+            assert.deepEqual(grouped["safe"], [4]);
+
+            assert.strictEqual(Object.getPrototypeOf(grouped), Object.prototype, "The grouped result prototype should remain unchanged");
+        });
     });
 
     describe("arrChunk", () => {

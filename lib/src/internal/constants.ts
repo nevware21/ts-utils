@@ -77,3 +77,57 @@ export const ArrSlice = (/*#__PURE__*/_pureRef<typeof ArrProto.slice>(ArrProto, 
  */
 export const NumberCls = (/*#__PURE__*/_pureAssign(Number));
 
+/**
+ * @ignore
+ */
+export const NumberProto = (/*#__PURE__*/_pureRef<typeof Number.prototype>(NumberCls, PROTOTYPE)) as Number;
+
+/**
+ * @ignore
+ */
+export const FuncCls = (/*#__PURE__*/_pureAssign(Function)) as FunctionConstructor;
+
+/**
+ * @ignore
+ */
+export const FuncProto = (/*#__PURE__*/_pureRef<typeof Function.prototype>(FuncCls, PROTOTYPE)) as Function;
+
+/**
+ * @ignore
+ */
+export const DateCls = (/*#__PURE__*/_pureAssign(Date)) as DateConstructor;
+
+/**
+ * @ignore
+ */
+export const DateProto = (/*#__PURE__*/_pureRef<typeof Date.prototype>(DateCls, PROTOTYPE)) as Date;
+
+/**
+ * @ignore
+ */
+export const RegExpCls = (/*#__PURE__*/_pureAssign(RegExp)) as RegExpConstructor;
+
+/**
+ * @ignore
+ */
+export const RegExpProto = (/*#__PURE__*/_pureRef<typeof RegExp.prototype>(RegExpCls, PROTOTYPE)) as RegExp;
+
+/**
+ * @ignore
+ */
+export const BooleanCls = (/*#__PURE__*/_pureAssign(Boolean)) as BooleanConstructor;
+
+/**
+ * @ignore
+ */
+export const BooleanProto = (/*#__PURE__*/_pureRef<typeof Boolean.prototype>(BooleanCls, PROTOTYPE)) as Boolean;
+
+/**
+ * @ignore
+ */
+export const ErrorCls = (/*#__PURE__*/_pureAssign(Error)) as ErrorConstructor;
+
+/**
+ * @ignore
+ */
+export const ErrorProto = (/*#__PURE__*/_pureRef<typeof Error.prototype>(ErrorCls, PROTOTYPE)) as Error;
