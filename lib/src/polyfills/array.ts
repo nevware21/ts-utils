@@ -11,7 +11,7 @@ import { arrForEach } from "../array/forEach";
 import { arrIndexOf } from "../array/indexOf";
 import { arrMap } from "../array/map";
 import { arrSlice } from "../array/slice";
-import { isArray, isNullOrUndefined, objToString } from "../helpers/base";
+import { isArray, isNullOrUndefined, isStrictNullOrUndefined, objToString } from "../helpers/base";
 import { CALL, LENGTH } from "../internal/constants";
 import { iterForOf } from "../iterator/forOf";
 
@@ -158,7 +158,7 @@ export function polyArrFind<T, E extends T>(theArray: ArrayLike<T>, callbackFn: 
 export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
     let result = -1;
     arrForEach(theArray, (value, index) => {
-        if (callbackFn[CALL](isNullOrUndefined(thisArg) ? theArray as any : thisArg, value, index, theArray)) {
+        if (callbackFn[CALL](isStrictNullOrUndefined(thisArg) ? theArray as any : thisArg, value, index, theArray)) {
             result = index;
             return -1;
         }
@@ -272,7 +272,7 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
     let result = -1;
     let len = theArray[LENGTH] >>> 0;
     for (let idx = len - 1; idx >= 0; idx--) {
-        if (idx in theArray && callbackFn[CALL](thisArg || theArray as any, theArray[idx], idx, theArray)) {
+        if (idx in theArray && callbackFn[CALL](isStrictNullOrUndefined(thisArg) ? theArray as any : thisArg, theArray[idx], idx, theArray)) {
             result = idx;
             break;
         }

@@ -161,6 +161,48 @@ describe("array polyfills", () => {
                 return value === 3;
             }), 2);
             assert.equal(cbThis, values);
+
+            cbThis = null;
+            assert.equal(polyArrFindIndex(values, function(value) {
+                cbThis = this;
+                return value === 3;
+            }, undefined), 2);
+            assert.equal(cbThis, values);
+
+            cbThis = null;
+            assert.equal(polyArrFindIndex(values, function(value) {
+                cbThis = this;
+                return value === 3;
+            }, 0), 2);
+            assert.equal(cbThis, 0);
+
+            cbThis = null;
+            assert.equal(polyArrFindIndex(values, function(value) {
+                cbThis = this;
+                return value === 3;
+            }, ""), 2);
+            assert.equal(cbThis, "");
+
+            cbThis = null;
+            assert.equal(polyArrFindIndex(values, function(value) {
+                cbThis = this;
+                return value === 3;
+            }, false), 2);
+            assert.equal(cbThis, false);
+
+            cbThis = null;
+            assert.equal(polyArrFindIndex(values, function(value) {
+                cbThis = this;
+                return value === 3;
+            }, "undefined"), 2);
+            assert.equal(cbThis, "undefined");
+
+            cbThis = null;
+            assert.equal(polyArrFindIndex(values, function(value) {
+                cbThis = this;
+                return value === 3;
+            }, "null"), 2);
+            assert.equal(cbThis, "null");
         });
     });
 
@@ -265,6 +307,49 @@ describe("array polyfills", () => {
                 return value === 1;
             }), 0);
             assert.equal(cbThis, values);
+
+
+            cbThis = null;
+            assert.equal(polyArrFindLastIndex(values, function(value) {
+                cbThis = this;
+                return value === 1;
+            }, undefined), 0);
+            assert.equal(cbThis, values);
+
+            cbThis = null;
+            assert.equal(polyArrFindLastIndex(values, function(value) {
+                cbThis = this;
+                return value === 1;
+            }, 0), 0);
+            assert.equal(cbThis, 0);
+
+            cbThis = null;
+            assert.equal(polyArrFindLastIndex(values, function(value) {
+                cbThis = this;
+                return value === 1;
+            }, ""), 0);
+            assert.equal(cbThis, "");
+
+            cbThis = null;
+            assert.equal(polyArrFindLastIndex(values, function(value) {
+                cbThis = this;
+                return value === 1;
+            }, false), 0);
+            assert.equal(cbThis, false);
+
+            cbThis = null;
+            assert.equal(polyArrFindLastIndex(values, function(value) {
+                cbThis = this;
+                return value === 1;
+            }, "undefined"), 0);
+            assert.equal(cbThis, "undefined");
+
+            cbThis = null;
+            assert.equal(polyArrFindLastIndex(values, function(value) {
+                cbThis = this;
+                return value === 1;
+            }, "null"), 0);
+            assert.equal(cbThis, "null");
         });
     });
 
