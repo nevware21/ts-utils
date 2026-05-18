@@ -8,11 +8,12 @@
 
 import { isStrictNullOrUndefined } from "../helpers/base";
 import { safe } from "../helpers/safe";
-import { NULL_VALUE, ObjClass } from "../internal/constants";
-import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
+import { NULL_VALUE, ObjClass, ObjProto } from "../internal/constants";
+import { _unwrapFunctionNoInstWithPoly, _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
+import { objHasOwnProperty } from "./has_own_prop";
 
 function _objPropertyIsEnum(obj: any, propKey: PropertyKey): boolean {
-    let desc: PropertyDescriptor | undefined;
+    let desc: PropertyDescriptor | null | undefined;
     let fn = ObjClass.getOwnPropertyDescriptor;
     
     if (!isStrictNullOrUndefined(obj) && fn) {
@@ -20,13 +21,13 @@ function _objPropertyIsEnum(obj: any, propKey: PropertyKey): boolean {
         desc = safe(fn, [obj, propKey]).v || NULL_VALUE;
     }
 
-    if (!desc) {
+    if (!desc && !isStrictNullOrUndefined(obj)) {
         desc = safe(() => {
             // Check enumerability of the property in the object
             // This is a workaround for the fact that `in` operator does not check for non-enumerable properties
             for (const key in obj) {
-                if (key === propKey) {
-                    return { enumerable: true };
+                if (key == propKey) {
+                    return { enumerable: objHasOwnProperty(obj, key) } as PropertyDescriptor;
                 }
             }
         }).v;
@@ -67,3 +68,21 @@ function _objPropertyIsEnum(obj: any, propKey: PropertyKey): boolean {
  * ```
  */
 export const objPropertyIsEnumerable: (obj: any, prop: PropertyKey) => boolean = (/*#__PURE__*/_unwrapFunctionWithPoly("propertyIsEnumerable", NULL_VALUE as any, _objPropertyIsEnum));
+
+/**
+ * @internal
+ * The `_objPropertyIsEnumerable()` method returns a Boolean indicating whether the specified property
+ * is enumerable and is a property of the specified object. This method is similar to the native
+ * `Object.prototype.propertyIsEnumerable()` method, but it is a standalone function that can be used
+ * without needing to call it on the object itself. This uses the native
+ * `Object.prototype.propertyIsEnumerable()` implementation when it is available on the prototype
+ * captured at module initialization time; otherwise it falls back to the helper polyfill implementation.
+ *
+ * @function
+ * @since 0.14.0
+ * @group Object
+ * @param obj - The object on which to check if the property is enumerable
+ * @param prop - The property name or symbol to check
+ * @returns A Boolean indicating whether the specified property is enumerable
+ */
+export const _objPropertyIsEnumerable: (obj: any, prop: PropertyKey) => boolean = (/*#__PURE__*/_unwrapFunctionNoInstWithPoly("propertyIsEnumerable", ObjProto, _objPropertyIsEnum));

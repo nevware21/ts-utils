@@ -8,21 +8,26 @@
 
 import { arrForEach } from "../array/forEach";
 import { isStrictUndefined } from "../helpers/base";
-import { forEachOwnKeySafe } from "./forEachOwnKeySafe";
-import { objHasOwn } from "./has_own";
+import { forEachOwnKeySafe } from "./forEachOwnKey";
 import { isUnsafeTarget } from "./isUnsafeTarget";
 
 /**
  * Copies own enumerable properties from `source` to `target` **only** when the predicate
  * returns truthy for that key/value pair.  All other own properties on `target` are left
  * unchanged.
+ *
+ * Security behavior: this helper iterates source keys via {@link forEachOwnKeySafe}, so unsafe
+ * keys (`__proto__`, `constructor`, `prototype`) are ignored even if the predicate returns true.
+ * It also skips all writes when `target` is a guarded built-in prototype object per
+ * {@link isUnsafeTarget}.
  * @since 0.14.0
  * @group Object
  * @typeParam T - The type of the target object
  * @param target - The target object to merge into
  * @param source - The source object to merge from. Null or undefined source is safely ignored.
  * @param predicate - A function `(key, srcValue, tgtValue) => boolean` called for each own
- *   enumerable property of `source`. The property is merged only when the predicate returns truthy.
+ *   enumerable safe property key of `source` (string and symbol). The property is merged only
+ *   when the predicate returns truthy.
  * @returns The `target` object (mutated in place).
  * @example
  * ```ts
@@ -37,12 +42,17 @@ import { isUnsafeTarget } from "./isUnsafeTarget";
  * const t2 = { x: 10 };
  * objMergeIf(t2, { x: 99, y: 5 }, (key, _sv, tgtVal) => tgtVal === undefined);
  * // t2 => { x: 10, y: 5 }
+ *
+ * // Unsafe keys are filtered even if predicate returns true
+ * const t3: any = {};
+ * objMergeIf(t3, { constructor: "ignored", safe: 1 } as any, () => true);
+ * // t3 => { safe: 1 }
  * ```
  */
 export function objMergeIf<T>(
     target: T,
-    source: Record<string, any> | null | undefined,
-    predicate: (key: string, srcValue: any, tgtValue: any) => boolean
+    source: Record<PropertyKey, any> | null | undefined,
+    predicate: (key: PropertyKey, srcValue: any, tgtValue: any) => boolean
 ): T {
     if (target && source && !isUnsafeTarget(target)) {
         forEachOwnKeySafe(source, (key, value) => {
@@ -61,6 +71,16 @@ export function objMergeIf<T>(
  *
  * This is similar to Lodash `_.defaults()`, but it only considers each source object's own
  * enumerable properties and does not copy inherited source properties.
+ *
+ * **Security filtering:** to guard against prototype-pollution attacks this function applies two
+ * layers of protection:
+ * - **Unsafe source keys** (`__proto__`, `constructor`, `prototype`) are silently skipped and
+ *   never written to `target`, even when those keys exist as own enumerable properties of a source.
+ * - **Guarded targets** (built-in prototype objects such as `Object.prototype`,
+ *   `Array.prototype`, etc.) are rejected entirely — `target` is returned unchanged.
+ *
+ * This means that calls like `objDefaults(obj, { constructor: fn })` or
+ * `objDefaults(Object.prototype, ...)` are silently no-ops for the filtered keys / guarded target.
  * @since 0.14.0
  * @group Object
  * @typeParam T - The type of the target object
@@ -79,6 +99,12 @@ export function objMergeIf<T>(
  * // Multiple sources — first defined value wins
  * objDefaults({}, { a: 1 }, { a: 99, b: 2 });
  * // => { a: 1, b: 2 }
+ *
+ * // Unsafe source keys are silently skipped (prototype-pollution guard)
+ * const cfg: any = { host: "localhost" };
+ * const src: any = { host: "evil.com", __proto__: { admin: true }, constructor: String };
+ * objDefaults(cfg, src);
+ * // => { host: "localhost" }  — __proto__ and constructor were never written
  * ```
  */
 export function objDefaults<T>(target: T, ...sources: Array<Partial<T> | null | undefined>): T {
@@ -86,7 +112,7 @@ export function objDefaults<T>(target: T, ...sources: Array<Partial<T> | null | 
         arrForEach(sources, (source) => {
             if (source) {
                 forEachOwnKeySafe(source, (key, value) => {
-                    if (!objHasOwn(target, key) || isStrictUndefined((target as any)[key])) {
+                    if (isStrictUndefined((target as any)[key])) {
                         (target as any)[key] = value;
                     }
                 });

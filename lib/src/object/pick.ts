@@ -8,10 +8,11 @@
 
 import { arrForEach } from "../array/forEach";
 import { arrIndexOf } from "../array/indexOf";
-import { isArray } from "../helpers/base";
+import { isArrayLike, isString } from "../helpers/base";
 import { objCreate } from "./create";
-import { objForEachKey } from "./for_each_key";
+import { forEachOwnKey } from "./forEachOwnKey";
 import { objHasOwn } from "./has_own";
+import { _objPropertyIsEnumerable } from "./property_is_enumerable";
 
 /**
  * Creates a new object composed of the picked enumerable own properties of `source`.
@@ -35,14 +36,16 @@ import { objHasOwn } from "./has_own";
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function objPick<T, const K extends keyof T>(source: T, keys: ReadonlyArray<K>): Pick<T, K>;
+export function objPick<T, K extends keyof T>(source: T, keys: ArrayLike<K>): Pick<T, K>;
 /*#__NO_SIDE_EFFECTS__*/
-export function objPick<T>(source: T, keys: ReadonlyArray<string>): Partial<T>;
-export function objPick<T>(source: T, keys: ReadonlyArray<PropertyKey>): Partial<T> {
+export function objPick<T>(source: T, keys: ArrayLike<string>): Partial<T>;
+/*#__NO_SIDE_EFFECTS__*/
+export function objPick<T>(source: T, keys: ArrayLike<PropertyKey>): Partial<T>;
+export function objPick<T>(source: T, keys: ArrayLike<PropertyKey>): Partial<T> {
     const result: Partial<T> = objCreate(null);
-    if (source && isArray(keys)) {
+    if (source && isArrayLike(keys)) {
         arrForEach(keys, (key) => {
-            if (objHasOwn(source, key)) {
+            if (objHasOwn(source, key) && _objPropertyIsEnumerable(source, key)) {
                 (result as any)[key] = (source as any)[key];
             }
         });
@@ -72,19 +75,29 @@ export function objPick<T>(source: T, keys: ReadonlyArray<PropertyKey>): Partial
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function objOmit<T, const K extends keyof T>(source: T, keys: ReadonlyArray<K>): Omit<T, K>;
+export function objOmit<T, K extends keyof T>(source: T, keys: ArrayLike<K>): Pick<T, Exclude<keyof T, K>>;
 /*#__NO_SIDE_EFFECTS__*/
-export function objOmit<T>(source: T, keys: ReadonlyArray<string>): Partial<T>;
-export function objOmit<T>(source: T, keys: ReadonlyArray<PropertyKey>): Partial<T> {
+export function objOmit<T>(source: T, keys: ArrayLike<string>): Partial<T>;
+/*#__NO_SIDE_EFFECTS__*/
+export function objOmit<T>(source: T, keys: ArrayLike<PropertyKey>): Partial<T>;
+export function objOmit<T>(source: T, keys: ArrayLike<PropertyKey>): Partial<T> {
     const result: Partial<T> = objCreate(null);
-    if (source && isArray(keys)) {
-        objForEachKey(source, (key, value) => {
+    if (source && isArrayLike(keys)) {
+        forEachOwnKey(source, (key, value) => {
             let hasKey = arrIndexOf(keys, key) !== -1;
-            if (!hasKey) {
+            if (!hasKey && isString(key)) {
                 // Also check for numeric keys using their runtime property names (e.g. "1" for key 1)
                 const numericKey = +key;
                 if (key === numericKey + "") {
-                    hasKey = arrIndexOf(keys, numericKey) !== -1;
+                    if (numericKey === numericKey) {
+                        hasKey = arrIndexOf(keys, numericKey) !== -1;
+                    } else {
+                        arrForEach(keys, (candidate) => {
+                            if (candidate !== candidate) {
+                                hasKey = true;
+                            }
+                        });
+                    }
                 }
             }
 
@@ -116,9 +129,9 @@ export function objOmit<T>(source: T, keys: ReadonlyArray<PropertyKey>): Partial
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function objPickBy<T>(source: T, predicate: (key: string, value: T[keyof T]) => boolean): Partial<T> {
+export function objPickBy<T>(source: T, predicate: (key: PropertyKey, value: T[keyof T]) => boolean): Partial<T> {
     const result: Partial<T> = objCreate(null);
-    objForEachKey(source, (key, value) => {
+    forEachOwnKey(source, (key, value) => {
         if (predicate(key, value)) {
             (result as any)[key] = value;
         }
@@ -146,9 +159,9 @@ export function objPickBy<T>(source: T, predicate: (key: string, value: T[keyof 
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function objOmitBy<T>(source: T, predicate: (key: string, value: T[keyof T]) => boolean): Partial<T> {
+export function objOmitBy<T>(source: T, predicate: (key: PropertyKey, value: T[keyof T]) => boolean): Partial<T> {
     const result: Partial<T> = objCreate(null);
-    objForEachKey(source, (key, value) => {
+    forEachOwnKey(source, (key, value) => {
         if (!predicate(key, value)) {
             (result as any)[key] = value;
         }

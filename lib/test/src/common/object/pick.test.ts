@@ -8,6 +8,7 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { objPick, objOmit, objPickBy, objOmitBy } from "../../../../src/object/pick";
+import { hasSymbol } from "../../../../src/symbol/symbol";
 
 describe("object pick utilities", () => {
 
@@ -16,12 +17,12 @@ describe("object pick utilities", () => {
     describe("objPick", () => {
         it("should pick specified keys", () => {
             const obj = { a: 1, b: "hello", c: true };
-            assert.deepEqual(objPick(obj, ["a", "c"]), { a: 1, c: true });
+            assert.deepEqual(objPick(obj, ["a", "c"] as const), { a: 1, c: true });
         });
 
         it("should pick a single key", () => {
             const obj = { x: 10, y: 20 };
-            assert.deepEqual(objPick(obj, ["x"]), { x: 10 });
+            assert.deepEqual(objPick(obj, ["x"] as const), { x: 10 });
         });
 
         it("should return empty object for empty keys array", () => {
@@ -69,6 +70,19 @@ describe("object pick utilities", () => {
             const obj = { a: 1, b: 2, c: 3, d: 4 };
             const result = objPick(obj, ["a", "b", "c", "d"]);
             assert.deepEqual(result, obj);
+        });
+
+        it("should not pick non-enumerable own properties", () => {
+            const obj: any = {};
+            Object.defineProperty(obj, "hidden", {
+                value: 1,
+                enumerable: false
+            });
+            obj.visible = 2;
+
+            const result = objPick(obj, ["hidden", "visible"]);
+            assert.equal((result as any).visible, 2);
+            assert.isFalse("hidden" in result);
         });
     });
 
@@ -121,6 +135,24 @@ describe("object pick utilities", () => {
             const obj = { 1: "x", 2: "y" };
             assert.deepEqual(objOmit(obj, [1]), { 2: "y" });
         });
+
+        it("should preserve enumerable symbol properties not in keys", () => {
+            if (!hasSymbol()) {
+                return;
+            }
+
+            const sym1 = Symbol("sym1");
+            const sym2 = Symbol("sym2");
+            const obj: any = { a: 1, b: 2 };
+            obj[sym1] = "symbol1";
+            obj[sym2] = "symbol2";
+
+            const result = objOmit(obj, ["a", sym1]);
+            assert.equal(result.b, 2);
+            assert.isFalse("a" in result);
+            assert.equal(result[sym2], "symbol2");
+            assert.isFalse(sym1 in result);
+        });
     });
 
     // ─── objPickBy ──────────────────────────────────────────────────────────────
@@ -153,7 +185,7 @@ describe("object pick utilities", () => {
 
         it("should receive correct key and value in predicate", () => {
             const obj = { x: 10 };
-            let capturedKey: string | undefined;
+            let capturedKey: PropertyKey | undefined;
             let capturedVal: any;
             objPickBy(obj, (k, v) => {
                 capturedKey = k;

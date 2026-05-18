@@ -111,8 +111,8 @@ export {
     ObjDefinePropDescriptor, ObjDefinePropDescriptorMap, objDefine, objDefineProp, objDefineGet, objDefineAccessors,
     objDefineProperties, objDefineProps
 } from "./object/define";
-export { objForEachKey } from "./object/for_each_key";
-export { forEachOwnKeySafe } from "./object/forEachOwnKeySafe";
+export { objForEachKey, objForEachKeySafe } from "./object/for_each_key";
+export { forEachOwnKey, forEachOwnKeySafe } from "./object/forEachOwnKey";
 export { isUnsafePropKey } from "./object/isUnsafePropKey";
 export {
     objGetOwnPropertyDescriptor, objGetOwnPropertyDescriptors, objGetOwnPropertyNames,

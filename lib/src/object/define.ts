@@ -12,7 +12,7 @@ import { objForEachKey } from "./for_each_key";
 import { ILazyValue } from "../helpers/lazy";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { arrForEach } from "../array/forEach";
-import { objPropertyIsEnumerable } from "./property_is_enumerable";
+import { _objPropertyIsEnumerable } from "./property_is_enumerable";
 import { _returnEmptyArray, _returnNothing } from "../internal/stubs";
 
 const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR)), _returnNothing));
@@ -268,7 +268,7 @@ export function objDefineProps<T>(target: T, propDescMap: ObjDefinePropDescripto
     });
 
     arrForEach(_objGetOwnPropertySymbols(propDescMap), (sym) => {
-        if (objPropertyIsEnumerable(propDescMap, sym)) {
+        if (_objPropertyIsEnumerable(propDescMap, sym)) {
             props[sym] = _createProp(propDescMap[sym]);
         }
     });

@@ -7,7 +7,7 @@
  */
 
 import { objCreate } from "./create";
-import { objForEachKey } from "./for_each_key";
+import { forEachOwnKey } from "./forEachOwnKey";
 
 /**
  * Creates a new object with the same keys as `source` but with each value transformed
@@ -33,9 +33,9 @@ import { objForEachKey } from "./for_each_key";
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function objMapValues<T, U>(source: T, mapper: (value: T[keyof T], key: string) => U): { [K in keyof T]: U } {
+export function objMapValues<T, U>(source: T, mapper: (value: T[keyof T], key: PropertyKey) => U): { [K in keyof T]: U } {
     const result: any = objCreate(null);
-    objForEachKey(source, (key, value) => {
+    forEachOwnKey(source, (key, value) => {
         result[key] = mapper(value, key);
     });
     return result;

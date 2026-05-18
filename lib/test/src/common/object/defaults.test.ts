@@ -8,6 +8,7 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { objMergeIf, objDefaults } from "../../../../src/object/defaults";
+import { hasSymbol } from "../../../../src/symbol/symbol";
 
 describe("object defaults utilities", () => {
 
@@ -97,7 +98,17 @@ describe("object defaults utilities", () => {
 
         it("should ignore unsafe source keys", () => {
             const target: any = {};
-            objMergeIf(target, { "__proto__": { polluted: true }, constructor: "bad", prototype: "bad", safe: 1 } as any, () => true);
+            const source: any = {};
+            Object.defineProperty(source, "__proto__", {
+                value: { polluted: true },
+                enumerable: true,
+                configurable: true,
+                writable: true
+            });
+            source.constructor = "bad";
+            source.prototype = "bad";
+            source.safe = 1;
+            objMergeIf(target, source, () => true);
             assert.equal(target.safe, 1);
             assert.isFalse(Object.prototype.hasOwnProperty.call(target, "__proto__"));
             assert.isFalse(Object.prototype.hasOwnProperty.call(target, "constructor"));
@@ -118,6 +129,21 @@ describe("object defaults utilities", () => {
                     (Object.prototype as any).polluted = original;
                 }
             }
+        });
+
+        it("should merge enumerable symbol keyed properties", () => {
+            if (!hasSymbol()) {
+                return;
+            }
+
+            const sym = Symbol("mergeIf");
+            const target: any = {};
+            const source: any = {};
+            source[sym] = 42;
+
+            objMergeIf(target, source, () => true);
+
+            assert.equal(target[sym], 42);
         });
     });
 
@@ -194,7 +220,18 @@ describe("object defaults utilities", () => {
 
         it("should ignore unsafe source keys", () => {
             const target: any = {};
-            objDefaults(target, { "__proto__": { polluted: true }, constructor: "bad", prototype: "bad", safe: 1 } as any);
+            const source: any = {
+                constructor: "bad",
+                prototype: "bad",
+                safe: 1
+            };
+            Object.defineProperty(source, "__proto__", {
+                configurable: true,
+                enumerable: true,
+                value: { polluted: true },
+                writable: true
+            });
+            objDefaults(target, source);
             assert.equal(target.safe, 1);
             assert.isFalse(Object.prototype.hasOwnProperty.call(target, "__proto__"));
             assert.isFalse(Object.prototype.hasOwnProperty.call(target, "constructor"));
@@ -221,6 +258,59 @@ describe("object defaults utilities", () => {
             const target: any = {};
             objDefaults(target, { x: 10, y: 20 });
             assert.deepEqual(target, { x: 10, y: 20 });
+        });
+
+        it("should apply enumerable symbol keyed defaults", () => {
+            if (!hasSymbol()) {
+                return;
+            }
+
+            const sym = Symbol("default");
+            const target: any = {};
+            const source: any = {};
+            source[sym] = 99;
+
+            objDefaults(target, source);
+
+            assert.equal(target[sym], 99);
+        });
+
+        it("should not apply non-enumerable symbol keyed defaults", () => {
+            if (!hasSymbol()) {
+                return;
+            }
+
+            const sym = Symbol("hiddenDefault");
+            const target: any = {};
+            const source: any = {};
+            Object.defineProperty(source, sym, {
+                value: 7,
+                enumerable: false,
+                configurable: true,
+                writable: true
+            });
+
+            objDefaults(target, source);
+
+            assert.isUndefined(target[sym]);
+        });
+
+        it("should NOT overwrite inherited target values that are already defined (non-undefined)", () => {
+            const proto = { inherited: "fromProto" };
+            const target: any = Object.create(proto);
+            // target does not own "inherited", but resolves it as "fromProto" via prototype
+            objDefaults(target, { inherited: "fromSource" });
+            // inherited is already defined (non-undefined) on the prototype chain → must not change
+            assert.equal(target.inherited, "fromProto", "inherited defined value must not be overwritten");
+            assert.isFalse(Object.prototype.hasOwnProperty.call(target, "inherited"), "own property must not be created");
+        });
+
+        it("should fill an inherited undefined value by assigning an own property", () => {
+            const proto: any = { inherited: undefined };
+            const target: any = Object.create(proto);
+            // target does not own "inherited" and the resolved value is undefined → should fill
+            objDefaults(target, { inherited: "filled" });
+            assert.equal(target.inherited, "filled", "undefined inherited value should be filled");
         });
     });
 });

@@ -10,7 +10,7 @@ import { arrForEach } from "../array/forEach";
 import { isArray, isDate, isNullOrUndefined, isPrimitiveType } from "../helpers/base";
 import { CALL, FUNCTION, NULL_VALUE, OBJECT } from "../internal/constants";
 import { objDefine } from "./define";
-import { forEachOwnKeySafe } from "./forEachOwnKeySafe";
+import { forEachOwnKeySafe } from "./forEachOwnKey";
 import { isPlainObject } from "./is_plain_object";
 import { isUnsafeTarget } from "./isUnsafeTarget";
 

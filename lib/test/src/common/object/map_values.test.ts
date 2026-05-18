@@ -8,6 +8,7 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { objMapValues } from "../../../../src/object/map_values";
+import { hasSymbol } from "../../../../src/symbol/symbol";
 
 describe("object map_values utilities", () => {
 
@@ -19,7 +20,7 @@ describe("object map_values utilities", () => {
 
         it("should pass the key as the second argument to mapper", () => {
             const obj = { x: 10, y: 20 };
-            const keysReceived: string[] = [];
+            const keysReceived: PropertyKey[] = [];
             objMapValues(obj, (v, k) => {
                 keysReceived.push(k);
                 return v;
@@ -85,6 +86,24 @@ describe("object map_values utilities", () => {
             for (let i = 0; i < 100; i++) {
                 assert.equal(result["k" + i], i + 1);
             }
+        });
+
+        it("should map enumerable symbol properties", () => {
+            if (!hasSymbol()) {
+                return;
+            }
+
+            const sym1 = Symbol("sym1");
+            const sym2 = Symbol("sym2");
+            const obj: any = { a: 1, b: 2 };
+            obj[sym1] = 10;
+            obj[sym2] = 20;
+
+            const result = objMapValues(obj, (v) => (v as number) * 2);
+            assert.equal(result.a, 2);
+            assert.equal(result.b, 4);
+            assert.equal((result as any)[sym1], 20);
+            assert.equal((result as any)[sym2], 40);
         });
     });
 });

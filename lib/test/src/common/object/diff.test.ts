@@ -8,6 +8,7 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { objDiff } from "../../../../src/object/diff";
+import { hasSymbol } from "../../../../src/symbol/symbol";
 
 describe("object diff utilities", () => {
 
@@ -105,6 +106,41 @@ describe("object diff utilities", () => {
             const shared = { nested: true };
             const result = objDiff({ ref: shared }, { ref: shared });
             assert.deepEqual(result, {});
+        });
+
+        it("should detect changes in enumerable symbol properties", () => {
+            if (!hasSymbol()) {
+                return;
+            }
+
+            const sym1 = Symbol("sym1");
+            const sym2 = Symbol("sym2");
+            const prev: any = { a: 1 };
+            prev[sym1] = "old";
+            prev[sym2] = "same";
+
+            const next: any = { a: 1 };
+            next[sym1] = "new";
+            next[sym2] = "same";
+
+            const result = objDiff(prev, next);
+            assert.isFalse("a" in result);
+            assert.equal((result as any)[sym1], "new");
+            assert.isFalse(sym2 in result);
+        });
+
+        it("should include added symbol properties in modified", () => {
+            if (!hasSymbol()) {
+                return;
+            }
+
+            const sym = Symbol("sym");
+            const prev: any = { a: 1 };
+            const next: any = { a: 1 };
+            next[sym] = "added";
+
+            const result = objDiff(prev, next);
+            assert.equal((result as any)[sym], "added");
         });
     });
 });

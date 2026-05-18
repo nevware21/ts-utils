@@ -7,7 +7,7 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
-import { objForEachKey } from "../../../../src/object/for_each_key";
+import { objForEachKey, objForEachKeySafe } from "../../../../src/object/for_each_key";
 
 describe("object for_each_key tests", () => {
     describe("objForEachKey", () => {
@@ -189,6 +189,195 @@ describe("object for_each_key tests", () => {
             let callCount = 0;
             
             objForEachKey(emptyObj, () => {
+                callCount++;
+            });
+
+            assert.equal(callCount, 0, "Should not call callback for empty objects");
+        });
+    });
+
+    describe("objForEachKeySafe", () => {
+        it("should iterate over all own enumerable keys excluding unsafe keys", () => {
+            const obj = { a: 1, b: 2, c: 3 };
+            const visitedKeys: string[] = [];
+            const values: number[] = [];
+
+            objForEachKeySafe(obj, (key, value) => {
+                visitedKeys.push(key);
+                values.push(value as number);
+            });
+
+            assert.deepEqual(visitedKeys.sort(), ["a", "b", "c"], "Should visit all safe keys");
+            assert.deepEqual(values.sort(), [1, 2, 3], "Should pass the correct values");
+        });
+
+        it("should filter out __proto__ key", () => {
+            const obj = { "name": "Alice" } as { [key: string]: string };
+            Object.defineProperty(obj, "__proto__", {
+                configurable: true,
+                enumerable: true,
+                value: "attack",
+                writable: true
+            });
+            const visitedKeys: string[] = [];
+
+            objForEachKeySafe(obj, (key) => {
+                visitedKeys.push(key);
+            });
+
+            assert.isFalse(visitedKeys.includes("__proto__"), "Should not include __proto__");
+            assert.isTrue(visitedKeys.includes("name"), "Should include safe keys");
+        });
+
+        it("should filter out constructor key", () => {
+            const obj = Object.assign({}, { "constructor": "attack", "name": "Bob" });
+            const visitedKeys: string[] = [];
+
+            objForEachKeySafe(obj, (key) => {
+                visitedKeys.push(key);
+            });
+
+            assert.isFalse(visitedKeys.includes("constructor"), "Should not include constructor");
+            assert.isTrue(visitedKeys.includes("name"), "Should include safe keys");
+        });
+
+        it("should filter out prototype key", () => {
+            const obj = Object.assign({}, { "prototype": "attack", "name": "Charlie" });
+            const visitedKeys: string[] = [];
+
+            objForEachKeySafe(obj, (key) => {
+                visitedKeys.push(key);
+            });
+
+            assert.isFalse(visitedKeys.includes("prototype"), "Should not include prototype");
+            assert.isTrue(visitedKeys.includes("name"), "Should include safe keys");
+        });
+
+        it("should filter out multiple unsafe keys", () => {
+            const obj = {
+                "constructor": "attack",
+                "prototype": "attack",
+                "name": "Dave"
+             } as { [key: string]: string };
+
+             Object.defineProperty(obj, "__proto__", {
+                configurable: true,
+                enumerable: true,
+                value: "attack",
+                writable: true
+            });
+
+            const visitedKeys: string[] = [];
+
+            objForEachKeySafe(obj, (key) => {
+                visitedKeys.push(key);
+            });
+
+            assert.deepEqual(visitedKeys.sort(), ["name"], "Should only include safe keys");
+        });
+
+        it("should use the provided thisArg", () => {
+            const obj = { a: 1, b: 2 };
+            const thisObj = { test: "context" };
+            let actualThis: any;
+
+            objForEachKeySafe(obj, function(this: any) {
+                actualThis = this;
+            }, thisObj);
+
+            assert.strictEqual(actualThis, thisObj, "Should use the provided thisArg");
+        });
+
+        it("should use the object as thisArg when not provided", () => {
+            const obj = { a: 1, b: 2 };
+            let actualThis: any;
+
+            objForEachKeySafe(obj, function(this: any) {
+                actualThis = this;
+            });
+
+            assert.strictEqual(actualThis, obj, "Should use the object as thisArg when not provided");
+        });
+
+        it("should break iteration when callback returns -1", () => {
+            const obj = { a: 1, b: 2, c: 3, d: 4 };
+            const visitedKeys: string[] = [];
+
+            objForEachKeySafe(obj, (key) => {
+                visitedKeys.push(key);
+                if (key === "b") {
+                    return -1;
+                }
+            });
+
+            assert.isTrue(
+                visitedKeys.length <= 2,
+                "Should stop iteration when callback returns -1"
+            );
+            assert.isFalse(
+                visitedKeys.includes("c") || visitedKeys.includes("d"),
+                "Should not visit keys after returning -1"
+            );
+        });
+
+        it("should handle null or undefined objects", () => {
+            let callCount = 0;
+            
+            objForEachKeySafe(null, () => {
+                callCount++;
+            });
+            
+            objForEachKeySafe(undefined, () => {
+                callCount++;
+            });
+
+            assert.equal(callCount, 0, "Should not call callback for null or undefined objects");
+        });
+
+        it("should handle non-object values", () => {
+            let callCount = 0;
+            
+            objForEachKeySafe(42 as any, () => {
+                callCount++;
+            });
+            
+            objForEachKeySafe("string" as any, () => {
+                callCount++;
+            });
+
+            assert.equal(callCount, 0, "Should not call callback for non-object values");
+        });
+
+        it("should work with complex objects and filter unsafe keys", () => {
+            const complexObj = Object.assign({}, {
+                num: 42,
+                str: "hello",
+                bool: true,
+                arr: [1, 2, 3],
+                nested: { a: 1, b: 2 },
+                func: function() {
+                    return "test";
+                },
+                "__proto__": "attack"
+            });
+            
+            const keys: string[] = [];
+            
+            objForEachKeySafe(complexObj, (key) => {
+                keys.push(key);
+            });
+
+            assert.isFalse(keys.includes("__proto__"), "Should not include __proto__");
+            assert.equal(keys.length, 6, "Should iterate over all safe keys in a complex object");
+            assert.includeMembers(keys, ["num", "str", "bool", "arr", "nested", "func"],
+                "Should include all safe keys");
+        });
+
+        it("should work with empty objects", () => {
+            const emptyObj = {};
+            let callCount = 0;
+            
+            objForEachKeySafe(emptyObj, () => {
                 callCount++;
             });
 

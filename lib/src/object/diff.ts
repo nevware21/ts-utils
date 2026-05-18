@@ -8,7 +8,7 @@
 
 import { isStrictNullOrUndefined } from "../helpers/base";
 import { objCreate } from "./create";
-import { objForEachKey } from "./for_each_key";
+import { forEachOwnKey } from "./forEachOwnKey";
 import { objHasOwn } from "./has_own";
 
 /**
@@ -47,10 +47,11 @@ import { objHasOwn } from "./has_own";
 export function objDiff<T, U extends Partial<T> = Partial<T>>(base: T, modified: U): Partial<U> {
     const result: Partial<U> = objCreate(null);
 
-    if (!isStrictNullOrUndefined(base) && !isStrictNullOrUndefined(modified)) {
-        objForEachKey(modified, (key, value) => {
-            const baseVal = objHasOwn(base, key) ? (base as any)[key] : undefined;
-            if (baseVal !== value) {
+    if (!isStrictNullOrUndefined(base)) {
+        forEachOwnKey(modified, (key, value) => {
+            const hasBase = objHasOwn(base, key);
+            const baseVal = hasBase ? (base as any)[key] : undefined;
+            if (!hasBase || baseVal !== value) {
                 (result as any)[key] = value;
             }
         });

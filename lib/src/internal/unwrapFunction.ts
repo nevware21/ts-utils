@@ -62,6 +62,33 @@ export function _unwrapFunctionWithPoly<T, P extends (...args: any) => any>(func
 /**
  * @internal
  * @ignore
+ * Internal helper to convert an expanded function back into an instance `this` function call
+ * using only the provided class / prototype function or the polyfill. Unlike
+ * {@link _unwrapFunctionWithPoly}, this helper does not perform any instance-level lookup.
+ * @param funcName - The function name to call on the first argument passed to the wrapped function
+ * @param clsProto - The Class or class prototype to use if the function exists.
+ * @param polyFunc - The function to call if the class / prototype function is not available
+ * @returns A function which will call the resolved function against the first passed argument and pass on the remaining arguments
+ */
+/*#__NO_SIDE_EFFECTS__*/
+
+export function _unwrapFunctionNoInstWithPoly<T, P extends (...args: any) => any>(funcName: keyof T, clsProto?: T, polyFunc?: P) {
+    let clsFn = clsProto ? clsProto[funcName] : NULL_VALUE;
+
+    return function(thisArg: any): ReturnType<P> {
+        let theFunc = clsFn;
+        if (theFunc || polyFunc) {
+            let theArgs = arguments;
+            return ((theFunc || polyFunc) as Function).apply(thisArg, theFunc ? ArrSlice[CALL](theArgs, 1) : theArgs);
+        }
+
+        throwTypeError("\"" + asString(funcName) + "\" not defined for " + dumpObj(thisArg));
+    };
+}
+
+/**
+ * @internal
+ * @ignore
  * Internal helper to lookup and return the named property from the first argument (which becomes the this)
  *
  * @since 0.4.2
