@@ -36,21 +36,7 @@ Notes:
 - Iterator helpers are intentionally listed as utility suggestions here rather than standard-language mappings.
 - Implementations should include ES5 polyfills where applicable for v0.x/v1.x compatibility
 
-### A. Object Utilities (Medium Value)
-
-- `objPick` / `objOmit`
-- `objMapValues`
-- `objMergeIf`
-- `objDiff`
-- `objPickBy` / `objOmitBy`
-- `objDefaults` for shallow default assignment without overriding defined values
-
-Notes:
-
-- maintain plain-object safety patterns
-- avoid behavior changes to existing deep copy helpers
-
-### B. Iterator and Collection Helpers (Medium Value)
+### A. Iterator and Collection Helpers (Medium Value)
 
 - `iterMap`, `iterFilter`, `iterTake` – Iterator transformation helpers
 - `iterReduce`, `iterSome`, `iterEvery` – Iterator reduction/testing
@@ -58,7 +44,7 @@ Notes:
 - `arrToMap` helpers with stable key selection
 - lightweight set operations for iterables
 
-### C. Reliability and Tooling (High Value)
+### B. Reliability and Tooling (High Value)
 
 - keep bundle-size thresholds justified with measured report
 - require test parity for polyfill vs native behavior

@@ -237,10 +237,10 @@
     "devDependencies": {
         "@istanbuljs/nyc-config-typescript": "^1.0.2",
         "@microsoft/api-extractor": "^7.57.7",
-        "@nevware21/coverage-tools": ">= 0.1.4 < 2.x",
+        "@nevware21/coverage-tools": ">= 0.1.5 < 2.x",
         "@nevware21/grunt-eslint-ts": "^0.5.1",
         "@nevware21/grunt-ts-plugin": "^0.5.1",
-        "@nevware21/publish-npm": ">= 0.1.4 < 2.x",
+        "@nevware21/publish-npm": ">= 0.1.5 < 2.x",
         "@nevware21/tripwire-chai": ">= 0.1.8 < 2.x",
         "@rollup/plugin-commonjs": "^29.0.0",
         "@rollup/plugin-json": "^6.0.0",

@@ -131,6 +131,10 @@ export { objPreventExtensions, objIsExtensible } from "./object/prevent_extensio
 export { objPropertyIsEnumerable } from "./object/property_is_enumerable";
 export { objSetPrototypeOf } from "./object/set_proto";
 export { objIsFrozen, objIsSealed } from "./object/object_state";
+export { objPick, objOmit, objPickBy, objOmitBy } from "./object/pick";
+export { objMapValues } from "./object/map_values";
+export { objMergeIf, objDefaults } from "./object/defaults";
+export { objDiff } from "./object/diff";
 export { strCamelCase, strCapitalizeWords, strKebabCase, strLetterCase, strSnakeCase } from "./string/conversion";
 export { strCount } from "./string/count";
 export { strAt } from "./string/at";
