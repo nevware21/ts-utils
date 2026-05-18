@@ -37,15 +37,47 @@ describe("object for_each_key tests", () => {
             assert.strictEqual(actualThis, thisObj, "Should use the provided thisArg");
         });
 
-        it("should use the object as thisArg when not provided", () => {
-            const obj = { a: 1, b: 2 };
-            let actualThis: any;
+        it("should use the object as this when thisArg is omitted, undefined, or null", () => {
+            const obj = { a: 1 };
+            let capturedThis: any;
+
+            // omitted thisArg → falls back to the object
+            objForEachKey(obj, function(this: any) {
+                capturedThis = this;
+            });
+            assert.strictEqual(capturedThis, obj, "omitting thisArg should use the object as this");
+
+            // explicit undefined → same as omitted
+            objForEachKey(obj, function(this: any) {
+                capturedThis = this;
+            }, undefined);
+            assert.strictEqual(capturedThis, obj, "explicit undefined thisArg should use the object as this");
+
+            // null → same as undefined, falls back to object
+            objForEachKey(obj, function(this: any) {
+                capturedThis = this;
+            }, null);
+            assert.strictEqual(capturedThis, obj, "null thisArg should use the object as this");
+        });
+
+        it("should use falsy-but-not-null/undefined thisArg values as-is", () => {
+            const obj = { a: 1 };
+            let capturedThis: any;
 
             objForEachKey(obj, function(this: any) {
-                actualThis = this;
-            });
+                capturedThis = this;
+            }, 0);
+            assert.strictEqual(capturedThis, 0, "thisArg of 0 should be used as-is");
 
-            assert.strictEqual(actualThis, obj, "Should use the object as thisArg when not provided");
+            objForEachKey(obj, function(this: any) {
+                capturedThis = this;
+            }, "");
+            assert.strictEqual(capturedThis, "", "thisArg of empty string should be used as-is");
+
+            objForEachKey(obj, function(this: any) {
+                capturedThis = this;
+            }, false);
+            assert.strictEqual(capturedThis, false, "thisArg of false should be used as-is");
         });
 
         it("should break iteration when callback returns -1", () => {

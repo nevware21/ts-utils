@@ -176,5 +176,49 @@ describe("create iterator helpers", () => {
             assert.equal(values[0], 10);
             assert.equal(values[1], 20);
         });
+
+        it("omitting or passing null/undefined thisArg falls back to the iterator", () => {
+            let capturedThis: any;
+
+            // omitted thisArg → falls back to the iterator
+            const iter1 = createArrayIterator([1]);
+            iterForOf(iter1, function(this: any) {
+                capturedThis = this;
+            });
+            assert.strictEqual(capturedThis, iter1, "omitting thisArg should use the iterator as this");
+
+            // explicit undefined → same as omitted
+            const iter2 = createArrayIterator([1]);
+            iterForOf(iter2, function(this: any) {
+                capturedThis = this;
+            }, undefined);
+            assert.strictEqual(capturedThis, iter2, "explicit undefined thisArg should use the iterator as this");
+
+            // null → same as undefined, falls back to iterator
+            const iter3 = createArrayIterator([1]);
+            iterForOf(iter3, function(this: any) {
+                capturedThis = this;
+            }, null);
+            assert.strictEqual(capturedThis, iter3, "null thisArg should use the iterator as this");
+        });
+
+        it("falsy-but-not-null/undefined thisArg values are used as-is", () => {
+            let capturedThis: any;
+
+            iterForOf(createArrayIterator([1]), function(this: any) {
+                capturedThis = this;
+            }, 0);
+            assert.strictEqual(capturedThis, 0, "thisArg of 0 should be used as-is");
+
+            iterForOf(createArrayIterator([1]), function(this: any) {
+                capturedThis = this;
+            }, "");
+            assert.strictEqual(capturedThis, "", "thisArg of empty string should be used as-is");
+
+            iterForOf(createArrayIterator([1]), function(this: any) {
+                capturedThis = this;
+            }, false);
+            assert.strictEqual(capturedThis, false, "thisArg of false should be used as-is");
+        });
     });
 });

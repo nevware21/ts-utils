@@ -152,6 +152,46 @@ describe("array helpers", () => {
             }
 
         });
+
+        it("Validate falsy thisArg values are used correctly (not replaced by array)", () => {
+            const arr = [1, 2, 3];
+            let capturedThis: any;
+
+
+            // omitted thisArg → falls back to the array
+            arrForEach(arr, function(this: any) {
+                capturedThis = this;
+            });
+            assert.strictEqual(capturedThis, arr, "omitting thisArg should use the array as this");
+
+            // explicit undefined → same as omitted
+            arrForEach(arr, function(this: any) {
+                capturedThis = this;
+            }, undefined);
+            assert.strictEqual(capturedThis, arr, "explicit undefined thisArg should use the array as this");
+
+            // null → same as undefined, falls back to array
+            arrForEach(arr, function(this: any) {
+                capturedThis = this;
+            }, null);
+            assert.strictEqual(capturedThis, arr, "null thisArg should use the array as this");
+
+            // falsy-but-not-null/undefined values are used as-is
+            arrForEach(arr, function(this: any) {
+                capturedThis = this;
+            }, 0);
+            assert.strictEqual(capturedThis, 0, "thisArg of 0 should be used as-is");
+
+            arrForEach(arr, function(this: any) {
+                capturedThis = this;
+            }, "");
+            assert.strictEqual(capturedThis, "", "thisArg of empty string should be used as-is");
+
+            arrForEach(arr, function(this: any) {
+                capturedThis = this;
+            }, false);
+            assert.strictEqual(capturedThis, false, "thisArg of false should be used as-is");
+        });
     });
 
     describe("arrAppend", () => {
