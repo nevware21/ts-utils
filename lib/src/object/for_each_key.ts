@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { isFunction, isObject } from "../helpers/base";
+import { isFunction, isObject, isStrictNullOrUndefined } from "../helpers/base";
 import { CALL } from "../internal/constants";
 import { objHasOwn } from "./has_own";
 
@@ -42,7 +42,7 @@ export function objForEachKey<T>(theObject: T, callbackfn: (key: string, value: 
     if (theObject && (isObject(theObject) || isFunction(theObject))) {
         for (const prop in theObject) {
             if (objHasOwn(theObject, prop)) {
-                if (callbackfn[CALL](thisArg || theObject, prop, theObject[prop as keyof T]) === -1) {
+                if (callbackfn[CALL](isStrictNullOrUndefined(thisArg) ? theObject : thisArg, prop, theObject[prop as keyof T]) === -1) {
                     break;
                 }
             }

@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { isStrictNullOrUndefined } from "../helpers/base";
 import { CALL, LENGTH } from "../internal/constants";
 
 /**
@@ -50,12 +51,14 @@ import { CALL, LENGTH } from "../internal/constants";
  * const items = { length: 3, 0: 'item1', 1: 'item2', 2: 'item3' };
  * ```
  */
-export function arrForEach<T = any>(theArray: ArrayLike<T>, callbackfn: (value: T, index: number, array: T[]) => void | number, thisArg?: any): void {
+export function arrForEach<T = any>(theArray: ArrayLike<T>, callbackfn: (value: T, index: number, array: T[]) => void | number, thisArg?: any): void;
+export function arrForEach<T = any>(theArray: ArrayLike<T>, callbackfn: (value: T, index: number, array: ArrayLike<T>) => void | number, thisArg?: any): void;
+export function arrForEach<T = any, A extends ArrayLike<T> = ArrayLike<T>>(theArray: A, callbackfn: (value: T, index: number, array: A) => void | number, thisArg?: any): void {
     if (theArray) {
         const len = theArray[LENGTH] >>> 0;
         for (let idx = 0; idx < len; idx++) {
             if (idx in theArray) {
-                if (callbackfn[CALL](thisArg || theArray, theArray[idx], idx, theArray) === -1) {
+                if (callbackfn[CALL](isStrictNullOrUndefined(thisArg) ? theArray as any : thisArg, theArray[idx], idx, theArray) === -1) {
                     break;
                 }
             }

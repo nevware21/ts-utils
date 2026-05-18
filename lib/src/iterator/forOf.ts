@@ -7,6 +7,7 @@
  */
 
 import { ICachedValue, createCachedValue } from "../helpers/cache";
+import { isStrictNullOrUndefined } from "../helpers/base";
 import { CALL, NULL_VALUE, UNDEF_VALUE } from "../internal/constants";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
@@ -68,7 +69,7 @@ export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value
             try {
                 let count = 0;
                 while(!(iterResult = iter.next()).done) {
-                    if (callbackfn[CALL](thisArg || iter, iterResult.value, count, iter) === -1) {
+                    if (callbackfn[CALL](isStrictNullOrUndefined(thisArg) ? iter : thisArg, iterResult.value, count, iter) === -1) {
                         break;
                     }
         
