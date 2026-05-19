@@ -111,8 +111,8 @@ export {
     ObjDefinePropDescriptor, ObjDefinePropDescriptorMap, objDefine, objDefineProp, objDefineGet, objDefineAccessors,
     objDefineProperties, objDefineProps
 } from "./object/define";
-export { objForEachKey } from "./object/for_each_key";
-export { forEachOwnKeySafe } from "./object/forEachOwnKeySafe";
+export { objForEachKey, objForEachKeySafe } from "./object/for_each_key";
+export { forEachOwnKey, forEachOwnKeySafe } from "./object/forEachOwnKey";
 export { isUnsafePropKey } from "./object/isUnsafePropKey";
 export {
     objGetOwnPropertyDescriptor, objGetOwnPropertyDescriptors, objGetOwnPropertyNames,
@@ -131,6 +131,10 @@ export { objPreventExtensions, objIsExtensible } from "./object/prevent_extensio
 export { objPropertyIsEnumerable } from "./object/property_is_enumerable";
 export { objSetPrototypeOf } from "./object/set_proto";
 export { objIsFrozen, objIsSealed } from "./object/object_state";
+export { objPick, objOmit, objPickBy, objOmitBy } from "./object/pick";
+export { objMapValues } from "./object/map_values";
+export { objMergeIf, objDefaults } from "./object/defaults";
+export { objDiff } from "./object/diff";
 export { strCamelCase, strCapitalizeWords, strKebabCase, strLetterCase, strSnakeCase } from "./string/conversion";
 export { strCount } from "./string/count";
 export { strAt } from "./string/at";

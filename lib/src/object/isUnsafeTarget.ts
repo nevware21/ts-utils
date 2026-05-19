@@ -58,6 +58,22 @@ function _getUnsafeTargets(): any[] {
     _addTargetProto(targets, safe(getInst as any, ["WeakSet"]).v);
     _addTargetProto(targets, safe(getInst as any, ["Promise"]).v);
     _addTargetProto(targets, safe(getInst as any, ["Symbol"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["ArrayBuffer"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["SharedArrayBuffer"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["DataView"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["Int8Array"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["Uint8Array"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["Uint8ClampedArray"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["Int16Array"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["Uint16Array"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["Int32Array"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["Uint32Array"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["Float32Array"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["Float64Array"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["BigInt64Array"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["BigUint64Array"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["WeakRef"]).v);
+    _addTargetProto(targets, safe(getInst as any, ["FinalizationRegistry"]).v);
 
     return targets;
 }

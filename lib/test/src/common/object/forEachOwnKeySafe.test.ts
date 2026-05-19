@@ -7,13 +7,52 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
-import { forEachOwnKeySafe } from "../../../../src/object/forEachOwnKeySafe";
+import { forEachOwnKey, forEachOwnKeySafe } from "../../../../src/object/forEachOwnKey";
+import { hasSymbol } from "../../../../src/symbol/symbol";
 
 describe("object forEachOwnKeySafe tests", () => {
+    describe("forEachOwnKey", () => {
+        it("should iterate own enumerable symbol keys", () => {
+            if (!hasSymbol()) {
+                return;
+            }
+
+            const sym = Symbol("key");
+            const source: any = { a: 1 };
+            source[sym] = 2;
+
+            const visited: PropertyKey[] = [];
+            forEachOwnKey(source, (key) => {
+                visited.push(key);
+            });
+
+            assert.include(visited, "a");
+            assert.include(visited, sym);
+        });
+
+        it("should not filter unsafe string keys", () => {
+            const source: any = Object.create(null);
+            source["safe"] = 1;
+            source["constructor"] = 2;
+            source["prototype"] = 3;
+
+            const visited: string[] = [];
+            forEachOwnKey(source, (key) => {
+                if (typeof key === "string") {
+                    visited.push(key);
+                }
+            });
+
+            assert.include(visited, "safe");
+            assert.include(visited, "constructor");
+            assert.include(visited, "prototype");
+        });
+    });
+
     describe("forEachOwnKeySafe", () => {
         it("should iterate own enumerable keys for plain objects", () => {
             const obj = { a: 1, b: 2, c: 3 };
-            const visited: string[] = [];
+            const visited: PropertyKey[] = [];
 
             forEachOwnKeySafe(obj, (key) => {
                 visited.push(key);
@@ -29,7 +68,7 @@ describe("object forEachOwnKeySafe tests", () => {
             source["constructor"] = 3;
             source["prototype"] = 4;
 
-            const visited: string[] = [];
+            const visited: PropertyKey[] = [];
 
             forEachOwnKeySafe(source, (key) => {
                 visited.push(key);
@@ -43,7 +82,7 @@ describe("object forEachOwnKeySafe tests", () => {
             (value as any)["extra"] = 30;
             (value as any)["constructor"] = 40;
 
-            const visited: string[] = [];
+            const visited: PropertyKey[] = [];
             const copied: any = {};
 
             forEachOwnKeySafe(value, (key, itemValue) => {
@@ -60,7 +99,7 @@ describe("object forEachOwnKeySafe tests", () => {
 
         it("should support break behavior when callback returns -1", () => {
             const obj = { a: 1, b: 2, c: 3 };
-            const visited: string[] = [];
+            const visited: PropertyKey[] = [];
 
             forEachOwnKeySafe(obj, (key) => {
                 visited.push(key);

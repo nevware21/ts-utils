@@ -7,7 +7,7 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
-import { objPropertyIsEnumerable } from "../../../../src/object/property_is_enumerable";
+import { _objPropertyIsEnumerable, objPropertyIsEnumerable } from "../../../../src/object/property_is_enumerable";
 import { ObjClass } from "../../../../src/internal/constants";
 
 describe("object property_is_enumerable tests", () => {
@@ -215,12 +215,98 @@ describe("object property_is_enumerable tests", () => {
                 assert.isFalse(objPropertyIsEnumerable(obj, "nonEnumInherited"),
                     "Non-enumerable inherited property should return false with fallback");
 
-                assert.isTrue(objPropertyIsEnumerable(obj, "hello"),
-                    "Enumerable inherited property should return true with fallback");
+                assert.isFalse(objPropertyIsEnumerable(obj, "hello"),
+                    "Enumerable inherited property should return false with fallback");
             } finally {
                 // Restore the original function
                 ObjClass.getOwnPropertyDescriptor = originalGetOwnPropDesc;
             }
+        });
+    });
+
+    describe("_objPropertyIsEnumerable", () => {
+        it("should identify own enumerable and non-enumerable properties", () => {
+            const obj: any = {
+                visible: true
+            };
+
+            Object.defineProperty(obj, "hidden", {
+                value: true,
+                enumerable: false
+            });
+
+            assert.isTrue(_objPropertyIsEnumerable(obj, "visible"), "Own enumerable property should return true");
+            assert.isFalse(_objPropertyIsEnumerable(obj, "hidden"), "Own non-enumerable property should return false");
+            assert.isFalse(_objPropertyIsEnumerable(obj, "missing"), "Missing property should return false");
+        });
+
+        it("should return false for inherited enumerable properties", () => {
+            const proto: any = {
+                inherited: true
+            };
+            const obj = Object.create(proto);
+
+            assert.isFalse(_objPropertyIsEnumerable(obj, "inherited"), "Inherited enumerable property should return false");
+        });
+
+        it("should support symbol keys", () => {
+            if (typeof Symbol !== "function") {
+                return;
+            }
+
+            const visibleSym = Symbol("visibleSym");
+            const hiddenSym = Symbol("hiddenSym");
+            const obj: any = {};
+
+            obj[visibleSym] = 1;
+            Object.defineProperty(obj, hiddenSym, {
+                value: 2,
+                enumerable: false
+            });
+
+            assert.isTrue(_objPropertyIsEnumerable(obj, visibleSym), "Own enumerable symbol property should return true");
+            assert.isFalse(_objPropertyIsEnumerable(obj, hiddenSym), "Own non-enumerable symbol property should return false");
+        });
+
+        it("should not use an instance propertyIsEnumerable override function", () => {
+            const obj: any = {
+                test: true
+            };
+            let called = false;
+
+            obj.propertyIsEnumerable = function() {
+                called = true;
+                return false;
+            };
+
+            assert.isTrue(_objPropertyIsEnumerable(obj, "test"), "Should use prototype implementation and return true");
+            assert.isFalse(called, "Should not call the instance propertyIsEnumerable override");
+        });
+
+        it("should not throw when instance propertyIsEnumerable is non-callable", () => {
+            const obj: any = {
+                test: true,
+                propertyIsEnumerable: 1
+            };
+
+            assert.doesNotThrow(() => {
+                assert.isTrue(_objPropertyIsEnumerable(obj, "test"), "Should still return correct enumerability result");
+            }, "Non-callable instance override must not be invoked");
+        });
+
+        it("should propagate errors for null/undefined unlike objPropertyIsEnumerable which uses safe()", () => {
+            // _objPropertyIsEnumerable is built with _unwrapFunctionNoInstWithPoly, which captures
+            // ObjProto.propertyIsEnumerable at module-load time.  That cached reference cannot be
+            // replaced at runtime, so a "native unavailable" scenario cannot be simulated in a live
+            // test.  The meaningful behavioral difference to verify here is that _objPropertyIsEnumerable
+            // does NOT wrap calls in safe(), so passing null or undefined lets the underlying native
+            // TypeError propagate — in contrast to objPropertyIsEnumerable, which returns false.
+            assert.isFalse(objPropertyIsEnumerable(null as any, "prop"), "objPropertyIsEnumerable should return false for null (safe guard)");
+            assert.isFalse(objPropertyIsEnumerable(undefined as any, "prop"), "objPropertyIsEnumerable should return false for undefined (safe guard)");
+
+            // Both should throw a TypeError ("Cannot convert undefined or null to object")
+            assert.throws(() => _objPropertyIsEnumerable(null as any, "prop"));
+            assert.throws(() => _objPropertyIsEnumerable(undefined as any, "prop"));
         });
     });
 });
