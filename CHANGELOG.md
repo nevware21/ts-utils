@@ -1,3 +1,57 @@
+# v0.14.0 May 18th, 2026
+
+## Changelog
+
+### Features
+
+- [#525](https://github.com/nevware21/ts-utils/pull/525) feat(array): add new array helpers and array-like detection
+  - New helpers: `isArrayLike`, `arrSlice`, and other array utility improvements
+- [#527](https://github.com/nevware21/ts-utils/pull/527) feat(string): add `strReplace` and `strReplaceAll` helpers with refactored internal replacements
+- [#528](https://github.com/nevware21/ts-utils/pull/528) feat(string): add `strCapitalizeWords` helper
+- [#529](https://github.com/nevware21/ts-utils/pull/529) / [#530](https://github.com/nevware21/ts-utils/pull/530) feat(string): add `strTruncate`, `strCount`, `strAt`, and `strMatchAll` helpers with shared literal regex helper
+- [#533](https://github.com/nevware21/ts-utils/pull/533) feat(array): add `arrFlatMap` with ES5 polyfill support
+- [#535](https://github.com/nevware21/ts-utils/pull/535) docs(types): add typing utilities for v0.14.0 and expand TSDoc examples
+- [#536](https://github.com/nevware21/ts-utils/pull/536) feat: add `isAsyncIterable` and `isIntegerInRange` type/value inspection helpers
+- [#543](https://github.com/nevware21/ts-utils/pull/543) feat(string): add `strStartsWithAny`, `strEndsWithAny`, `strWrap`, `strUnwrap`, and `strNormalizeNewlines` helpers
+- [#564](https://github.com/nevware21/ts-utils/pull/564) feat(object): add new object utility helpers and harden defaults against prototype pollution
+  - New helpers: `objPick`, `objOmit`, `objPickBy`, `objOmitBy` — property selection and omission with typed overloads
+  - New helpers: `objMapValues` — create a new object with values transformed by a mapper function
+  - New helpers: `objMergeIf`, `objDefaults` — conditional merge and shallow defaults (similar to Lodash `_.defaults`) hardened against prototype pollution
+  - New helper: `objDiff` — shallow diff returning only changed/added keys from a modified object vs a base
+  - New helpers: `forEachOwnKey`, `forEachOwnKeySafe` — iteration over both string and symbol keys (existing `forEachOwnKeySafe` was string-only)
+  - New helper: `objForEachKeySafe` — safe string-key iteration that filters `__proto__`, `constructor`, `prototype`
+  - Extended `isUnsafeTarget` coverage to TypedArrays, `ArrayBuffer`, `DataView`, `WeakRef`, `FinalizationRegistry`
+
+### Security Issue
+- CVE-2026-46681 Prototype Pollution in objDeepCopy/objCopyProps via for...in without hasOwnProperty
+  - Also affected `setValueByKey` and `setValueByIter`
+  - [#565](https://github.com/nevware21/ts-utils/pull/565) feat: add prototype-pollution guards and array key helpers
+
+
+### Bug Fixes
+
+- [#558](https://github.com/nevware21/ts-utils/pull/558) Fix ES2015 built-in type errors in consumers by adding lib reference directive to published declarations
+  - Consumers using `"lib": ["ES5", "DOM"]` (or omitting `lib`) received `Cannot find name 'Symbol'` / `Cannot find name 'Iterator'` errors because the published `.d.ts` exposed ES2015 types without declaring the dependency
+  - Added `/// <reference lib="es2015" />` to the source entry points (`index.ts`, `polyfills.ts`) and a new post-processing script (`lib/scripts/setTsReferences.js`) that prepends the directive to the api-extractor bundled output (api-extractor strips these directives from its rollup)
+  - Added `"lib": ["ES2015", "DOM"]` to all library and test `tsconfig` files for consistent compile-time validation
+  - Net effect: consumers no longer need to add `"ES2015"` to their own `tsconfig.json` lib settings
+- [#561](https://github.com/nevware21/ts-utils/issues/561) Bug: Falsy `thisArg` (0, `''`, `false`) overridden in `arrForEach`/`iterForOf`/`objForEachKey`
+  - [#566](https://github.com/nevware21/ts-utils/pull/566) Fix falsy `thisArg` (0, `''`, `false`) being overridden in `arrForEach`, `iterForOf`, `objForEachKey`
+- [#562](https://github.com/nevware21/ts-utils/pull/562) Fix `thisArg` binding in `polyArrFindIndex` / `polyArrFindLastIndex` polyfills
+
+### Repository Improvements
+
+- [#549](https://github.com/nevware21/ts-utils/pull/549) Drop Node.js 16 from CI matrix and add Node.js 24
+- [#552](https://github.com/nevware21/ts-utils/pull/552) Upgrade Grunt devDependency to v1.6.2
+- [#554](https://github.com/nevware21/ts-utils/pull/554) Add funding metadata to published package manifests
+- [#556](https://github.com/nevware21/ts-utils/pull/556) Add release PR instructions to Copilot instructions
+
+### Dependency Updates
+
+- [#559](https://github.com/nevware21/ts-utils/pull/559) Bump puppeteer from 24.43.1 to 25.0.2
+
+[Full Changelog](https://github.com/nevware21/ts-utils/compare/v0.13.0...v0.14.0)
+
 # v0.13.0 Feb 26th, 2026
 
 ## Changelog
