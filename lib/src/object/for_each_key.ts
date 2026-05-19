@@ -86,7 +86,8 @@ export function objForEachKey<T>(theObject: T, callbackfn: (key: string, value: 
  * @example
  * ```ts
  * // Safe iteration - unsafe keys are skipped
- * const untrustedObj = Object.assign({}, { "__proto__": "attack", "name": "Alice", "constructor": {} });
+ * const untrustedObj: any = { name: "Alice", constructor: {} };
+ * Object.defineProperty(untrustedObj, "__proto__", { value: "attack", enumerable: true, configurable: true, writable: true });
  * objForEachKeySafe(untrustedObj, (key, value) => {
  *     console.log(key, value);  // Only prints: name Alice
  * });
