@@ -25,7 +25,7 @@ import { _pureRef } from "../internal/treeshake_helpers";
  * mathPow(8, 1/3); // 2
  * ```
  */
-export const mathPow = (/*#__PURE__*/_pureRef<typeof Math.pow>(MathCls, "pow"));
+export const mathPow = /*#__PURE__*/_pureRef<typeof Math.pow>(MathCls, "pow");
 
 /**
  * The `mathSqrt()` function returns the square root of a number.
@@ -43,4 +43,4 @@ export const mathPow = (/*#__PURE__*/_pureRef<typeof Math.pow>(MathCls, "pow"));
  * mathSqrt(-1); // NaN
  * ```
  */
-export const mathSqrt = (/*#__PURE__*/_pureRef<typeof Math.sqrt>(MathCls, "sqrt"));
+export const mathSqrt = /*#__PURE__*/_pureRef<typeof Math.sqrt>(MathCls, "sqrt");

@@ -21,7 +21,7 @@ let _symbolKeyFor: ICachedValue<(sym: symbol) => string | undefined>;
 
 /*#__NO_SIDE_EFFECTS__*/
 function _initSymbol() {
-    _symbol = (/*#__PURE__*/createCachedValue(safe(getInst<Symbol>, [SYMBOL]).v));
+    _symbol = /*#__PURE__*/createCachedValue(safe(getInst<Symbol>, [SYMBOL]).v);
 
     return _symbol;
 }
@@ -40,7 +40,7 @@ function _getSymbolKey<R>(key: string) {
  * @param value - Value to be checked.
  * @return True if the value is a symbol, false otherwise.
  */
-export const isSymbol: (value: any) => value is symbol = (/*#__PURE__*/_createIsWithPoly<symbol>("symbol"));
+export const isSymbol: (value: any) => value is symbol = /*#__PURE__*/_createIsWithPoly<symbol>("symbol");
 
 /**
  * Helper to identify whether the runtime support the Symbols either via native or an installed polyfill
@@ -49,7 +49,7 @@ export const isSymbol: (value: any) => value is symbol = (/*#__PURE__*/_createIs
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function hasSymbol(): boolean {
-    return !!( /*#__PURE__*/getSymbol());
+    return !!/*#__PURE__*/getSymbol();
 }
 
 /**
@@ -120,7 +120,7 @@ export function symbolFor(key: string): symbol {
     !_globalLazyTestHooks && _initTestHooks();
 
     // Cause lazy symbol to get initialized
-    _symbolFor = ((!_globalLazyTestHooks.lzy ? _symbolFor : 0) || (/*#__PURE__*/createCachedValue(safe(_getSymbolKey<typeof Symbol.for>, ["for"]).v)));
+    _symbolFor = ((!_globalLazyTestHooks.lzy ? _symbolFor : 0) || /*#__PURE__*/createCachedValue(safe(_getSymbolKey<typeof Symbol.for>, ["for"]).v));
 
     return (_symbolFor.v || polySymbolFor)(key);
 }
@@ -137,7 +137,7 @@ export function symbolKeyFor(sym: symbol): string | undefined {
     !_globalLazyTestHooks && _initTestHooks();
 
     // Cause lazy symbol to get initialized
-    _symbolKeyFor = ((!_globalLazyTestHooks.lzy ? _symbolKeyFor : 0) || (/*#__PURE__*/createCachedValue(safe(_getSymbolKey<typeof Symbol.keyFor>, ["keyFor"]).v)));
+    _symbolKeyFor = ((!_globalLazyTestHooks.lzy ? _symbolKeyFor : 0) || /*#__PURE__*/createCachedValue(safe(_getSymbolKey<typeof Symbol.keyFor>, ["keyFor"]).v));
 
     return (_symbolKeyFor.v || polySymbolKeyFor)(sym);
 }

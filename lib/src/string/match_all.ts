@@ -78,7 +78,7 @@ import { createIterableIterator } from "../iterator/create";
  * strMatchAll("hello", /l/); // throws TypeError
  * ```
  */
-export const strMatchAll: (value: string, matcher: string | RegExp) => IterableIterator<RegExpExecArray> = (/*#__PURE__*/_unwrapFunctionWithPoly("matchAll", StrProto as any, polyStrMatchAll));
+export const strMatchAll: (value: string, matcher: string | RegExp) => IterableIterator<RegExpExecArray> = /*#__PURE__*/_unwrapFunctionWithPoly("matchAll", StrProto as any, polyStrMatchAll);
 
 /*#__NO_SIDE_EFFECTS__*/
 function _cloneRegExp(theRegex: RegExp): RegExp {

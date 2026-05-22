@@ -23,7 +23,7 @@ import { _pureRef } from "../internal/treeshake_helpers";
  * mathSin(Math.PI); // 0 (approximately)
  * ```
  */
-export const mathSin = (/*#__PURE__*/_pureRef<typeof Math.sin>(MathCls, "sin"));
+export const mathSin = /*#__PURE__*/_pureRef<typeof Math.sin>(MathCls, "sin");
 
 /**
  * The `mathCos()` function returns the cosine of a number.
@@ -39,7 +39,7 @@ export const mathSin = (/*#__PURE__*/_pureRef<typeof Math.sin>(MathCls, "sin"));
  * mathCos(Math.PI); // -1
  * ```
  */
-export const mathCos = (/*#__PURE__*/_pureRef<typeof Math.cos>(MathCls, "cos"));
+export const mathCos = /*#__PURE__*/_pureRef<typeof Math.cos>(MathCls, "cos");
 
 /**
  * The `mathTan()` function returns the tangent of a number.
@@ -55,4 +55,4 @@ export const mathCos = (/*#__PURE__*/_pureRef<typeof Math.cos>(MathCls, "cos"));
  * mathTan(Math.PI / 2); // Infinity or a very large number (depending on implementation)
  * ```
  */
-export const mathTan = (/*#__PURE__*/_pureRef<typeof Math.tan>(MathCls, "tan"));
+export const mathTan = /*#__PURE__*/_pureRef<typeof Math.tan>(MathCls, "tan");

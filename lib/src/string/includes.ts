@@ -32,7 +32,7 @@ import { strIndexOf } from "./index_of";
  * when searchString is an empty string; otherwise, `false`.
  * @throws TypeError If searchString is a regex.
  */
-export const strIncludes: (value: string, searchString: string, position?: number) => boolean = (/*#__PURE__*/_unwrapFunctionWithPoly("includes", StrProto, polyStrIncludes));
+export const strIncludes: (value: string, searchString: string, position?: number) => boolean = /*#__PURE__*/_unwrapFunctionWithPoly("includes", StrProto, polyStrIncludes);
 
 /**
  * The strContains() method performs a __case-sensitive__ search to determine whether one string
@@ -51,7 +51,7 @@ export const strIncludes: (value: string, searchString: string, position?: numbe
  * when searchString is an empty string; otherwise, `false`.
  * @throws TypeError If searchString is a regex.
  */
-export const strContains: (value: string, searchString: string, position?: number) => boolean = (/*#__PURE__*/_pureAssign(strIncludes));
+export const strContains: (value: string, searchString: string, position?: number) => boolean = /*#__PURE__*/_pureAssign(strIncludes);
 
 /**
  * The polyStrIncludes() method performs a case-sensitive search to determine whether one string

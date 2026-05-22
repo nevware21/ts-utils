@@ -15,8 +15,8 @@ import { arrForEach } from "../array/forEach";
 import { _objPropertyIsEnumerable } from "./property_is_enumerable";
 import { _returnEmptyArray, _returnNothing } from "../internal/stubs";
 
-const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR)), _returnNothing));
-const _objGetOwnPropertySymbols: (obj: any) => symbol[] = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertySymbols>(ObjClass, GET_OWN_PROPERTY_SYMBOLS)), _returnEmptyArray));
+const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = /*#__PURE__*/_pureAssign(/*#__PURE__*/_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR), _returnNothing);
+const _objGetOwnPropertySymbols: (obj: any) => symbol[] = /*#__PURE__*/_pureAssign(/*#__PURE__*/_pureRef<typeof Object.getOwnPropertySymbols>(ObjClass, GET_OWN_PROPERTY_SYMBOLS), _returnEmptyArray);
 
 /**
  * Definition of the Property Descriptor mappings for the objDefine functions.
@@ -160,7 +160,7 @@ function _createProp(value: ObjDefinePropDescriptor): PropertyDescriptor {
  * @param descriptor - The descriptor for the property being defined or modified.
  * @returns The object that was passed to the function with the new or updated property.
  */
-export const objDefineProp: <T>(target: T, key: PropertyKey, descriptor: PropertyDescriptor & ThisType<any>) => T = (/*#__PURE__*/_pureRef<typeof Object.defineProperty>(ObjClass as any, "defineProperty"));
+export const objDefineProp: <T>(target: T, key: PropertyKey, descriptor: PropertyDescriptor & ThisType<any>) => T = /*#__PURE__*/_pureRef<typeof Object.defineProperty>(ObjClass as any, "defineProperty");
 
 /**
  * The objDefineProperties() method defines new or modifies existing properties directly on an object, returning the object.
@@ -174,7 +174,7 @@ export const objDefineProp: <T>(target: T, key: PropertyKey, descriptor: Propert
  * it cannot be both (see {@link ObjDefinePropDescriptorMap} for more details).
  * @returns
  */
-export const objDefineProperties: <T>(target: T, props: PropertyDescriptorMap & ThisType<any>) => T = (/*#__PURE__*/_pureRef<typeof Object.defineProperties>(ObjClass as any, "defineProperties"));
+export const objDefineProperties: <T>(target: T, props: PropertyDescriptorMap & ThisType<any>) => T = /*#__PURE__*/_pureRef<typeof Object.defineProperties>(ObjClass as any, "defineProperties");
 
 /**
  * Try to define a get object property accessor for the target object, if a function is past as the value this will

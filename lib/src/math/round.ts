@@ -40,4 +40,4 @@ import { _pureRef } from "../internal/treeshake_helpers";
  * mathRound(-0.9); // -1
  * ```
  */
-export const mathRound = (/*#__PURE__*/_pureRef<typeof Math.floor>(MathCls, "round"));
+export const mathRound = /*#__PURE__*/_pureRef<typeof Math.floor>(MathCls, "round");

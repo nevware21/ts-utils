@@ -26,4 +26,4 @@ import { _pureRef } from "../internal/treeshake_helpers";
  * mathAbs(0); // 0
  * ```
  */
-export const mathAbs = (/*#__PURE__*/_pureRef<typeof Math.abs>(MathCls, "abs"));
+export const mathAbs = /*#__PURE__*/_pureRef<typeof Math.abs>(MathCls, "abs");

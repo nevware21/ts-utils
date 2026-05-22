@@ -24,7 +24,7 @@ import { _pureRef } from "../internal/treeshake_helpers";
  * mathAsin(0.5); // 0.5235987755982989 (approximately π/6)
  * ```
  */
-export const mathAsin = (/*#__PURE__*/_pureRef<typeof Math.asin>(MathCls, "asin"));
+export const mathAsin = /*#__PURE__*/_pureRef<typeof Math.asin>(MathCls, "asin");
 
 /**
  * The `mathAcos()` function returns the arccosine of a number.
@@ -41,7 +41,7 @@ export const mathAsin = (/*#__PURE__*/_pureRef<typeof Math.asin>(MathCls, "asin"
  * mathAcos(0.5); // 1.0471975511965979 (approximately π/3)
  * ```
  */
-export const mathAcos = (/*#__PURE__*/_pureRef<typeof Math.acos>(MathCls, "acos"));
+export const mathAcos = /*#__PURE__*/_pureRef<typeof Math.acos>(MathCls, "acos");
 
 /**
  * The `mathAtan()` function returns the arctangent of a number.
@@ -57,7 +57,7 @@ export const mathAcos = (/*#__PURE__*/_pureRef<typeof Math.acos>(MathCls, "acos"
  * mathAtan(Infinity); // 1.5707963267948966 (π/2)
  * ```
  */
-export const mathAtan = (/*#__PURE__*/_pureRef<typeof Math.atan>(MathCls, "atan"));
+export const mathAtan = /*#__PURE__*/_pureRef<typeof Math.atan>(MathCls, "atan");
 
 /**
  * The `mathAtan2()` function returns the angle in the plane (in radians) between the positive
@@ -76,4 +76,4 @@ export const mathAtan = (/*#__PURE__*/_pureRef<typeof Math.atan>(MathCls, "atan"
  * mathAtan2(-1, -1); // -2.356194490192345 (approximately -3π/4)
  * ```
  */
-export const mathAtan2 = (/*#__PURE__*/_pureRef<typeof Math.atan2>(MathCls, "atan2"));
+export const mathAtan2 = /*#__PURE__*/_pureRef<typeof Math.atan2>(MathCls, "atan2");

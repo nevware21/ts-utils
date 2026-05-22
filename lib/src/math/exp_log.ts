@@ -24,7 +24,7 @@ import { _pureRef } from "../internal/treeshake_helpers";
  * mathExp(2); // 7.38905609893065 (approximately e^2)
  * ```
  */
-export const mathExp = (/*#__PURE__*/_pureRef<typeof Math.exp>(MathCls, "exp"));
+export const mathExp = /*#__PURE__*/_pureRef<typeof Math.exp>(MathCls, "exp");
 
 /**
  * The `mathLog()` function returns the natural logarithm (base e) of a number.
@@ -41,4 +41,4 @@ export const mathExp = (/*#__PURE__*/_pureRef<typeof Math.exp>(MathCls, "exp"));
  * mathLog(-1); // NaN
  * ```
  */
-export const mathLog = (/*#__PURE__*/_pureRef<typeof Math.log>(MathCls, "log"));
+export const mathLog = /*#__PURE__*/_pureRef<typeof Math.log>(MathCls, "log");
