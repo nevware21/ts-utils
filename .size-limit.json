@@ -2,21 +2,21 @@
   {
     "name": "es5-full",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "32.5 kb",
+    "limit": "33.5 kb",
     "brotli": false,
     "running": false
   },
   {
     "name": "es6-full",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "31.5 kb",
+    "limit": "32 kb",
     "brotli": false,
     "running": false
   },
   {
     "name": "es5-full-brotli",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "11.5 kb",
+    "limit": "12 kb",
     "brotli": true,
     "running": false
   },
@@ -30,14 +30,14 @@
   {
     "name": "es5-zip",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "12.5 Kb",
+    "limit": "13 Kb",
     "gzip": true,
     "running": false
   },
   {
     "name": "es6-zip",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "12.5 Kb",
+    "limit": "13 Kb",
     "gzip": true,
     "running": false
   },
@@ -91,8 +91,24 @@
   {
     "name": "es5-simple-string",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "1kb",
+    "limit": "1 kb",
     "import": "{ getWindow, strEndsWith }",
+    "gzip": true,
+    "running": false
+  },
+  {
+    "name": "es5-scheduleTimeout",
+    "path": "lib/dist/es5/mod/ts-utils.js",
+    "limit": "1 kb",
+    "import": "{ scheduleTimeout }",
+    "gzip": true,
+    "running": false
+  },
+  {
+    "name": "es5-scheduleMicrotask",
+    "path": "lib/dist/es5/mod/ts-utils.js",
+    "limit": "1.5 kb",
+    "import": "{ scheduleMicrotask }",
     "gzip": true,
     "running": false
   }

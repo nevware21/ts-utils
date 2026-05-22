@@ -15,6 +15,7 @@ import { ITimerHandler, _createTimerHandler } from "./handler";
 // Package instance timeout override functions
 let _setTimeoutFn: TimeoutOverrideFn | undefined;
 let _clearTimeoutFn: ClearTimeoutOverrideFn | undefined;
+let _microtaskCallback: (() => void) | undefined;
 
 function _resolveTimeoutFn(timeoutFn: TimeoutOverrideFn): TimeoutOverrideFn {
     let result = isFunction(timeoutFn) ? timeoutFn : _setTimeoutFn;
@@ -53,6 +54,16 @@ function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn |
 
     let timerFn = theArgs[0];
     theArgs[0] = function () {
+        // Microtask fallback hook for environments without native queueMicrotask support, this allows us to
+        // simulate the running of microtasks before standard timeouts.
+        let microTasksFn = _microtaskCallback;
+        if (microTasksFn) {
+            // Run any pending microtasks before running the timeout callback to allow any microtasks
+            // scheduled within the callback to run before the next timeout.
+            _microtaskCallback = UNDEF_VALUE;
+            microTasksFn();
+        }
+
         handler.dn();
         fnApply(timerFn, UNDEF_VALUE, ArrSlice[CALL](arguments));
     };
@@ -73,6 +84,20 @@ function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn |
     });
 
     return handler.h;
+}
+
+/**
+ * @internal
+ * Internal function to set the microtask callback used by the microtask scheduling functions, this is used as
+ * a hook to allow the timeout implementation to run any pending microtasks before running a timeout callback
+ * @since 0.15.0
+ * @param queueFn - The function to be called to flush the microtask queue, this will be set by the microtask
+ * scheduling functions when they need to schedule a flush of the microtask queue
+ */
+export function _setMicrotaskCallback(queueFn: (() => void) | undefined): void {
+    if (!_microtaskCallback && isFunction(queueFn)) {
+        _microtaskCallback = queueFn;
+    }
 }
 
 /**
