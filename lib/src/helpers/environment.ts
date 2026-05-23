@@ -151,7 +151,7 @@ export function getInst<T>(name: string | number | symbol, useCached?: boolean):
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function hasDocument(): boolean {
-    return !!/*#__PURE__*/getDocument();
+    return !!getDocument();
 }
 
 /**
@@ -169,7 +169,7 @@ export const getDocument = /*#__PURE__*/_getGlobalInstFn<Document>(getInst, ["do
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function hasWindow(): boolean {
-    return !!/*#__PURE__*/getWindow();
+    return !!getWindow();
 }
 
 /**
@@ -187,7 +187,7 @@ export const getWindow = /*#__PURE__*/_getGlobalInstFn<Window>(getInst, [WINDOW]
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function hasNavigator(): boolean {
-    return !!/*#__PURE__*/getNavigator();
+    return !!getNavigator();
 }
 
 /**
@@ -205,7 +205,7 @@ export const getNavigator = /*#__PURE__*/_getGlobalInstFn<Navigator>(getInst, ["
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function hasHistory(): boolean {
-    return !!/*#__PURE__*/getHistory();
+    return !!getHistory();
 }
 
 /**
@@ -223,7 +223,7 @@ export const getHistory = /*#__PURE__*/_getGlobalInstFn<History>(getInst, ["hist
  * @returns True if you are
  */
 export const isNode = /*#__PURE__*/_getGlobalInstFn<boolean>(() => {
-    return !!/*#__PURE__*/safe(() => (process && (process.versions||{}).node)).v;
+    return !!safe(() => (process && (process.versions||{}).node)).v;
 });
 
 /**
@@ -233,5 +233,5 @@ export const isNode = /*#__PURE__*/_getGlobalInstFn<boolean>(() => {
  * @returns True if the environment you are in looks like a Web Worker
  */
 export const isWebWorker = /*#__PURE__*/_getGlobalInstFn<boolean>(() => {
-    return !!/*#__PURE__*/safe(() => self && self instanceof WorkerGlobalScope).v;
+    return !!safe(() => self && self instanceof WorkerGlobalScope).v;
 });
