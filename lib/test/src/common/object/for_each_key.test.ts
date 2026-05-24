@@ -258,9 +258,9 @@ describe("object for_each_key tests", () => {
                 "constructor": "attack",
                 "prototype": "attack",
                 "name": "Dave"
-             } as { [key: string]: string };
+            } as { [key: string]: string };
 
-             Object.defineProperty(obj, "__proto__", {
+            Object.defineProperty(obj, "__proto__", {
                 configurable: true,
                 enumerable: true,
                 value: "attack",
