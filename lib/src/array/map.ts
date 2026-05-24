@@ -61,4 +61,4 @@ import { ArrMapCallbackFn } from "./callbacks";
  * };
  * ```
  */
-export const arrMap: <T, R = T>(theArray: ArrayLike<T>, callbackFn: ArrMapCallbackFn<T, R>, thisArg?: any) => R[] = (/*#__PURE__*/_unwrapFunction("map", ArrProto));
+export const arrMap: <T, R = T>(theArray: ArrayLike<T>, callbackFn: ArrMapCallbackFn<T, R>, thisArg?: any) => R[] = /*#__PURE__*/ _unwrapFunction("map", ArrProto);

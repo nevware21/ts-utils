@@ -67,7 +67,7 @@ function _objPropertyIsEnum(obj: any, propKey: PropertyKey): boolean {
  * console.log(objPropertyIsEnumerable(obj, "nonExistent")); // false
  * ```
  */
-export const objPropertyIsEnumerable: (obj: any, prop: PropertyKey) => boolean = (/*#__PURE__*/_unwrapFunctionWithPoly("propertyIsEnumerable", NULL_VALUE as any, _objPropertyIsEnum));
+export const objPropertyIsEnumerable: (obj: any, prop: PropertyKey) => boolean = /*#__PURE__*/ _unwrapFunctionWithPoly("propertyIsEnumerable", NULL_VALUE as any, _objPropertyIsEnum);
 
 /**
  * @internal
@@ -85,4 +85,4 @@ export const objPropertyIsEnumerable: (obj: any, prop: PropertyKey) => boolean =
  * @param prop - The property name or symbol to check
  * @returns A Boolean indicating whether the specified property is enumerable
  */
-export const _objPropertyIsEnumerable: (obj: any, prop: PropertyKey) => boolean = (/*#__PURE__*/_unwrapFunctionNoInstWithPoly("propertyIsEnumerable", ObjProto, _objPropertyIsEnum));
+export const _objPropertyIsEnumerable: (obj: any, prop: PropertyKey) => boolean = /*#__PURE__*/ _unwrapFunctionNoInstWithPoly("propertyIsEnumerable", ObjProto, _objPropertyIsEnum);

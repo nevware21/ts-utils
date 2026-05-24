@@ -36,7 +36,7 @@ import { mathMax, mathMin } from "../math/min_max";
  * arrFill([], 1);                     // []
  * ```
  */
-export const arrFill = (/*#__PURE__*/_unwrapFunctionWithPoly("fill", ArrProto, polyArrFill) as <T>(theArray: WritableArrayLike<T>, value: T, start?: number, end?: number) => WritableArrayLike<T>);
+export const arrFill = /*#__PURE__*/ _unwrapFunctionWithPoly("fill", ArrProto, polyArrFill) as <T>(theArray: WritableArrayLike<T>, value: T, start?: number, end?: number) => WritableArrayLike<T>;
 
 /**
  * Polyfill implementation of Array.fill() for environments that don't support it.

@@ -41,7 +41,7 @@ import { throwRangeError } from "../helpers/throw";
  * arrWith({ length: 3, 0: "a", 1: "b", 2: "c" }, 1, "x");  // ["a", "x", "c"]
  * ```
  */
-export const arrWith = (/*#__PURE__*/_unwrapFunctionWithPoly("with", ArrProto as any, polyArrWith) as <T>(theArray: ArrayLike<T>, index: number, value: T) => T[]);
+export const arrWith = /*#__PURE__*/ _unwrapFunctionWithPoly("with", ArrProto as any, polyArrWith) as <T>(theArray: ArrayLike<T>, index: number, value: T) => T[];
 
 /**
  * Polyfill implementation of Array.with() for environments that don't support it.

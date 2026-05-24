@@ -40,7 +40,7 @@ import { asString } from "./as_string";
  * strAt("hello", -99); // undefined — out of range
  * ```
  */
-export const strAt: (value: string, index: number) => string | undefined = (/*#__PURE__*/_unwrapFunctionWithPoly("at", StrProto as any, polyStrAt));
+export const strAt: (value: string, index: number) => string | undefined = /*#__PURE__*/ _unwrapFunctionWithPoly("at", StrProto as any, polyStrAt);
 
 /**
  * Polyfill implementation of `String.prototype.at()` that returns the character at the given

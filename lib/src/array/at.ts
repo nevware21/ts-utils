@@ -35,7 +35,7 @@ import { isArrayLike } from "../helpers/base";
  * arrAt({ length: 3, 0: "a", 1: "b", 2: "c" }, -1);  // "c"
  * ```
  */
-export const arrAt = (/*#__PURE__*/_unwrapFunctionWithPoly("at", ArrProto as any, polyArrAt) as <T>(theArray: ArrayLike<T>, index: number) => T | undefined);
+export const arrAt = /*#__PURE__*/ _unwrapFunctionWithPoly("at", ArrProto as any, polyArrAt) as <T>(theArray: ArrayLike<T>, index: number) => T | undefined;
 
 /**
  * Polyfill implementation of Array.at() for environments that don't support it.

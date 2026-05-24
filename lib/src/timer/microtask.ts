@@ -76,7 +76,7 @@ export interface MicroTaskOptions {
  * }
  * ```
  */
-export const getQueueMicrotask = (/*#__PURE__*/_getGlobalInstFn<ScheduleMicrotaskFn>(getInst as any, ["queueMicrotask"]));
+export const getQueueMicrotask = /*#__PURE__*/ _getGlobalInstFn<ScheduleMicrotaskFn>(getInst as any, ["queueMicrotask"]);
 
 /**
  * Identifies if the runtime supports the `queueMicrotask` API.
@@ -94,7 +94,7 @@ export const getQueueMicrotask = (/*#__PURE__*/_getGlobalInstFn<ScheduleMicrotas
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function hasQueueMicrotask(): boolean {
-    return !!( /*#__PURE__*/getQueueMicrotask());
+    return !!getQueueMicrotask();
 }
 
 /**

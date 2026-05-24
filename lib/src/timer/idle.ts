@@ -127,7 +127,7 @@ export type CancelIdleCallback = (handle: number) => void;
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function hasIdleCallback(): boolean {
-    return !!( /*#__PURE__*/getIdleCallback());
+    return !!getIdleCallback();
 }
 
 /**
@@ -140,7 +140,7 @@ export function hasIdleCallback(): boolean {
  * @group Idle
  * @group Environment
  */
-export const getIdleCallback = (/*#__PURE__*/_getGlobalInstFn<RequestIdleCallback>(getInst, ["requestIdleCallback"]));
+export const getIdleCallback = /*#__PURE__*/ _getGlobalInstFn<RequestIdleCallback>(getInst, ["requestIdleCallback"]);
 
 /**
  * Returns the global `cancelIdleCallback` function if available, which can be used to
@@ -152,7 +152,7 @@ export const getIdleCallback = (/*#__PURE__*/_getGlobalInstFn<RequestIdleCallbac
  * @group Idle
  * @group Environment
  */
-export const getCancelIdleCallback = (/*#__PURE__*/_getGlobalInstFn<CancelIdleCallback>(getInst, ["cancelIdleCallback"]));
+export const getCancelIdleCallback = /*#__PURE__*/ _getGlobalInstFn<CancelIdleCallback>(getInst, ["cancelIdleCallback"]);
 
 /**
  * Set the idle timeout fallback timeout which is used when the runtime does not support `requestIdleCallback`

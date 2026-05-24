@@ -34,100 +34,100 @@ export const GET_OWN_PROPERTY_SYMBOLS = "getOwnPropertySymbols";
 /**
  * @ignore
  */
-export const ObjClass = (/*#__PURE__*/_pureAssign(Object));
+export const ObjClass = /*#__PURE__*/ _pureAssign(Object);
 
 /**
  * @ignore
  */
-export const ObjProto = (/*#__PURE__*/_pureRef<typeof Object.prototype>(ObjClass, PROTOTYPE));
+export const ObjProto = /*#__PURE__*/ _pureRef<typeof Object.prototype>(ObjClass, PROTOTYPE);
 
 /**
  * @ignore
  */
-export const StrCls = (/*#__PURE__*/_pureAssign(String));
+export const StrCls = /*#__PURE__*/ _pureAssign(String);
 
 /**
  * @ignore
  */
-export const StrProto = (/*#__PURE__*/_pureRef<typeof String.prototype>(StrCls, PROTOTYPE)) as String;
+export const StrProto: String = /*#__PURE__*/ _pureRef<typeof String.prototype>(StrCls, PROTOTYPE);
 
 /**
  * @ignore
  */
-export const MathCls = (/*#__PURE__*/_pureAssign(Math)) as Math;
+export const MathCls: Math = /*#__PURE__*/ _pureAssign(Math);
 
 /**
  * @ignore
  */
-export const ArrCls = (/*#__PURE__*/_pureAssign(Array));
+export const ArrCls = /*#__PURE__*/ _pureAssign(Array);
 
 /**
  * @ignore
  */
-export const ArrProto = (/*#__PURE__*/_pureRef<typeof ArrCls.prototype>(ArrCls, PROTOTYPE));
+export const ArrProto = /*#__PURE__*/ _pureRef<typeof ArrCls.prototype>(ArrCls, PROTOTYPE);
 
 /**
  * @ignore
  *
  */
-export const ArrSlice = (/*#__PURE__*/_pureRef<typeof ArrProto.slice>(ArrProto, "slice"));
+export const ArrSlice = /*#__PURE__*/ _pureRef<typeof ArrProto.slice>(ArrProto, "slice");
 
 /**
  * @ignore
  */
-export const NumberCls = (/*#__PURE__*/_pureAssign(Number));
+export const NumberCls = /*#__PURE__*/ _pureAssign(Number);
 
 /**
  * @ignore
  */
-export const NumberProto = (/*#__PURE__*/_pureRef<typeof Number.prototype>(NumberCls, PROTOTYPE)) as Number;
+export const NumberProto: Number = /*#__PURE__*/ _pureRef<typeof Number.prototype>(NumberCls, PROTOTYPE);
 
 /**
  * @ignore
  */
-export const FuncCls = (/*#__PURE__*/_pureAssign(Function)) as FunctionConstructor;
+export const FuncCls: FunctionConstructor = /*#__PURE__*/ _pureAssign(Function);
 
 /**
  * @ignore
  */
-export const FuncProto = (/*#__PURE__*/_pureRef<typeof Function.prototype>(FuncCls, PROTOTYPE)) as Function;
+export const FuncProto: Function = /*#__PURE__*/ _pureRef<typeof Function.prototype>(FuncCls, PROTOTYPE);
 
 /**
  * @ignore
  */
-export const DateCls = (/*#__PURE__*/_pureAssign(Date)) as DateConstructor;
+export const DateCls: DateConstructor = /*#__PURE__*/ _pureAssign(Date);
 
 /**
  * @ignore
  */
-export const DateProto = (/*#__PURE__*/_pureRef<typeof Date.prototype>(DateCls, PROTOTYPE)) as Date;
+export const DateProto: Date = /*#__PURE__*/ _pureRef<typeof Date.prototype>(DateCls, PROTOTYPE);
 
 /**
  * @ignore
  */
-export const RegExpCls = (/*#__PURE__*/_pureAssign(RegExp)) as RegExpConstructor;
+export const RegExpCls: RegExpConstructor = /*#__PURE__*/ _pureAssign(RegExp);
 
 /**
  * @ignore
  */
-export const RegExpProto = (/*#__PURE__*/_pureRef<typeof RegExp.prototype>(RegExpCls, PROTOTYPE)) as RegExp;
+export const RegExpProto: RegExp = /*#__PURE__*/ _pureRef<typeof RegExp.prototype>(RegExpCls, PROTOTYPE);
 
 /**
  * @ignore
  */
-export const BooleanCls = (/*#__PURE__*/_pureAssign(Boolean)) as BooleanConstructor;
+export const BooleanCls: BooleanConstructor = /*#__PURE__*/ _pureAssign(Boolean);
 
 /**
  * @ignore
  */
-export const BooleanProto = (/*#__PURE__*/_pureRef<typeof Boolean.prototype>(BooleanCls, PROTOTYPE)) as Boolean;
+export const BooleanProto: Boolean = /*#__PURE__*/ _pureRef<typeof Boolean.prototype>(BooleanCls, PROTOTYPE);
 
 /**
  * @ignore
  */
-export const ErrorCls = (/*#__PURE__*/_pureAssign(Error)) as ErrorConstructor;
+export const ErrorCls: ErrorConstructor = /*#__PURE__*/ _pureAssign(Error);
 
 /**
  * @ignore
  */
-export const ErrorProto = (/*#__PURE__*/_pureRef<typeof Error.prototype>(ErrorCls, PROTOTYPE)) as Error;
+export const ErrorProto: Error = /*#__PURE__*/ _pureRef<typeof Error.prototype>(ErrorCls, PROTOTYPE);

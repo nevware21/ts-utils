@@ -35,7 +35,7 @@ import { mathToInt } from "../math/to_int";
  * // [0, 1, 2]
  * ```
  */
-export const arrKeys: <T = any>(value: ArrayLike<T>) => IterableIterator<number> = (/*#__PURE__*/_unwrapFunctionWithPoly("keys", ArrProto as any, polyArrKeys) as any);
+export const arrKeys: <T = any>(value: ArrayLike<T>) => IterableIterator<number> = /*#__PURE__*/ _unwrapFunctionWithPoly("keys", ArrProto as any, polyArrKeys) as any;
 
 /**
  * Polyfill implementation of `Array.prototype.keys()` for array-like values.

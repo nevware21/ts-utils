@@ -23,4 +23,4 @@ import { _pureRef } from "../internal/treeshake_helpers";
  * Math.floor(mathRandom() * 100); // a random integer between 0 and 99
  * ```
  */
-export const mathRandom = (/*#__PURE__*/_pureRef<typeof Math.random>(MathCls, "random"));
+export const mathRandom = /*#__PURE__*/ _pureRef<typeof Math.random>(MathCls, "random");

@@ -61,7 +61,7 @@ import { fnCall } from "../funcs/funcs";
  * // [[1, 11], [2, 12]]
  * ```
  */
-export const arrFlatMap = (/*#__PURE__*/_unwrapFunctionWithPoly("flatMap", ArrProto as any, polyArrFlatMap) as <T, R = T>(theArray: ArrayLike<T>, callbackFn: ArrFlatMapCallbackFn<T, R>, thisArg?: any) => R[]);
+export const arrFlatMap = /*#__PURE__*/ _unwrapFunctionWithPoly("flatMap", ArrProto as any, polyArrFlatMap) as <T, R = T>(theArray: ArrayLike<T>, callbackFn: ArrFlatMapCallbackFn<T, R>, thisArg?: any) => R[];
 
 /**
  * Polyfill implementation of Array.flatMap() for environments that don't support it.

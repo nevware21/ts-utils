@@ -35,7 +35,7 @@ import { strReplace } from "./replace";
  * // "A0bcA3"
  * ```
  */
-export const strReplaceAll: (value: string, searchValue: string | RegExp, replaceValue: string | ((substring: string, ...args: any[]) => string)) => string = (/*#__PURE__*/_unwrapFunctionWithPoly("replaceAll", StrProto as any, polyStrReplaceAll));
+export const strReplaceAll: (value: string, searchValue: string | RegExp, replaceValue: string | ((substring: string, ...args: any[]) => string)) => string = /*#__PURE__*/ _unwrapFunctionWithPoly("replaceAll", StrProto as any, polyStrReplaceAll);
 
 /**
  * Polyfill implementation of `String.prototype.replaceAll()` that returns a new string with all

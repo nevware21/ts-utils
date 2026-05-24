@@ -29,7 +29,7 @@ import { _pureRef } from "../internal/treeshake_helpers";
  * const z = Math.min(x, y); // -20
  * ```
  */
-export const mathMin: (...values: number[]) => number = (/*#__PURE__*/_pureRef<typeof Math.min>(MathCls, "min"));
+export const mathMin: (...values: number[]) => number = /*#__PURE__*/ _pureRef<typeof Math.min>(MathCls, "min");
 
 /**
  * The `mathMax()` function returns the largest of the zero or more numbers given as input
@@ -52,4 +52,4 @@ export const mathMin: (...values: number[]) => number = (/*#__PURE__*/_pureRef<t
  * mathMax(-10, 20);  //  20
  * ```
  */
-export const mathMax: (...values: number[]) => number = (/*#__PURE__*/_pureRef<typeof Math.max>(MathCls, "max"));
+export const mathMax: (...values: number[]) => number = /*#__PURE__*/ _pureRef<typeof Math.max>(MathCls, "max");
