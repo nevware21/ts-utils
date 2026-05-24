@@ -1,3 +1,15 @@
+# Unreleased
+
+## Changelog
+
+### Features
+
+- Add microtask scheduling helpers with native `queueMicrotask`, Promise, and timer-backed fallbacks
+  - New functions: `scheduleMicrotask`, `hasQueueMicrotask`, `getQueueMicrotask`, `setMicroTaskFallbackOptions`
+  - New public types: `ScheduleMicrotaskFn`, `MicroTaskOptions`
+  - Extends microtask support by providing cancellable microtasks via `ITimerHandler`, plus fallback ordering to run microtasks before queued timers when using the timer-backed implementation
+  - Provides runtime parity across all supported environments by using native `queueMicrotask` when present, Promise-backed scheduling when available, and a timer-backed microtask queue otherwise
+
 # v0.14.0 May 18th, 2026
 
 ## Changelog
@@ -5,7 +17,7 @@
 ### Features
 
 - [#525](https://github.com/nevware21/ts-utils/pull/525) feat(array): add new array helpers and array-like detection
-  - New helpers: `isArrayLike`, `arrSlice`, and other array utility improvements
+  - New helpers: `isArrayLike`, `arrUnique`, `arrCompact`, `arrFlatten`, `arrGroupBy`, `arrChunk` and export previously missed `isArrayLike`
 - [#527](https://github.com/nevware21/ts-utils/pull/527) feat(string): add `strReplace` and `strReplaceAll` helpers with refactored internal replacements
 - [#528](https://github.com/nevware21/ts-utils/pull/528) feat(string): add `strCapitalizeWords` helper
 - [#529](https://github.com/nevware21/ts-utils/pull/529) / [#530](https://github.com/nevware21/ts-utils/pull/530) feat(string): add `strTruncate`, `strCount`, `strAt`, and `strMatchAll` helpers with shared literal regex helper

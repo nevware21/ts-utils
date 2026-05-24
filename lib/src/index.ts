@@ -76,7 +76,7 @@ export {
 export { deepExtend, objExtend } from "./helpers/extend";
 export { getValueByKey, setValueByKey, getValueByIter, setValueByIter } from "./helpers/get_set_value";
 export { ILazyValue, getLazy, setBypassLazyCache, getWritableLazy } from "./helpers/lazy";
-export { IGetLength as GetLengthImpl, getLength } from "./helpers/length";
+export { IGetLength, IGetLength as GetLengthImpl, getLength } from "./helpers/length";
 export { getIntValue, isInteger, isIntegerInRange, isFiniteNumber } from "./helpers/number";
 export { getPerformance, hasPerformance, elapsedTime, perfNow } from "./helpers/perf";
 export { createFilenameRegex, createLiteralRegex, createWildcardRegex, makeGlobRegex } from "./helpers/regexp";
@@ -166,6 +166,10 @@ export {
     getIdleCallback, getCancelIdleCallback, RequestIdleCallback, CancelIdleCallback
 } from "./timer/idle";
 export { scheduleInterval } from "./timer/interval";
+export {
+    hasQueueMicrotask, scheduleMicrotask, getQueueMicrotask,
+    ScheduleMicrotaskFn, MicroTaskOptions, setMicroTaskFallbackOptions
+} from "./timer/microtask";
 export {
     TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, scheduleTimeout, scheduleTimeoutWith,
     createTimeout, createTimeoutWith, setTimeoutOverrides, setGlobalTimeoutOverrides
