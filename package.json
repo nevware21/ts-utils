@@ -271,6 +271,7 @@
         "karma-mocha": "^2.0.1",
         "karma-spec-reporter": "^0.0.36",
         "karma-typescript": "^5.5.4",
+        "magic-string": "^0.30.21",
         "mocha": "^11.2.0",
         "nyc": "^18.0.0",
         "puppeteer": "^25.0.2",

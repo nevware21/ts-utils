@@ -30,8 +30,8 @@ let _recursionCheckOwnDescriptors: boolean;
 let _recursionCheckOwnSymbols: boolean;
 
 // Defining these locally to avoid tree-shaking issues with the polyfill and circular references
-const _objGetOwnPropertyNames: (obj: any) => string[] = /* #__PURE__ */_pureAssign(/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyNames>(ObjClass, GET_OWN_PROPERTY_NAMES), _returnEmptyArray);
-const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = /* #__PURE__ */_pureAssign(/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR), _returnNothing);
+const _objGetOwnPropertyNames: (obj: any) => string[] = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyNames>(ObjClass, GET_OWN_PROPERTY_NAMES)), _returnEmptyArray));
+const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR)), _returnNothing));
 
 /**
  * Polyfill implementation of Object.getOwnPropertyDescriptors for environments where it doesn't exist.

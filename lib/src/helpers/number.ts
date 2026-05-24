@@ -60,7 +60,7 @@ export function getIntValue(value?: string | number, defValue?: number): number 
  * isInteger(Infinity);            // false
  * ```
  */
-export const isInteger: (value: unknown) => value is number = /* #__PURE__*/_pureAssign(/* #__PURE__*/_pureRef<(value: unknown) => value is number>(NumberCls as any, "isInteger"), _polyNumberIsInteger);
+export const isInteger: (value: unknown) => value is number = (/* #__PURE__*/_pureAssign((/* #__PURE__*/_pureRef<(value: unknown) => value is number>(NumberCls as any, "isInteger")), _polyNumberIsInteger));
 
 /**
  * Checks if a value is an integer and within the provided inclusive range.

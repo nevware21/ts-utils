@@ -39,7 +39,7 @@ function _createTrimFn(exp: RegExp): (value: string) => string {
  * a copy of str), with no exception being thrown.
  * To return a new string with whitespace trimmed from just one end, use `strTrimStart()` or `strTrimEnd()`.
  */
-export const polyStrTrim = /*#__PURE__*/_createTrimFn(/^\s+|(?=\s)\s+$/g);
+export const polyStrTrim = (/*#__PURE__*/_createTrimFn(/^\s+|(?=\s)\s+$/g));
 
 /**
  * The `polyStrTrimStart()` method removes whitespace from the beginning of a string.
@@ -51,7 +51,7 @@ export const polyStrTrim = /*#__PURE__*/_createTrimFn(/^\s+|(?=\s)\s+$/g);
  * If the beginning of str has no whitespace, a new string is still returned (essentially a copy of str),
  * with no exception being thrown.
  */
-export const polyStrTrimStart = /*#__PURE__*/_createTrimFn(/^\s+/g);
+export const polyStrTrimStart = (/*#__PURE__*/_createTrimFn(/^\s+/g));
  
 /**
  * The `polyStrTrimEnd()` method removes whitespace from the end of a string.
@@ -63,4 +63,4 @@ export const polyStrTrimStart = /*#__PURE__*/_createTrimFn(/^\s+/g);
  * If the end of str has no whitespace, a new string is still returned (essentially a copy of str),
  * with no exception being thrown.
  */
-export const polyStrTrimEnd = /*#__PURE__*/_createTrimFn(/(?=\s)\s+$/g);
+export const polyStrTrimEnd = (/*#__PURE__*/_createTrimFn(/(?=\s)\s+$/g));

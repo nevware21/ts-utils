@@ -26,4 +26,4 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
  * strReplace("hello", /[aeiou]/, "*");    // "h*llo"
  * ```
  */
-export const strReplace: (value: string, searchValue: string | RegExp, replaceValue: string | ((substring: string, ...args: any[]) => string)) => string = /*#__PURE__*/_unwrapFunction("replace", StrProto as any);
+export const strReplace: (value: string, searchValue: string | RegExp, replaceValue: string | ((substring: string, ...args: any[]) => string)) => string = (/*#__PURE__*/_unwrapFunction("replace", StrProto as any));

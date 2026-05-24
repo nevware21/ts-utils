@@ -47,4 +47,4 @@ import { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "./callbacks";
  * @return `true` if the callback function returns a truthy value for at least one element in the array.
  * Otherwise, `false`.
  */
-export const arrSome: <T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any) => boolean = /*#__PURE__*/_unwrapFunction("some", ArrProto);
+export const arrSome: <T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any) => boolean = (/*#__PURE__*/_unwrapFunction("some", ArrProto));

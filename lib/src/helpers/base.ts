@@ -399,7 +399,7 @@ export function isPrimitiveType(theType: string): boolean {
  * isString(0);             // false
  * ```
  */
-export const isString: (value: any) => value is string = /*#__PURE__*/_createIs<string>("string");
+export const isString: (value: any) => value is string = (/*#__PURE__*/_createIs<string>("string"));
 
 /**
  * Checks to see if the past value is a function value
@@ -424,7 +424,7 @@ export const isString: (value: any) => value is string = /*#__PURE__*/_createIs<
  * isFunction(new Array(1));    // false
  * ```
  */
-export const isFunction: (value: any) => value is Function = /*#__PURE__*/_createIs<Function>(FUNCTION);
+export const isFunction: (value: any) => value is Function = (/*#__PURE__*/_createIs<Function>(FUNCTION));
 
 /**
  * Checks if the provided value is an AsyncFunction
@@ -451,7 +451,7 @@ export const isFunction: (value: any) => value is Function = /*#__PURE__*/_creat
  * isAsyncFunction(undefined);             // false
  * ```
  */
-export const isAsyncFunction: (value: any) => value is Function = /*#__PURE__*/_createObjIs<Function>("AsyncFunction");
+export const isAsyncFunction: (value: any) => value is Function = (/*#__PURE__*/_createObjIs<Function>("AsyncFunction"));
 
 /**
  * Checks if the provided value is a GeneratorFunction
@@ -477,7 +477,7 @@ export const isAsyncFunction: (value: any) => value is Function = /*#__PURE__*/_
  * isGenerator(undefined);                 // false
  * ```
  */
-export const isGenerator: (value: any) => value is GeneratorFunction = /*#__PURE__*/_createObjIs<GeneratorFunction>("GeneratorFunction");
+export const isGenerator: (value: any) => value is GeneratorFunction = (/*#__PURE__*/_createObjIs<GeneratorFunction>("GeneratorFunction"));
 
 /**
  * Checks if the provided value is an AsyncGeneratorFunction
@@ -502,7 +502,7 @@ export const isGenerator: (value: any) => value is GeneratorFunction = /*#__PURE
  * isAsyncGenerator(undefined);            // false
  * ```
  */
-export const isAsyncGenerator: (value: any) => value is AsyncGeneratorFunction = /*#__PURE__*/_createObjIs<AsyncGeneratorFunction>("AsyncGeneratorFunction");
+export const isAsyncGenerator: (value: any) => value is AsyncGeneratorFunction = (/*#__PURE__*/_createObjIs<AsyncGeneratorFunction>("AsyncGeneratorFunction"));
 
 /**
  * Checks to see if the past value is an object value
@@ -543,7 +543,7 @@ export function isObject<T>(value: T): value is T {
  * }
  * ```
  */
-export const isArray: <T = any>(arg: any) => arg is Array<T> = /* #__PURE__*/_pureRef<typeof ArrCls.isArray>(ArrCls as any, "isArray");
+export const isArray: <T = any>(arg: any) => arg is Array<T> = (/* #__PURE__*/_pureRef<typeof ArrCls.isArray>(ArrCls as any, "isArray"));
 
 /**
  * Checks if the type of value is array-like (has a numeric length property and numeric indices).
@@ -588,7 +588,7 @@ export function isArrayLike(arg: any): arg is ArrayLike<any> {
  * }
  * ```
  */
-export const isDate: (value: any) => value is Date = /*#__PURE__*/_createObjIs<Date>("Date");
+export const isDate: (value: any) => value is Date = (/*#__PURE__*/_createObjIs<Date>("Date"));
 
 /**
  * Checks if the type of value is a number.
@@ -597,7 +597,7 @@ export const isDate: (value: any) => value is Date = /*#__PURE__*/_createObjIs<D
  * @param value - Value to be checked.
  * @return True if the value is a number, false otherwise.
  */
-export const isNumber: (value: any) => value is number = /*#__PURE__*/_createIs<number>("number");
+export const isNumber: (value: any) => value is number = (/*#__PURE__*/_createIs<number>("number"));
 
 /**
  * Checks if the type of value is a boolean.
@@ -606,7 +606,7 @@ export const isNumber: (value: any) => value is number = /*#__PURE__*/_createIs<
  * @param value - Value to be checked.
  * @return True if the value is a boolean, false otherwise.
  */
-export const isBoolean: (value: any) => value is boolean = /*#__PURE__*/_createIs<boolean>("boolean");
+export const isBoolean: (value: any) => value is boolean = (/*#__PURE__*/_createIs<boolean>("boolean"));
 
 /**
  * Determines if a value is a regular expression object.
@@ -615,7 +615,7 @@ export const isBoolean: (value: any) => value is boolean = /*#__PURE__*/_createI
  * @param value - Reference to check.
  * @returns True if `value` is a `RegExp`.
  */
-export const isRegExp: (value: any) => value is RegExp = /*#__PURE__*/_createObjIs<RegExp>("RegExp");
+export const isRegExp: (value: any) => value is RegExp = (/*#__PURE__*/_createObjIs<RegExp>("RegExp"));
 
 /**
  * Checks if the type of value is a File object.
@@ -624,7 +624,7 @@ export const isRegExp: (value: any) => value is RegExp = /*#__PURE__*/_createObj
  * @param value - Value to be checked.
  * @return True if the value is a File, false otherwise.
  */
-export const isFile: (value: any) => value is File = /*#__PURE__*/_createObjIs<File>("File");
+export const isFile: (value: any) => value is File = (/*#__PURE__*/_createObjIs<File>("File"));
 
 /**
  * Checks if the type of value is a FormData object.
@@ -633,7 +633,7 @@ export const isFile: (value: any) => value is File = /*#__PURE__*/_createObjIs<F
  * @param value - Value to be checked.
  * @return True if the value is a FormData, false otherwise.
  */
-export const isFormData: (value: any) => value is FormData = /*#__PURE__*/_createObjIs<FormData>("FormData");
+export const isFormData: (value: any) => value is FormData = (/*#__PURE__*/_createObjIs<FormData>("FormData"));
 
 /**
  * Checks if the type of value is a Blob object.
@@ -642,7 +642,7 @@ export const isFormData: (value: any) => value is FormData = /*#__PURE__*/_creat
  * @param value - Value to be checked.
  * @return True if the value is a Blob, false otherwise.
  */
-export const isBlob: (value: any) => value is Blob = /*#__PURE__*/_createObjIs<Blob>("Blob");
+export const isBlob: (value: any) => value is Blob = (/*#__PURE__*/_createObjIs<Blob>("Blob"));
 
 /**
  * Checks if the type of value is a ArrayBuffer object.
@@ -651,7 +651,7 @@ export const isBlob: (value: any) => value is Blob = /*#__PURE__*/_createObjIs<B
  * @param value - Value to be checked.
  * @return True if the value is a ArrayBuffer, false otherwise.
  */
-export const isArrayBuffer: (value: any) => value is ArrayBuffer = /*#__PURE__*/_createObjIs<ArrayBuffer>("ArrayBuffer");
+export const isArrayBuffer: (value: any) => value is ArrayBuffer = (/*#__PURE__*/_createObjIs<ArrayBuffer>("ArrayBuffer"));
 
 /**
  * Checks if the type of value is a Error object.
@@ -661,7 +661,7 @@ export const isArrayBuffer: (value: any) => value is ArrayBuffer = /*#__PURE__*/
  * @param value - Value to be checked.
  * @return True if the value is a Error, false otherwise.
  */
-export const isError: (value: any) => value is Error = /*#__PURE__*/_createObjIs<Error>("Error");
+export const isError: (value: any) => value is Error = (/*#__PURE__*/_createObjIs<Error>("Error"));
 
 /**
  * Checks if the type of value is a PromiseLike instance (contains a then function).
@@ -709,7 +709,7 @@ export function isPromise<T>(value: any): value is Promise<T> {
  * isMap(null);             // false
  * ```
  */
-export const isMap: <K = any, V = any>(value: any) => value is Map<K, V> = /*#__PURE__*/_createObjIs<Map<any, any>>("Map");
+export const isMap: <K = any, V = any>(value: any) => value is Map<K, V> = (/*#__PURE__*/_createObjIs<Map<any, any>>("Map"));
 
 /**
  * Checks if the type of value is a WeakMap object.
@@ -725,7 +725,7 @@ export const isMap: <K = any, V = any>(value: any) => value is Map<K, V> = /*#__
  * isWeakMap(null);             // false
  * ```
  */
-export const isWeakMap: <K extends object = object, V = any>(value: any) => value is WeakMap<K, V> = /*#__PURE__*/_createObjIs<WeakMap<any, any>>("WeakMap");
+export const isWeakMap: <K extends object = object, V = any>(value: any) => value is WeakMap<K, V> = (/*#__PURE__*/_createObjIs<WeakMap<any, any>>("WeakMap"));
 
 /**
  * Checks if the type of value is a Set object.
@@ -741,7 +741,7 @@ export const isWeakMap: <K extends object = object, V = any>(value: any) => valu
  * isSet(null);             // false
  * ```
  */
-export const isSet: <T = any>(value: any) => value is Set<T> = /*#__PURE__*/_createObjIs<Set<any>>("Set");
+export const isSet: <T = any>(value: any) => value is Set<T> = (/*#__PURE__*/_createObjIs<Set<any>>("Set"));
 
 /**
  * Checks if the type of value is a WeakSet object.
@@ -757,7 +757,7 @@ export const isSet: <T = any>(value: any) => value is Set<T> = /*#__PURE__*/_cre
  * isWeakSet(null);             // false
  * ```
  */
-export const isWeakSet: <T extends object = object>(value: any) => value is WeakSet<T> = /*#__PURE__*/_createObjIs<WeakSet<any>>("WeakSet");
+export const isWeakSet: <T extends object = object>(value: any) => value is WeakSet<T> = (/*#__PURE__*/_createObjIs<WeakSet<any>>("WeakSet"));
 
 /**
  * Checks if the type of value is Map-like (has essential Map methods).
@@ -869,4 +869,4 @@ export function isTruthy(value: any) {
  * isBigInt(undefined);            // false
  * ```
  */
-export const isBigInt: (value: any) => value is bigint = /*#__PURE__*/_createIsWithPoly<bigint>("bigint");
+export const isBigInt: (value: any) => value is bigint = (/*#__PURE__*/_createIsWithPoly<bigint>("bigint"));

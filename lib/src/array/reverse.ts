@@ -35,4 +35,4 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
  * // original: [1, 2, 3], reversed: [3, 2, 1]
  * ```
  */
-export const arrReverse: <T>(theArray: WritableArrayLike<T>) => WritableArrayLike<T> = /*#__PURE__*/_unwrapFunction("reverse", ArrProto);
+export const arrReverse: <T>(theArray: WritableArrayLike<T>) => WritableArrayLike<T> = (/*#__PURE__*/_unwrapFunction("reverse", ArrProto));

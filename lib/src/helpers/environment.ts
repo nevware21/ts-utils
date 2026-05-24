@@ -160,7 +160,7 @@ export function hasDocument(): boolean {
  * @group Environment
  * @returns
  */
-export const getDocument = /*#__PURE__*/_getGlobalInstFn<Document>(getInst, ["document"]);
+export const getDocument = (/*#__PURE__*/_getGlobalInstFn<Document>(getInst, ["document"]));
 
 /**
  * Identify whether the runtime contains a `window` object
@@ -178,7 +178,7 @@ export function hasWindow(): boolean {
  * @group Environment
  * @returns
  */
-export const getWindow = /*#__PURE__*/_getGlobalInstFn<Window>(getInst, [WINDOW]);
+export const getWindow = (/*#__PURE__*/_getGlobalInstFn<Window>(getInst, [WINDOW]));
 
 /**
  * Identify whether the runtimne contains a `navigator` object
@@ -196,7 +196,7 @@ export function hasNavigator(): boolean {
  * @group Environment
  * @returns
  */
-export const getNavigator = /*#__PURE__*/_getGlobalInstFn<Navigator>(getInst, ["navigator"]);
+export const getNavigator = (/*#__PURE__*/_getGlobalInstFn<Navigator>(getInst, ["navigator"]));
 
 /**
  * Identifies whether the runtime contains a `history` object
@@ -214,7 +214,7 @@ export function hasHistory(): boolean {
  * @group Environment
  * @returns
  */
-export const getHistory = /*#__PURE__*/_getGlobalInstFn<History>(getInst, ["history"]);
+export const getHistory = (/*#__PURE__*/_getGlobalInstFn<History>(getInst, ["history"]));
 
 /**
  * Simple method to determine if we are running in a node environment
@@ -222,9 +222,9 @@ export const getHistory = /*#__PURE__*/_getGlobalInstFn<History>(getInst, ["hist
  * @group Environment
  * @returns True if you are
  */
-export const isNode = /*#__PURE__*/_getGlobalInstFn<boolean>(() => {
+export const isNode = (/*#__PURE__*/_getGlobalInstFn<boolean>(() => {
     return !!safe(() => (process && (process.versions||{}).node)).v;
-});
+}));
 
 /**
  * Helper to identify if you are running as a Dedicated, Shared or Service worker
@@ -232,6 +232,6 @@ export const isNode = /*#__PURE__*/_getGlobalInstFn<boolean>(() => {
  * @group Environment
  * @returns True if the environment you are in looks like a Web Worker
  */
-export const isWebWorker = /*#__PURE__*/_getGlobalInstFn<boolean>(() => {
+export const isWebWorker = (/*#__PURE__*/_getGlobalInstFn<boolean>(() => {
     return !!safe(() => self && self instanceof WorkerGlobalScope).v;
-});
+}));

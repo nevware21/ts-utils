@@ -21,7 +21,7 @@ import { mathCeil, mathFloor } from "./floor";
  * @param value - The value to be truncated
  * @returns The integer path of the given number
  */
-export const mathTrunc: (value: number) => number = /* #__PURE__*/_pureAssign(/* #__PURE__*/_pureRef<typeof Math.trunc>(MathCls as any, "trunc"), polyMathTrunc);
+export const mathTrunc: (value: number) => number = (/* #__PURE__*/_pureAssign((/* #__PURE__*/_pureRef<typeof Math.trunc>(MathCls as any, "trunc")), polyMathTrunc));
 
 /**
  * The `mathTrunc()` function returns the integer part of a number by removing any fractional digits.

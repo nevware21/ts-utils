@@ -77,7 +77,7 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
  * arrIndexOf(arrayLike, "green-pepper"); // -1
  * ```
  */
-export const arrIndexOf: <T>(theArray: ArrayLike<T>, searchElement: T, fromIndex?: number) => number = /*#__PURE__*/_unwrapFunction("indexOf", ArrProto);
+export const arrIndexOf: <T>(theArray: ArrayLike<T>, searchElement: T, fromIndex?: number) => number = (/*#__PURE__*/_unwrapFunction("indexOf", ArrProto));
 
 /**
  * The arrLastIndexOf() method returns the last index at which a given element can be found in the array,
@@ -157,4 +157,4 @@ export const arrIndexOf: <T>(theArray: ArrayLike<T>, searchElement: T, fromIndex
  * arrLastIndexOf(arrayLike, "green-pepper"); // -1
  * ```
  */
-export const arrLastIndexOf: <T>(theArray: ArrayLike<T>, searchElement: T, fromIndex?: number) => number = /*#__PURE__*/_unwrapFunction("lastIndexOf", ArrProto);
+export const arrLastIndexOf: <T>(theArray: ArrayLike<T>, searchElement: T, fromIndex?: number) => number = (/*#__PURE__*/_unwrapFunction("lastIndexOf", ArrProto));

@@ -63,4 +63,4 @@ import { ArrFromMapFn } from "./callbacks";
  * // [ {"1": "Hello"}, {"2": "Darkness"}, {"3": "my"}, {"4": "old"}, {"5": "friend"} ]
  * ```
  */
-export const arrFrom: <T, U = T>(theValue: ArrayLike<T> | Iterable<T>, mapFn?: ArrFromMapFn<T, U>, thisArg?: any) => U[] = /* #__PURE__*/_pureAssign(/* #__PURE__*/_pureRef<typeof ArrCls.from>(ArrCls, "from"), polyArrFrom);
+export const arrFrom: <T, U = T>(theValue: ArrayLike<T> | Iterable<T>, mapFn?: ArrFromMapFn<T, U>, thisArg?: any) => U[] = (/* #__PURE__*/_pureAssign((/* #__PURE__*/_pureRef<typeof ArrCls.from>(ArrCls, "from")), polyArrFrom));
