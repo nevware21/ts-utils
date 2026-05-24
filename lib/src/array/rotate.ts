@@ -7,7 +7,6 @@
  */
 
 import { arrSlice } from "./slice";
-import { getLength } from "../helpers/length";
 import { isArrayLike } from "../helpers/base";
 import { arrAppend } from "./append";
 

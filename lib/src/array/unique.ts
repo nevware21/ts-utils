@@ -7,7 +7,6 @@
  */
 
 import { isArrayLike } from "../helpers/base";
-import { normalizeJsName } from "../helpers/encode";
 import { objCreate } from "../object/create";
 import { objHasOwn } from "../object/has_own";
 import { arrForEach } from "./forEach";

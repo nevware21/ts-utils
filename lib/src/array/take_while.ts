@@ -7,7 +7,6 @@
  */
 
 import { isArrayLike } from "../helpers/base";
-import { getLength } from "../helpers/length";
 import { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "./callbacks";
 import { arrForEach } from "./forEach";
 

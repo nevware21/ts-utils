@@ -29,7 +29,7 @@
         "comma-dangle": [ "error", "never" ],                       // Enabled for auto fixing
         "security/detect-object-injection": "off",                  // Suppress Warning -- need to Review Later
         "@typescript-eslint/ban-types": "off",
-        "@typescript-eslint/no-unused-vars": [ "warn", { "vars": "all", "args": "none", "argsIgnorePattern": "^_", "ignoreRestSiblings": true } ],
+        "@typescript-eslint/no-unused-vars": [ "warn", { "vars": "all", "args": "none", "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "ignoreRestSiblings": true } ], // "_" prefix = intentionally unused (incl. compile-time type-assertion aliases like `type _x = AssertTrue<...>`)
         "@typescript-eslint/triple-slash-reference": "off",
         "@typescript-eslint/no-inferrable-types": "off",
         "@typescript-eslint/no-this-alias": "off",
