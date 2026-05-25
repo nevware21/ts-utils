@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { ArrProto, UNDEF_VALUE, UNDEFINED } from "../internal/constants";
+import { ArrProto, UNDEF_VALUE } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { isArrayLike } from "../helpers/base";
 import { getLength } from "../helpers/length";

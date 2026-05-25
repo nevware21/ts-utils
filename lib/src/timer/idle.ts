@@ -127,7 +127,7 @@ export type CancelIdleCallback = (handle: number) => void;
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function hasIdleCallback(): boolean {
-    return !!( /*#__PURE__*/getIdleCallback());
+    return !!getIdleCallback();
 }
 
 /**

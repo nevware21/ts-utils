@@ -49,7 +49,7 @@ export const isSymbol: (value: any) => value is symbol = (/*#__PURE__*/_createIs
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function hasSymbol(): boolean {
-    return !!( /*#__PURE__*/getSymbol());
+    return !!getSymbol();
 }
 
 /**
