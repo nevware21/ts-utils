@@ -6,11 +6,15 @@
  * Licensed under the MIT license.
  */
 
-import { isStrictUndefined } from "../helpers/base";
 import { _getGlobalInstFn, getInst } from "../helpers/environment";
-import { ITimerHandler, _TimerHandler, _createTimerHandler } from "./handler";
-import { _getPromiseMicrotaskFn } from "./microtasks/promiseMicrotask";
-import { _addMicrotaskToQueue } from "./microtasks/timerMicrotask";
+import { ITimerHandler } from "./handler";
+import { _createCancellableTask } from "./microtasks/cancellableTask";
+import { isArray } from "../helpers/base";
+import { _resolveScheduleFn } from "./microtasks/resolveScheduleFn";
+import { _eTaskQueueType } from "./microtasks/taskQueue";
+import { _addMicrotaskQueue } from "./microtasks/timerQueue";
+import { fnBindArgs } from "../funcs/fnBindArgs";
+import { UNDEF_VALUE } from "../internal/constants";
 
 let _defaultOptions: MicroTaskOptions | undefined;
 
@@ -31,8 +35,10 @@ export type MicrotaskFn = () => void;
  * @group Timer
  * @group Environment
  * @param callback - The microtask callback function to schedule.
+ * @param maxQueuedTasks - Optional, the maximum number of queued tasks allowed before the scheduler
+ * starts dropping tasks or throwing errors, depending on the implementation.
  */
-export type ScheduleMicrotaskFn = (callback: MicrotaskFn) => void;
+export type ScheduleMicrotaskFn = (callback: MicrotaskFn, maxQueuedTasks?: number) => void | boolean;
 
 /**
  * Controls how `scheduleMicrotask` chooses fallback behavior when native
@@ -138,6 +144,7 @@ export function setMicroTaskFallbackOptions(options?: MicroTaskOptions): void {
  * @group Timer
  *
  * @param callback - The callback to execute.
+ * @param args - Optional callback arguments to pass when the callback executes.
  * @param options - Optional per-call fallback options when `queueMicrotask` is unavailable.
  * @returns A handler that can be used to cancel or refresh the scheduled callback.
  * @example
@@ -166,62 +173,40 @@ export function setMicroTaskFallbackOptions(options?: MicroTaskOptions): void {
  *     }
  * });
  * ```
+ * @example
+ * ```ts
+ * // Args only
+ * scheduleMicrotask((name: string, count: number) => {
+ *     console.log(name, count);
+ * }, ["task", 1]);
+ *
+ * // Args + options
+ * scheduleMicrotask((name: string, count: number) => {
+ *     console.log(name, count);
+ * }, ["task", 2], {
+ *     useTimeout: true
+ * });
+ * ```
  */
-export function scheduleMicrotask(callback: () => void, options?: MicroTaskOptions): ITimerHandler {
-    let scheduleFn: ScheduleMicrotaskFn | undefined;
+export function scheduleMicrotask(callback: () => void, options?: MicroTaskOptions): ITimerHandler;
+export function scheduleMicrotask<TArgs extends any[]>(callback: (...args: TArgs) => void, args: TArgs, options?: MicroTaskOptions): ITimerHandler;
+export function scheduleMicrotask<TArgs extends any[]>(callback: (...args: TArgs) => void, argsOrOptions?: TArgs | MicroTaskOptions, options?: MicroTaskOptions): ITimerHandler {
+    let callbackArgs: TArgs | undefined;
+    let theOptions: MicroTaskOptions | undefined;
+
+    if (arguments.length > 1 && argsOrOptions && isArray(argsOrOptions)) {
+        callbackArgs = argsOrOptions as TArgs;
+        theOptions = options;
+    } else {
+        theOptions = argsOrOptions as MicroTaskOptions;
+    }
+
+    let taskCallback = callbackArgs ? fnBindArgs(callback, UNDEF_VALUE, callbackArgs) : (callback as MicrotaskFn);
     let queueMicrotaskFn = getQueueMicrotask();
 
     if (!queueMicrotaskFn) {
-        // Do we have a custom schedule function to use
-        scheduleFn = (options && options.scheduleFn) || (_defaultOptions && _defaultOptions.scheduleFn);
-        if (!scheduleFn) {
-            // Per-call options.useTimeout takes full precedence over the global default when it is
-            // explicitly provided (even as false), so only fall back to _defaultOptions when the per-call
-            // value is undefined/absent. usePromise is the inverse: true unless useTimeout is explicitly set.
-            let usePromise = !((options && !isStrictUndefined(options.useTimeout))
-                ? options.useTimeout
-                : (_defaultOptions && _defaultOptions.useTimeout));
-            if (usePromise) {
-                // Use the Promise based fallback if available, otherwise use setTimeout
-                queueMicrotaskFn = _getPromiseMicrotaskFn();
-            }
-        }
+        queueMicrotaskFn = _resolveScheduleFn(theOptions, _defaultOptions, _eTaskQueueType.microtask);
     }
 
-    return _createCancellableMicroTask(callback, scheduleFn || queueMicrotaskFn || _addMicrotaskToQueue);
-}
-
-/**
- * @internal
- * @since 0.15.0
- */
-function _createCancellableMicroTask(callback: () => void, queueFn: ScheduleMicrotaskFn): ITimerHandler {
-    let handler: _TimerHandler;
-    // Used to track the currently scheduled task, incremented to cancel pending tasks when needed
-    let currentTask = 0;
-
-    function _scheduleTask() {
-        let taskId = ++currentTask;
-        queueFn(() => {
-            if (taskId === currentTask) {
-                handler.dn();
-                callback();
-            }
-        });
-
-        return taskId;
-    }
-
-    function _cancelTask(taskId: number) {
-        if (taskId === currentTask) {
-            currentTask++;
-        }
-    }
-
-    handler = _createTimerHandler(false, _scheduleTask, _cancelTask);
-    // Start the timer only after handler is fully assigned so that any synchronous
-    // queueFn implementation that fires the callback immediately can safely access handler.dn().
-    handler.h.refresh();
-
-    return handler.h;
+    return _createCancellableTask(taskCallback, queueMicrotaskFn || _addMicrotaskQueue);
 }

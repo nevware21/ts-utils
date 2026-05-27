@@ -20,7 +20,9 @@ import { scheduleTimeout } from "../timeout";
  */
 export function _runMicroTask(callback: MicrotaskFn): void {
     try {
-        callback();
+        if (callback) {
+            callback();
+        }
     } catch (e) {
         scheduleTimeout(() => {
             throw e;

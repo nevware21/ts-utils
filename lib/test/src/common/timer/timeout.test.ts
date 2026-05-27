@@ -9,7 +9,6 @@
 import * as sinon from "sinon";
 import { assert } from "@nevware21/tripwire-chai";
 import { createTimeout, createTimeoutWith, scheduleTimeout, scheduleTimeoutWith, setTimeoutOverrides, setGlobalTimeoutOverrides, TimeoutOverrideFuncs } from "../../../../src/timer/timeout";
-import { isNode } from "../../../../src/helpers/environment";
 
 describe("timeout tests", () => {
     let clock: sinon.SinonFakeTimers;
@@ -326,6 +325,12 @@ describe("timeout tests", () => {
 
         it("basic timeout", () => {
             let timeoutCalled = false;
+            let timerId = setTimeout(() => {
+                // no-op
+            }, 1);
+            let supportsTimerRefresh = !!(timerId && (timerId as any).refresh);
+            clearTimeout(timerId);
+
             let theTimeout = scheduleTimeoutWith(newSetTimeoutFn, () => {
                 timeoutCalled = true;
             }, 100);
@@ -363,19 +368,19 @@ describe("timeout tests", () => {
             clock.tick(1);
             assert.equal(theTimeout.enabled, true, "Check that the handler is stopped");
             assert.equal(timeoutCalled, false, "Timeout should have been called yet");
-            assert.equal(overrideCalled, isNode() ? 2 : 3, "The override should have been called");
+            assert.equal(overrideCalled, supportsTimerRefresh ? 2 : 3, "The override should have been called");
 
             clock.tick(98);
 
             assert.equal(theTimeout.enabled, true, "Check that the handler is stopped");
             assert.equal(timeoutCalled, false, "Timeout should have been called yet");
-            assert.equal(overrideCalled, isNode() ? 2 : 3, "The override should have been called");
+            assert.equal(overrideCalled, supportsTimerRefresh ? 2 : 3, "The override should have been called");
 
             clock.tick(1);
 
             assert.equal(theTimeout.enabled, false, "Check that the handler is stopped");
             assert.equal(timeoutCalled, true, "Timeout should have been called yet");
-            assert.equal(overrideCalled, isNode() ? 2 : 3, "The override should have been called");
+            assert.equal(overrideCalled, supportsTimerRefresh ? 2 : 3, "The override should have been called");
         });
     });
 

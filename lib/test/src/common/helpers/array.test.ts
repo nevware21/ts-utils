@@ -195,6 +195,14 @@ describe("array helpers", () => {
     });
 
     describe("arrAppend", () => {
+        it("returns the same array instance", () => {
+            let target = [1];
+            let result = arrAppend(target, [2, 3]);
+
+            assert.strictEqual(result, target, "arrAppend should return the same array instance");
+            assert.deepEqual(target, [1, 2, 3]);
+        });
+
         it("Validate passing null values doesn't throw", () => {
             let target = arrAppend(null, null);
             assert.ok(true, "Passing null values");

@@ -7,6 +7,7 @@
  */
 
 import { ArrSlice, CALL } from "../internal/constants";
+import { BoundFunction } from "./types";
 
 /**
  * The `fnApply` function calls the specified `fn` function with the given `thisArg` as the `this` value,
@@ -213,7 +214,7 @@ export function fnCall<F extends (...args: any) => any, T>(fn: F, thisArg: T): R
  * module2.getX(); // 21
  * ```
  */
-export function fnBind<F extends Function, T>(fn: F, thisArg: T, ...argArray: any[]): F;
+export function fnBind<F extends (...args: any[]) => any, T>(fn: F, thisArg: T): F;
 
 /**
  * Creates a new function that when called will set the value of `thisArg` as the `this` keyword
@@ -249,6 +250,34 @@ export function fnBind<F extends Function, T>(fn: F, thisArg: T, ...argArray: an
  * module2.getX(); // 21
  * ```
  */
-export function fnBind<F extends Function, T>(fn: F, thisArg: T): F {
-    return fn.bind.apply(fn, ArrSlice[CALL](arguments, 1));
+export function fnBind<F extends (...args: any[]) => any, T, TArgs extends any[]>(fn: F, thisArg: T, ...argArray: TArgs): BoundFunction<F, TArgs>;
+
+/**
+ * Fallback overload for less-specific `Function`-typed call sites where the concrete parameter
+ * list is not available, such as dynamic proxy wiring.
+ * @param fn - The function instance to be called.
+ * @param thisArg - The value to be used as the `this` when calling the `fn`.
+ * @param argArray - Zero or more arguments to pre-bind to the function.
+ * @returns The original function type with the bound `this` value and any provided arguments.
+ * @since 0.9.8
+ * @group Function
+ * @example
+ * ```ts
+ * const host = {
+ *     prefix: "Hello",
+ *     log(value: string) {
+ *         return this.prefix + " " + value;
+ *     }
+ * };
+ *
+ * const dynamicLog: Function = host.log;
+ * const bound = fnBind(dynamicLog, host);
+ *
+ * bound("friend"); // "Hello friend"
+ * ```
+ */
+export function fnBind<F extends Function, T>(fn: F, thisArg: T, ...argArray: any[]): F;
+
+export function fnBind<F extends (...args: any[]) => any, T>(fn: F, thisArg: T): any {
+    return fn.bind.apply(fn, ArrSlice[CALL](arguments, 1) as any);
 }

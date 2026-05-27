@@ -9,6 +9,7 @@
 /// <reference lib="es2015" />
 
 export { arrAppend } from "./array/append";
+export { arrConcat } from "./array/concat";
 export { ArrPredicateCallbackFn, ArrPredicateCallbackFn2, ArrMapCallbackFn, ArrFlatMapCallbackFn, ArrFromMapFn } from "./array/callbacks";
 export { arrAt } from "./array/at";
 export { arrChunk } from "./array/chunk";
@@ -46,9 +47,10 @@ export { arrUnzip } from "./array/unzip";
 export { arrWith } from "./array/with";
 export { arrZip } from "./array/zip";
 export { fnApply, fnBind, fnCall } from "./funcs/funcs";
+export { fnBindArgs } from "./funcs/fnBindArgs";
 export { createFnDeferredProxy, createProxyFuncs } from "./funcs/fnProxy";
 export { readArgs } from "./funcs/readArgs";
-export { ProxyFunctionDef, TypeFuncNames } from "./funcs/types";
+export { BoundFunction, ProxyFunctionDef, TypeFuncNames } from "./funcs/types";
 export { WritableArrayLike } from "./helpers/arrayLike";
 export {
     isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isArrayLike, isDate, isNumber, isBoolean,
@@ -170,6 +172,7 @@ export {
     hasQueueMicrotask, scheduleMicrotask, getQueueMicrotask,
     ScheduleMicrotaskFn, MicroTaskOptions, setMicroTaskFallbackOptions
 } from "./timer/microtask";
+export { hasProcessNextTick, scheduleNextTick, getProcessNextTick, NextTickOptions, ProcessNextTickFn, setNextTickFallbackOptions } from "./timer/nextTick";
 export {
     TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, scheduleTimeout, scheduleTimeoutWith,
     createTimeout, createTimeoutWith, setTimeoutOverrides, setGlobalTimeoutOverrides

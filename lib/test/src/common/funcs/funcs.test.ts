@@ -8,6 +8,7 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { fnApply, fnBind, fnCall } from "../../../../src/funcs/funcs";
+import { fnBindArgs } from "../../../../src/funcs/fnBindArgs";
 
 describe("function helpers", () => {
     describe("fnBind", () => {
@@ -33,6 +34,22 @@ describe("function helpers", () => {
 
             module2.getX = fnBind(module1.getX, module1);
             assert.equal(module2.getX(), 21);
+        });
+
+        it("binds this and pre-bound arguments", () => {
+            const module1 = {
+                prefix: "Hello",
+                log(value: string, punctuation: string) {
+                    return this.prefix + " " + value + punctuation;
+                }
+            };
+
+            const module2 = {
+                prefix: "my"
+            };
+
+            const bound = fnBind(module1.log, module2, "friend");
+            assert.equal(bound("!"), "my friend!", "pre-bound arguments should be preserved");
         });
     });
 
@@ -65,6 +82,26 @@ describe("function helpers", () => {
 
             assert.equal(fnApply(module1.getX, module2), 42);
             assert.equal(fnApply(module1.log, module2, [ "friend" ]), "my friend : 42");
+        });
+    });
+
+    describe("fnBindArgs", () => {
+        it("binds this and pre-bound arguments from an array", () => {
+            const module1 = {
+                prefix: "Hello",
+                x: 21,
+                log(value: string, punctuation: string) {
+                    return this.prefix + " " + value + punctuation + " : " + this.x;
+                }
+            };
+
+            let module2 = {
+                prefix: "my",
+                x: 42
+            };
+
+            let bound = fnBindArgs(module1.log, module2, [ "friend" ]);
+            assert.equal(bound("!"), "my friend! : 42");
         });
     });
 

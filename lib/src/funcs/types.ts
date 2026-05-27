@@ -66,3 +66,35 @@ export type ProxyFunctionDef<T, H> = {
      */
     rp?: boolean
 }
+
+/**
+ * Produces the return type for a function after a prefix of arguments has already been bound.
+ *
+ * This implementation is a TypeScript 3.4+ compatible middle ground between:
+ * 1. A fully simplified fallback (`(...args: any[]) => ReturnType<TFn>`)
+ * 2. A TS 4.0+ variadic tuple implementation (shown below as comments)
+ *
+ * It preserves remaining argument inference for up to 5 pre-bound arguments and then
+ * falls back to a generic callable return type.
+ * @since 0.15.0
+ * @group Funcs
+ * @typeParam TFn - The function being bound.
+ * @typeParam TArgs - The tuple of arguments that will be pre-bound.
+ */
+export type BoundFunction<TFn extends (...args: any[]) => any, TArgs extends any[]> =
+    TArgs extends [] ? TFn :
+    TArgs extends [any] ? (TFn extends (a0: any, ...args: infer R) => infer RT ? (...args: R) => RT : (...args: any[]) => ReturnType<TFn>) :
+    TArgs extends [any, any] ? (TFn extends (a0: any, a1: any, ...args: infer R) => infer RT ? (...args: R) => RT : (...args: any[]) => ReturnType<TFn>) :
+    TArgs extends [any, any, any] ? (TFn extends (a0: any, a1: any, a2: any, ...args: infer R) => infer RT ? (...args: R) => RT : (...args: any[]) => ReturnType<TFn>) :
+    TArgs extends [any, any, any, any] ? (TFn extends (a0: any, a1: any, a2: any, a3: any, ...args: infer R) => infer RT ? (...args: R) => RT : (...args: any[]) => ReturnType<TFn>) :
+    TArgs extends [any, any, any, any, any] ? (TFn extends (a0: any, a1: any, a2: any, a3: any, a4: any, ...args: infer R) => infer RT ? (...args: R) => RT : (...args: any[]) => ReturnType<TFn>) :
+    (...args: any[]) => ReturnType<TFn>;
+// Requires TypeScript 4.0+ for variadic tuple types (this is a better alternative for the fnBind and fnBindArgs return types)
+// /**
+//  * Produces the return type for a function after a prefix of arguments has already been bound.
+//  * @since 0.15.0
+//  * @group Funcs
+//  * @typeParam TFn - The function being bound.
+//  * @typeParam TArgs - The tuple of arguments that will be pre-bound.
+//  */
+// export type BoundFunction<TFn extends (...args: any[]) => any, TArgs extends any[]> = TFn extends (...args: [...TArgs, ...infer TRemaining]) => infer TReturn ? (...args: TRemaining) => TReturn : never;
