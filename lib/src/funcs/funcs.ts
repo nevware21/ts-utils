@@ -214,6 +214,7 @@ export function fnCall<F extends (...args: any) => any, T>(fn: F, thisArg: T): R
  * module2.getX(); // 21
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function fnBind<F extends (...args: any[]) => any, T>(fn: F, thisArg: T): F;
 
 /**
@@ -250,6 +251,7 @@ export function fnBind<F extends (...args: any[]) => any, T>(fn: F, thisArg: T):
  * module2.getX(); // 21
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function fnBind<F extends (...args: any[]) => any, T, TArgs extends any[]>(fn: F, thisArg: T, ...argArray: TArgs): BoundFunction<F, TArgs>;
 
 /**
@@ -276,8 +278,10 @@ export function fnBind<F extends (...args: any[]) => any, T, TArgs extends any[]
  * bound("friend"); // "Hello friend"
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function fnBind<F extends Function, T>(fn: F, thisArg: T, ...argArray: any[]): F;
 
+/*#__NO_SIDE_EFFECTS__*/
 export function fnBind<F extends (...args: any[]) => any, T>(fn: F, thisArg: T): any {
     return fn.bind.apply(fn, ArrSlice[CALL](arguments, 1) as any);
 }

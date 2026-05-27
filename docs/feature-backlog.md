@@ -33,18 +33,9 @@ Notes:
 
 - These are direct language-native wrappers with ES version markers for polyfill candidates
 - Other suggestions below are library-level utilities (not direct language features).
-- Iterator helpers are intentionally listed as utility suggestions here rather than standard-language mappings.
 - Implementations should include ES5 polyfills where applicable for v0.x/v1.x compatibility
 
-### A. Iterator and Collection Helpers (Medium Value)
-
-- `iterMap`, `iterFilter`, `iterTake` – Iterator transformation helpers
-- `iterReduce`, `iterSome`, `iterEvery` – Iterator reduction/testing
-- `iterToArray` for predictable materialization of iterables / iterators
-- `arrToMap` helpers with stable key selection
-- lightweight set operations for iterables
-
-### B. Reliability and Tooling (High Value)
+### A. Reliability and Tooling (High Value)
 
 - keep bundle-size thresholds justified with measured report
 - require test parity for polyfill vs native behavior
