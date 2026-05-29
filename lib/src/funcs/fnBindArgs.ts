@@ -37,8 +37,11 @@ import { BoundFunction } from "./types";
  * bound("!"); // "Hi friend!"
  * ```
  */
+/*#__NO_SIDE_EFFECTS__*/
 export function fnBindArgs<F extends (...args: any[]) => any, T, TArgs extends any[]>(fn: F, thisArg: T, argArray: TArgs): BoundFunction<F, TArgs>;
+/*#__NO_SIDE_EFFECTS__*/
 export function fnBindArgs<F extends (...args: any[]) => any, T>(fn: F, thisArg: T): F;
+/*#__NO_SIDE_EFFECTS__*/
 export function fnBindArgs<F extends (...args: any[]) => any, T>(fn: F, thisArg: T, argArray?: any[]): any {
     return fn.bind.apply(fn, (argArray ? [ thisArg ].concat(argArray) : [ thisArg ]) as any);
 }

@@ -64,8 +64,8 @@ export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value
         }
         
         if (isIterator(iter)) {
-            let err: { e: any } = UNDEF_VALUE;
-            let iterResult: IteratorResult<T> = UNDEF_VALUE;
+            let err: { e: any } | undefined = UNDEF_VALUE;
+            let iterResult: IteratorResult<T> | null | undefined = UNDEF_VALUE;
             try {
                 let count = 0;
                 while(!(iterResult = iter.next()).done) {

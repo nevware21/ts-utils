@@ -15,6 +15,11 @@
   - Adds shared queue logic and callback-argument support across microtask and nextTick scheduling
   - Adds `arrConcat` as a dedicated array helper and `fnBindArgs` as a dedicated function helper
   - Improves function binding typing with exported `BoundFunction` and updated signatures for `fnBind` / `fnBindArgs`
+- [#574](https://github.com/nevware21/ts-utils/pull/574) feat(iterator,array): add iterator collection helpers, split helper modules, and align collection membership semantics
+  - Added new iterator helpers: `iterMap`, `iterFilter`, `iterTake`, `iterReduce`, `iterSome`, `iterEvery`, `iterToArray`, `iterUnion`, `iterIntersection`, `iterDifference`
+  - Added `arrToMap` helper in the array module and moved callback/type declarations into `iterator/types`
+  - Refactored iterator helper implementation/tests into per-function files and updated root exports
+  - Added NaN regression coverage and switched iterator set-operation membership checks to `arrIncludes` semantics for parity with array helpers
 
 ### Bug Fixes
 
