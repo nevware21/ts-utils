@@ -70,7 +70,7 @@ export {
 } from "./helpers/enum";
 export {
     getGlobal, getInst, lazySafeGetInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory,
-    getHistory, isNode, isWebWorker
+    getHistory, isNode, isWebWorker, hasQueueMicrotask, getQueueMicrotask
 } from "./helpers/environment";
 export {
     encodeAsHtml, encodeAsJson, normalizeJsName, encodeAsBase64, decodeBase64, encodeAsBase64Url,
@@ -87,7 +87,10 @@ export { safe, ISafeReturn, SafeReturnType } from "./helpers/safe";
 export { safeGet } from "./helpers/safe_get";
 export { safeGetLazy, safeGetWritableLazy, safeGetDeferred, safeGetWritableDeferred } from "./helpers/safe_lazy";
 export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";
-export { ReadonlyRecord, DeepPartial, DeepReadonly, Mutable, DeepRequired, ValueOf, NonEmptyArray } from "./helpers/types";
+export {
+    ReadonlyRecord, DeepPartial, DeepReadonly, Mutable, DeepRequired, ValueOf, NonEmptyArray,
+    ScheduleMicrotaskFn, MicrotaskFn
+} from "./helpers/types";
 export { hasValue } from "./helpers/value";
 export { createArrayIterator } from "./iterator/array";
 export { CreateIteratorContext, createIterator, createIterable, createIterableIterator, makeIterable } from "./iterator/create";
@@ -180,10 +183,7 @@ export {
     getIdleCallback, getCancelIdleCallback, RequestIdleCallback, CancelIdleCallback
 } from "./timer/idle";
 export { scheduleInterval } from "./timer/interval";
-export {
-    hasQueueMicrotask, scheduleMicrotask, getQueueMicrotask,
-    ScheduleMicrotaskFn, MicroTaskOptions, setMicroTaskFallbackOptions
-} from "./timer/microtask";
+export { scheduleMicrotask, MicroTaskOptions, setMicroTaskFallbackOptions } from "./timer/microtask";
 export { hasProcessNextTick, scheduleNextTick, getProcessNextTick, NextTickOptions, ProcessNextTickFn, setNextTickFallbackOptions } from "./timer/nextTick";
 export {
     TimeoutOverrideFn, ClearTimeoutOverrideFn, TimeoutOverrideFuncs, scheduleTimeout, scheduleTimeoutWith,

@@ -20,6 +20,10 @@
   - Added `arrToMap` helper in the array module and moved callback/type declarations into `iterator/types`
   - Refactored iterator helper implementation/tests into per-function files and updated root exports
   - Added NaN regression coverage and switched iterator set-operation membership checks to `arrIncludes` semantics for parity with array helpers
+- [#576](https://github.com/nevware21/ts-utils/pull/576) Refactor timer microtask/nextTick shared types and environment helpers, with expanded fallback coverage
+  - Moved `MicrotaskFn` and `ScheduleMicrotaskFn` to `helpers/types` and updated timer internals to consume shared type definitions
+  - Moved `getQueueMicrotask` and `hasQueueMicrotask` to `helpers/environment`, updated root exports, and aligned `scheduleNextTick` fallback resolution to prefer `queueMicrotask` when available
+  - Added internal `microtaskQueue` scheduler helper wiring and expanded tests for queue fallback behavior, Promise ordering, and no-Promise edge cases
 
 ### Bug Fixes
 

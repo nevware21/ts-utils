@@ -7,7 +7,7 @@
  */
 
 import { isStrictUndefined } from "../../helpers/base";
-import { ScheduleMicrotaskFn } from "../microtask";
+import { ScheduleMicrotaskFn } from "../../helpers/types";
 import { _getPromiseQueueFn } from "./promiseQueue";
 import { _eTaskQueueType } from "./taskQueue";
 

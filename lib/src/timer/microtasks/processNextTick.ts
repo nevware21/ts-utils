@@ -10,8 +10,8 @@ import { isFunction } from "../../helpers/base";
 import { createCachedValue, ICachedValue } from "../../helpers/cache";
 import { getInst, isNode } from "../../helpers/environment";
 import { _globalLazyTestHooks, _initTestHooks } from "../../helpers/lazy";
+import { ScheduleMicrotaskFn } from "../../helpers/types";
 import { UNDEF_VALUE } from "../../internal/constants";
-import { ScheduleMicrotaskFn } from "../microtask";
 import { _runMicroTask } from "./runMicrotask";
 
 interface IProcessLike {

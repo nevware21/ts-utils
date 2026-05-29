@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { _getGlobalInstFn, getInst } from "../helpers/environment";
+import { getQueueMicrotask } from "../helpers/environment";
 import { ITimerHandler } from "./handler";
 import { _createCancellableTask } from "./microtasks/cancellableTask";
 import { isArray } from "../helpers/base";
@@ -15,30 +15,9 @@ import { _eTaskQueueType } from "./microtasks/taskQueue";
 import { _addMicrotaskQueue } from "./microtasks/timerQueue";
 import { fnBindArgs } from "../funcs/fnBindArgs";
 import { UNDEF_VALUE } from "../internal/constants";
+import { MicrotaskFn, ScheduleMicrotaskFn } from "../helpers/types";
 
 let _defaultOptions: MicroTaskOptions | undefined;
-
-/**
- * Type alias for a microtask callback function, which is a function that is scheduled to run in the microtask
- * queue after the current execution context completes.
- * @since 0.15.0
- * @group Timer
- * @group Environment
- */
-export type MicrotaskFn = () => void;
-
-/**
- * Type alias for a function that is used to schedule a microtask, which is a function
- * that takes a callback and schedules it to run
- *
- * @since 0.15.0
- * @group Timer
- * @group Environment
- * @param callback - The microtask callback function to schedule.
- * @param maxQueuedTasks - Optional, the maximum number of queued tasks allowed before the scheduler
- * starts dropping tasks or throwing errors, depending on the implementation.
- */
-export type ScheduleMicrotaskFn = (callback: MicrotaskFn, maxQueuedTasks?: number) => void | boolean;
 
 /**
  * Controls how `scheduleMicrotask` chooses fallback behavior when native
@@ -63,44 +42,6 @@ export interface MicroTaskOptions {
      * default set via {@link setMicroTaskFallbackOptions} has `useTimeout: true`.
      */
     useTimeout?: boolean;
-}
-
-/**
- * Returns the global `queueMicrotask` function if available, or `null` when unavailable.
- *
- * @function
- * @since 0.15.0
- * @group Timer
- * @group Environment
- * @example
- * ```ts
- * const queueFn = getQueueMicrotask();
- * if (queueFn) {
- *     queueFn(() => {
- *         console.log("microtask");
- *     });
- * }
- * ```
- */
-export const getQueueMicrotask = (/*#__PURE__*/_getGlobalInstFn<ScheduleMicrotaskFn>(getInst as any, ["queueMicrotask"]));
-
-/**
- * Identifies if the runtime supports the `queueMicrotask` API.
- *
- * @since 0.15.0
- * @group Timer
- * @group Environment
- * @returns True if the runtime supports `queueMicrotask` otherwise false.
- * @example
- * ```ts
- * if (hasQueueMicrotask()) {
- *     console.log("Native queueMicrotask support is available");
- * }
- * ```
- */
-/*#__NO_SIDE_EFFECTS__*/
-export function hasQueueMicrotask(): boolean {
-    return !!( /*#__PURE__*/getQueueMicrotask());
 }
 
 /**

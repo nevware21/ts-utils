@@ -7,16 +7,17 @@
  */
 
 import { isArray, isFunction, isStrictUndefined } from "../helpers/base";
-import { _getGlobalInstFn, getInst, isNode } from "../helpers/environment";
+import { _getGlobalInstFn, getInst, getQueueMicrotask, isNode } from "../helpers/environment";
 import { ITimerHandler } from "./handler";
 import { _createCancellableTask } from "./microtasks/cancellableTask";
-import { MicrotaskFn, ScheduleMicrotaskFn } from "./microtask";
 import { _getProcessNextTickFn } from "./microtasks/processNextTick";
 import { _resolveScheduleFn } from "./microtasks/resolveScheduleFn";
 import { _addNextTickToQueue } from "./microtasks/timerQueue";
 import { _eTaskQueueType } from "./microtasks/taskQueue";
 import { fnBindArgs } from "../funcs/fnBindArgs";
 import { UNDEF_VALUE } from "../internal/constants";
+import { MicrotaskFn, ScheduleMicrotaskFn } from "../helpers/types";
+import { _getMicrotaskQueueFn } from "./microtasks/microtaskQueue";
 
 const _defaultMaxQueuedTasks = 1000;
 
@@ -129,14 +130,17 @@ export function hasProcessNextTick(): boolean {
 }
 
 /**
- * Schedules a callback to run using `process.nextTick` when available and otherwise uses an
- * Promise-based fallback before using the timer-backed queue.
+ * Schedules a callback to run using `process.nextTick` when available and otherwise uses
+ * queueMicrotask, a Promise-based fallback or finally a timer-backed queue.
  *
- * When `scheduleFn` is provided, it is used before the Promise and timer-backed fallbacks.
- * When `useTimeout` is `true`, the timer-backed queue is used instead of the Promise fallback.
- * `maxQueuedTasks` controls the fallback queue depth limit; when omitted the Promise/timer fallback queues
- * use a Node-compatible default of 1000. Set `maxQueuedTasks` to `0` to disable the limit (for fallbacks only,
- * the native `process.nextTick` is not affected by this limit).
+ * When `scheduleFn` is provided, it is used before the Promise and timer-backed fallbacks, if
+ * queueMicrotask is available it is used before all fallbacks.
+ * When `useTimeout` is `true`, the timer-backed queue is used instead of the Promise fallback only
+ * when native `process.nextTick` and `queueMicrotask` are unavailable.
+ * `maxQueuedTasks` controls the fallback queue depth limit; when omitted the fallback queue uses
+ * the default limit (set via `setNextTickFallbackOptions`) or a Node-compatible default of 1000.
+ * Setting/passing `maxQueuedTasks` to `0` disables the limit (for fallbacks only, the native
+ * `process.nextTick` is not affected by this limit).
  *
  * @since 0.15.0
  * @group Timer
@@ -194,7 +198,7 @@ export function scheduleNextTick<TArgs extends any[]>(callback: (...args: TArgs)
     }
 
     let taskCallback = callbackArgs ? fnBindArgs(callback, UNDEF_VALUE, callbackArgs) : (callback as MicrotaskFn);
-    let nextTickFn = _getProcessNextTickFn();
+    let nextTickFn = _getProcessNextTickFn() || _getMicrotaskQueueFn(_eTaskQueueType.nextTick);
     let maxQueuedTasks = (theOptions && !isStrictUndefined(theOptions.maxQueuedTasks))
         ? theOptions.maxQueuedTasks
         : ((_defaultOptions && !isStrictUndefined(_defaultOptions.maxQueuedTasks))

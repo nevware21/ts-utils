@@ -10,7 +10,7 @@ import { isFunction } from "../../helpers/base";
 import { createCachedValue, ICachedValue } from "../../helpers/cache";
 import { getInst } from "../../helpers/environment";
 import { _globalLazyTestHooks, _initTestHooks } from "../../helpers/lazy";
-import { ScheduleMicrotaskFn } from "../microtask";
+import { ScheduleMicrotaskFn } from "../../helpers/types";
 import { _addToQueue, _eTaskQueueType, _flushQueues } from "./taskQueue";
 
 let _promiseCls: ICachedValue<PromiseConstructor | undefined>;
