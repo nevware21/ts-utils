@@ -16,6 +16,12 @@
   - Adds `arrConcat` as a dedicated array helper and `fnBindArgs` as a dedicated function helper
   - Improves function binding typing with exported `BoundFunction` and updated signatures for `fnBind` / `fnBindArgs`
 
+### Bug Fixes
+
+- [#568](https://github.com/nevware21/ts-utils/issues/568) Rolldown `INVALID_ANNOTATION` warnings caused by non-canonical PURE annotation spacing in generated output
+  - [#569](https://github.com/nevware21/ts-utils/pull/569) Add generated-chunk PURE annotation normalization so spaced forms are rewritten to canonical `(/*#__PURE__*/` / `(/*@__PURE__*/` in rollup output
+  - [#575](https://github.com/nevware21/ts-utils/pull/575) Add packaged artifact validation for PURE annotation spacing and update normalization tolerance, with per-file logging while scanning `lib/bundle` and `lib/dist`
+
 # v0.14.0 May 18th, 2026
 
 ## Changelog
