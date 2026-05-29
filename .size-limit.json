@@ -2,42 +2,42 @@
   {
     "name": "es5-full",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "33.5 kb",
+    "limit": "35 kb",
     "brotli": false,
     "running": false
   },
   {
     "name": "es6-full",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "32 kb",
+    "limit": "33.5 kb",
     "brotli": false,
     "running": false
   },
   {
     "name": "es5-full-brotli",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "12 kb",
+    "limit": "12.5 kb",
     "brotli": true,
     "running": false
   },
   {
     "name": "es6-full-brotli",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "11.5 kb",
+    "limit": "12 kb",
     "brotli": true,
     "running": false
   },
   {
     "name": "es5-zip",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "13 Kb",
+    "limit": "13.5 Kb",
     "gzip": true,
     "running": false
   },
   {
     "name": "es6-zip",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "13 Kb",
+    "limit": "13.5 Kb",
     "gzip": true,
     "running": false
   },
@@ -107,8 +107,24 @@
   {
     "name": "es5-scheduleMicrotask",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "1.5 kb",
+    "limit": "1.75 kb",
     "import": "{ scheduleMicrotask }",
+    "gzip": true,
+    "running": false
+  },
+  {
+    "name": "es5-scheduleNextTick",
+    "path": "lib/dist/es5/mod/ts-utils.js",
+    "limit": "2 kb",
+    "import": "{ scheduleNextTick }",
+    "gzip": true,
+    "running": false
+  },
+  {
+    "name": "es5-scheduleNextTickAndMicrotask",
+    "path": "lib/dist/es5/mod/ts-utils.js",
+    "limit": "2 kb",
+    "import": "{ scheduleNextTick, scheduleMicrotask }",
     "gzip": true,
     "running": false
   }

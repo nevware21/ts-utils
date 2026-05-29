@@ -4,11 +4,17 @@
 
 ### Features
 
-- Add microtask scheduling helpers with native `queueMicrotask`, Promise, and timer-backed fallbacks
+- [#570](https://github.com/nevware21/ts-utils/pull/570) Add microtask scheduling helpers with native `queueMicrotask`, Promise, and timer-backed fallbacks
   - New functions: `scheduleMicrotask`, `hasQueueMicrotask`, `getQueueMicrotask`, `setMicroTaskFallbackOptions`
   - New public types: `ScheduleMicrotaskFn`, `MicroTaskOptions`
   - Extends microtask support by providing cancellable microtasks via `ITimerHandler`, plus fallback ordering to run microtasks before queued timers when using the timer-backed implementation
   - Provides runtime parity across all supported environments by using native `queueMicrotask` when present, Promise-backed scheduling when available, and a timer-backed microtask queue otherwise
+- [#573](https://github.com/nevware21/ts-utils/pull/573) Add nextTick scheduling support and new helper exports
+  - New timer/runtime functions: `scheduleNextTick`, `getProcessNextTick`, `hasProcessNextTick`, `setNextTickFallbackOptions`
+  - Uses native `process.nextTick` in Node runtimes when available, while providing equivalent nextTick behavior in browser and worker runtimes via Promise and timer-backed fallbacks
+  - Adds shared queue logic and callback-argument support across microtask and nextTick scheduling
+  - Adds `arrConcat` as a dedicated array helper and `fnBindArgs` as a dedicated function helper
+  - Improves function binding typing with exported `BoundFunction` and updated signatures for `fnBind` / `fnBindArgs`
 
 # v0.14.0 May 18th, 2026
 

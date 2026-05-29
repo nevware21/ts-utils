@@ -223,7 +223,10 @@ export const getHistory = (/*#__PURE__*/_getGlobalInstFn<History>(getInst, ["his
  * @returns True if you are
  */
 export const isNode = (/*#__PURE__*/_getGlobalInstFn<boolean>(() => {
-    return !!safe(() => (process && (process.versions||{}).node)).v;
+    return !!safe(() => {
+        let processInst = getInst<any>("process");
+        return processInst && (processInst.versions || {}).node;
+    }).v;
 }));
 
 /**

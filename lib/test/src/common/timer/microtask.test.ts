@@ -11,9 +11,10 @@ import { assert } from "@nevware21/tripwire-chai";
 import { getGlobal } from "../../../../src/helpers/environment";
 import { setBypassLazyCache } from "../../../../src/helpers/lazy";
 import { getQueueMicrotask, hasQueueMicrotask, scheduleMicrotask, setMicroTaskFallbackOptions } from "../../../../src/timer/microtask";
-import { _addMicrotaskToQueue, _resetMicrotaskQueue } from "../../../../src/timer/microtasks/timerMicrotask";
+import { _addMicrotaskQueue, _resetSharedTimer } from "../../../../src/timer/microtasks/timerQueue";
 import { _runMicroTask } from "../../../../src/timer/microtasks/runMicrotask";
 import { scheduleTimeout, setTimeoutOverrides } from "../../../../src/timer/timeout";
+import { _clearTaskQueues } from "../../../../src/timer/microtasks/taskQueue";
 
 describe("microtask tests", () => {
     let orgPromise: any;
@@ -36,7 +37,8 @@ describe("microtask tests", () => {
     afterEach(() => {
         (<any>getGlobal()).Promise = orgPromise;
         (<any>getGlobal()).queueMicrotask = orgQueueMicrotask;
-        _resetMicrotaskQueue();
+        _clearTaskQueues();
+        _resetSharedTimer();
         setTimeoutOverrides();
         setMicroTaskFallbackOptions();
         setBypassLazyCache(false);
@@ -122,6 +124,52 @@ describe("microtask tests", () => {
             assert.equal(handler.enabled, false, "Check that the handler is stopped");
             done();
         }, 0);
+    });
+
+    it("supports callback arguments with available microtask queue", (done) => {
+        let calledName: string;
+        let calledCount: number;
+
+        let handler = scheduleMicrotask((name: string, count: number) => {
+            calledName = name;
+            calledCount = count;
+        }, ["micro", 42]);
+
+        assert.equal(handler.enabled, true, "Check that the handler is running");
+
+        orgSetTimeout(() => {
+            assert.equal(calledName, "micro", "Expected callback argument 'name' to be passed");
+            assert.equal(calledCount, 42, "Expected callback argument 'count' to be passed");
+            assert.equal(handler.enabled, false, "Check that the handler is stopped");
+            done();
+        }, 0);
+    });
+
+    it("forwards callback arguments via native queueMicrotask implementation", (done) => {
+        let theGlobal: any = getGlobal();
+        let queueCalls = 0;
+        let calledName: string;
+        let calledCount: number;
+
+        theGlobal.queueMicrotask = (callback: () => void) => {
+            queueCalls++;
+            orgSetTimeout(callback, 0);
+        };
+
+        let handler = scheduleMicrotask((name: string, count: number) => {
+            calledName = name;
+            calledCount = count;
+        }, ["native", 101]);
+
+        assert.equal(handler.enabled, true, "Check that the handler is running");
+
+        orgSetTimeout(() => {
+            assert.equal(queueCalls, 1, "Expected native queueMicrotask implementation to be used once");
+            assert.equal(calledName, "native", "Expected callback argument 'name' to be passed");
+            assert.equal(calledCount, 101, "Expected callback argument 'count' to be passed");
+            assert.equal(handler.enabled, false, "Check that the handler is stopped");
+            done();
+        }, 10);
     });
 
     it("enabled=false then enabled=true re-schedules with available microtask queue", (done) => {
@@ -221,6 +269,25 @@ describe("microtask tests", () => {
             }, 0);
         });
 
+        it("supports callback arguments via Promise fallback", (done) => {
+            let calledName: string;
+            let calledCount: number;
+
+            let handler = scheduleMicrotask((name: string, count: number) => {
+                calledName = name;
+                calledCount = count;
+            }, ["promise", 6]);
+
+            assert.equal(handler.enabled, true, "Check that the handler is running");
+
+            orgSetTimeout(() => {
+                assert.equal(calledName, "promise", "Expected callback argument 'name' to be passed");
+                assert.equal(calledCount, 6, "Expected callback argument 'count' to be passed");
+                assert.equal(handler.enabled, false, "Check that the handler is stopped");
+                done();
+            }, 10);
+        });
+
         it("uses timeout fallback when Promise fallback is disabled", () => {
             let clock = sinon.useFakeTimers();
             try {
@@ -257,6 +324,53 @@ describe("microtask tests", () => {
             assert.equal(called, 0, "Callback should not be called yet");
             orgSetTimeout(() => {
                 assert.equal(called, 1, "Callback should be called once via custom fallback scheduler");
+                assert.equal(handler.enabled, false, "Check that the handler is stopped");
+                done();
+            }, 10);
+        });
+
+        it("supports callback arguments via custom fallback scheduling function", (done) => {
+            let scheduleCalls = 0;
+            let calledName: string;
+            let calledCount: number;
+
+            let handler = scheduleMicrotask((name: string, count: number) => {
+                calledName = name;
+                calledCount = count;
+            }, ["custom", 9], {
+                scheduleFn: (cb) => {
+                    scheduleCalls++;
+                    orgSetTimeout(cb, 0);
+                }
+            });
+
+            assert.equal(handler.enabled, true, "Check that the handler is running");
+
+            orgSetTimeout(() => {
+                assert.equal(scheduleCalls, 1, "Custom fallback scheduler should be used");
+                assert.equal(calledName, "custom", "Expected callback argument 'name' to be passed");
+                assert.equal(calledCount, 9, "Expected callback argument 'count' to be passed");
+                assert.equal(handler.enabled, false, "Check that the handler is stopped");
+                done();
+            }, 10);
+        });
+
+        it("supports callback arguments with options in fallback mode", (done) => {
+            let calledName: string;
+            let calledCount: number;
+
+            let handler = scheduleMicrotask((name: string, count: number) => {
+                calledName = name;
+                calledCount = count;
+            }, ["fallback", 7], {
+                useTimeout: true
+            });
+
+            assert.equal(handler.enabled, true, "Check that the handler is running");
+
+            orgSetTimeout(() => {
+                assert.equal(calledName, "fallback", "Expected callback argument 'name' to be passed");
+                assert.equal(calledCount, 7, "Expected callback argument 'count' to be passed");
                 assert.equal(handler.enabled, false, "Check that the handler is stopped");
                 done();
             }, 10);
@@ -343,7 +457,8 @@ describe("microtask tests", () => {
             setMicroTaskFallbackOptions();
             (<any>getGlobal()).queueMicrotask = null;
             (<any>getGlobal()).Promise = null;
-            _resetMicrotaskQueue();
+            _clearTaskQueues();
+            _resetSharedTimer();
         });
 
         it("uses scheduleTimeout fallback", (done) => {
@@ -429,12 +544,12 @@ describe("microtask tests", () => {
                 }
             ]);
 
-            _addMicrotaskToQueue(() => {
+            _addMicrotaskQueue(() => {
                 flushedBatches.push("batch-1");
             });
 
             orgSetTimeout(() => {
-                _addMicrotaskToQueue(() => {
+                _addMicrotaskQueue(() => {
                     flushedBatches.push("batch-2");
                 });
 
