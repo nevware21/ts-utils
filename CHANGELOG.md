@@ -31,6 +31,41 @@
   - [#569](https://github.com/nevware21/ts-utils/pull/569) Add generated-chunk PURE annotation normalization so spaced forms are rewritten to canonical `(/*#__PURE__*/` / `(/*@__PURE__*/` in rollup output
   - [#575](https://github.com/nevware21/ts-utils/pull/575) Add packaged artifact validation for PURE annotation spacing and update normalization tolerance, with per-file logging while scanning `lib/bundle` and `lib/dist`
 
+# v0.15.0 May 29th, 2026
+
+## Changelog
+
+### Features
+
+- [#570](https://github.com/nevware21/ts-utils/pull/570) Add microtask scheduling helpers with native `queueMicrotask`, Promise, and timer-backed fallbacks
+  - New functions: `scheduleMicrotask`, `hasQueueMicrotask`, `getQueueMicrotask`, `setMicroTaskFallbackOptions`
+  - New public types: `ScheduleMicrotaskFn`, `MicroTaskOptions`
+  - Extends microtask support by providing cancellable microtasks via `ITimerHandler`, plus fallback ordering to run microtasks before queued timers when using the timer-backed implementation
+  - Provides runtime parity across all supported environments by using native `queueMicrotask` when present, Promise-backed scheduling when available, and a timer-backed microtask queue otherwise
+- [#573](https://github.com/nevware21/ts-utils/pull/573) Add nextTick scheduling support and new helper exports
+  - New timer/runtime functions: `scheduleNextTick`, `getProcessNextTick`, `hasProcessNextTick`, `setNextTickFallbackOptions`
+  - Uses native `process.nextTick` in Node runtimes when available, while providing equivalent nextTick behavior in browser and worker runtimes via Promise and timer-backed fallbacks
+  - Adds shared queue logic and callback-argument support across microtask and nextTick scheduling
+  - Adds `arrConcat` as a dedicated array helper and `fnBindArgs` as a dedicated function helper
+  - Improves function binding typing with exported `BoundFunction` and updated signatures for `fnBind` / `fnBindArgs`
+- [#574](https://github.com/nevware21/ts-utils/pull/574) feat(iterator,array): add iterator collection helpers, split helper modules, and align collection membership semantics
+  - Added new iterator helpers: `iterMap`, `iterFilter`, `iterTake`, `iterReduce`, `iterSome`, `iterEvery`, `iterToArray`, `iterUnion`, `iterIntersection`, `iterDifference`
+  - Added `arrToMap` helper in the array module and moved callback/type declarations into `iterator/types`
+  - Refactored iterator helper implementation/tests into per-function files and updated root exports
+  - Added NaN regression coverage and switched iterator set-operation membership checks to `arrIncludes` semantics for parity with array helpers
+- [#576](https://github.com/nevware21/ts-utils/pull/576) Refactor timer microtask/nextTick shared types and environment helpers, with expanded fallback coverage
+  - Moved `MicrotaskFn` and `ScheduleMicrotaskFn` to `helpers/types` and updated timer internals to consume shared type definitions
+  - Moved `getQueueMicrotask` and `hasQueueMicrotask` to `helpers/environment`, updated root exports, and aligned `scheduleNextTick` fallback resolution to prefer `queueMicrotask` when available
+  - Added internal `microtaskQueue` scheduler helper wiring and expanded tests for queue fallback behavior, Promise ordering, and no-Promise edge cases
+
+### Bug Fixes
+
+- [#568](https://github.com/nevware21/ts-utils/issues/568) Rolldown `INVALID_ANNOTATION` warnings caused by non-canonical PURE annotation spacing in generated output
+  - [#569](https://github.com/nevware21/ts-utils/pull/569) Add generated-chunk PURE annotation normalization so spaced forms are rewritten to canonical `(/*#__PURE__*/` / `(/*@__PURE__*/` in rollup output
+  - [#575](https://github.com/nevware21/ts-utils/pull/575) Add packaged artifact validation for PURE annotation spacing and update normalization tolerance, with per-file logging while scanning `lib/bundle` and `lib/dist`
+
+[Full Changelog](https://github.com/nevware21/ts-utils/compare/v0.14.0...v0.15.0)
+
 # v0.14.0 May 18th, 2026
 
 ## Changelog
