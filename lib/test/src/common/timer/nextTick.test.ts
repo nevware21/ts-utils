@@ -11,6 +11,7 @@ import { getGlobal, isNode } from "../../../../src/helpers/environment";
 import { setBypassLazyCache } from "../../../../src/helpers/lazy";
 import { scheduleMicrotask, setMicroTaskFallbackOptions } from "../../../../src/timer/microtask";
 import { getProcessNextTick, hasProcessNextTick, scheduleNextTick, setNextTickFallbackOptions } from "../../../../src/timer/nextTick";
+import { _resetMicrotaskQueueFns } from "../../../../src/timer/microtasks/microtaskQueue";
 import { scheduleTimeout } from "../../../../src/timer/timeout";
 import { _clearTaskQueues } from "../../../../src/timer/microtasks/taskQueue";
 import { _resetSharedTimer } from "../../../../src/timer/microtasks/timerQueue";
@@ -34,6 +35,7 @@ describe("nextTick tests", () => {
         setBypassLazyCache(true);
         setMicroTaskFallbackOptions();
         setNextTickFallbackOptions();
+        _resetMicrotaskQueueFns();
         theGlobal.process = orgProcess;
         theGlobal.Promise = orgPromise;
         theGlobal.queueMicrotask = orgQueueMicrotask;
@@ -46,6 +48,7 @@ describe("nextTick tests", () => {
         theGlobal.queueMicrotask = orgQueueMicrotask;
         _clearTaskQueues();
         _resetSharedTimer();
+        _resetMicrotaskQueueFns();
         setMicroTaskFallbackOptions();
         setNextTickFallbackOptions();
         setBypassLazyCache(false);
@@ -229,6 +232,8 @@ describe("nextTick tests", () => {
             nextTick: null
         };
 
+        theGlobal.queueMicrotask = null;
+
         let handler = scheduleNextTick(() => {
             called++;
         }, {
@@ -258,6 +263,7 @@ describe("nextTick tests", () => {
             versions: orgProcess && orgProcess.versions,
             nextTick: null
         };
+        theGlobal.queueMicrotask = null;
 
         let handler = scheduleNextTick((name: string, count: number) => {
             calledName = name;
@@ -274,6 +280,39 @@ describe("nextTick tests", () => {
         }, 10);
     });
 
+    it("supports callback arguments via queueMicrotask fallback", (done) => {
+        let theGlobal: any = getGlobal();
+        let queueCalls = 0;
+        let calledName: string;
+        let calledCount: number;
+
+        theGlobal.process = {
+            version: orgProcess && orgProcess.version,
+            versions: orgProcess && orgProcess.versions,
+            nextTick: null
+        };
+        theGlobal.Promise = null;
+        theGlobal.queueMicrotask = (callback: () => void) => {
+            queueCalls++;
+            orgQueueMicrotask(callback);
+        };
+
+        let handler = scheduleNextTick((name: string, count: number) => {
+            calledName = name;
+            calledCount = count;
+        }, ["queueMicrotask", 6]);
+
+        assert.equal(handler.enabled, true, "Check that the handler is running");
+
+        orgSetTimeout(() => {
+            assert.equal(queueCalls, 1, "Expected native queueMicrotask to be used once");
+            assert.equal(calledName, "queueMicrotask", "Expected callback argument 'name' to be passed");
+            assert.equal(calledCount, 6, "Expected callback argument 'count' to be passed");
+            assert.equal(handler.enabled, false, "Check that the handler is stopped");
+            done();
+        }, 10);
+    });
+
     it("cancel prevents callback via Promise fallback", (done) => {
         let theGlobal: any = getGlobal();
         let called = 0;
@@ -283,6 +322,7 @@ describe("nextTick tests", () => {
             versions: orgProcess && orgProcess.versions,
             nextTick: null
         };
+        theGlobal.queueMicrotask = null;
 
         let handler = scheduleNextTick(() => {
             called++;
@@ -298,6 +338,37 @@ describe("nextTick tests", () => {
         }, 10);
     });
 
+    it("cancel prevents callback via queueMicrotask fallback", (done) => {
+        let theGlobal: any = getGlobal();
+        let queueCalls = 0;
+        let called = 0;
+
+        theGlobal.process = {
+            version: orgProcess && orgProcess.version,
+            versions: orgProcess && orgProcess.versions,
+            nextTick: null
+        };
+        theGlobal.Promise = null;
+        theGlobal.queueMicrotask = (callback: () => void) => {
+            queueCalls++;
+            orgQueueMicrotask(callback);
+        };
+
+        let handler = scheduleNextTick(() => {
+            called++;
+        });
+
+        assert.equal(handler.enabled, true, "Check that the handler is running");
+        handler.cancel();
+        assert.equal(handler.enabled, false, "Check that the handler is stopped");
+
+        orgSetTimeout(() => {
+            assert.equal(queueCalls, 1, "Expected native queueMicrotask to be used once");
+            assert.equal(called, 0, "Expected callback to not run after cancel");
+            done();
+        }, 10);
+    });
+
     it("refresh reschedules callback via Promise fallback", (done) => {
         let theGlobal: any = getGlobal();
         let called = 0;
@@ -307,6 +378,7 @@ describe("nextTick tests", () => {
             versions: orgProcess && orgProcess.versions,
             nextTick: null
         };
+        theGlobal.queueMicrotask = null;
 
         let handler = scheduleNextTick(() => {
             called++;
@@ -323,6 +395,38 @@ describe("nextTick tests", () => {
         }, 10);
     });
 
+    it("refresh reschedules callback via queueMicrotask fallback", (done) => {
+        let theGlobal: any = getGlobal();
+        let queueCalls = 0;
+        let called = 0;
+
+        theGlobal.process = {
+            version: orgProcess && orgProcess.version,
+            versions: orgProcess && orgProcess.versions,
+            nextTick: null
+        };
+        theGlobal.Promise = null;
+        theGlobal.queueMicrotask = (callback: () => void) => {
+            queueCalls++;
+            orgQueueMicrotask(callback);
+        };
+
+        let handler = scheduleNextTick(() => {
+            called++;
+        });
+
+        assert.equal(handler.enabled, true, "Check that the handler is running");
+        handler.refresh();
+        assert.equal(handler.enabled, true, "Check that the handler is running");
+
+        orgSetTimeout(() => {
+            assert.isAtLeast(queueCalls, 1, "Expected native queueMicrotask to be used");
+            assert.equal(called, 1, "Expected callback to run once after refresh");
+            assert.equal(handler.enabled, false, "Check that the handler is stopped");
+            done();
+        }, 10);
+    });
+
     it("cancel prevents callback via timer-queue fallback", (done) => {
         let theGlobal: any = getGlobal();
         let called = 0;
@@ -332,6 +436,7 @@ describe("nextTick tests", () => {
             versions: orgProcess && orgProcess.versions,
             nextTick: null
         };
+        theGlobal.queueMicrotask = null;
 
         let handler = scheduleNextTick(() => {
             called++;
@@ -358,6 +463,7 @@ describe("nextTick tests", () => {
             versions: orgProcess && orgProcess.versions,
             nextTick: null
         };
+        theGlobal.queueMicrotask = null;
 
         let handler = scheduleNextTick(() => {
             called++;
@@ -387,6 +493,7 @@ describe("nextTick tests", () => {
             versions: orgProcess && orgProcess.versions,
             nextTick: null
         };
+        theGlobal.queueMicrotask = null;
 
         let handler = scheduleNextTick((name: string, count: number) => {
             calledName = name;
@@ -419,6 +526,7 @@ describe("nextTick tests", () => {
             versions: orgProcess && orgProcess.versions,
             nextTick: null
         };
+        theGlobal.queueMicrotask = null;
 
         let handler = scheduleNextTick((name: string, count: number) => {
             calledName = name;
@@ -446,6 +554,7 @@ describe("nextTick tests", () => {
             versions: orgProcess && orgProcess.versions,
             nextTick: null
         };
+        theGlobal.queueMicrotask = null;
 
         setNextTickFallbackOptions({
             scheduleFn: (cb) => {
@@ -613,6 +722,7 @@ describe("nextTick tests", () => {
             versions: orgProcess && orgProcess.versions,
             nextTick: null
         };
+        theGlobal.queueMicrotask = null;
         theGlobal.Promise = {
             resolve: () => ({
                 then: () => {
@@ -657,6 +767,7 @@ describe("nextTick tests", () => {
             versions: orgProcess && orgProcess.versions,
             nextTick: null
         };
+        theGlobal.queueMicrotask = null;
         theGlobal.Promise = {
             resolve: () => ({
                 then: () => {
@@ -698,6 +809,7 @@ describe("nextTick tests", () => {
             versions: orgProcess && orgProcess.versions,
             nextTick: null
         };
+        theGlobal.queueMicrotask = null;
 
         // Simulate a Promise implementation that never resolves callbacks, leaving pending state stuck.
         theGlobal.Promise = {
@@ -721,6 +833,231 @@ describe("nextTick tests", () => {
         orgSetTimeout(() => {
             try {
                 assert.deepEqual(events, ["first", "second"], "Expected queued nextTick callbacks to flush after Promise implementation change");
+                done();
+            } catch (e) {
+                done(e as Error);
+            }
+        }, 10);
+    });
+
+    it("executes nextTick before setTimeout when scheduled via Promise fallback - edge case", (done) => {
+        let theGlobal: any = getGlobal();
+        let events: string[] = [];
+
+        // Force Promise fallback (disable process.nextTick and queueMicrotask)
+        theGlobal.process = {
+            version: orgProcess && orgProcess.version,
+            versions: orgProcess && orgProcess.versions,
+            nextTick: null
+        };
+        theGlobal.queueMicrotask = null;
+
+        // Schedule direct setTimeout first - this gets queued as a macrotask
+        orgSetTimeout(() => {
+            events.push("setTimeout");
+        }, 0);
+
+        // Then schedule nextTick - this should run before setTimeout via Promise microtask
+        scheduleNextTick(() => {
+            events.push("nextTick");
+        });
+
+        // Verify that nextTick runs before setTimeout when using Promise fallback
+        orgSetTimeout(() => {
+            try {
+                assert.deepEqual(events, ["nextTick", "setTimeout"], "Promise fallback: Expected nextTick (microtask) to execute before direct setTimeout (macrotask)");
+                done();
+            } catch (e) {
+                done(e as Error);
+            }
+        }, 10);
+    });
+
+    it("handles interleaved nextTick and setTimeout scheduling with Promise fallback", (done) => {
+        let theGlobal: any = getGlobal();
+        let events: string[] = [];
+
+        // Force Promise fallback
+        theGlobal.process = {
+            version: orgProcess && orgProcess.version,
+            versions: orgProcess && orgProcess.versions,
+            nextTick: null
+        };
+        theGlobal.queueMicrotask = null;
+
+        // Rapidly interleave scheduling
+        orgSetTimeout(() => {
+            events.push("timer-1");
+        }, 0);
+
+        scheduleNextTick(() => {
+            events.push("nextTick-1");
+        });
+
+        orgSetTimeout(() => {
+            events.push("timer-2");
+        }, 0);
+
+        scheduleNextTick(() => {
+            events.push("nextTick-2");
+        });
+
+        orgSetTimeout(() => {
+            events.push("timer-3");
+        }, 0);
+
+        scheduleNextTick(() => {
+            events.push("nextTick-3");
+        });
+
+        // With Promise fallback: all nextTicks (microtasks) execute before any setTimeout (macrotasks)
+        orgSetTimeout(() => {
+            try {
+                assert.deepEqual(events, ["nextTick-1", "nextTick-2", "nextTick-3", "timer-1", "timer-2", "timer-3"], "Promise fallback: all microtasks (nextTick) execute before macrotasks (setTimeout)");
+                done();
+            } catch (e) {
+                done(e as Error);
+            }
+        }, 15);
+    });
+
+    it("executes queued nextTick callbacks through timer-queue fallback", (done) => {
+        let theGlobal: any = getGlobal();
+        let events: string[] = [];
+
+        // Force timer-queue fallback (disable all native microtask support)
+        theGlobal.process = {
+            version: orgProcess && orgProcess.version,
+            versions: orgProcess && orgProcess.versions,
+            nextTick: null
+        };
+        theGlobal.queueMicrotask = null;
+        theGlobal.Promise = null;
+
+        // Schedule nextTick callbacks using timer-queue fallback
+        scheduleNextTick(() => {
+            events.push("nextTick-1");
+        }, {
+            useTimeout: true
+        });
+
+        scheduleNextTick(() => {
+            events.push("nextTick-2");
+        }, {
+            useTimeout: true
+        });
+
+        scheduleTimeout(() => {
+            events.push("timer");
+        }, 0);
+
+        // Verify that nextTick callbacks execute and eventually complete before test ends
+        orgSetTimeout(() => {
+            try {
+                assert.isOk(events.includes("nextTick-1"), "Expected nextTick-1 to execute via timer-queue fallback");
+                assert.isOk(events.includes("nextTick-2"), "Expected nextTick-2 to execute via timer-queue fallback");
+                assert.isOk(events.includes("timer"), "Expected timer callback to execute");
+                done();
+            } catch (e) {
+                done(e as Error);
+            }
+        }, 20);
+    });
+
+    it("nextTick should fail to execute before native setTimeout with no promise or microtask support", (done) => {
+        let theGlobal: any = getGlobal();
+        let events: string[] = [];
+
+        // Force timer-queue fallback (disable all native microtask support)
+        // This simulates environments without Promise, queueMicrotask, or process.nextTick
+        theGlobal.process = {
+            version: orgProcess && orgProcess.version,
+            versions: orgProcess && orgProcess.versions,
+            nextTick: null
+        };
+        theGlobal.queueMicrotask = null;
+        theGlobal.Promise = null;
+
+        // User schedules their own setTimeout first
+        orgSetTimeout(() => {
+            events.push("user-setTimeout");
+        }, 0);
+
+        // Then user calls scheduleNextTick.
+        // In timer-queue fallback mode this is also timer-backed, so it may run after the user timer.
+        scheduleNextTick(() => {
+            events.push("scheduleNextTick");
+        }, {
+            useTimeout: true
+        });
+
+        // Verify the execution order
+        orgSetTimeout(() => {
+            try {
+                // This intentionally documents the known limitation of the timer-queue fallback:
+                // direct user timers can run before scheduleNextTick when native microtask APIs are unavailable.
+                assert.notDeepEqual(events, ["scheduleNextTick", "user-setTimeout"],
+                    "Known limitation: with timer-queue fallback, scheduleNextTick may execute after a directly scheduled native setTimeout.");
+                done();
+            } catch (e) {
+                // If this starts failing, fallback ordering behavior changed and this limitation may have been improved.
+                done(e as Error);
+            }
+        }, 10);
+    });
+
+    it("scheduleNextTick should execute before direct setTimeout with defaults", (done) => {
+        let events: string[] = [];
+
+        // User schedules their own setTimeout first
+        orgSetTimeout(() => {
+            events.push("user-setTimeout");
+        }, 0);
+
+        // Then user calls scheduleNextTick expecting it to run first
+        // This should hold true regardless of fallback implementation
+        scheduleNextTick(() => {
+            events.push("scheduleNextTick");
+        });
+
+        // Verify the execution order
+        orgSetTimeout(() => {
+            try {
+                assert.deepEqual(events, ["scheduleNextTick", "user-setTimeout"],
+                    "CRITICAL: scheduleNextTick must always execute before user's direct setTimeout. " +
+                    "This ensures consistent microtask-like semantics across all environments and fallbacks.");
+                done();
+            } catch (e) {
+                done(e as Error);
+            }
+        }, 10);
+    });
+
+
+    it("No Promise support scheduleNextTick should still execute before direct setTimeout with defaults", (done) => {
+        let theGlobal: any = getGlobal();
+        let events: string[] = [];
+
+        // Disable Promise fallback to force timer-queue fallback, but scheduleNextTick should still execute before direct setTimeout
+        theGlobal.Promise = null;
+
+        // User schedules their own setTimeout first
+        orgSetTimeout(() => {
+            events.push("user-setTimeout");
+        }, 0);
+
+        // Then user calls scheduleNextTick expecting it to run first
+        // This should hold true regardless of fallback implementation
+        scheduleNextTick(() => {
+            events.push("scheduleNextTick");
+        });
+
+        // Verify the execution order
+        orgSetTimeout(() => {
+            try {
+                assert.deepEqual(events, ["scheduleNextTick", "user-setTimeout"],
+                    "CRITICAL: scheduleNextTick must always execute before user's direct setTimeout. " +
+                    "This ensures consistent microtask-like semantics across all environments and fallbacks.");
                 done();
             } catch (e) {
                 done(e as Error);

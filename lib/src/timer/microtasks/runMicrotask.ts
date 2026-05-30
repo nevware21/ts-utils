@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { MicrotaskFn } from "../microtask";
+import { MicrotaskFn } from "../../helpers/types";
 import { scheduleTimeout } from "../timeout";
 
 /**

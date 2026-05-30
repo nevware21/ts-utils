@@ -11,6 +11,7 @@ import { _getGlobalValue } from "../internal/global";
 import { ILazyValue, _globalLazyTestHooks, _initTestHooks, getLazy } from "./lazy";
 import { ICachedValue, createCachedValue } from "./cache";
 import { safe } from "./safe";
+import { ScheduleMicrotaskFn } from "./types";
 
 const WINDOW = "window";
 
@@ -238,3 +239,42 @@ export const isNode = (/*#__PURE__*/_getGlobalInstFn<boolean>(() => {
 export const isWebWorker = (/*#__PURE__*/_getGlobalInstFn<boolean>(() => {
     return !!safe(() => self && self instanceof WorkerGlobalScope).v;
 }));
+
+
+/**
+ * Returns the global `queueMicrotask` function if available, or `null` when unavailable.
+ *
+ * @function
+ * @since 0.15.0
+ * @group Timer
+ * @group Environment
+ * @example
+ * ```ts
+ * const queueFn = getQueueMicrotask();
+ * if (queueFn) {
+ *     queueFn(() => {
+ *         console.log("microtask");
+ *     });
+ * }
+ * ```
+ */
+export const getQueueMicrotask = (/*#__PURE__*/_getGlobalInstFn<ScheduleMicrotaskFn>(getInst as any, ["queueMicrotask"]));
+
+/**
+ * Identifies if the runtime supports the `queueMicrotask` API.
+ *
+ * @since 0.15.0
+ * @group Timer
+ * @group Environment
+ * @returns True if the runtime supports `queueMicrotask` otherwise false.
+ * @example
+ * ```ts
+ * if (hasQueueMicrotask()) {
+ *     console.log("Native queueMicrotask support is available");
+ * }
+ * ```
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function hasQueueMicrotask(): boolean {
+    return !!( /*#__PURE__*/getQueueMicrotask());
+}

@@ -8,13 +8,14 @@
 
 import * as sinon from "sinon";
 import { assert } from "@nevware21/tripwire-chai";
-import { getGlobal } from "../../../../src/helpers/environment";
+import { getGlobal, getQueueMicrotask, hasQueueMicrotask } from "../../../../src/helpers/environment";
 import { setBypassLazyCache } from "../../../../src/helpers/lazy";
-import { getQueueMicrotask, hasQueueMicrotask, scheduleMicrotask, setMicroTaskFallbackOptions } from "../../../../src/timer/microtask";
+import { scheduleMicrotask, setMicroTaskFallbackOptions } from "../../../../src/timer/microtask";
+import { _getMicrotaskQueueFn } from "../../../../src/timer/microtasks/microtaskQueue";
 import { _addMicrotaskQueue, _resetSharedTimer } from "../../../../src/timer/microtasks/timerQueue";
 import { _runMicroTask } from "../../../../src/timer/microtasks/runMicrotask";
 import { scheduleTimeout, setTimeoutOverrides } from "../../../../src/timer/timeout";
-import { _clearTaskQueues } from "../../../../src/timer/microtasks/taskQueue";
+import { _clearTaskQueues, _eTaskQueueType } from "../../../../src/timer/microtasks/taskQueue";
 
 describe("microtask tests", () => {
     let orgPromise: any;
@@ -562,6 +563,47 @@ describe("microtask tests", () => {
                     }
                 }, 10);
             }, 10);
+        });
+    });
+
+    describe("internal microtaskQueue helper", () => {
+        it("reschedules when pending queueMicrotask implementation changes across queue types", () => {
+            let theGlobal: any = getGlobal();
+            let firstSchedulerBatches: Array<() => void> = [];
+            let secondSchedulerBatches: Array<() => void> = [];
+            let events: string[] = [];
+
+            theGlobal.queueMicrotask = (cb: () => void) => {
+                firstSchedulerBatches.push(cb);
+            };
+
+            let nextTickQueueFn = _getMicrotaskQueueFn(_eTaskQueueType.nextTick);
+            assert.isOk(nextTickQueueFn, "Expected nextTick queue helper to be returned");
+
+            nextTickQueueFn(() => {
+                events.push("nextTick");
+            });
+
+            assert.equal(firstSchedulerBatches.length, 1, "Expected first scheduler to receive one batch callback");
+
+            theGlobal.queueMicrotask = (cb: () => void) => {
+                secondSchedulerBatches.push(cb);
+            };
+
+            let microtaskQueueFn = _getMicrotaskQueueFn(_eTaskQueueType.microtask);
+            assert.isOk(microtaskQueueFn, "Expected microtask queue helper to be returned");
+
+            microtaskQueueFn(() => {
+                events.push("microtask");
+            });
+
+            assert.equal(secondSchedulerBatches.length, 1, "Expected second scheduler to receive a fresh batch callback");
+
+            secondSchedulerBatches[0]();
+            assert.deepEqual(events, ["nextTick", "microtask"], "Expected nextTick queue to flush before microtask queue");
+
+            firstSchedulerBatches[0]();
+            assert.deepEqual(events, ["nextTick", "microtask"], "Expected stale first scheduler callback to have no additional effect");
         });
     });
 });

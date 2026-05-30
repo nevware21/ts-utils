@@ -167,3 +167,25 @@ export type ValueOf<T> = T[keyof T];
  * ```
  */
 export type NonEmptyArray<T> = [T, ...T[]];
+
+/**
+ * Type alias for a microtask callback function, which is a function that is scheduled to run in the microtask
+ * queue after the current execution context completes.
+ * @since 0.15.0
+ * @group Timer
+ * @group Environment
+ */
+export type MicrotaskFn = () => void;
+
+/**
+ * Type alias for a function that is used to schedule a microtask, which is a function
+ * that takes a callback and schedules it to run
+ *
+ * @since 0.15.0
+ * @group Timer
+ * @group Environment
+ * @param callback - The microtask callback function to schedule.
+ * @param maxQueuedTasks - Optional, the maximum number of queued tasks allowed before the scheduler
+ * starts dropping tasks or throwing errors, depending on the implementation.
+ */
+export type ScheduleMicrotaskFn = (callback: MicrotaskFn, maxQueuedTasks?: number) => void | boolean;

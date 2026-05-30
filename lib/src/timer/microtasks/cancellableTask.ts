@@ -6,8 +6,8 @@
  * Licensed under the MIT license.
  */
 
+import { ScheduleMicrotaskFn } from "../../helpers/types";
 import { ITimerHandler, _TimerHandler, _createTimerHandler } from "../handler";
-import { ScheduleMicrotaskFn } from "../microtask";
 
 /**
  * @internal

@@ -12,6 +12,7 @@ This guide provides practical examples for using the @nevware21/ts-utils library
   - [String Functions](#string-functions)
   - [Safe Operations](#safe-operations)
 - [Runtime Environment Helpers](#runtime-environment-helpers)
+- [Scheduling Semantics and Known Limitations](#scheduling-semantics-and-known-limitations)
 - [Advanced Usage](#advanced-usage)
   - [Working with Iterators](#working-with-iterators)
   - [Lazy Evaluation](#lazy-evaluation)
@@ -273,6 +274,65 @@ if (isNode()) {
 const global = getGlobal();
 const doc = hasDocument() ? getDocument() : null;
 ```
+
+## Scheduling Semantics and Known Limitations
+
+When using timer helpers, especially `scheduleNextTick()`, ordering depends on the runtime capabilities and whether you mix direct native APIs with ts-utils wrappers.
+
+### Fallback priority used by `scheduleNextTick()`
+
+`scheduleNextTick()` resolves scheduling in this order:
+
+1. Native `process.nextTick` (Node.js)
+2. Native `queueMicrotask`
+3. Promise microtask fallback (`Promise.resolve().then(...)`)
+4. Timer-backed fallback (`setTimeout(..., 0)`)
+
+### Mixing direct native calls with `scheduleNextTick()`
+
+- In modern browser/worker runtimes (where native `process.nextTick` is not available), `scheduleNextTick()` typically uses native `queueMicrotask`.
+- If you directly call native `queueMicrotask()` and also call `scheduleNextTick()`, both callbacks are queued in the same microtask queue, so ordering is insertion/FIFO based.
+- This means `scheduleNextTick()` does not get special priority over a previously queued native `queueMicrotask()` callback in browser/worker environments.
+- For deterministic ordering, prefer one strategy per critical path: either use only native microtask APIs directly or use ts-utils wrappers (`scheduleNextTick()` / `scheduleMicrotask()`) consistently.
+
+Node.js note:
+
+- In Node.js, native `process.nextTick` has existed for a long time and `scheduleNextTick()` uses it when available, so the browser/worker `queueMicrotask` mixing concern is generally not the primary issue.
+
+### Known limitation in timer-backed fallback environments
+
+In older runtimes where `process.nextTick`, `queueMicrotask`, and Promise are not available, `scheduleNextTick()` falls back to `setTimeout(..., 0)`.
+
+In this mode:
+
+- `scheduleNextTick()` is no longer a true microtask.
+- It cannot preempt a user's directly scheduled native timers that were already queued.
+- Ordering between user timers and `scheduleNextTick()` becomes macrotask queue ordering and may differ from microtask-like expectations.
+
+Example:
+
+```typescript
+import { scheduleNextTick } from "@nevware21/ts-utils";
+
+setTimeout(() => {
+  console.log("user timeout");
+}, 0);
+
+scheduleNextTick(() => {
+  console.log("scheduleNextTick");
+});
+
+// In timer-backed fallback environments, output may be:
+// "user timeout"
+// "scheduleNextTick"
+```
+
+### Practical guidance
+
+- only use `scheduleTimeout()`, `scheduleMicrotask()` and `scheduleNextTick()` to ensure the correct execution order.
+- Use `scheduleNextTick()` for cross-runtime behavior, but do not assume it always has higher priority than directly queued native `queueMicrotasks` in browser/worker environments.
+- Avoid relying on strict microtask-before-timer guarantees in environments that require timer fallback (unless you only use the `scheduleXXXXX()` functions)
+- For app-level deterministic ordering, pick one scheduling strategy per critical execution path and avoid mixing native and wrapped scheduling primitives.
 
 ## Advanced Usage
 
