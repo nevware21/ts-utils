@@ -3,7 +3,7 @@ const childProcess = require('child_process');
 function _resolvePuppeteerExecutablePathSync() {
     return childProcess.execFileSync(process.execPath, [
         "-e",
-        "require('puppeteer').executablePath().then((path) => process.stdout.write(path || ''))"
+        "import('puppeteer').then((m) => (m.default || m).executablePath()).then((path) => process.stdout.write(path || ''))"
     ], {
         encoding: "utf8"
     }).trim();
