@@ -22,7 +22,8 @@
     "githubPages": true,
     "gitRevision": "main",
     "compilerOptions": {
-        "stripInternal": true
+        "stripInternal": true,
+        "skipLibCheck": true
     },
     "blockTags": [
         "@defaultValue",
