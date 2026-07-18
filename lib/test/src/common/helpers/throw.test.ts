@@ -7,10 +7,13 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
+import * as sinon from "sinon";
 import { isError, objToString } from "../../../../src/helpers/base";
 import { createCustomError, CustomErrorConstructor, throwUnsupported } from "../../../../src/helpers/customError";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { throwError, throwTypeError } from "../../../../src/helpers/throw";
+
+const _hasCaptureStackTrace = !!(Error as any).captureStackTrace;
 
 
 function _expectThrow<T extends Error = Error>(cb: () => never, message: string): T {
@@ -378,6 +381,78 @@ describe("throw helpers", () => {
 
             assert.ok(isError(err), "isError returns true");
             assert.equal(err.message, "hello", "Message is set correctly");
+        });
+    });
+
+    describe("createCustomError internal stack capture optimization", () => {
+        it("captures the stack only once for a multi-level chain", () => {
+            if (!_hasCaptureStackTrace) {
+                return;
+            }
+
+            let captureSpy = sinon.spy(Error as any, "captureStackTrace");
+            try {
+                let Level1 = createCustomError("Level1CaptureTest");
+                let Level2 = createCustomError("Level2CaptureTest", null, Level1);
+                let Level3 = createCustomError("Level3CaptureTest", null, Level2);
+
+                captureSpy.resetHistory();
+                let err = new (Level3 as any)("boom");
+                assert.ok(isError(err), "isError returns true");
+                assert.equal(captureSpy.callCount, 1, "Expected exactly one automatic capture, for the leaf-most class");
+            } finally {
+                captureSpy.restore();
+            }
+        });
+    });
+
+    describe("createCustomError constructCb isOwnInstance argument", () => {
+        it("is true when the class is instantiated directly with no base chain", () => {
+            let seen: (boolean | undefined)[] = [];
+            let MyError = createCustomError("IsOwnInstanceDirectTest", (self, args, isOwnInstance) => {
+                seen.push(isOwnInstance);
+            });
+
+            new (MyError as any)("boom");
+            assert.deepEqual(seen, [true], "constructCb should see isOwnInstance === true");
+        });
+
+        it("is false for base classes and true only for the leaf-most class in a chain", () => {
+            let calls: { name: string; isOwnInstance: boolean | undefined }[] = [];
+
+            let Level1 = createCustomError("IsOwnInstanceLevel1Test", (self, args, isOwnInstance) => {
+                calls.push({ name: "Level1", isOwnInstance });
+            });
+            let Level2 = createCustomError("IsOwnInstanceLevel2Test", (self, args, isOwnInstance) => {
+                calls.push({ name: "Level2", isOwnInstance });
+            }, Level1);
+            let Level3 = createCustomError("IsOwnInstanceLevel3Test", (self, args, isOwnInstance) => {
+                calls.push({ name: "Level3", isOwnInstance });
+            }, Level2);
+
+            let err = new (Level3 as any)("boom");
+            assert.ok(isError(err), "isError returns true");
+
+            assert.equal(calls.length, 3, "Every level's constructCb should still run");
+            assert.equal(calls[0].name, "Level1", "Level1's own constructCb runs first (innermost base call)");
+            assert.equal(calls[0].isOwnInstance, false, "Level1 is only running as a base class here");
+            assert.equal(calls[1].name, "Level2");
+            assert.equal(calls[1].isOwnInstance, false, "Level2 is only running as a base class here");
+            assert.equal(calls[2].name, "Level3");
+            assert.equal(calls[2].isOwnInstance, true, "Level3 is the leaf-most class actually being instantiated");
+        });
+
+        it("the same base class sees isOwnInstance true when instantiated directly and false when used as a base", () => {
+            let baseCalls: (boolean | undefined)[] = [];
+            let Base = createCustomError("IsOwnInstanceBaseTest", (self, args, isOwnInstance) => {
+                baseCalls.push(isOwnInstance);
+            });
+            let Leaf = createCustomError("IsOwnInstanceLeafTest", null, Base);
+
+            new (Base as any)("direct");
+            new (Leaf as any)("via-subclass");
+
+            assert.deepEqual(baseCalls, [ true, false ], "Base sees true when it's the leaf, false when acting as a base class for Leaf");
         });
     });
 });
