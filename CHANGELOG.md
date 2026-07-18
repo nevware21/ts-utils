@@ -4,6 +4,11 @@
 
 ### Features
 
+- feat(errors): expose `isOwnInstance` to `createCustomError`'s `constructCb` and skip redundant stack captures
+  - `constructCb` now receives a 3rd argument, `isOwnInstance`, which is `true` when the class is the leaf-most type actually being instantiated and `false` when its constructor is only running as a base-class step for a subclass further down an inheritance chain
+  - The internal `Error.captureStackTrace` call is now gated by the same check, so it only fires once per instance (at the leaf-most class) instead of redundantly at every level of a chain
+  - Lets custom error hierarchies with their own per-level stack-capture logic skip that work except at the leaf
+
 ### Bug Fixes
 
 # v0.15.0 May 29th, 2026
