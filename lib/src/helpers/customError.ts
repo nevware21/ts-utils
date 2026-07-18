@@ -53,7 +53,13 @@ function  _setName(baseClass: any, name: string) {
  * @group Error
  * @param name - The name of the Custom Error
  * @param constructCb - [Optional] An optional callback function to call when a
- * new Custom Error instance is being created.
+ * new Custom Error instance is being created. The 3rd argument (since v0.16.0), `isOwnInstance`, is `true`
+ * when this class is the leaf-most (most-derived) type actually being instantiated (eg. `new ThisClass()`),
+ * and `false` when this class's own constructor is only running because it is a base class of some other
+ * custom error further down an inheritance chain (eg. `new SomeSubClass()`, where `SomeSubClass` was created
+ * via `createCustomError(..., ThisClass)`). Use this to skip work - such as your own stack-trace capture -
+ * that only the leaf-most instance actually needs, since a base class's own construction step runs (and
+ * would otherwise redo that work) for every instance of every one of its subclasses too.
  * @param errorBase - [Optional] (since v0.9.6) The error class to extend for this class, defaults to Error.
  * @param superArgsFn - [Optional] (since v0.13.0) An optional function that receives the constructor arguments and
  * returns the arguments to pass to the base class constructor. When not provided all constructor
@@ -151,16 +157,20 @@ function  _setName(baseClass: any, name: string) {
 /*#__NO_SIDE_EFFECTS__*/
 export function createCustomError<T extends ErrorConstructor = CustomErrorConstructor, B extends ErrorConstructor = ErrorConstructor>(
     name: string,
-    constructCb?: ((self: any, args: IArguments) => void) | null,
+    constructCb?: ((self: any, args: IArguments, isOwnInstance?: boolean) => void) | null,
     errorBase?: B,
     superArgsFn?: ((args: IArguments) => ArrayLike<any>) | null): T {
 
     let theBaseClass = errorBase || Error;
     let orgName = theBaseClass[PROTOTYPE][NAME];
     let captureFn = Error.captureStackTrace;
-    return _createCustomError<T>(name, function (this: any) {
+    return _createCustomError<T>(name, function _ctor(this: any) {
         let _this = this;
         let theArgs = arguments;
+        // this[CONSTRUCTOR] always resolves (via the prototype chain) to the leaf-most class
+        // actually being instantiated, so comparing it against ourselves tells us whether we're
+        // that leaf class or just being invoked as a base class for a child further down the chain
+        let isOwnInstance = _this[CONSTRUCTOR] === _ctor;
         try {
             safe(_setName, [theBaseClass, name]);
             let _self = fnApply(theBaseClass, _this, superArgsFn ? superArgsFn(theArgs) : ArrSlice[CALL](theArgs)) || _this;
@@ -172,12 +182,14 @@ export function createCustomError<T extends ErrorConstructor = CustomErrorConstr
                 }
             }
 
-            // Make sure we only capture our stack details
-            captureFn && captureFn(_self, _this[CONSTRUCTOR]);
-    
+            // Only capture the stack once, at the leaf-most class being instantiated - the
+            // constructorOpt target is always the same leaf class, so capturing at every level
+            // of a base class chain would just repeat the same work
+            isOwnInstance && captureFn && captureFn(_self, _this[CONSTRUCTOR]);
+
             // Run the provided construction function
-            constructCb && constructCb(_self, theArgs);
-    
+            constructCb && constructCb(_self, theArgs, isOwnInstance);
+
             return _self;
         } finally {
             safe(_setName, [theBaseClass, orgName]);
