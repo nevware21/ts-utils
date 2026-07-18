@@ -4,12 +4,34 @@
 
 ### Features
 
-- feat(errors): expose `isOwnInstance` to `createCustomError`'s `constructCb` and skip redundant stack captures
+### Bug Fixes
+
+# v0.16.0 July 18th, 2026
+
+## Changelog
+
+### Features
+
+- [#587](https://github.com/nevware21/ts-utils/pull/587) feat(errors): expose `isOwnInstance` to `createCustomError`'s `constructCb` and skip redundant stack captures
   - `constructCb` now receives a 3rd argument, `isOwnInstance`, which is `true` when the class is the leaf-most type actually being instantiated and `false` when its constructor is only running as a base-class step for a subclass further down an inheritance chain
   - The internal `Error.captureStackTrace` call is now gated by the same check, so it only fires once per instance (at the leaf-most class) instead of redundantly at every level of a chain
   - Lets custom error hierarchies with their own per-level stack-capture logic skip that work except at the leaf
+- [#589](https://github.com/nevware21/ts-utils/pull/589) feat(errors): bind `constructCb`'s `this` to the new instance via `fnCall`
+  - `constructCb` is now invoked with `this` bound to the constructed instance (the same value also passed as the `self` argument), so non-arrow callbacks can use `this.prop = ...` instead of requiring the `self` argument
+  - `constructCb`'s type signature now declares an explicit `this: any` parameter; existing callbacks (arrow functions, or plain functions that don't declare `this`) remain unaffected
 
 ### Bug Fixes
+
+- [#588](https://github.com/nevware21/ts-utils/pull/588) `npm run package` failed with `ERR_REQUIRE_ESM` after `magic-string` moved to an ESM-only release (v1.0.0)
+  - `lib/rollup.config.js`'s PURE-annotation normalization plugin now loads `magic-string` via a dynamic `import()` inside `renderChunk` instead of a static import, since `--bundleConfigAsCjs` rewrites static imports to `require()`, which throws on Node versions without `require(esm)` support (eg. Node 18)
+  - Added `skipLibCheck` to the main build and test `tsconfig`s (`lib/tsconfig.base.json` and `lib/test/tsconfig.*.json`) to stop external `@types/node` type errors (`IteratorObject`, `BuiltinIteratorReturn`, etc., introduced by the `@types/node` v26 bump) from leaking into the build and test compiles
+- [#585](https://github.com/nevware21/ts-utils/pull/585) Add `skipLibCheck` to the TypeDoc compiler options to fix the same `@types/node` v26 type errors when generating docs
+
+### Repository Improvements
+
+- [#582](https://github.com/nevware21/ts-utils/pull/582) CI: switch Puppeteer loading to ESM `import()` in Karma configs (Puppeteer is ESM-only), pin Size tests to run only on Node 22, and make Codecov upload non-blocking
+
+[Full Changelog](https://github.com/nevware21/ts-utils/compare/v0.15.0...v0.16.0)
 
 # v0.15.0 May 29th, 2026
 
