@@ -455,5 +455,57 @@ describe("throw helpers", () => {
             assert.deepEqual(baseCalls, [ true, false ], "Base sees true when it's the leaf, false when acting as a base class for Leaf");
         });
     });
+
+    describe("createCustomError constructCb this binding", () => {
+        it("binds this to self when instantiated directly", () => {
+            let seenThis: any;
+            let seenSelf: any;
+            let MyError = createCustomError("ConstructCbThisDirectTest", function (this: any, self) {
+                seenThis = this;
+                seenSelf = self;
+            });
+
+            let err = new (MyError as any)("boom");
+            assert.ok(isError(err), "isError returns true");
+            assert.equal(seenThis, seenSelf, "this === self inside constructCb");
+            assert.equal(seenThis, err, "this === the constructed error instance");
+        });
+
+        it("binds this to self at every level of a base-class chain", () => {
+            let calls: { name: string; thisIsSelf: boolean }[] = [];
+
+            let Level1 = createCustomError("ConstructCbThisLevel1Test", function (this: any, self) {
+                calls.push({ name: "Level1", thisIsSelf: this === self });
+            });
+            let Level2 = createCustomError("ConstructCbThisLevel2Test", function (this: any, self) {
+                calls.push({ name: "Level2", thisIsSelf: this === self });
+            }, Level1);
+            let Level3 = createCustomError("ConstructCbThisLevel3Test", function (this: any, self) {
+                calls.push({ name: "Level3", thisIsSelf: this === self });
+            }, Level2);
+
+            let err = new (Level3 as any)("boom");
+            assert.ok(isError(err), "isError returns true");
+
+            assert.equal(calls.length, 3, "Every level's constructCb should still run");
+            calls.forEach((call) => {
+                assert.ok(call.thisIsSelf, call.name + ": this === self");
+            });
+        });
+
+        it("binds this to the same class's own leaf instance and to the subclass instance when used as a base", () => {
+            let baseThisIsSelf: boolean[] = [];
+            let Base = createCustomError("ConstructCbThisBaseTest", function (this: any, self) {
+                baseThisIsSelf.push(this === self);
+            });
+            let Leaf = createCustomError("ConstructCbThisLeafTest", null, Base);
+
+            let directErr = new (Base as any)("direct");
+            let subclassErr = new (Leaf as any)("via-subclass");
+
+            assert.deepEqual(baseThisIsSelf, [ true, true ], "this === self for both the direct instance and when acting as a base for Leaf");
+            assert.ok(isError(directErr) && isError(subclassErr), "both instances are errors");
+        });
+    });
 });
 

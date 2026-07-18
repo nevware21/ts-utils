@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { fnApply } from "../funcs/funcs";
+import { fnApply, fnCall } from "../funcs/funcs";
 import { ArrSlice, CALL, CONSTRUCTOR, NAME, NULL_VALUE, PROTOTYPE } from "../internal/constants";
 import { objCreate } from "../object/create";
 import { objDefine } from "../object/define";
@@ -53,13 +53,16 @@ function  _setName(baseClass: any, name: string) {
  * @group Error
  * @param name - The name of the Custom Error
  * @param constructCb - [Optional] An optional callback function to call when a
- * new Custom Error instance is being created. The 3rd argument (since v0.16.0), `isOwnInstance`, is `true`
- * when this class is the leaf-most (most-derived) type actually being instantiated (eg. `new ThisClass()`),
- * and `false` when this class's own constructor is only running because it is a base class of some other
- * custom error further down an inheritance chain (eg. `new SomeSubClass()`, where `SomeSubClass` was created
- * via `createCustomError(..., ThisClass)`). Use this to skip work - such as your own stack-trace capture -
- * that only the leaf-most instance actually needs, since a base class's own construction step runs (and
- * would otherwise redo that work) for every instance of every one of its subclasses too.
+ * new Custom Error instance is being created. (Since v0.16.0) The callback is invoked with `this` bound to
+ * the same instance that is also passed as the `self` (1st) argument, so implementations may use either
+ * `this.prop = ...` or `self.prop = ...` interchangeably - this only applies when `constructCb` is a normal
+ * (non-arrow) function, as arrow functions ignore the bound `this` and keep their own lexically captured value.
+ * The 3rd argument, `isOwnInstance`, is `true` when this class is the leaf-most (most-derived) type actually
+ * being instantiated (eg. `new ThisClass()`), and `false` when this class's own constructor is only running
+ * because it is a base class of some other custom error further down an inheritance chain (eg. `new SomeSubClass()`,
+ * where `SomeSubClass` was created via `createCustomError(..., ThisClass)`). Use this to skip work - such as
+ * your own stack-trace capture - that only the leaf-most instance actually needs, since a base class's own
+ * construction step runs (and would otherwise redo that work) for every instance of every one of its subclasses too.
  * @param errorBase - [Optional] (since v0.9.6) The error class to extend for this class, defaults to Error.
  * @param superArgsFn - [Optional] (since v0.13.0) An optional function that receives the constructor arguments and
  * returns the arguments to pass to the base class constructor. When not provided all constructor
@@ -157,20 +160,21 @@ function  _setName(baseClass: any, name: string) {
 /*#__NO_SIDE_EFFECTS__*/
 export function createCustomError<T extends ErrorConstructor = CustomErrorConstructor, B extends ErrorConstructor = ErrorConstructor>(
     name: string,
-    constructCb?: ((self: any, args: IArguments, isOwnInstance?: boolean) => void) | null,
+    constructCb?: ((this: any, self: any, args: IArguments, isOwnInstance?: boolean) => void) | null,
     errorBase?: B,
     superArgsFn?: ((args: IArguments) => ArrayLike<any>) | null): T {
 
     let theBaseClass = errorBase || Error;
     let orgName = theBaseClass[PROTOTYPE][NAME];
     let captureFn = Error.captureStackTrace;
-    return _createCustomError<T>(name, function _ctor(this: any) {
+    let ctorFn = function (this: any) {
         let _this = this;
         let theArgs = arguments;
         // this[CONSTRUCTOR] always resolves (via the prototype chain) to the leaf-most class
         // actually being instantiated, so comparing it against ourselves tells us whether we're
         // that leaf class or just being invoked as a base class for a child further down the chain
-        let isOwnInstance = _this[CONSTRUCTOR] === _ctor;
+        let isOwnInstance = _this[CONSTRUCTOR] === ctorFn;
+
         try {
             safe(_setName, [theBaseClass, name]);
             let _self = fnApply(theBaseClass, _this, superArgsFn ? superArgsFn(theArgs) : ArrSlice[CALL](theArgs)) || _this;
@@ -182,19 +186,28 @@ export function createCustomError<T extends ErrorConstructor = CustomErrorConstr
                 }
             }
 
-            // Only capture the stack once, at the leaf-most class being instantiated - the
-            // constructorOpt target is always the same leaf class, so capturing at every level
-            // of a base class chain would just repeat the same work
-            isOwnInstance && captureFn && captureFn(_self, _this[CONSTRUCTOR]);
+            if (isOwnInstance) {
+                // If this is the leaf-most class being instantiated, then capture the stack trace for it
+                captureFn && captureFn(_self, ctorFn);
+            }
 
             // Run the provided construction function
-            constructCb && constructCb(_self, theArgs, isOwnInstance);
+            if (constructCb) {
+                // Call the callback with the leaf-most instance, the original arguments, and whether this class is
+                // the leaf-most class being instantiated (or just a base class of some other custom error further
+                // down the inheritance chain), so that the callback can skip work that only the leaf-most instance
+                // actually needs to do.  And support construction functions that want to use `this` instead of the
+                // first argument.
+                fnCall(constructCb, _self, _self, theArgs, isOwnInstance);
+            }
 
             return _self;
         } finally {
             safe(_setName, [theBaseClass, orgName]);
         }
-    }, theBaseClass);
+    };
+
+    return _createCustomError<T>(name, ctorFn, theBaseClass);
 }
 
 /**
