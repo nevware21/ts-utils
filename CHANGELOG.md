@@ -1,8 +1,10 @@
-# Unreleased
+# Unreleased (Proposed 0.17.0)
 
 ## Changelog
 
 ### Features
+
+- feat(array): add `arrIndexOfSubset()` and `arrLastIndexOfSubset()` to locate the first/last index at which an array of values matches contiguously within another, re-searching later/earlier occurrences of the leading value when it repeats (eg. matching one stack trace against another) instead of stopping at the first, wrong occurrence
 
 ### Bug Fixes
 
