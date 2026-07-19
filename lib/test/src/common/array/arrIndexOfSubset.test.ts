@@ -127,6 +127,7 @@ describe("arrLastIndexOfSubset", () => {
 
     it("fromIndex", () => {
         const array = ["a", "b", "a", "b", "c"];
+        assert.equal(arrLastIndexOfSubset(array, ["a", "b"], null as any), 0);
         assert.equal(arrLastIndexOfSubset(array, ["a", "b"], 1), 0);
         assert.equal(arrLastIndexOfSubset(array, ["a", "b"], 4), 2);
         assert.equal(arrLastIndexOfSubset(array, ["a", "b"], -2), 2);
