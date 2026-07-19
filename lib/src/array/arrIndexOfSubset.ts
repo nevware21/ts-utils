@@ -130,7 +130,7 @@ export function arrIndexOfSubset<T>(theArray: ArrayLike<T>, subset: ArrayLike<T>
  * @param subset - The (ordered) array or array-like object of elements to locate within theArray.
  * @param fromIndex - The index to start searching backwards from (the position at which subset's
  * first element may occur). If the provided index value is a negative number, it is taken as the
- * offset from the end of theArray. Default: theArray's length (search from the end).
+ * offset from the end of theArray. Default: theArray's length - 1 (search from the end).
  * @returns The last index within theArray at which subset fully matches (or matches theArray's
  * available elements from that position), or -1 if no such position exists. Returns fromIndex
  * (normalized to a valid index, or theArray's length) if subset is empty.
