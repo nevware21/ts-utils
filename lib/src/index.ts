@@ -28,6 +28,7 @@ export { arrFrom } from "./array/from";
 export { ArrGroupByCallbackFn, arrGroupBy } from "./array/groupBy";
 export { arrContains, arrIncludes } from "./array/includes";
 export { arrIndexOf, arrLastIndexOf } from "./array/indexOf";
+export { arrIndexOfSubset, arrLastIndexOfSubset } from "./array/arrIndexOfSubset";
 export { arrIntersection } from "./array/intersection";
 export { arrIndexKeys } from "./array/arrIndexKeys";
 export { arrMap } from "./array/map";
