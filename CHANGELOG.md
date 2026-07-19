@@ -31,7 +31,7 @@
 
 - [#582](https://github.com/nevware21/ts-utils/pull/582) CI: switch Puppeteer loading to ESM `import()` in Karma configs (Puppeteer is ESM-only), pin Size tests to run only on Node 22, and make Codecov upload non-blocking
 
-[Full Changelog](https://github.com/nevware21/ts-utils/compare/v0.15.0...v0.16.0)
+[Full Changelog](https://github.com/nevware21/ts-utils/compare/0.15.0...0.16.0)
 
 # v0.15.0 May 29th, 2026
 
@@ -66,7 +66,7 @@
   - [#569](https://github.com/nevware21/ts-utils/pull/569) Add generated-chunk PURE annotation normalization so spaced forms are rewritten to canonical `(/*#__PURE__*/` / `(/*@__PURE__*/` in rollup output
   - [#575](https://github.com/nevware21/ts-utils/pull/575) Add packaged artifact validation for PURE annotation spacing and update normalization tolerance, with per-file logging while scanning `lib/bundle` and `lib/dist`
 
-[Full Changelog](https://github.com/nevware21/ts-utils/compare/v0.14.0...v0.15.0)
+[Full Changelog](https://github.com/nevware21/ts-utils/compare/0.14.0...0.15.0)
 
 # v0.14.0 May 18th, 2026
 
@@ -120,7 +120,7 @@
 
 - [#559](https://github.com/nevware21/ts-utils/pull/559) Bump puppeteer from 24.43.1 to 25.0.2
 
-[Full Changelog](https://github.com/nevware21/ts-utils/compare/v0.13.0...v0.14.0)
+[Full Changelog](https://github.com/nevware21/ts-utils/compare/0.13.0...0.14.0)
 
 # v0.13.0 Feb 26th, 2026
 
