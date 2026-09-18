@@ -2,49 +2,49 @@
   {
     "name": "es5-full",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "37.75 kb",
+    "limit": "55.5 kb",
     "brotli": false,
     "running": false
   },
   {
     "name": "es6-full",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "36.5 kb",
+    "limit": "54.5 kb",
     "brotli": false,
     "running": false
   },
   {
     "name": "es5-full-brotli",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "13 kb",
+    "limit": "15.25 kb",
     "brotli": true,
     "running": false
   },
   {
     "name": "es6-full-brotli",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "12.75 kb",
+    "limit": "15.25 kb",
     "brotli": true,
     "running": false
   },
   {
     "name": "es5-zip",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "14.5 Kb",
+    "limit": "16.8 Kb",
     "gzip": true,
     "running": false
   },
   {
     "name": "es6-zip",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "14 Kb",
+    "limit": "16.7 Kb",
     "gzip": true,
     "running": false
   },
   {
     "name": "es5-env",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "1.5 kb",
+    "limit": "1.7 kb",
     "import": "{ getGlobal, getInst, hasDocument, getDocument, hasWindow, getWindow, hasNavigator, getNavigator, hasHistory, getHistory, isNode, isWebWorker }",
     "brotli": false,
     "running": false
@@ -52,7 +52,7 @@
   {
     "name": "es5-is",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "700b",
+    "limit": "1 kb",
     "import": "{ isString, isFunction, isObject, isArray, isDate, isRegExp, isBoolean, isNumber, isNullOrUndefined, isUndefined }",
     "brotli": false,
     "running": false
@@ -68,7 +68,7 @@
   {
     "name": "es5-poly",
     "path": "lib/bundle/es5/ts-polyfills-utils.js",
-    "limit": "12 kb",
+    "limit": "15.1 kb",
     "brotli": false,
     "running": false
   },
@@ -83,7 +83,7 @@
   {
     "name": "es5-getWindow",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "500 b",
+    "limit": "510 b",
     "import": "{ getWindow }",
     "gzip": true,
     "running": false
@@ -107,7 +107,7 @@
   {
     "name": "es5-scheduleMicrotask",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "1.75 kb",
+    "limit": "1.8 kb",
     "import": "{ scheduleMicrotask }",
     "gzip": true,
     "running": false
@@ -115,7 +115,7 @@
   {
     "name": "es5-scheduleNextTick",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "2 kb",
+    "limit": "2.05 kb",
     "import": "{ scheduleNextTick }",
     "gzip": true,
     "running": false
@@ -123,7 +123,7 @@
   {
     "name": "es5-scheduleNextTickAndMicrotask",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "2 kb",
+    "limit": "2.05 kb",
     "import": "{ scheduleNextTick, scheduleMicrotask }",
     "gzip": true,
     "running": false

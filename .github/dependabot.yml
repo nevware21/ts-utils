@@ -16,6 +16,11 @@ updates:
     schedule:
       interval: "daily"
     open-pull-requests-limit: 5
+    groups:
+      size-limit:
+        patterns:
+          - "size-limit"
+          - "@size-limit/*"
 
 
   - package-ecosystem: "npm" # See documentation for possible values
