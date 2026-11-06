@@ -8,6 +8,8 @@
 
 ### Bug Fixes
 
+- [#634](https://github.com/nevware21/ts-utils/issues/634) Normalize camel-case words, share word boundaries across camel, kebab and snake case, preserve Unicode word characters, and remove leading and trailing separators. `strLetterCase` and `strCapitalizeWords` also recognize Unicode word characters. These changes can alter existing output; Unicode classification is approximate on engines without Unicode property escapes. `strCapitalizeWords` continues to lowercase existing camel-case boundaries.
+
 # v0.16.0 July 18th, 2026
 
 ## Changelog

@@ -25,15 +25,15 @@ describe("strLetterCase", () => {
     it("Reverse kebabcase Basic", () => {
         assert.equal(strLetterCase(strKebabCase("hello darkness")), "Hello-Darkness");
         assert.equal(strLetterCase(strKebabCase("hello_darkness")), "Hello-Darkness");
-        assert.equal(strLetterCase(strKebabCase("_hello_darkness")), "-Hello-Darkness");
-        assert.equal(strLetterCase(strKebabCase("hello darkness, my old friend.")), "Hello-Darkness-My-Old-Friend-");
+        assert.equal(strLetterCase(strKebabCase("_hello_darkness")), "Hello-Darkness");
+        assert.equal(strLetterCase(strKebabCase("hello darkness, my old friend.")), "Hello-Darkness-My-Old-Friend");
     });
 
     it("Reverse snakecase Basic", () => {
         assert.equal(strLetterCase(strSnakeCase("hello darkness")), "Hello_Darkness");
         assert.equal(strLetterCase(strSnakeCase("hello_darkness")), "Hello_Darkness");
-        assert.equal(strLetterCase(strSnakeCase("_hello_darkness")), "_Hello_Darkness");
-        assert.equal(strLetterCase(strSnakeCase("hello darkness, my old friend.")), "Hello_Darkness_My_Old_Friend_");
+        assert.equal(strLetterCase(strSnakeCase("_hello_darkness")), "Hello_Darkness");
+        assert.equal(strLetterCase(strSnakeCase("hello darkness, my old friend.")), "Hello_Darkness_My_Old_Friend");
     });
 
     it("Reverse camel case Basic", () => {
@@ -62,15 +62,15 @@ describe("strCapitalizeWords", () => {
     it("Reverse kebabcase Basic", () => {
         assert.equal(strCapitalizeWords(strKebabCase("hello darkness")), "Hello-Darkness");
         assert.equal(strCapitalizeWords(strKebabCase("hello_darkness")), "Hello-Darkness");
-        assert.equal(strCapitalizeWords(strKebabCase("_hello_darkness")), "-Hello-Darkness");
-        assert.equal(strCapitalizeWords(strKebabCase("hello darkness, my old friend.")), "Hello-Darkness-My-Old-Friend-");
+        assert.equal(strCapitalizeWords(strKebabCase("_hello_darkness")), "Hello-Darkness");
+        assert.equal(strCapitalizeWords(strKebabCase("hello darkness, my old friend.")), "Hello-Darkness-My-Old-Friend");
     });
 
     it("Reverse snakecase Basic", () => {
         assert.equal(strCapitalizeWords(strSnakeCase("hello darkness")), "Hello_Darkness");
         assert.equal(strCapitalizeWords(strSnakeCase("hello_darkness")), "Hello_Darkness");
-        assert.equal(strCapitalizeWords(strSnakeCase("_hello_darkness")), "_Hello_Darkness");
-        assert.equal(strCapitalizeWords(strSnakeCase("hello darkness, my old friend.")), "Hello_Darkness_My_Old_Friend_");
+        assert.equal(strCapitalizeWords(strSnakeCase("_hello_darkness")), "Hello_Darkness");
+        assert.equal(strCapitalizeWords(strSnakeCase("hello darkness, my old friend.")), "Hello_Darkness_My_Old_Friend");
     });
 
     it("Differs from strLetterCase by normalizing word casing", () => {
@@ -136,15 +136,15 @@ describe("strKebabCase", () => {
     it("Basic", () => {
         assert.equal(strKebabCase("hello darkness"), "hello-darkness");
         assert.equal(strKebabCase("hello_darkness"), "hello-darkness");
-        assert.equal(strKebabCase("_hello_darkness"), "-hello-darkness");
-        assert.equal(strKebabCase("hello darkness, my old friend."), "hello-darkness-my-old-friend-");
+        assert.equal(strKebabCase("_hello_darkness"), "hello-darkness");
+        assert.equal(strKebabCase("hello darkness, my old friend."), "hello-darkness-my-old-friend");
     });
 
     it("Scream Basic", () => {
         assert.equal(strKebabCase("hello darkness", true), "HELLO-DARKNESS");
         assert.equal(strKebabCase("hello_darkness", true), "HELLO-DARKNESS");
-        assert.equal(strKebabCase("_hello_darkness", true), "-HELLO-DARKNESS");
-        assert.equal(strKebabCase("hello darkness, my old friend.", true), "HELLO-DARKNESS-MY-OLD-FRIEND-");
+        assert.equal(strKebabCase("_hello_darkness", true), "HELLO-DARKNESS");
+        assert.equal(strKebabCase("hello darkness, my old friend.", true), "HELLO-DARKNESS-MY-OLD-FRIEND");
     });
 
     it("Reverse Camelcase Basic", () => {
@@ -157,8 +157,8 @@ describe("strKebabCase", () => {
     it("Reverse Snakecase Basic", () => {
         assert.equal(strKebabCase(strSnakeCase("hello darkness")), "hello-darkness");
         assert.equal(strKebabCase(strSnakeCase("hello_darkness")), "hello-darkness");
-        assert.equal(strKebabCase(strSnakeCase("_hello_darkness")), "-hello-darkness");
-        assert.equal(strKebabCase(strSnakeCase("hello darkness, my old friend.")), "hello-darkness-my-old-friend-");
+        assert.equal(strKebabCase(strSnakeCase("_hello_darkness")), "hello-darkness");
+        assert.equal(strKebabCase(strSnakeCase("hello darkness, my old friend.")), "hello-darkness-my-old-friend");
     });
 });
 
@@ -168,22 +168,73 @@ describe("strSnakeCase", () => {
         assert.equal(strSnakeCase(undefined), "undefined");
     });
 
+    describe("case conversion word boundaries", () => {
+        it("normalizes mixed case and all-uppercase words", () => {
+            assert.equal(strCamelCase("hELLo dARKness-my old_friend"), "helloDarknessMyOldFriend");
+            assert.equal(strKebabCase("hELLo dARKness-my old_friend"), "hello-darkness-my-old-friend");
+            assert.equal(strSnakeCase("hELLo dARKness-my old_friend"), "hello_darkness_my_old_friend");
+            assert.equal(strCamelCase("ABC def"), "abcDef");
+            assert.equal(strCamelCase("HELLO WORLD"), "helloWorld");
+            assert.equal(strCamelCase("EFTPOS PURCHASE 1234"), "eftposPurchase1234");
+            assert.equal(strCamelCase("HELLO WORLD", true), "HelloWorld");
+        });
+
+        it("recognizes camel case, acronyms and digit-to-uppercase boundaries consistently", () => {
+            assert.equal(strKebabCase("ABCDef"), "abc-def");
+            assert.equal(strKebabCase("XMLHttpRequest"), "xml-http-request");
+            assert.equal(strSnakeCase("XMLHttpRequest"), "xml_http_request");
+            assert.equal(strCamelCase("XMLHttpRequest"), "xmlHttpRequest");
+            assert.equal(strKebabCase("fooBar2Baz"), "foo-bar2-baz");
+            assert.equal(strSnakeCase("fooBar2Baz", true), "FOO_BAR2_BAZ");
+            assert.equal(strCamelCase("fooBar2Baz"), "fooBar2Baz");
+            assert.equal(strKebabCase("aBC"), "abc");
+        });
+
+        it("preserves Unicode letters, numbers and combining marks", () => {
+            assert.equal(strCamelCase("café crème"), "caféCrème");
+            assert.equal(strKebabCase("café crème"), "café-crème");
+            assert.equal(strSnakeCase("über straße"), "über_straße");
+            assert.equal(strCamelCase("über straße"), "überStraße");
+            assert.equal(strCamelCase("über straße", true), "ÜberStraße");
+            assert.equal(strCapitalizeWords("café crème"), "Café Crème");
+            assert.equal(strLetterCase("café crème"), "Café Crème");
+            assert.equal(strCamelCase("cafe\u0301 crème"), "cafe\u0301Crème");
+            assert.equal(strKebabCase("cafe\u0301Crème"), "cafe\u0301-crème");
+            assert.equal(strKebabCase("foo١Bar"), "foo١-bar");
+            assert.equal(strKebabCase("東京・大阪"), "東京-大阪");
+            assert.equal(strKebabCase("hello😀world"), "hello-world");
+            assert.equal(strCamelCase("𐐀𐐨 test"), "𐐨𐐨Test");
+        });
+
+        it("removes edge separators while preserving capitalization separators", () => {
+            assert.equal(strKebabCase("__init__"), "init");
+            assert.equal(strKebabCase("--foo--"), "foo");
+            assert.equal(strSnakeCase("O'Brien & Sons, Ltd."), "o_brien_sons_ltd");
+            assert.equal(strCamelCase("O'Brien & Sons, Ltd."), "oBrienSonsLtd");
+            assert.equal(strKebabCase("---"), "");
+            assert.equal(strSnakeCase("___", true), "");
+            assert.equal(strCamelCase(""), "");
+            assert.equal(strCapitalizeWords("fooBarBaz"), "Foobarbaz");
+            assert.equal(strCapitalizeWords("foo_bar-baz qux"), "Foo_Bar-Baz Qux");
+        });
+    });
+
     it("Basic", () => {
         assert.equal(strSnakeCase("hello darkness"), "hello_darkness");
         assert.equal(strSnakeCase("hello_darkness"), "hello_darkness");
-        assert.equal(strSnakeCase("_hello_darkness"), "_hello_darkness");
+        assert.equal(strSnakeCase("_hello_darkness"), "hello_darkness");
         assert.equal(strSnakeCase("hello-darkness"), "hello_darkness");
-        assert.equal(strSnakeCase("-hello-darkness"), "_hello_darkness");
-        assert.equal(strSnakeCase("hello darkness, my old friend."), "hello_darkness_my_old_friend_");
+        assert.equal(strSnakeCase("-hello-darkness"), "hello_darkness");
+        assert.equal(strSnakeCase("hello darkness, my old friend."), "hello_darkness_my_old_friend");
     });
 
     it("Scream Basic", () => {
         assert.equal(strSnakeCase("hello darkness", true), "HELLO_DARKNESS");
         assert.equal(strSnakeCase("hello_darkness", true), "HELLO_DARKNESS");
-        assert.equal(strSnakeCase("_hello_darkness", true), "_HELLO_DARKNESS");
+        assert.equal(strSnakeCase("_hello_darkness", true), "HELLO_DARKNESS");
         assert.equal(strSnakeCase("hello-darkness", true), "HELLO_DARKNESS");
-        assert.equal(strSnakeCase("-hello-darkness", true), "_HELLO_DARKNESS");
-        assert.equal(strSnakeCase("hello darkness, my old friend.", true), "HELLO_DARKNESS_MY_OLD_FRIEND_");
+        assert.equal(strSnakeCase("-hello-darkness", true), "HELLO_DARKNESS");
+        assert.equal(strSnakeCase("hello darkness, my old friend.", true), "HELLO_DARKNESS_MY_OLD_FRIEND");
     });
 
     it("reverse camelcase Basic", () => {
@@ -198,9 +249,9 @@ describe("strSnakeCase", () => {
     it("reverse kebab Basic", () => {
         assert.equal(strSnakeCase(strKebabCase("hello darkness")), "hello_darkness");
         assert.equal(strSnakeCase(strKebabCase("hello_darkness")), "hello_darkness");
-        assert.equal(strSnakeCase(strKebabCase("_hello_darkness")), "_hello_darkness");
+        assert.equal(strSnakeCase(strKebabCase("_hello_darkness")), "hello_darkness");
         assert.equal(strSnakeCase(strKebabCase("hello-darkness")), "hello_darkness");
-        assert.equal(strSnakeCase(strKebabCase("-hello-darkness")), "_hello_darkness");
-        assert.equal(strSnakeCase(strKebabCase("hello darkness, my old friend.")), "hello_darkness_my_old_friend_");
+        assert.equal(strSnakeCase(strKebabCase("-hello-darkness")), "hello_darkness");
+        assert.equal(strSnakeCase(strKebabCase("hello darkness, my old friend.")), "hello_darkness_my_old_friend");
     });
 });
