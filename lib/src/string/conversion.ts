@@ -20,7 +20,7 @@ function _isWordChar(value: string): boolean {
             _numberChar = new RegExp("^\\p{N}$", "u");
             _markChar = new RegExp("^\\p{M}$", "u");
         } catch (_e) {
-            _wordChar = /^(?:[a-zA-Z0-9\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u02ff\u0370-\u052f\u0590-\u1fff\u2c00-\u2dff\u3040-\ud7ff\uf900-\ufdcf\ufdf0-\uffef]|[\u0300-\u036f])$/;
+            _wordChar = /^(?:[a-zA-Z0-9\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u02ff\u0370-\u052f\u0590-\u1fff\u2c00-\u2dff\u3040-\u30fa\u30fc-\ud7ff\uf900-\ufdcf\ufdf0-\uffef]|[\u0300-\u036f])$/;
             _numberChar = /^[0-9\u0660-\u0669\u06f0-\u06f9\uff10-\uff19]$/;
             _markChar = /^[\u0300-\u036f]$/;
         }
