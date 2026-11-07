@@ -36,19 +36,33 @@ function _charAt(value: string, index: number): string {
         value.substring(index, index + 2) : value.charAt(index);
 }
 
-function _words(value: string): string[] {
-    let words: string[] = [];
+function _appendWord(result: string, value: string, start: number, end: number, newPrefix: string, upperWord?: boolean): string {
+    let word = strLower(value.substring(start, end));
+    if (result) {
+        if (upperWord) {
+            let first = _charAt(word, 0);
+            word = strUpper(first) + word.substring(first.length);
+        }
+        result += newPrefix;
+    }
+    return result + word;
+}
+
+/*#__NO_SIDE_EFFECTS__*/
+function _convertCase<T>(value: T, newPrefix: string, upperWord?: boolean): string {
+    let input = asString(value);
+    let result = "";
     let start = -1;
     let prevType = 0;
     let run = 0;
     let upperStart = -1;
     let previous = 0;
 
-    for (let idx = 0; idx < value.length;) {
-        let chr = _charAt(value, idx);
+    for (let idx = 0; idx < input.length;) {
+        let chr = _charAt(input, idx);
         if (!_isWordChar(chr)) {
             if (start !== -1) {
-                words.push(value.substring(start, idx));
+                result = _appendWord(result, input, start, idx, newPrefix, upperWord);
                 start = -1;
             }
             prevType = 0;
@@ -60,11 +74,11 @@ function _words(value: string): string[] {
             if (start === -1) {
                 start = idx;
             } else if (type === 2 && ((prevType === 1 &&
-                (run > 1 || (upperStart === start && previous === start + _charAt(value, start).length))) || prevType === 3)) {
-                words.push(value.substring(start, idx));
+                (run > 1 || (upperStart === start && previous === start + _charAt(input, start).length))) || prevType === 3)) {
+                result = _appendWord(result, input, start, idx, newPrefix, upperWord);
                 start = idx;
             } else if (type === 1 && prevType === 2 && run > 1 && upperStart === start) {
-                words.push(value.substring(start, previous));
+                result = _appendWord(result, input, start, previous, newPrefix, upperWord);
                 start = previous;
             }
 
@@ -84,23 +98,9 @@ function _words(value: string): string[] {
     }
 
     if (start !== -1) {
-        words.push(value.substring(start));
+        result = _appendWord(result, input, start, input.length, newPrefix, upperWord);
     }
-    return words;
-}
-
-/*#__NO_SIDE_EFFECTS__*/
-function _convertCase<T>(value: T, newPrefix: string, upperWord?: boolean): string {
-    let words = _words(asString(value));
-    for (let idx = 0; idx < words.length; idx++) {
-        let word = strLower(words[idx]);
-        if (upperWord && idx > 0) {
-            let first = _charAt(word, 0);
-            word = strUpper(first) + word.substring(first.length);
-        }
-        words[idx] = word;
-    }
-    return words.join(newPrefix);
+    return result;
 }
 
 /**

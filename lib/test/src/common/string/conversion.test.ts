@@ -190,6 +190,14 @@ describe("strSnakeCase", () => {
             assert.equal(strKebabCase("aBC"), "abc");
         });
 
+        it("converts each word at separator and internal boundaries", () => {
+            assert.equal(strCamelCase("--XMLHttpRequest__ΟΣ TEST--"), "xmlHttpRequestΟςTest");
+            assert.equal(strCamelCase("--XMLHttpRequest__ΟΣ TEST--", true), "XmlHttpRequestΟςTest");
+            assert.equal(strKebabCase("--XMLHttpRequest__ΟΣ TEST--"), "xml-http-request-ος-test");
+            assert.equal(strSnakeCase("--XMLHttpRequest__ΟΣ TEST--", true), "XML_HTTP_REQUEST_ΟΣ_TEST");
+            assert.equal(strCamelCase("ΟΣ"), "ος");
+        });
+
         it("preserves Unicode letters, numbers and combining marks", () => {
             assert.equal(strCamelCase("café crème"), "caféCrème");
             assert.equal(strKebabCase("café crème"), "café-crème");
