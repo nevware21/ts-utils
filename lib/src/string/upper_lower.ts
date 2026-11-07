@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { StrProto } from "../internal/constants";
+import { StrProto, TO_LOWER_CASE, TO_UPPER_CASE } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 
 /**
@@ -29,7 +29,7 @@ import { _unwrapFunction } from "../internal/unwrapFunction";
  * strUpper(undefined);     // Throws TypeError
  * ```
  */
-export const strUpper: <T>(value: T) => string = (/*#__PURE__*/_unwrapFunction("toUpperCase", StrProto));
+export const strUpper: <T>(value: T) => string = (/*#__PURE__*/_unwrapFunction(TO_UPPER_CASE, StrProto));
 
 /**
  * The strLower() method returns the value of the string converted to lower case.
@@ -50,4 +50,4 @@ export const strUpper: <T>(value: T) => string = (/*#__PURE__*/_unwrapFunction("
  * strLower(undefined);     // Throws TypeError
  * ```
  */
-export const strLower: <T>(value: T) => string = (/*#__PURE__*/_unwrapFunction("toLowerCase", StrProto));
+export const strLower: <T>(value: T) => string = (/*#__PURE__*/_unwrapFunction(TO_LOWER_CASE, StrProto));

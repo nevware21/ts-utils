@@ -9,7 +9,7 @@
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
 import { asString } from "../string/as_string";
-import { ArrSlice, CALL, NULL_VALUE } from "./constants";
+import { FuncCall, LENGTH, NULL_VALUE } from "./constants";
 
 /**
  * @function
@@ -49,13 +49,20 @@ export function _unwrapFunctionWithPoly<T, P extends (...args: any) => any>(func
     let clsFn = clsProto ? clsProto[funcName] : NULL_VALUE;
 
     return function(thisArg: any): ReturnType<P> {
+        // Capture this invocations arguments first (supports all ES5 runtimes). This function MUST also work
+        // in non-strict mode where the arguments object is mapped to the named parameters, so thisArg must
+        // never be assigned as that would also change theArgs[0].
+        // theArgs is also referenced by the error message, so minifiers don't collapse it back into `arguments`.
+        let theArgs = arguments;
         let theFunc = (thisArg ? thisArg[funcName] : NULL_VALUE) || clsFn;
         if (theFunc || polyFunc) {
-            let theArgs = arguments;
-            return ((theFunc || polyFunc) as Function).apply(thisArg, theFunc ? ArrSlice[CALL](theArgs, 1) : theArgs);
+            // theFunc.call(thisArg, ...rest) or polyFunc(thisArg, ...rest), passing the arguments object directly
+            // to apply() (rather than slicing it) avoids an array allocation on every call. The intrinsic
+            // Function.prototype.call is used so this doesn't depend on theFunc's own (overridable) call property
+            return ((theFunc ? FuncCall : polyFunc) as Function).apply(theFunc || thisArg, theArgs);
         }
 
-        throwTypeError("\"" + asString(funcName) + "\" not defined for " + dumpObj(thisArg));
+        throwTypeError("\"" + asString(funcName) + "\" not defined for " + dumpObj(thisArg) + " with " + theArgs[LENGTH] + " args");
     };
 }
 
@@ -76,13 +83,16 @@ export function _unwrapFunctionNoInstWithPoly<T, P extends (...args: any) => any
     let clsFn = clsProto ? clsProto[funcName] : NULL_VALUE;
 
     return function(thisArg: any): ReturnType<P> {
+        // See _unwrapFunctionWithPoly(), capture the arguments first (also referenced by the error message so
+        // minifiers keep it) and never assign thisArg (non-strict mode)
+        let theArgs = arguments;
         let theFunc = clsFn;
         if (theFunc || polyFunc) {
-            let theArgs = arguments;
-            return ((theFunc || polyFunc) as Function).apply(thisArg, theFunc ? ArrSlice[CALL](theArgs, 1) : theArgs);
+            // Forwards the arguments without slicing them, using the intrinsic Function.prototype.call
+            return ((theFunc ? FuncCall : polyFunc) as Function).apply(theFunc || thisArg, theArgs);
         }
 
-        throwTypeError("\"" + asString(funcName) + "\" not defined for " + dumpObj(thisArg));
+        throwTypeError("\"" + asString(funcName) + "\" not defined for " + dumpObj(thisArg) + " with " + theArgs[LENGTH] + " args");
     };
 }
 

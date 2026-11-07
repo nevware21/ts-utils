@@ -7,7 +7,7 @@
  */
 
 import { isUndefined } from "../helpers/base";
-import { EMPTY, LENGTH, StrProto } from "../internal/constants";
+import { EMPTY, LENGTH, StrProto, SUBSTRING } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunction, _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { mathMax } from "../math/min_max";
@@ -56,7 +56,7 @@ import { strSlice } from "./slice";
  * console.log(strSubstring(anyString, 0, 10));
  * ```
  */
-export const strSubstring: (value: string, indexStart: number, indexEnd?: number) => string = (/*#__PURE__*/_unwrapFunction("substring", StrProto));
+export const strSubstring: (value: string, indexStart: number, indexEnd?: number) => string = (/*#__PURE__*/_unwrapFunction(SUBSTRING, StrProto));
 
 /**
  * The strSubstr() method returns a portion of the string, starting at the specified index and extending for a given

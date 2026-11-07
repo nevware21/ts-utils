@@ -26,6 +26,9 @@ export const LENGTH = "length";
 export const NAME = "name";
 export const CALL = "call";
 export const TO_STRING = "toString";
+export const TO_UPPER_CASE = "toUpperCase";
+export const TO_LOWER_CASE = "toLowerCase";
+export const SUBSTRING = "substring";
 
 export const GET_OWN_PROPERTY_DESCRIPTOR = "getOwnPropertyDescriptor";
 export const GET_OWN_PROPERTY_NAMES = "getOwnPropertyNames";
@@ -91,6 +94,29 @@ export const FuncCls = (/*#__PURE__*/_pureAssign(Function)) as FunctionConstruct
  * @ignore
  */
 export const FuncProto = (/*#__PURE__*/_pureRef<typeof Function.prototype>(FuncCls, PROTOTYPE)) as Function;
+
+/**
+ * @ignore
+ * The intrinsic `Function.prototype.call`, `FuncCall.apply(fn, [thisArg, ...args])` is the same as
+ * `fn.call(thisArg, ...args)` without depending on the `call` / `apply` properties of `fn` (which may be
+ * overridden) and when passed an `arguments` object it forwards them without allocating a new array.
+ */
+export const FuncCall = (/*#__PURE__*/_pureRef<typeof Function.prototype.call>(FuncProto, CALL)) as Function;
+
+/**
+ * @ignore
+ * The intrinsic `Function.prototype.apply`, `FuncCall.bind(FuncApply)` is a function where
+ * `(fn, thisArg, argArray)` is the same as `fn.apply(thisArg, argArray)` without depending on the
+ * `call` / `apply` properties of `fn` (which may be overridden).
+ */
+export const FuncApply = (/*#__PURE__*/_pureRef<typeof Function.prototype.apply>(FuncProto, "apply")) as Function;
+
+/**
+ * @ignore
+ * The intrinsic `Function.prototype.bind`, `FuncCall.apply(FuncBind, [fn, thisArg, ...args])` is the same
+ * as `fn.bind(thisArg, ...args)` without depending on the `bind` / `call` / `apply` properties of `fn`.
+ */
+export const FuncBind = (/*#__PURE__*/_pureRef<typeof Function.prototype.bind>(FuncProto, "bind")) as Function;
 
 /**
  * @ignore
