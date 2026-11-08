@@ -7,7 +7,7 @@
  */
 
 import { isArray, isFunction, isStrictUndefined } from "../helpers/base";
-import { _getGlobalInstFn, getInst, getQueueMicrotask, isNode } from "../helpers/environment";
+import { _getGlobalInstFn, getInst, isNode } from "../helpers/environment";
 import { ITimerHandler } from "./handler";
 import { _createCancellableTask } from "./microtasks/cancellableTask";
 import { _getProcessNextTickFn } from "./microtasks/processNextTick";
@@ -61,7 +61,7 @@ export interface NextTickOptions {
 export type ProcessNextTickFn = (callback: (...args: any[]) => void, ...args: any[]) => void;
 
 /**
- * Sets the default fallback behavior for {@link scheduleNextTick} when
+ * Sets the default fallback behavior for `scheduleNextTick()` when
  * `process.nextTick` is not available.
  *
  * @since 0.15.0
@@ -146,7 +146,6 @@ export function hasProcessNextTick(): boolean {
  * @group Timer
  *
  * @param callback - The callback to execute.
- * @param args - Optional callback arguments to pass when the callback executes.
  * @param options - Optional fallback behavior when native `process.nextTick` is not available.
  * @returns A handler that can be used to cancel or refresh the scheduled callback.
  * @example
@@ -169,6 +168,30 @@ export function hasProcessNextTick(): boolean {
  *     }
  * });
  * ```
+ */
+export function scheduleNextTick(callback: MicrotaskFn, options?: NextTickOptions): ITimerHandler;
+
+/**
+ * Schedules a callback to run using `process.nextTick` when available and otherwise uses
+ * queueMicrotask, a Promise-based fallback or finally a timer-backed queue, passing the provided
+ * `args` to the callback when it executes.
+ *
+ * When `scheduleFn` is provided, it is used before the Promise and timer-backed fallbacks, if
+ * queueMicrotask is available it is used before all fallbacks.
+ * When `useTimeout` is `true`, the timer-backed queue is used instead of the Promise fallback only
+ * when native `process.nextTick` and `queueMicrotask` are unavailable.
+ * `maxQueuedTasks` controls the fallback queue depth limit; when omitted the fallback queue uses
+ * the default limit (set via `setNextTickFallbackOptions`) or a Node-compatible default of 1000.
+ * Setting/passing `maxQueuedTasks` to `0` disables the limit (for fallbacks only, the native
+ * `process.nextTick` is not affected by this limit).
+ *
+ * @since 0.15.0
+ * @group Timer
+ *
+ * @param callback - The callback to execute.
+ * @param args - The callback arguments to pass when the callback executes.
+ * @param options - Optional fallback behavior when native `process.nextTick` is not available.
+ * @returns A handler that can be used to cancel or refresh the scheduled callback.
  * @example
  * ```ts
  * // Args only
@@ -184,7 +207,6 @@ export function hasProcessNextTick(): boolean {
  * });
  * ```
  */
-export function scheduleNextTick(callback: MicrotaskFn, options?: NextTickOptions): ITimerHandler;
 export function scheduleNextTick<TArgs extends any[]>(callback: (...args: TArgs) => void, args: TArgs, options?: NextTickOptions): ITimerHandler;
 export function scheduleNextTick<TArgs extends any[]>(callback: (...args: TArgs) => void, argsOrOptions?: TArgs | NextTickOptions, options?: NextTickOptions): ITimerHandler {
     let callbackArgs: TArgs | undefined;

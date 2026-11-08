@@ -20,7 +20,7 @@ const _validNewlines = ["\n", "\r\n", "\r", "\n\r"];
  * @group String
  * @group Conversion
  * @param value - The value containing line endings to normalize.
- * @param newlineType - Optional target line ending. Supported values are "\n", "\r\n", "\r", and "\n\r". Defaults to "\n".
+ * @param newlineType - Optional target line ending. Supported values are `"\n"`, `"\r\n"`, `"\r"`, and `"\n\r"`. Defaults to `"\n"`.
  * @returns A string with normalized line endings.
  * @throws TypeError If value is null or undefined, or newlineType is not a supported newline string.
  */

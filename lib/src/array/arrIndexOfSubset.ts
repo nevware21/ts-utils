@@ -28,18 +28,18 @@ function _normalizeFromIndex(value: number | null | undefined, defValue: number)
 }
 
 /**
- * The arrIndexOfSubset() method returns the index within {@link theArray} at which {@link subset}
+ * The arrIndexOfSubset() method returns the index within `theArray` at which `subset`
  * first matches contiguously, comparing elements using strict equality (the same method used by the
  * === or triple-equals operator).
  *
- * Unlike a simple `arrIndexOf()` of the first element of {@link subset}, this continues searching
+ * Unlike a simple `arrIndexOf()` of the first element of `subset`, this continues searching
  * later occurrences of that first element until it finds one where the whole sequence lines up (or
- * exhausts {@link theArray}), which avoids landing on the wrong occurrence when values repeat -- for
+ * exhausts `theArray`), which avoids landing on the wrong occurrence when values repeat -- for
  * example matching one stack trace against another when recursive calls repeat identical lines.
  *
- * If {@link theArray} has fewer remaining elements than {@link subset} from a candidate position, the
- * comparison is limited to just those available elements -- so a {@link subset} that "runs off the end"
- * of {@link theArray} is still considered a match against its available prefix. This makes it possible
+ * If `theArray` has fewer remaining elements than `subset` from a candidate position, the
+ * comparison is limited to just those available elements -- so a `subset` that "runs off the end"
+ * of `theArray` is still considered a match against its available prefix. This makes it possible
  * to match a shorter (eg. truncated) array against a longer one, or vice-versa.
  * @function
  * @since 0.17.0
@@ -112,14 +112,14 @@ export function arrIndexOfSubset<T>(theArray: ArrayLike<T>, subset: ArrayLike<T>
 }
 
 /**
- * The arrLastIndexOfSubset() method returns the last index within {@link theArray} at which
- * {@link subset} matches contiguously, comparing elements using strict equality (the same method
+ * The arrLastIndexOfSubset() method returns the last index within `theArray` at which
+ * `subset` matches contiguously, comparing elements using strict equality (the same method
  * used by the === or triple-equals operator). It is the mirror of {@link arrIndexOfSubset}, searching
- * backwards from {@link fromIndex} (or the end of theArray) towards the start.
+ * backwards from `fromIndex` (or the end of theArray) towards the start.
  *
- * As with {@link arrIndexOfSubset}, if {@link theArray} has fewer remaining elements than
- * {@link subset} from a candidate position, the comparison is limited to just those available
- * elements -- so a {@link subset} that "runs off the end" of {@link theArray} is still considered a
+ * As with {@link arrIndexOfSubset}, if `theArray` has fewer remaining elements than
+ * `subset` from a candidate position, the comparison is limited to just those available
+ * elements -- so a `subset` that "runs off the end" of `theArray` is still considered a
  * match against its available prefix.
  * @function
  * @since 0.17.0

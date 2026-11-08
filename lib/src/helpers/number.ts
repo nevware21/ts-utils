@@ -71,7 +71,7 @@ export const isInteger: (value: unknown) => value is number = (/* #__PURE__*/_pu
  * @param value - The value to check
  * @param min - The minimum inclusive integer value
  * @param max - The maximum inclusive integer value
- * @returns True if the value is an integer and min <= value <= max, false otherwise
+ * @returns True if the value is an integer and `min <= value <= max`, false otherwise
  * @example
  * ```ts
  * isIntegerInRange(5, 0, 10);      // true

@@ -26,7 +26,7 @@ import { strIndexOf } from "./index_of";
  * if `null` or `undefined`, it is stringified (for example, to `"null"` or `"undefined"`). If the
  * resulting string is empty, `0` is returned.
  * @returns The number of non-overlapping substring occurrences.
- * @throws {TypeError} If `value` is `null` or `undefined`.
+ * @throws `TypeError` if `value` is `null` or `undefined`.
  * @example
  * ```ts
  * strCount("hello hello", "hello"); // 2
