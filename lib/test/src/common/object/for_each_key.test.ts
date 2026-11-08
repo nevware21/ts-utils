@@ -8,6 +8,8 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { objForEachKey, objForEachKeySafe } from "../../../../src/object/for_each_key";
+import { arrForEach } from "../../../../src/array/forEach";
+import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 describe("object for_each_key tests", () => {
     describe("objForEachKey", () => {
@@ -194,6 +196,60 @@ describe("object for_each_key tests", () => {
 
             assert.equal(callCount, 0, "Should not call callback for empty objects");
         });
+        it("should continue iterating when a property getter throws", () => {
+            const obj: any = { a: 1 };
+            Object.defineProperty(obj, "b", {
+                get: function() {
+                    throw new Error("getter failed");
+                },
+                enumerable: true,
+                configurable: true
+            });
+            obj.c = 3;
+
+            const visited: { [key: string]: any } = {};
+            assert.doesNotThrow(() => {
+                objForEachKey(obj, (key, value) => {
+                    visited[key] = value;
+                });
+            }, "Should not throw when a getter throws");
+
+            assert.deepEqual(Object.keys(visited).sort(), ["a", "b", "c"], "Should visit all keys including the throwing getter");
+            assert.equal(visited["a"], 1, "Should pass the value for a");
+            assert.isUndefined(visited["b"], "Should pass undefined for the throwing getter");
+            assert.equal(visited["c"], 3, "Should pass the value for c");
+        });
+
+        it("should still allow early exit with -1 when a property getter throws", () => {
+            const obj: any = { a: 1 };
+            Object.defineProperty(obj, "b", {
+                get: function() {
+                    throw new Error("getter failed");
+                },
+                enumerable: true,
+                configurable: true
+            });
+            obj.c = 3;
+
+            const visited: string[] = [];
+            objForEachKey(obj, (key) => {
+                visited.push(key);
+                if (key === "b") {
+                    return -1;
+                }
+            });
+
+            assert.deepEqual(visited, ["a", "b"], "Should stop after the throwing getter key");
+        });
+
+        it("should not swallow exceptions thrown by the callback", () => {
+            const obj = { a: 1, b: 2 };
+            assert.throws(() => {
+                objForEachKey(obj, () => {
+                    throw new Error("callback failed");
+                });
+            }, "callback failed");
+        });
     });
 
     describe("objForEachKeySafe", () => {
@@ -299,6 +355,29 @@ describe("object for_each_key tests", () => {
             assert.strictEqual(actualThis, obj, "Should use the object as thisArg when not provided");
         });
 
+        it("should use the object as this for null / undefined thisArg and falsy values as-is", () => {
+            const obj = { a: 1, b: 2 };
+            const thisValues: any[] = [];
+
+            objForEachKeySafe(obj, function(this: any) {
+                thisValues.push(this);
+            }, null);
+            objForEachKeySafe(obj, function(this: any) {
+                thisValues.push(this);
+            }, undefined);
+            assert.deepEqual(thisValues, [obj, obj, obj, obj], "null and undefined thisArg should use the object for every key");
+
+            arrForEach([0, "", false], (falsyValue) => {
+                const seen: any[] = [];
+                objForEachKeySafe(obj, function(this: any) {
+                    seen.push(this);
+                }, falsyValue);
+                assert.equal(seen.length, 2, "Should call the callback for each key");
+                assert.strictEqual(seen[0], falsyValue, "thisArg of " + dumpObj(falsyValue) + " should be used as-is");
+                assert.strictEqual(seen[1], falsyValue, "thisArg of " + dumpObj(falsyValue) + " should be used as-is for every key");
+            });
+        });
+
         it("should break iteration when callback returns -1", () => {
             const obj = { a: 1, b: 2, c: 3, d: 4 };
             const visitedKeys: string[] = [];
@@ -382,6 +461,28 @@ describe("object for_each_key tests", () => {
             });
 
             assert.equal(callCount, 0, "Should not call callback for empty objects");
+        });
+        it("should continue iterating when a property getter throws", () => {
+            const obj: any = { a: 1 };
+            Object.defineProperty(obj, "b", {
+                get: function() {
+                    throw new Error("getter failed");
+                },
+                enumerable: true,
+                configurable: true
+            });
+            obj.c = 3;
+
+            const visited: { [key: string]: any } = {};
+            assert.doesNotThrow(() => {
+                objForEachKeySafe(obj, (key, value) => {
+                    visited[key] = value;
+                });
+            }, "Should not throw when a getter throws");
+
+            assert.deepEqual(Object.keys(visited).sort(), ["a", "b", "c"], "Should visit all keys including the throwing getter");
+            assert.isUndefined(visited["b"], "Should pass undefined for the throwing getter");
+            assert.equal(visited["c"], 3, "Should pass the value for c");
         });
     });
 });

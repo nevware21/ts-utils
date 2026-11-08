@@ -8,9 +8,9 @@
 
 import { arrForEach } from "../array/forEach";
 import { isStrictNullOrUndefined } from "../helpers/base";
-import { CALL, NULL_VALUE, UNDEF_VALUE } from "../internal/constants";
+import { CALL, UNDEF_VALUE } from "../internal/constants";
+import { _objForEachKey } from "./for_each_key";
 import { objGetOwnPropertySymbols } from "./get_own_property";
-import { objHasOwn } from "./has_own";
 import { isUnsafePropKey } from "./isUnsafePropKey";
 import { _objPropertyIsEnumerable } from "./property_is_enumerable";
 
@@ -24,6 +24,10 @@ import { _objPropertyIsEnumerable } from "./property_is_enumerable";
  * **Note:** Unlike {@link objForEachKey}, this helper also iterates enumerable symbol keys via
  * `Object.getOwnPropertySymbols`. Use {@link forEachOwnKeySafe} when iterating untrusted input
  * to filter out unsafe keys like `__proto__`, `constructor`, and `prototype`.
+ *
+ * If reading a property value throws (for example a getter that throws an exception), the exception
+ * is caught and the `callbackFn` is still called for that key with an `undefined` value, so a single
+ * throwing getter does not stop the iteration of the remaining keys.
  * @since 0.14.0
  * @group Object
  * @typeParam T - The source type.
@@ -65,22 +69,24 @@ import { _objPropertyIsEnumerable } from "./property_is_enumerable";
  * ```
  */
 export function forEachOwnKey<T>(theObject: T, callbackfn: (key: PropertyKey, value: T[keyof T]) => void | number, thisArg?: any): void {
-    if (theObject !== NULL_VALUE && theObject !== UNDEF_VALUE) {
-        for (const prop in theObject) {
-            if (objHasOwn(theObject, prop)) {
-                if (callbackfn[CALL](isStrictNullOrUndefined(thisArg) ? theObject : thisArg, prop, theObject[prop as keyof T]) === -1) {
-                    return;
-                }
-            }
-        }
+    if (!isStrictNullOrUndefined(theObject)) {
+        // Resolve the `this` value once, reusing the thisArg variable to keep the minified output small
+        thisArg = isStrictNullOrUndefined(thisArg) ? theObject : thisArg;
+        if (_objForEachKey(theObject, callbackfn, thisArg) !== -1) {
+            arrForEach(objGetOwnPropertySymbols(theObject), (key) => {
+                if (_objPropertyIsEnumerable(theObject, key)) {
+                    let value: any = UNDEF_VALUE;
+                    try {
+                        value = theObject[key as keyof T];
+                    } catch (e) {
+                        // A throwing getter, so just pass undefined as the value
+                    }
 
-        arrForEach(objGetOwnPropertySymbols(theObject), (key) => {
-            if (_objPropertyIsEnumerable(theObject, key)) {
-                if (callbackfn[CALL](isStrictNullOrUndefined(thisArg) ? theObject : thisArg, key, theObject[key as keyof T]) === -1) {
-                    return -1;
+                    // arrForEach stops when -1 is returned
+                    return callbackfn[CALL](thisArg, key, value);
                 }
-            }
-        });
+            });
+        }
     }
 }
 
@@ -92,6 +98,9 @@ export function forEachOwnKey<T>(theObject: T, callbackfn: (key: PropertyKey, va
  * This helper wraps {@link forEachOwnKey} with extra key filtering for safer assignment flows.
  * Use this instead of {@link forEachOwnKey} whenever keys come from untrusted input (e.g.
  * user-supplied objects, parsed JSON).
+ *
+ * As with {@link forEachOwnKey}, if reading a property value throws (for example a throwing getter)
+ * the `callbackFn` is called for that key with an `undefined` value and the iteration continues.
  * @since 0.14.0
  * @group Object
  * @typeParam T - The source type.
@@ -145,9 +154,12 @@ export function forEachOwnKey<T>(theObject: T, callbackfn: (key: PropertyKey, va
  * ```
  */
 export function forEachOwnKeySafe<T>(theObject: T, callbackfn: (key: PropertyKey, value: T[keyof T]) => void | number, thisArg?: any): void {
+    // Resolve the `this` value once (not per key), passing it directly rather than via the wrapper's own `this`
+    // as that would box primitive values (e.g. 0, "", false) when running in non-strict mode
+    thisArg = isStrictNullOrUndefined(thisArg) ? theObject : thisArg;
     forEachOwnKey(theObject, (key, value) => {
         if (!isUnsafePropKey(key)) {
-            return callbackfn[CALL](isStrictNullOrUndefined(thisArg) ? theObject : thisArg, key, value);
+            return callbackfn[CALL](thisArg, key, value);
         }
-    }, thisArg);
+    });
 }

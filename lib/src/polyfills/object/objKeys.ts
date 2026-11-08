@@ -6,17 +6,28 @@
  * Licensed under the MIT license.
  */
 
-import { isObject } from "../../helpers/base";
+import { isFunction, isObject } from "../../helpers/base";
 import { dumpObj } from "../../helpers/diagnostics";
 import { throwTypeError } from "../../helpers/throw";
 import { _throwIfNullOrUndefined } from "../../internal/throwIf";
-import { objForEachKey } from "../../object/for_each_key";
+import { objHasOwn } from "../../object/has_own";
 
-function _objIterateEntries<T, R>(obj: any, mapper: (key: string, value: T) => R): R[] {
+/**
+ * Iterates the own enumerable string keys of the object, passing only the key to the mapper. This intentionally
+ * does not use objForEachKey (which reads every value and swallows getter exceptions) so that, like the native
+ * implementations, polyObjKeys never invokes getters and polyObjEntries / polyObjValues invoke each getter once
+ * and propagate any exception it throws.
+ */
+function _objIterateEntries<R>(obj: any, mapper: (key: string) => R): R[] {
     const result: R[] = [];
-    objForEachKey(obj, (key, val) => {
-        result.push(mapper(key, val));
-    });
+    if (obj && (isObject(obj) || isFunction(obj))) {
+        for (const key in obj) {
+            if (objHasOwn(obj, key)) {
+                result.push(mapper(key));
+            }
+        }
+    }
+
     return result;
 }
 
@@ -35,7 +46,7 @@ export function polyObjKeys(obj: any): string[] {
         throwTypeError("non-object " + dumpObj(obj));
     }
 
-    return _objIterateEntries<any, any>(obj, (k, _) => k);
+    return _objIterateEntries<string>(obj, (k) => k);
 }
 
 /**
@@ -61,7 +72,7 @@ export function polyObjKeys(obj: any): string[] {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyObjEntries<T = any>(value: {} | { [s: string]: T } | ArrayLike<T>): [string, T][] {
-    return _objIterateEntries<T, [string, T]>(value, (k, v) => [k, v]);
+    return _objIterateEntries<[string, T]>(value, (k) => [k, (value as any)[k]]);
 }
 
 /**
@@ -87,5 +98,5 @@ export function polyObjEntries<T = any>(value: {} | { [s: string]: T } | ArrayLi
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyObjValues<T = any>(value: {} | { [s: string]: T } | ArrayLike<T>): T[] {
-    return _objIterateEntries<T, T>(value, (_, v) => v);
+    return _objIterateEntries<T>(value, (k) => (value as any)[k]);
 }
