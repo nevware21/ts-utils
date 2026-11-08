@@ -8,6 +8,12 @@
 
 ### Bug Fixes
 
+- [#627](https://github.com/nevware21/ts-utils/issues/627) fix(object): `objForEachKey`, `objForEachKeySafe`, `forEachOwnKey` and `forEachOwnKeySafe` no longer abort the enumeration when a property getter throws
+  - The exception from the getter is caught and the callback is still called for that key with an `undefined` value, so the remaining keys are still visited
+  - Exceptions thrown by the callback itself are not caught and still propagate
+  - `polyObjKeys` no longer invokes property getters (so it no longer throws for an object with a throwing getter), matching the native `Object.keys`
+  - `polyObjEntries` and `polyObjValues` still invoke each getter once and propagate any exception it throws, matching the native `Object.entries` and `Object.values`
+
 # v0.16.0 July 18th, 2026
 
 ## Changelog

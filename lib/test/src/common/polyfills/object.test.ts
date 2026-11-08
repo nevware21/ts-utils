@@ -68,6 +68,15 @@ describe("object polyfills", () => {
         });
     });
 
+    it("polyObjKeys with a throwing getter", () => {
+        const getterObj = _createGetterObj(true);
+
+        // Object.keys() never invokes getters, so the polyfill must not either (and therefore cannot fail)
+        assert.deepEqual(polyObjKeys(getterObj.obj), Object.keys(getterObj.obj));
+        assert.deepEqual(polyObjKeys(getterObj.obj), ["a", "b", "c"]);
+        assert.equal(getterObj.calls(), 0, "polyObjKeys should not invoke any getters");
+    });
+
     describe("polyObjEntries", () => {
         it("examples", () => {
             assert.deepEqual(polyObjEntries({ Hello: "Darkness", my: "old", friend: "." }), [ [ "Hello", "Darkness" ], [ "my", "old"], [ "friend", "." ] ]);
@@ -77,6 +86,34 @@ describe("object polyfills", () => {
 
             // Array-like object with random key ordering
             assert.deepEqual(polyObjEntries({ 100: "a", 2: "b", 7: "c" }), [ ["2", "b"], ["7", "c"], ["100", "a"] ]);
+        });
+
+        it("should invoke each getter once and return its value", () => {
+            const getterObj = _createGetterObj(false);
+            const result = polyObjEntries(getterObj.obj);
+            assert.deepEqual(result, [ ["a", 1], ["b", 2], ["c", 3] ]);
+            assert.equal(getterObj.calls(), 1, "Should invoke the getter exactly once");
+
+            const nativeEntries = (Object as any).entries;
+            if (nativeEntries) {
+                const nativeGetterObj = _createGetterObj(false);
+                assert.deepEqual(result, nativeEntries(nativeGetterObj.obj), "Should match the native result");
+                assert.equal(nativeGetterObj.calls(), 1, "Native should also invoke the getter exactly once");
+            }
+        });
+
+        it("should propagate an exception thrown by a getter like the native implementation", () => {
+            const getterObj = _createGetterObj(true);
+            assert.throws(() => {
+                polyObjEntries(getterObj.obj);
+            }, "getter failed");
+
+            const nativeEntries = (Object as any).entries;
+            if (nativeEntries) {
+                assert.throws(() => {
+                    nativeEntries(getterObj.obj);
+                }, "getter failed");
+            }
         });
     });
 
@@ -90,7 +127,61 @@ describe("object polyfills", () => {
             // Array-like object with random key ordering
             assert.deepEqual(polyObjValues({ 100: "a", 2: "b", 7: "c" }), [ "b", "c", "a"]);
         });
+
+        it("should invoke each getter once and return its value", () => {
+            const getterObj = _createGetterObj(false);
+            const result = polyObjValues(getterObj.obj);
+            assert.deepEqual(result, [ 1, 2, 3 ]);
+            assert.equal(getterObj.calls(), 1, "Should invoke the getter exactly once");
+
+            const nativeValues = (Object as any).values;
+            if (nativeValues) {
+                const nativeGetterObj = _createGetterObj(false);
+                assert.deepEqual(result, nativeValues(nativeGetterObj.obj), "Should match the native result");
+                assert.equal(nativeGetterObj.calls(), 1, "Native should also invoke the getter exactly once");
+            }
+        });
+
+        it("should propagate an exception thrown by a getter like the native implementation", () => {
+            const getterObj = _createGetterObj(true);
+            assert.throws(() => {
+                polyObjValues(getterObj.obj);
+            }, "getter failed");
+
+            const nativeValues = (Object as any).values;
+            if (nativeValues) {
+                assert.throws(() => {
+                    nativeValues(getterObj.obj);
+                }, "getter failed");
+            }
+        });
     });
+
+    /**
+     * Creates `{ a: 1, b: <getter>, c: 3 }` where the "b" getter either returns 2 or throws, and counts its invocations
+     */
+    function _createGetterObj(throws: boolean) {
+        let calls = 0;
+        const obj: any = { a: 1 };
+        Object.defineProperty(obj, "b", {
+            get: function() {
+                calls++;
+                if (throws) {
+                    throw new Error("getter failed");
+                }
+
+                return 2;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        obj.c = 3;
+
+        return {
+            obj: obj,
+            calls: () => calls
+        };
+    }
 
     describe("polyObjIs", () => {
         it("should handle primitive values correctly", () => {
