@@ -7,7 +7,7 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
-import { _unwrapFunction, _unwrapFunctionWithPoly, _unwrapInstFunction } from "../../../../src/internal/unwrapFunction";
+import { _unwrapFunction, _unwrapFunctionNoInstWithPoly, _unwrapFunctionWithPoly, _unwrapInstFunction } from "../../../../src/internal/unwrapFunction";
 import { strIncludes } from "../../../../src/string/includes";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 
@@ -371,6 +371,40 @@ describe("_unwrapFunctionWithPoly", () => {
         assert.ok(_expectThrow(() => {
             wrappedFn({});
         }, "not defined for"));
+    });
+
+    it("error message includes the number of arguments passed", () => {
+        let wrappedFn = _unwrapFunctionWithPoly("test", null as any, null as any);
+
+        assert.ok(_expectThrow(() => {
+            wrappedFn(null);
+        }, "\"test\" not defined for [object Null]: null with 1 args"));
+
+        assert.ok(_expectThrow(() => {
+            (wrappedFn as any)({}, 1, "two");
+        }, " with 3 args"));
+    });
+
+    it("does not depend on the function's own call or apply properties", () => {
+        function test(this: any, value: number) {
+            return this.x + value + arguments.length;
+        }
+
+        (test as any).call = null;
+        let wrappedFn = _unwrapFunctionWithPoly("test" as any, null as any, null as any);
+        assert.equal((wrappedFn as any)({ x: 20, test: test }, 1), 22);
+
+        (test as any).call = () => "wrong";
+        (test as any).apply = () => "wrong";
+        assert.equal((wrappedFn as any)({ x: 20, test: test }, 1), 22);
+
+        // Using the class / prototype fallback
+        let fallbackFn = _unwrapFunctionWithPoly("test" as any, { test: test } as any, null as any);
+        assert.equal((fallbackFn as any)({ x: 10 }, 1), 12);
+
+        // Only the class / prototype function is used
+        let noInstFn = _unwrapFunctionNoInstWithPoly("test" as any, { test: test } as any, null as any);
+        assert.equal((noInstFn as any)({ x: 10, test: () => "instance" }, 1), 12);
     });
 });
 

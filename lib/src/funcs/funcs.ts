@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { ArrSlice, CALL } from "../internal/constants";
+import { FuncApply, FuncBind, FuncCall } from "../internal/constants";
 import { BoundFunction } from "./types";
 
 /**
@@ -23,6 +23,11 @@ import { BoundFunction } from "./types";
  * For example, you could use a NodeList, or a custom object like `{ 'length': 2, '0': 'eat', '1': 'bananas' }`.
  * You can also use `arguments`.
  *
+ * `fnApply` is the intrinsic `Function.prototype.call` bound to the intrinsic `Function.prototype.apply`, so
+ * `fnApply(fn, thisArg, argArray)` is `fn.apply(thisArg, argArray)` without any wrapper function, and it doesn't
+ * depend on the `call` or `apply` properties of `fn` (which may have been overridden).
+ *
+ * @function
  * @since 0.9.8
  * @group Function
  *
@@ -67,13 +72,11 @@ import { BoundFunction } from "./types";
  * fnApply(module1.log, module2, [ "friend" ]); // my friend : 42
  * ```
  */
-export function fnApply<F extends (...args: any) => any, T>(fn: F, thisArg: T, argArray?: ArrayLike<any>): ReturnType<F> {
-    return fn.apply(thisArg, argArray);
-}
+export const fnApply: <F extends (...args: any) => any, T>(fn: F, thisArg: T, argArray?: ArrayLike<any>) => ReturnType<F> = (/*#__PURE__*/FuncCall.bind(FuncApply));
 
 /**
  * The `fnCall` function calls the function with the given `thisArg` as the `this` value and with
- * al of the `_args` provided as it's `arguments`.
+ * all of the `args` provided as it's `arguments`.
  *
  * Note: This is almost identical to `fnApply`, except that the function arguments are passed to `fnCall`
  * individually as a list, while with `fnApply` that are combined into a single array argument.
@@ -83,13 +86,18 @@ export function fnApply<F extends (...args: any) => any, T>(fn: F, thisArg: T, a
  * existing function, without first attaching the function to the object as a property. This allows you
  * to use methods of one object as generic utility functions.
  *
+ * `fnCall` is the intrinsic `Function.prototype.call` bound to itself, so `fnCall(fn, thisArg, ...args)` is
+ * `fn.call(thisArg, ...args)` without any wrapper function or copying of the arguments, and it doesn't depend
+ * on the `call` or `apply` properties of `fn` (which may have been overridden).
+ *
+ * @function
  * @since 0.9.8
  * @group Function
  *
  * @param fn - The function to be called
  * @param thisArg - The value of `this` provided for the call to `fn`. If the function is not in strict mode,
  * `null` and `undefined` will be replaced with the global object, and primitive values will be converted to objects.
- * @param _args - The zero or more arguments to be passed to the `fn` function.
+ * @param args - The zero or more arguments to be passed to the `fn` function.
  * @returns The result of calling the function with the specified `this` value and arguments.
  * @example
  * ```ts
@@ -126,59 +134,7 @@ export function fnApply<F extends (...args: any) => any, T>(fn: F, thisArg: T, a
  * fnCall(module1.log, module2, "friend"); // my friend : 42
  * ```
  */
-export function fnCall<F extends (...args: any) => any, T>(fn: F, thisArg: T, ...args: Parameters<F>): ReturnType<F>;
-
-/**
- * The `fnCall` function calls the function with the given `thisArg` as the `this` value and with
- * al of the `_args` provided as it's `arguments.
- *
- * > This is almost identical to `fnApply`, except that the function arguments are passed to `fnCall`
- * individually as a list, while with `fnApply` that are combined into a single array argument.
- *
- * Normally, when calling a function, the value of `this` inside the function is the object that the
- * function was accessed on. With `fnCall()`, you can pass an arbitrary value as the `this` when calling an
- * existing function, without first attaching the function to the object as a property. This allows you
- * to use methods of one object as generic utility functions.
- *
- * @since 0.9.8
- * @group Function
- *
- * @param fn - The function to be called
- * @param thisArg - The value of `this` provided for the call to `fn`. If the function is not in strict mode,
- * `null` and `undefined` will be replaced with the global object, and primitive values will be converted to objects.
- * @param args - The zero or more arguments to be passed to the `fn` function.
- * @returns The result of calling the function with the specified `this` value and arguments.
- * @example
- * ```ts
- * const module1 = {
- *     prefix: "Hello",
- *     x: 21,
- *     getX() {
- *         return this.x;
- *     },
- *     log(value: string) {
- *         return this.prefix + " " + value + " : " + this.x
- *     }
- * };
- *
- * // The 'this' parameter of 'getX' is bound to 'module'.
- * module1.getX(); // 21
- * module1.log("Darkness"); // Hello Darkness : 21
- *
- * // Create a new function 'boundGetX' with the 'this' parameter bound to 'module'.
- * let module2 = {
- *     prefix: "my",
- *     x: 42
- * };
- *
- * // Call the function of module1 with module2 as it's this
- * fnCall(module1.getX, module2); // 42
- * fnCall(module1.log, module2, "friend"); // my friend : 42
- * ```
- */
-export function fnCall<F extends (...args: any) => any, T>(fn: F, thisArg: T): ReturnType<F> {
-    return fn.apply(thisArg, ArrSlice[CALL](arguments, 2));
-}
+export const fnCall: <F extends (...args: any) => any, T>(fn: F, thisArg: T, ...args: Parameters<F>) => ReturnType<F> = (/*#__PURE__*/FuncCall.bind(FuncCall));
 
 /**
  * Creates a new function that when called will set the value of `thisArg` as the `this` keyword
@@ -283,5 +239,10 @@ export function fnBind<F extends Function, T>(fn: F, thisArg: T, ...argArray: an
 
 /*#__NO_SIDE_EFFECTS__*/
 export function fnBind<F extends (...args: any[]) => any, T>(fn: F, thisArg: T): any {
-    return fn.bind.apply(fn, ArrSlice[CALL](arguments, 1) as any);
+    // The arguments are [fn, thisArg, ...args], so this invokes the intrinsic Function.prototype.bind with fn
+    // as its `this`, which is fn.bind(thisArg, ...args). Passing the arguments object directly to apply()
+    // avoids slicing them into a new array, and using the intrinsic means this doesn't depend on the fn's own
+    // (overridable) bind / call / apply properties. This remains a function (rather than an alias like fnCall)
+    // to retain the overloads, and no other code runs before arguments is read.
+    return FuncCall.apply(FuncBind, arguments);
 }
