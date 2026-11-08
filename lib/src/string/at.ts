@@ -18,7 +18,7 @@ import { asString } from "./as_string";
  * UTF-16 code unit located at the specified offset into the string. It accepts both positive and
  * negative integers: negative integers count back from the last string character.
  *
- * This is the equivalent of `String.prototype.at()` and falls back to {@link polyStrAt} in
+ * This is the equivalent of `String.prototype.at()` and falls back to `polyStrAt()` in
  * environments where the native method is unavailable.
  *
  * @function

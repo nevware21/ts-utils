@@ -17,7 +17,7 @@ let _iterSymbol: ICachedValue<symbol>;
 
 /**
  * Calls the provided `callbackFn` function once for each element in the iterator or iterator returned by
- * the iterable and processed in the same order as returned by the iterator. As with the {@link arrForEach}
+ * the iterable and processed in the same order as returned by the iterator. As with the `arrForEach()`
  * you CAN stop / break the iteration by returning -1 from the`callbackFn` function.
  *
  * The order of processing is not reset if you add or remove elements to the iterator, the actual behavior

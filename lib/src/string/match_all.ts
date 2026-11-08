@@ -19,8 +19,8 @@ import { createIterableIterator } from "../iterator/create";
 
 /**
  * The `strMatchAll()` method returns an iterator of all results matching a string against a
- * regular expression, including capturing groups. Unlike {@link strMatch}, it returns every
- * match in the string (not just the first) and each result includes full `RegExpExecArray`
+ * regular expression, including capturing groups. Unlike `String.prototype.match()`, it returns
+ * every match in the string (not just the first) and each result includes full `RegExpExecArray`
  * details: matched substrings, capture groups, the match `index`, and the original `input` string.
  *
  * If `matcher` is a `RegExp` it **must** have the global (`g`) flag set; a non-global `RegExp`

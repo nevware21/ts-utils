@@ -45,7 +45,7 @@ export interface MicroTaskOptions {
 }
 
 /**
- * Sets the default fallback behavior for {@link scheduleMicrotask} when
+ * Sets the default fallback behavior for `scheduleMicrotask()` when
  * `queueMicrotask` is not available.
  *
  * @since 0.15.0
@@ -85,7 +85,6 @@ export function setMicroTaskFallbackOptions(options?: MicroTaskOptions): void {
  * @group Timer
  *
  * @param callback - The callback to execute.
- * @param args - Optional callback arguments to pass when the callback executes.
  * @param options - Optional per-call fallback options when `queueMicrotask` is unavailable.
  * @returns A handler that can be used to cancel or refresh the scheduled callback.
  * @example
@@ -114,6 +113,28 @@ export function setMicroTaskFallbackOptions(options?: MicroTaskOptions): void {
  *     }
  * });
  * ```
+ */
+export function scheduleMicrotask(callback: () => void, options?: MicroTaskOptions): ITimerHandler;
+
+/**
+ * Schedules a callback to run in the microtask queue, passing the provided `args` to the
+ * callback when it executes.
+ *
+ * It uses the native `queueMicrotask` when available, otherwise falls back to
+ * `Promise.resolve().then(...)`, and if `Promise` is unavailable it falls back to
+ * `scheduleTimeout(..., 0)`.
+ * Unlike standard microtasks, this helper returns a cancellable `ITimerHandler`
+ * so scheduled callbacks can be canceled before execution.
+ * This provides consistent microtask scheduling behavior across all supported runtimes,
+ * including Node.js, browsers, and web workers.
+ *
+ * @since 0.15.0
+ * @group Timer
+ *
+ * @param callback - The callback to execute.
+ * @param args - The callback arguments to pass when the callback executes.
+ * @param options - Optional per-call fallback options when `queueMicrotask` is unavailable.
+ * @returns A handler that can be used to cancel or refresh the scheduled callback.
  * @example
  * ```ts
  * // Args only
@@ -129,7 +150,6 @@ export function setMicroTaskFallbackOptions(options?: MicroTaskOptions): void {
  * });
  * ```
  */
-export function scheduleMicrotask(callback: () => void, options?: MicroTaskOptions): ITimerHandler;
 export function scheduleMicrotask<TArgs extends any[]>(callback: (...args: TArgs) => void, args: TArgs, options?: MicroTaskOptions): ITimerHandler;
 export function scheduleMicrotask<TArgs extends any[]>(callback: (...args: TArgs) => void, argsOrOptions?: TArgs | MicroTaskOptions, options?: MicroTaskOptions): ITimerHandler {
     let callbackArgs: TArgs | undefined;

@@ -40,7 +40,7 @@ export type IterPredicateCallbackFn<T> = (value: T, index: number) => unknown;
 export type IterReduceCallbackFn<T, R = T> = (previousValue: T | R, currentValue: T, currentIndex: number, iter: Iterator<T>) => R;
 
 /**
- * Callback signature for key selection in {@link arrToMap}.
+ * Callback signature for key selection in `arrToMap()`.
  * @since 0.15.0
  * @group Array
  * @example
@@ -51,7 +51,7 @@ export type IterReduceCallbackFn<T, R = T> = (previousValue: T | R, currentValue
 export type ArrToMapKeySelectorFn<T> = (value: T, index: number) => string | number;
 
 /**
- * Callback signature for value selection in {@link arrToMap}.
+ * Callback signature for value selection in `arrToMap()`.
  * @since 0.15.0
  * @group Array
  * @example

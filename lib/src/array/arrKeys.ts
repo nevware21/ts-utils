@@ -15,7 +15,7 @@ import { mathToInt } from "../math/to_int";
 /**
  * Returns an iterator over all numeric keys from `0` to `length - 1`.
  *
- * This uses `Array.prototype.keys()` when available and falls back to {@link polyArrKeys}.
+ * This uses `Array.prototype.keys()` when available and falls back to `polyArrKeys()`.
  * Unlike {@link arrIndexKeys}, this always iterates all index positions, including holes.
  * @since 0.14.0
  * @function
