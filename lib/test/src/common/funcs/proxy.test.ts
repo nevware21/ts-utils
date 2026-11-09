@@ -50,6 +50,33 @@ describe("function proxy helpers", () => {
             assert.equal(module2.defX(), 42);
             assert.equal(module2.log("Darkness"), "Hello Darkness : 42");
         });
+
+        it("passes all of the arguments and resolves the host on every call", () => {
+            interface IHost {
+                name: string;
+                getArgs(...args: any[]): any[];
+            }
+
+            let getArgs = function(this: IHost, ..._args: any[]) {
+                return [ this.name, arguments.length ].concat(Array.prototype.slice.call(arguments));
+            };
+
+            let host1: IHost = { name: "host1", getArgs: getArgs };
+            let host2: IHost = { name: "host2", getArgs: getArgs };
+            let theHost = host1;
+            let hostCalls = 0;
+            let proxyFn = createFnDeferredProxy<IHost, (...args: any[]) => any[]>(() => {
+                hostCalls++;
+                return theHost;
+            }, "getArgs");
+
+            assert.deepEqual(proxyFn(), [ "host1", 0 ]);
+            assert.deepEqual(proxyFn(1, "two", undefined), [ "host1", 3, 1, "two", undefined ]);
+
+            theHost = host2;
+            assert.deepEqual(proxyFn(null), [ "host2", 1, null ]);
+            assert.equal(hostCalls, 3, "The host is resolved for every call");
+        });
     });
 
     describe("createProxyFuncs", () => {

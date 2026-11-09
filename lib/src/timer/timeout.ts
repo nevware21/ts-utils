@@ -8,9 +8,12 @@
 
 import { fnApply } from "../funcs/funcs";
 import { isArray, isFunction } from "../helpers/base";
+import { ClearTimeoutOverrideFn, TimeoutOverrideFn, TimeoutOverrideFuncs } from "../helpers/types";
 import { ArrSlice, CALL, UNDEF_VALUE } from "../internal/constants";
 import { _getGlobalConfig } from "../internal/global";
 import { ITimerHandler, _createTimerHandler } from "./handler";
+
+export { ClearTimeoutOverrideFn, TimeoutOverrideFn, TimeoutOverrideFuncs };
 
 // Package instance timeout override functions
 let _setTimeoutFn: TimeoutOverrideFn | undefined;
@@ -43,6 +46,13 @@ function _resolveClearTimeoutFn(timeoutFn: ClearTimeoutOverrideFn): ClearTimeout
     return result || clearTimeout;
 }
 
+/**
+ * @internal
+ * @ignore
+ * Creates the timer handler, the callers MUST pass a copy of their arguments (not the arguments object itself)
+ * as the callback (`theArgs[0]`) is replaced with a wrapper and the arguments are kept and reused by `refresh()`
+ * after the callers have returned.
+ */
 function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, theArgs: any[]): ITimerHandler {
     let isArr = isArray(overrideFn);
     let len = isArr ? overrideFn.length : 0;
@@ -65,7 +75,9 @@ function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn |
         }
 
         handler.dn();
-        fnApply(timerFn, UNDEF_VALUE, ArrSlice[CALL](arguments));
+        // Pass this callbacks arguments directly (apply accepts any array-like), this function has no named
+        // parameters and the arguments are not modified, so there is no need to slice them into a new array
+        fnApply(timerFn, UNDEF_VALUE, arguments);
     };
     
     let handler = _createTimerHandler(startTimer, (timerId?: any) => {
@@ -232,37 +244,6 @@ export function setGlobalTimeoutOverrides(overrideFn?: TimeoutOverrideFn | Timeo
         ] as TimeoutOverrideFuncs;
     }
 }
-
-/**
- * The signature of the override timeout function used to create a new timeout instance, it follows the same signature as
- * the native `setTimeout` API.
- * @since 0.4.4
- * @group Timer
- * @param callback - A function to be executed after the timer expires.
- * @param ms - The time, in milliseconds that the timer should wait before the specified function or code is executed.
- * If this parameter is omitted, a value of 0 is used, meaning execute "immediately", or more accurately, the next event cycle.
- * @param args - Additional arguments which are passed through to the function specified by callback.
- * @return The returned timeoutID is a positive integer value which identifies the timer created by the call to setTimeout().
- * This value can be passed to clearTimeout() to cancel the timeout.
- */
-export type TimeoutOverrideFn = <TArgs extends any[]>(callback: (...args: TArgs) => void, ms?: number, ...args: TArgs) => number | any;
-
-/**
- * The signatire of the function to override clearing a previous timeout created with the {@link TimeoutOverrideFn}, it will be passed
- * the result returned from the {@link TimeoutOverrideFn} call.
- * @since 0.4.5
- * @group Timer
- * @param timeoutId - The value returned from the previous {@link TimeoutOverrideFn}.
- */
-export type ClearTimeoutOverrideFn = (timeoutId: number | any) => void;
-
-/**
- * Defines the array signature used to pass the override set and clean functions for creating a timeout.
- * The first index [0] is the set function to be used and the second index [1] is the clear function to be used.
- * @since 0.4.5
- * @group Timer
- */
-export type TimeoutOverrideFuncs = [ TimeoutOverrideFn | null, ClearTimeoutOverrideFn | null ];
 
 /**
  * Creates and starts a timer which executes a function or specified piece of code once the timer expires, this is simular

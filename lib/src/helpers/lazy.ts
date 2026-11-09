@@ -9,7 +9,9 @@
 import { fnApply } from "../funcs/funcs";
 import { _GlobalTestHooks, _getGlobalConfig } from "../internal/global";
 import { objDefineProp } from "../object/define";
-import { ICachedValue } from "./cache";
+import { ILazyValue } from "./types";
+
+export { ILazyValue };
 
 /**
  * @internal
@@ -19,24 +21,6 @@ export let _globalLazyTestHooks: _GlobalTestHooks;
 
 export function _initTestHooks() {
     _globalLazyTestHooks = _getGlobalConfig();
-}
-
-/**
- * Interface of the object returned by the {@link getLazy} instance
- * @since 0.4.5
- * @group Lazy
- */
-export interface ILazyValue<T> extends ICachedValue<T> {
-    /**
-     * Returns the current cached value from the lazy lookup, if the callback function has not yet occurred
-     * accessing the value will cause the lazy evaluation to occur and the result will be returned.
-     */
-    v: T,
-
-    /**
-     * Identifies if this instance is bypassing the internal caching mechanism which is used for testing
-     */
-    b?: boolean
 }
 
 /**

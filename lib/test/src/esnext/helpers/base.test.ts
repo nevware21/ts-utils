@@ -8,6 +8,7 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { isAsyncFunction, isGenerator, isAsyncGenerator, isFunction } from "../../../../src/helpers/base";
+import { IAsyncGeneratorFunction } from "../../../../src/helpers/types";
 
 // This test suite is designed to check the functionality of the base helper functions
 // As TypeScript rewrites the async and generator functions when the target is ES5, and
@@ -76,6 +77,24 @@ describe("ESNext base tests", () => {
                 assert.equal(isAsyncGenerator(42), false, "Should handle number");
                 assert.equal(isAsyncGenerator("string"), false, "Should handle string");
                 assert.equal(isAsyncGenerator(true), false, "Should handle boolean");
+            });
+
+            it("should narrow so the value can be used as a native AsyncGeneratorFunction", () => {
+                function narrowAny(value: any): AsyncGeneratorFunction | null {
+                    return isAsyncGenerator(value) ? value : null;
+                }
+
+                function narrowKnown(value: AsyncGeneratorFunction | string): AsyncGeneratorFunction | null {
+                    return isAsyncGenerator(value) ? value : null;
+                }
+
+                const guard: (value: any) => value is IAsyncGeneratorFunction = isAsyncGenerator;
+
+                assert.equal(guard(_asyncGeneratorFunction), true, "The guard identifies an async generator function");
+                assert.equal(narrowAny(_asyncGeneratorFunction), _asyncGeneratorFunction as any, "An async generator function is narrowed");
+                assert.equal(narrowAny(_regularFunction), null, "A regular function is not narrowed");
+                assert.equal(narrowKnown(_asyncGeneratorFunction as any), _asyncGeneratorFunction as any, "A native type is retained");
+                assert.equal(narrowKnown("a"), null, "A string is not narrowed");
             });
         });
 

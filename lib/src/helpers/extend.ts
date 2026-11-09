@@ -7,14 +7,17 @@
  */
 
 import { arrForEach } from "../array/forEach";
-import { ArrSlice, CALL } from "../internal/constants";
 import { objCopyProps, objDeepCopy } from "../object/copy";
 
 /**
  * @internal
  * @ignore
+ * Copies the properties of each of the arguments onto the target. The callers pass their arguments object
+ * directly rather than a copy, as (ES5+) each call has its own arguments object, the callers never reassign
+ * their named parameters (which would change a mapped arguments object in non-strict mode) and the arguments
+ * are only read during the call.
  */
-function _doExtend<T>(target: T, theArgs: any[]): any {
+function _doExtend<T>(target: T, theArgs: ArrayLike<any>): any {
     arrForEach(theArgs, (theArg) => {
         objCopyProps(target, theArg);
     });
@@ -41,7 +44,7 @@ export function deepExtend<T>(target: T, ...theArgs: any): T & any;
  * @returns - A new object or the original
  */
 export function deepExtend<T, T1, T2, T3, T4, T5, T6>(target: T, obj1?: T1, obj2?: T2, obj3?: T3, obj4?: T4, obj5?: T5, obj6?: T6): T & T1 & T2 & T3 & T4 & T5 & T6 {
-    return _doExtend(objDeepCopy(target) || {}, ArrSlice[CALL](arguments));
+    return _doExtend(objDeepCopy(target) || {}, arguments);
 }
  
 /**
@@ -61,7 +64,7 @@ export function objExtend<T>(target: T, ...theArgs: any): T & any;
  * @returns - A new object or the original
  */
 export function objExtend<T, T1, T2, T3, T4, T5, T6>(target: T, obj1?: T1, obj2?: T2, obj3?: T3, obj4?: T4, obj5?: T5, obj6?: T6): T & T1 & T2 & T3 & T4 & T5 & T6 {
-    return _doExtend(target || {}, ArrSlice[CALL](arguments));
+    return _doExtend(target || {}, arguments);
 }
 
  

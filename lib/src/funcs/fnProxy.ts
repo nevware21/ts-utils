@@ -8,7 +8,6 @@
 
 import { arrForEach } from "../array/forEach";
 import { isArray, isFunction } from "../helpers/base";
-import { ArrSlice, CALL } from "../internal/constants";
 import { fnApply, fnBind } from "./funcs";
 import { ProxyFunctionDef, TypeFuncNames } from "./types";
 
@@ -65,8 +64,10 @@ import { ProxyFunctionDef, TypeFuncNames } from "./types";
 export function createFnDeferredProxy<H, F extends (...args:any) => any>(hostFn: () => H, funcName: TypeFuncNames<H>): F {
 
     return function() {
-        // Capture the original arguments passed to the method
-        var theArgs = ArrSlice[CALL](arguments);
+        // Capture the original arguments passed to the method, these are passed directly to fnApply rather than
+        // being copied, as (ES5+) each call has its own arguments object, this function has no named parameters
+        // (so there are no mapped parameters in non-strict mode) and they are only used during this call
+        var theArgs = arguments;
         let theHost = hostFn();
 
         return fnApply(theHost[funcName] as (...args: any) => any, theHost, theArgs);

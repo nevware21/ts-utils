@@ -25,54 +25,6 @@
 export type ReadonlyRecord<K extends keyof any, V> = Readonly<Record<K, V>>;
 
 /**
- * Represents a recursive partial type where all nested properties are optional.
- * @since 0.14.0
- * @group Helpers
- * @typeParam T - The type to transform.
- * @example
- * ```ts
- * interface User {
- *     name: string;
- *     address: {
- *         street: string;
- *         city: string;
- *     };
- * }
- *
- * // All nested properties become optional
- * function updateUser(id: number, patch: DeepPartial<User>) { }
- *
- * updateUser(1, { address: { city: "Seattle" } }); // OK — street is not required
- * ```
- */
-export type DeepPartial<T> = T extends Function ? T :
-    T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>> :
-    T extends object ? { [P in keyof T]?: DeepPartial<T[P]> } : T;
-
-/**
- * Represents a recursive readonly type where all nested properties are readonly.
- * @since 0.14.0
- * @group Helpers
- * @typeParam T - The type to transform.
- * @example
- * ```ts
- * interface Config {
- *     server: {
- *         host: string;
- *         port: number;
- *     };
- * }
- *
- * const cfg: DeepReadonly<Config> = { server: { host: "localhost", port: 8080 } };
- *
- * // cfg.server.host = "example.com";  // Error: cannot assign to a read-only property
- * ```
- */
-export type DeepReadonly<T> = T extends Function ? T :
-    T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepReadonly<U>> :
-    T extends object ? { readonly [P in keyof T]: DeepReadonly<T[P]> } : T;
-
-/**
  * Represents a writable version of a type by removing readonly from top-level properties.
  * @since 0.14.0
  * @group Helpers
@@ -95,37 +47,6 @@ export type DeepReadonly<T> = T extends Function ? T :
 export type Mutable<T> = {
     -readonly [P in keyof T]: T[P]
 };
-
-/**
- * Represents a recursive required type where all nested properties are required.
- * @since 0.14.0
- * @group Helpers
- * @typeParam T - The type to transform.
- * @example
- * ```ts
- * interface Options {
- *     timeout?: number;
- *     retry?: {
- *         count?: number;
- *         delay?: number;
- *     };
- * }
- *
- * // After applying defaults every field is guaranteed to be present
- * function withDefaults(opts: Options): DeepRequired<Options> {
- *     return {
- *         timeout: opts.timeout ?? 5000,
- *         retry: {
- *             count: opts.retry?.count ?? 3,
- *             delay: opts.retry?.delay ?? 1000
- *         }
- *     };
- * }
- * ```
- */
-export type DeepRequired<T> = T extends Function ? T :
-    T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepRequired<NonNullable<U>>> :
-    T extends object ? { [P in keyof T]-?: DeepRequired<NonNullable<T[P]>> } : NonNullable<T>;
 
 /**
  * Creates a union of all property values of a type.
@@ -189,3 +110,113 @@ export type MicrotaskFn = () => void;
  * starts dropping tasks or throwing errors, depending on the implementation.
  */
 export type ScheduleMicrotaskFn = (callback: MicrotaskFn, maxQueuedTasks?: number) => void | boolean;
+
+/**
+ * A generic interface for holding a cached value
+ * @since 0.10.5
+ * @group Helpers
+ * @group Cache
+ * @typeParam T - The type of the value to be cached
+ * @example
+ * ```ts
+ * let cachedValue: ICachedValue<string> = {
+ *    v: "some value"
+ * };
+ * ```
+ */
+export interface ICachedValue<T> {
+    /**
+     * Returns the current cached value
+     */
+    v: T,
+
+    /**
+     * Returns the current cached value
+     */
+    toJSON(): T;
+}
+
+/**
+ * Interface of the object returned by the {@link getLazy} instance
+ * @since 0.4.5
+ * @group Lazy
+ */
+export interface ILazyValue<T> extends ICachedValue<T> {
+    /**
+     * Returns the current cached value from the lazy lookup, if the callback function has not yet occurred
+     * accessing the value will cause the lazy evaluation to occur and the result will be returned.
+     */
+    v: T,
+
+    /**
+     * Identifies if this instance is bypassing the internal caching mechanism which is used for testing
+     */
+    b?: boolean
+}
+
+/**
+ * The signature of the override timeout function used to create a new timeout instance, it follows the same signature as
+ * the native `setTimeout` API.
+ * @since 0.4.4
+ * @group Timer
+ * @param callback - A function to be executed after the timer expires.
+ * @param ms - The time, in milliseconds that the timer should wait before the specified function or code is executed.
+ * If this parameter is omitted, a value of 0 is used, meaning execute "immediately", or more accurately, the next event cycle.
+ * @param args - Additional arguments which are passed through to the function specified by callback.
+ * @return The returned timeoutID is a positive integer value which identifies the timer created by the call to setTimeout().
+ * This value can be passed to clearTimeout() to cancel the timeout.
+ */
+export type TimeoutOverrideFn = <TArgs extends any[]>(callback: (...args: TArgs) => void, ms?: number, ...args: TArgs) => number | any;
+
+/**
+ * The signatire of the function to override clearing a previous timeout created with the {@link TimeoutOverrideFn}, it will be passed
+ * the result returned from the {@link TimeoutOverrideFn} call.
+ * @since 0.4.5
+ * @group Timer
+ * @param timeoutId - The value returned from the previous {@link TimeoutOverrideFn}.
+ */
+export type ClearTimeoutOverrideFn = (timeoutId: number | any) => void;
+
+/**
+ * Defines the array signature used to pass the override set and clean functions for creating a timeout.
+ * The first index [0] is the set function to be used and the second index [1] is the clear function to be used.
+ * @since 0.4.5
+ * @group Timer
+ */
+export type TimeoutOverrideFuncs = [ TimeoutOverrideFn | null, ClearTimeoutOverrideFn | null ];
+
+/**
+ * The signature of an async generator function, this has the same shape as the `AsyncGeneratorFunction` provided by
+ * TypeScript v3.6 and later, it is defined here so that the exported types can be used with earlier versions. The
+ * results are `any` so a value of this type can be assigned to an `AsyncGeneratorFunction`.
+ * @since 0.20.0
+ * @group Type Identity
+ */
+export interface IAsyncGeneratorFunction {
+    /**
+     * Creates a new async generator object.
+     * @param args - The arguments for the async generator function
+     */
+    new (...args: any[]): any;
+
+    /**
+     * Calls the async generator function and returns the new async generator object.
+     * @param args - The arguments for the async generator function
+     */
+    (...args: any[]): any;
+
+    /**
+     * The number of arguments expected by the async generator function.
+     */
+    readonly length: number;
+
+    /**
+     * The name of the async generator function.
+     */
+    readonly name: string;
+
+    /**
+     * The prototype of the async generator objects created by the async generator function.
+     */
+    readonly prototype: any;
+}

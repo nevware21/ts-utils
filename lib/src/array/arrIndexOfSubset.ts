@@ -42,7 +42,7 @@ function _normalizeFromIndex(value: number | null | undefined, defValue: number)
  * of `theArray` is still considered a match against its available prefix. This makes it possible
  * to match a shorter (eg. truncated) array against a longer one, or vice-versa.
  * @function
- * @since 0.17.0
+ * @since 0.20.0
  * @group Array
  * @group ArrayLike
  * @typeParam T - Identifies the type of array elements
@@ -122,7 +122,7 @@ export function arrIndexOfSubset<T>(theArray: ArrayLike<T>, subset: ArrayLike<T>
  * elements -- so a `subset` that "runs off the end" of `theArray` is still considered a
  * match against its available prefix.
  * @function
- * @since 0.17.0
+ * @since 0.20.0
  * @group Array
  * @group ArrayLike
  * @typeParam T - Identifies the type of array elements

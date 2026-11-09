@@ -10,6 +10,7 @@ import { ArrCls, FUNCTION, LENGTH, NULL_VALUE, OBJECT, ObjProto, TO_STRING, UNDE
 import { _isPolyfillType } from "../internal/poly_helpers";
 import { _pureRef } from "../internal/treeshake_helpers";
 import { safeGet } from "./safe_get";
+import { IAsyncGeneratorFunction } from "./types";
 
 let _primitiveTypes: string[];
 
@@ -502,7 +503,7 @@ export const isGenerator: (value: any) => value is GeneratorFunction = (/*#__PUR
  * isAsyncGenerator(undefined);            // false
  * ```
  */
-export const isAsyncGenerator: (value: any) => value is AsyncGeneratorFunction = (/*#__PURE__*/_createObjIs<AsyncGeneratorFunction>("AsyncGeneratorFunction"));
+export const isAsyncGenerator: (value: any) => value is IAsyncGeneratorFunction = (/*#__PURE__*/_createObjIs<IAsyncGeneratorFunction>("AsyncGeneratorFunction"));
 
 /**
  * Checks to see if the past value is an object value
