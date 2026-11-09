@@ -9,7 +9,7 @@
 import { GET_OWN_PROPERTY_DESCRIPTOR, GET_OWN_PROPERTY_SYMBOLS, ObjClass } from "../internal/constants";
 import { isFunction, isStrictUndefined } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
-import { ILazyValue } from "../helpers/lazy";
+import { ILazyValue } from "../helpers/types";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { arrForEach } from "../array/forEach";
 import { _objPropertyIsEnumerable } from "./property_is_enumerable";
@@ -88,9 +88,7 @@ export interface ObjDefinePropDescriptor<V = any> {
  * @since 0.6.0
  * @group Object
  */
-export type ObjDefinePropDescriptorMap = {
-    [key: PropertyKey]: ObjDefinePropDescriptor
-};
+export type ObjDefinePropDescriptorMap = Record<PropertyKey, ObjDefinePropDescriptor>;
 
 /**
  * @internal

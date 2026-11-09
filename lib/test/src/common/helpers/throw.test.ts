@@ -382,6 +382,23 @@ describe("throw helpers", () => {
             assert.ok(isError(err), "isError returns true");
             assert.equal(err.message, "hello", "Message is set correctly");
         });
+
+        it("passes all of the arguments to the base class when there is no superArgsFn", () => {
+            let baseArgs: any[] = null;
+            let BaseErrorCls = createCustomError<any>("BaseArgsError", (_self, args) => {
+                baseArgs = Array.prototype.slice.call(args);
+            });
+            let ChildErrorCls = createCustomError<any>("ChildArgsError", null, BaseErrorCls);
+
+            let err = new ChildErrorCls("hello", 1, undefined, null);
+            assert.deepEqual(baseArgs, [ "hello", 1, undefined, null ], "The base class received all of the arguments");
+            assert.equal(err.message, "hello", "Message is set correctly");
+            assert.ok(err instanceof BaseErrorCls, "is a BaseArgsError");
+
+            baseArgs = null;
+            new ChildErrorCls();
+            assert.deepEqual(baseArgs, [], "The base class received no arguments");
+        });
     });
 
     describe("createCustomError internal stack capture optimization", () => {

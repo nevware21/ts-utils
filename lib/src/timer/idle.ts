@@ -16,6 +16,46 @@ let _defaultIdleTimeout = 100;
 let _maxExecutionTime = 50;
 
 /**
+ * The deadline passed to an idle callback, it describes how long the callback can run for. It has the same shape
+ * as the [IdleDeadline](https://developer.mozilla.org/en-US/docs/Web/API/IdleDeadline) provided by the DOM types
+ * of newer TypeScript versions, it is defined here so that the exported types can be used with earlier versions.
+ * @since 0.20.0
+ * @group Timer
+ */
+export interface IIdleDeadline {
+    /**
+     * True if the callback is being called because the timeout specified when it was scheduled expired.
+     */
+    readonly didTimeout: boolean;
+
+    /**
+     * Returns the estimated number of milliseconds remaining in the current idle period.
+     */
+    timeRemaining(): number;
+}
+
+/**
+ * The signature of the callback passed to `requestIdleCallback` and {@link scheduleIdleCallback}.
+ * @since 0.20.0
+ * @group Timer
+ * @param deadline - The deadline which describes how long the callback can run for.
+ */
+export type IdleCallbackFn = (deadline: IIdleDeadline) => void;
+
+/**
+ * The options for requesting an idle callback, it has the same shape as the `IdleRequestOptions` provided by the
+ * DOM types of newer TypeScript versions.
+ * @since 0.20.0
+ * @group Timer
+ */
+export interface IIdleRequestOptions {
+    /**
+     * If the callback has not been called within this number of milliseconds it is scheduled to be called anyway.
+     */
+    timeout?: number;
+}
+
+/**
  * Type alias for the global `requestIdleCallback` function, which schedules a callback to
  * be invoked during the browser's idle periods. Using a type alias makes it easier to
  * reference and annotate the function, and supports older TypeScript versions that may not
@@ -65,7 +105,7 @@ let _maxExecutionTime = 50;
  * }
  * ```
  */
-export type RequestIdleCallback = (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+export type RequestIdleCallback = (callback: IdleCallbackFn, options?: IIdleRequestOptions) => number;
 
 /**
  * Type alias for the global `cancelIdleCallback` function, which cancels a previously
@@ -239,7 +279,7 @@ export function setDefaultMaxExecutionTime(maxTime: number) {
  * theIdleTimer.refresh();
  * ```
  */
-export function scheduleIdleCallback(callback: IdleRequestCallback, options?: IdleRequestOptions): ITimerHandler {
+export function scheduleIdleCallback(callback: IdleCallbackFn, options?: IIdleRequestOptions): ITimerHandler {
     function _createDeadline(timedOut: boolean) {
         let startTime = perfNow();
         return {
@@ -253,7 +293,7 @@ export function scheduleIdleCallback(callback: IdleRequestCallback, options?: Id
     if (hasIdleCallback()) {
         let handler = _createTimerHandler(true, (idleId: number) => {
             idleId && getCancelIdleCallback()(idleId);
-            return getIdleCallback()((deadline: IdleDeadline) => {
+            return getIdleCallback()((deadline: IIdleDeadline) => {
                 handler.dn();
                 callback(deadline || _createDeadline(false));
             }, options);

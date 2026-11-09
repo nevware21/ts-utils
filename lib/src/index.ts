@@ -89,14 +89,17 @@ export { safeGet } from "./helpers/safe_get";
 export { safeGetLazy, safeGetWritableLazy, safeGetDeferred, safeGetWritableDeferred } from "./helpers/safe_lazy";
 export { throwError, throwTypeError, throwRangeError } from "./helpers/throw";
 export {
-    ReadonlyRecord, DeepPartial, DeepReadonly, Mutable, DeepRequired, ValueOf, NonEmptyArray,
-    ScheduleMicrotaskFn, MicrotaskFn
+    ReadonlyRecord, Mutable, ValueOf, NonEmptyArray,
+    ScheduleMicrotaskFn, MicrotaskFn, IAsyncGeneratorFunction
 } from "./helpers/types";
+export {
+    DeepPartial, DeepPartialArray, DeepReadonly, DeepReadonlyArray, DeepRequired, DeepRequiredArray
+} from "./helpers/deep_types";
 export { hasValue } from "./helpers/value";
 export { createArrayIterator } from "./iterator/array";
 export { CreateIteratorContext, createIterator, createIterable, createIterableIterator, makeIterable } from "./iterator/create";
 export { iterForOf } from "./iterator/forOf";
-export { IterMapCallbackFn, IterPredicateCallbackFn, IterReduceCallbackFn, ArrToMapKeySelectorFn, ArrToMapValueSelectorFn } from "./iterator/types";
+export { IterMapCallbackFn, IterPredicateCallbackFn, IterReduceCallbackFn, ArrToMapKeySelectorFn, ArrToMapValueSelectorFn, IAsyncIterable, IAsyncIterator } from "./iterator/types";
 export { iterMap } from "./iterator/iterMap";
 export { iterFilter } from "./iterator/iterFilter";
 export { iterTake } from "./iterator/iterTake";
@@ -181,7 +184,7 @@ export { WellKnownSymbols } from "./symbol/well_known";
 export { ITimerHandler } from "./timer/handler";
 export {
     hasIdleCallback, scheduleIdleCallback, setDefaultIdleTimeout, setDefaultMaxExecutionTime,
-    getIdleCallback, getCancelIdleCallback, RequestIdleCallback, CancelIdleCallback
+    getIdleCallback, getCancelIdleCallback, RequestIdleCallback, CancelIdleCallback, IIdleDeadline, IIdleRequestOptions, IdleCallbackFn
 } from "./timer/idle";
 export { scheduleInterval } from "./timer/interval";
 export { scheduleMicrotask, MicroTaskOptions, setMicroTaskFallbackOptions } from "./timer/microtask";

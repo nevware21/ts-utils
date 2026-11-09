@@ -7,7 +7,7 @@
  */
 
 import { safe } from "../helpers/safe";
-import { TimeoutOverrideFuncs } from "../timer/timeout";
+import { TimeoutOverrideFuncs } from "../helpers/types";
 import { UNDEFINED } from "./constants";
 
 const GLOBAL_CONFIG_KEY = "__tsUtils$gblCfg";

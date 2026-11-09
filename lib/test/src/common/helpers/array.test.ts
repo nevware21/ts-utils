@@ -1024,6 +1024,61 @@ describe("array helpers", () => {
             assert.deepEqual(arrSlice(lyrics, -2), [ "to", "talk" ]);
             assert.deepEqual(arrSlice(lyrics, 2, -1), [ "my", "old", "friend.", "I've", "come", "to" ]);
         });
+
+        it("array-like values and the start / end arguments", () => {
+            let arrayLike: ArrayLike<string> = { length: 3, 0: "a", 1: "b", 2: "c" };
+            assert.deepEqual(arrSlice(arrayLike), [ "a", "b", "c" ]);
+            assert.deepEqual(arrSlice(arrayLike, 1), [ "b", "c" ]);
+            assert.deepEqual(arrSlice(arrayLike, undefined, 2), [ "a", "b" ]);
+            assert.deepEqual(arrSlice(arrayLike, -2, -1), [ "b" ]);
+            assert.deepEqual(arrSlice({ length: 0 }), []);
+
+            (function(..._args: any[]) {
+                assert.deepEqual(arrSlice(arguments), [ 1, "two", undefined ]);
+                assert.deepEqual(arrSlice(arguments, 1), [ "two", undefined ]);
+            })(1, "two", undefined);
+        });
+
+        it("preserves empty slots", () => {
+            let sparse: number[] = [ 1 ];
+            sparse[2] = 3;
+
+            let result = arrSlice(sparse);
+            assert.equal(result.length, 3);
+            assert.ok(!(1 in result), "the empty slot is preserved");
+            assert.equal(result[2], 3);
+        });
+
+        it("uses the value's own slice function", () => {
+            let custom: any = {
+                length: 2,
+                0: 1,
+                1: 2,
+                slice: function(this: any, start?: number, end?: number) {
+                    return [ this === custom, arguments.length, start, end ];
+                }
+            };
+
+            assert.deepEqual(arrSlice(custom), [ true, 0, undefined, undefined ]);
+            assert.deepEqual(arrSlice(custom, 1, 2), [ true, 2, 1, 2 ]);
+
+            // Strings use String.prototype.slice
+            assert.equal(arrSlice("hello" as any, 1, 3) as any, "el");
+        });
+
+        it("throws a TypeError for null and undefined", () => {
+            let invalid: any[] = [ null, undefined ];
+            for (let lp = 0; lp < invalid.length; lp++) {
+                let caught: any = null;
+                try {
+                    arrSlice(invalid[lp]);
+                } catch (e) {
+                    caught = e;
+                }
+
+                assert.ok(caught instanceof TypeError, "Expected a TypeError for " + String(invalid[lp]) + " - " + String(caught));
+            }
+        });
     });
 
     describe("arrUnique", () => {

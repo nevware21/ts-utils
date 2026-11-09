@@ -9,31 +9,9 @@
 import { fnApply } from "../funcs/funcs";
 import { NULL_VALUE } from "../internal/constants";
 import { objDefineProp } from "../object/define";
+import { ICachedValue } from "./types";
 
-/**
- * A generic interface for holding a cached value
- * @since 0.10.5
- * @group Helpers
- * @group Cache
- * @typeParam T - The type of the value to be cached
- * @example
- * ```ts
- * let cachedValue: ICachedValue<string> = {
- *    v: "some value"
- * };
- * ```
- */
-export interface ICachedValue<T> {
-    /**
-     * Returns the current cached value
-     */
-    v: T,
-
-    /**
-     * Returns the current cached value
-     */
-    toJSON(): T;
-}
+export { ICachedValue };
 
 /**
  * Create and return a readonly {@link ICachedValue} instance that is populated with the provided value.

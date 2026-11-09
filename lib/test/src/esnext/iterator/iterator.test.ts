@@ -8,6 +8,7 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { isAsyncIterable, isIterable, isIterator } from "../../../../src/iterator/iterator";
+import { IAsyncIterable } from "../../../../src/iterator/types";
 
 describe("ESNext iterator tests", () => {
     async function* _asyncGenerator() {
@@ -38,6 +39,47 @@ describe("ESNext iterator tests", () => {
             assert.equal(isAsyncIterable([]), false, "Should reject arrays");
             assert.equal(isAsyncIterable(_generator()), false, "Should reject sync generators");
             assert.equal(isAsyncIterable({ [Symbol.asyncIterator]: 1 } as any), false, "Should require function async iterator");
+        });
+
+        it("should narrow a value so it can be used as a native AsyncIterable", async () => {
+            async function _sum(value: any): Promise<number> {
+                let total = 0;
+                if (isAsyncIterable<number>(value)) {
+                    for await (const item of value) {
+                        total += item;
+                    }
+                }
+
+                return total;
+            }
+
+            function _toNative(value: unknown): AsyncIterable<number> | null {
+                return isAsyncIterable<number>(value) ? value : null;
+            }
+
+            assert.equal(await _sum(_asyncGenerator()), 1, "Should iterate the narrowed value");
+            assert.equal(await _sum("value"), 0, "Should not iterate values that are not async iterable");
+            assert.ok(_toNative(_asyncGenerator()), "Should return the async iterable");
+            assert.equal(_toNative(1), null, "Should not return other values");
+        });
+
+        it("should accept native AsyncIterable values and retain their type", async () => {
+            const native: AsyncIterable<number> = _asyncGenerator();
+            const mixed = native as AsyncIterable<number> | string;
+            const compatible: IAsyncIterable<number> = native;
+            const backToNative: AsyncIterable<number> = compatible;
+
+            let total = 0;
+            if (isAsyncIterable(native)) {
+                for await (const item of native) {
+                    const value: number = item;
+                    total += value;
+                }
+            }
+
+            assert.equal(total, 1, "A native AsyncIterable is identified and keeps its type");
+            assert.equal(isAsyncIterable(mixed) ? "async" : mixed.charAt(0), "async", "A union is narrowed to the native type");
+            assert.equal(isAsyncIterable(backToNative), true, "The compatible type can be assigned back to the native type");
         });
 
         it("should remain distinct from sync iterator checks", () => {

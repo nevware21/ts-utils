@@ -7,7 +7,7 @@
  */
 
 import { fnApply, fnCall } from "../funcs/funcs";
-import { ArrSlice, CALL, CONSTRUCTOR, NAME, NULL_VALUE, PROTOTYPE } from "../internal/constants";
+import { CONSTRUCTOR, NAME, NULL_VALUE, PROTOTYPE } from "../internal/constants";
 import { objCreate } from "../object/create";
 import { objDefine } from "../object/define";
 import { objGetPrototypeOf } from "../object/object";
@@ -177,7 +177,9 @@ export function createCustomError<T extends ErrorConstructor = CustomErrorConstr
 
         try {
             safe(_setName, [theBaseClass, name]);
-            let _self = fnApply(theBaseClass, _this, superArgsFn ? superArgsFn(theArgs) : ArrSlice[CALL](theArgs)) || _this;
+            // The arguments object is passed directly to the base class (apply accepts any array-like) rather than
+            // being sliced into a new array, ctorFn has no named parameters and the arguments are not modified
+            let _self = fnApply(theBaseClass, _this, superArgsFn ? superArgsFn(theArgs) : theArgs) || _this;
             if (_self !== _this) {
                 // Looks like runtime error constructor reset the prototype chain, so restore it
                 let orgProto = objGetPrototypeOf(_this);

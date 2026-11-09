@@ -9,6 +9,7 @@
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 import { isFunction, isStrictNullOrUndefined } from "../helpers/base";
+import { IAsyncIterable } from "./types";
 
 /**
  * Checks if the type of value looks like an iterator instance (contains a next function).
@@ -72,9 +73,15 @@ export function isIterable<T = any>(value: any): value is Iterable<T> {
  * isAsyncIterable(undefined);   // false
  * isAsyncIterable("null");      // false
  * isAsyncIterable([]);          // false
+ *
+ * async function* asyncGenerator() {
+ *     yield 1;
+ * }
+ *
+ * isAsyncIterable(asyncGenerator());  // true
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function isAsyncIterable<T = any>(value: any): value is AsyncIterable<T> {
+export function isAsyncIterable<T = any>(value: any): value is IAsyncIterable<T> {
     return !isStrictNullOrUndefined(value) && isFunction(value[getKnownSymbol(WellKnownSymbols.asyncIterator)]);
 }
