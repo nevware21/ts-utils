@@ -10,6 +10,8 @@ import { assert } from "@nevware21/tripwire-chai";
 import { objCopyProps, objDeepCopy } from "../../../../src/object/copy";
 import { isDate } from "../../../../src/helpers/base";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
+import { objExtend } from "../../../../src/helpers/extend";
+import { getGlobal } from "../../../../src/helpers/environment";
 
 /**
  * Helper function to check if an array contains a deep equal item
@@ -421,5 +423,149 @@ describe("object copy functions", () => {
             assert.isObject(result.customInstance, "Custom instance should be copied as an object");
             assert.equal(result.customInstance.value, "custom", "Custom instance should have the same properties");
         });
+    });
+});
+
+describe("objCopyProps and objDeepCopy behaviors", () => {
+    const POLLUTED = "tsUtilsPollutedTestValue";
+
+    afterEach(() => {
+        delete (Object.prototype as any)[POLLUTED];
+    });
+
+    it("should not change a built-in prototype target", () => {
+        const source: any = {};
+        source[POLLUTED] = 1;
+
+        assert.equal(objCopyProps(Object.prototype, source), Object.prototype, "The target is returned");
+        assert.equal(({} as any)[POLLUTED], undefined, "objCopyProps did not change Object.prototype");
+
+        objExtend(Object.prototype, source);
+        assert.equal(({} as any)[POLLUTED], undefined, "objExtend did not change Object.prototype");
+    });
+
+    it("should still copy to the prototype of a class", () => {
+        function TestClass() { }
+        objCopyProps(TestClass.prototype, { value: 21 });
+
+        assert.equal(new (TestClass as any)().value, 21);
+    });
+
+    it("should only copy own enumerable properties", () => {
+        const source = Object.create({ inherited: 1 });
+        source.own = 2;
+
+        assert.deepEqual(objCopyProps({}, source), { own: 2 });
+        assert.deepEqual(objExtend({}, source), { own: 2 });
+    });
+
+    it("should not copy properties named constructor or prototype", () => {
+        assert.deepEqual(objDeepCopy<any>({ constructor: "Acme", prototype: 1, a: 2 }), { a: 2 });
+    });
+
+    it("should copy primitive values without a handler", () => {
+        const source = { a: 1, b: "two", c: true, d: null as any, e: undefined as any };
+        const result = objDeepCopy(source);
+
+        assert.deepEqual(result, source);
+        assert.ok(result !== source, "A new object is returned");
+        assert.equal(objDeepCopy(21), 21);
+        assert.equal(objDeepCopy(null), null);
+    });
+
+    it("should still call a handler for primitive values", () => {
+        const result = objDeepCopy({ a: 1, b: 2 }, (details) => {
+            if (details.isPrim && details.value === 1) {
+                details.result = 42;
+                return true;
+            }
+
+            return false;
+        });
+
+        assert.deepEqual(result, { a: 42, b: 2 });
+    });
+
+    function _paths(source: any) {
+        const paths: string[] = [];
+        objDeepCopy(source, (details) => {
+            paths.push(JSON.stringify(details.path));
+            return false;
+        });
+
+        return paths;
+    }
+
+    it("should include an empty string key in the path", () => {
+        const source: any = { y: { z: 2 } };
+        source[""] = { x: 1 };
+
+        const paths = _paths(source);
+        assert.ok(paths.indexOf("[\"\"]") !== -1, "The empty key is in the path: " + paths.join(" "));
+        assert.ok(paths.indexOf("[\"\",\"x\"]") !== -1, "A child of the empty key is in the path: " + paths.join(" "));
+    });
+
+    it("should include a key of 0 passed to the handlers copy function", () => {
+        const paths: string[] = [];
+        objDeepCopy({ a: 1 }, (details) => {
+            paths.push(JSON.stringify(details.path));
+            if (details.path.length === 0) {
+                details.result = details.copy(details.value.a, 0);
+                return true;
+            }
+
+            return false;
+        });
+
+        assert.ok(paths.indexOf("[0]") !== -1, "The key is in the path: " + paths.join(" "));
+    });
+
+    function _checkReferences() {
+        const shared = { value: 1 };
+        const source: any = { first: shared, second: shared };
+        source.self = source;
+
+        const result = objDeepCopy(source);
+
+        return {
+            selfIsResult: result.self === result,
+            sameCopy: result.first === result.second,
+            notSource: result.first !== shared,
+            value: result.first.value
+        };
+    }
+
+    const expectedReferences = { selfIsResult: true, sameCopy: true, notSource: true, value: 1 };
+
+    it("should retain recursive and shared references", () => {
+        assert.deepEqual(_checkReferences(), expectedReferences);
+    });
+
+    it("should retain recursive and shared references without a native Map", () => {
+        const theGlobal: any = getGlobal();
+        const orgMap = theGlobal.Map;
+        let result: any;
+
+        theGlobal.Map = undefined;
+        try {
+            result = _checkReferences();
+        } finally {
+            theGlobal.Map = orgMap;
+        }
+
+        assert.deepEqual(result, expectedReferences);
+    });
+
+    it("should copy a large array of objects", () => {
+        const source: any[] = [];
+        for (let lp = 0; lp < 5000; lp++) {
+            source.push({ id: lp });
+        }
+
+        const result = objDeepCopy(source);
+
+        assert.equal(result.length, 5000);
+        assert.equal(result[4999].id, 4999);
+        assert.ok(result[0] !== source[0], "The entries are copied");
     });
 });

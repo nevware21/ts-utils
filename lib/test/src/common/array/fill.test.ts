@@ -149,3 +149,44 @@ describe("polyArrFill", () => {
         assert.equal(arrayLike[3], 4);
     });
 });
+
+describe("polyArrFill index conversion", () => {
+    it("should convert the indexes to integers like the native function", () => {
+        assert.deepEqual(polyArrFill([1, 2, 3], 9, 0.5), [9, 9, 9], "A fractional start is truncated");
+        assert.deepEqual(polyArrFill([1, 2, 3], 9, NaN), [9, 9, 9], "A NaN start is treated as 0");
+        assert.deepEqual(polyArrFill([1, 2, 3], 9, 1, 2.5), [1, 9, 3], "A fractional end is truncated");
+        assert.deepEqual(polyArrFill([1, 2, 3], 9, 0, NaN), [1, 2, 3], "A NaN end is treated as 0");
+    });
+
+    it("should not add fractional properties", () => {
+        assert.deepEqual(Object.keys(polyArrFill([1, 2, 3], 9, 0.5)), ["0", "1", "2"]);
+    });
+});
+
+describe("polyArrFill compared to the native function", () => {
+    const nativeFill = (Array.prototype as any).fill;
+    const values: any[] = [
+        0, 1, 2, 3, 4, 5, -1, -2, -3, -4, -5, -6,
+        0.5, 1.5, 2.5, 3.5, -0.5, -1.5, -2.5, -3.5, -4.5, -5.5,
+        NaN, Infinity, -Infinity, "1", "-1", "1.5", "abc", "", null, undefined, true, false,
+        2147483647, 2147483648, -2147483648, -2147483649, 4294967295, 4294967296, 4294967297, -4294967296,
+        9007199254740991, -9007199254740991, { valueOf: () => 1 }
+    ];
+
+    (nativeFill ? it : it.skip)("should return the same result for every kind of start and end", () => {
+        const sources = [[], [1], [1, 2, 3, 4]];
+
+        for (let lp = 0; lp < sources.length; lp++) {
+            for (let start = 0; start < values.length; start++) {
+                for (let end = 0; end < values.length; end++) {
+                    const actual = polyArrFill(sources[lp].slice(), 9, values[start], values[end]) as number[];
+                    const expected = nativeFill.call(sources[lp].slice(), 9, values[start], values[end]);
+                    const details = "length " + sources[lp].length + " start [" + String(values[start]) + "] end [" + String(values[end]) + "]";
+
+                    assert.deepEqual(actual, expected, details);
+                    assert.equal(Object.keys(actual).length, sources[lp].length, "No extra properties: " + details);
+                }
+            }
+        }
+    });
+});

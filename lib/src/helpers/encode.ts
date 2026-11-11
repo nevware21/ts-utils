@@ -6,7 +6,8 @@
  * Licensed under the MIT license.
  */
 
-import { EMPTY, NULL_VALUE, TO_STRING, UNDEF_VALUE } from "../internal/constants";
+import { EMPTY, NULL_VALUE, StrCls, TO_STRING, UNDEF_VALUE } from "../internal/constants";
+import { _pureRef } from "../internal/treeshake_helpers";
 import { asString } from "../string/as_string";
 import { strCamelCase } from "../string/conversion";
 import { strPadStart } from "../string/pad";
@@ -23,10 +24,92 @@ const DBL_QUOTE = "\"";
 const INVALID_JS_NAME = /([^\w\d_$])/g;
 const BASE64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 const HEX_CHARS = "0123456789abcdef";
+const _fromCharCode = (/*#__PURE__*/_pureRef<typeof String.fromCharCode>(StrCls, "fromCharCode"));
+// The UTF-8 byte order mark, used to identify an encoded value as containing UTF-8 text
+const UTF8_BOM = "\xEF\xBB\xBF";
+const NON_LATIN1 = /[^\0-\xFF]/;
+const NON_ASCII_CHAR = /[\uD800-\uDBFF][\uDC00-\uDFFF]|[\x80-\uFFFF]/g;
+const UTF8_SEQUENCE = /[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF]{2}|[\xF0-\xF7][\x80-\xBF]{3}|[\x80-\xFF]/g;
 let _btoa: ICachedValue<(value: string) => string>;
 let _atob: ICachedValue<(value: string) => string>;
 let _htmlEntityCache: { [key: string]: string};
 let _base64Cache: { [key: string]: number };
+
+/**
+ * @internal
+ * @ignore
+ * Returns the UTF-8 bytes (one per character) of the matched character or surrogate pair. A lone surrogate
+ * is encoded like any other 3 byte character, so that it is also reversible.
+ */
+function _utf8Encode(match: string): string {
+    let code = match.charCodeAt(0);
+    if (match.length > 1) {
+        code = 0x10000 + ((code - 0xD800) << 10) + match.charCodeAt(1) - 0xDC00;
+    }
+
+    const count = code < 0x800 ? 1 : (code < 0x10000 ? 2 : 3);
+    let result = _fromCharCode(((0xF0 << (3 - count)) & 0xFF) | (code >> (count * 6)));
+    for (let lp = count - 1; lp >= 0; lp--) {
+        result += _fromCharCode(0x80 | ((code >> (lp * 6)) & 0x3F));
+    }
+
+    return result;
+}
+
+/**
+ * @internal
+ * @ignore
+ * Identifies whether the value starts with the marker, checking the first byte first as very few values will have it
+ */
+function _hasUtf8Bom(value: string): boolean {
+    return value.charCodeAt(0) === 0xEF && strSubstr(value, 0, 3) === UTF8_BOM;
+}
+
+/**
+ * @internal
+ * @ignore
+ * Converts the text into a string of bytes (one per character) to be encoded. Text which only contains Latin-1
+ * characters already fits, otherwise (or if it would be mistaken for marked text) it becomes the UTF-8 byte order
+ * mark followed by the UTF-8 bytes, so that it can be identified and restored by {@link _fromBinary}.
+ */
+function _toBinary(value: string): string {
+    return NON_LATIN1.test(value) || _hasUtf8Bom(value) ? UTF8_BOM + strReplace(value, NON_ASCII_CHAR, _utf8Encode) : value;
+}
+
+/**
+ * @internal
+ * @ignore
+ * Converts decoded bytes back into text, the bytes are returned as-is unless they are the UTF-8 byte order mark
+ * followed by valid UTF-8.
+ */
+function _fromBinary(value: string): string {
+    if (value.length > 3 && _hasUtf8Bom(value)) {
+        let isValid = true;
+
+        const result = strReplace(strSubstr(value, 3), UTF8_SEQUENCE, (match) => {
+            const count = match.length - 1;
+            let code = match.charCodeAt(0) & (0x3F >> count);
+
+            for (let lp = 1; lp <= count; lp++) {
+                code = (code << 6) | (match.charCodeAt(lp) & 0x3F);
+            }
+
+            // Reject stray bytes, overlong sequences and values which are not valid code points
+            if (!count || code < (1 << (count * 5 + 1)) || code > 0x10FFFF) {
+                isValid = false;
+                return match;
+            }
+
+            return code < 0x10000 ? _fromCharCode(code) : _fromCharCode(0xD800 + ((code - 0x10000) >> 10), 0xDC00 + ((code - 0x10000) & 0x3FF));
+        });
+
+        if (isValid) {
+            return result;
+        }
+    }
+
+    return value;
+}
 
 /**
  * Validates that the string name conforms to the JS IdentifierName specification and if not
@@ -189,7 +272,9 @@ export function encodeAsHtml(value: string) {
 }
 
 /**
- * Encode a string value as Base64
+ * Encode a string value as Base64.
+ * Text containing characters above `U+00FF` is encoded as the UTF-8 byte order mark followed by its UTF-8 bytes, so
+ * it can be restored by the matching decode function. All other text is encoded as one byte per character.
  * @since 0.13.0
  * @group Encoding
  * @group Conversion
@@ -200,6 +285,7 @@ export function encodeAsHtml(value: string) {
  * encodeAsBase64("Hello"); // "SGVsbG8="
  * encodeAsBase64("Hello World"); // "SGVsbG8gV29ybGQ="
  * encodeAsBase64(""); // ""
+ * encodeAsBase64("€"); // "77u/4oKs"
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
@@ -207,11 +293,11 @@ export function encodeAsBase64(value: string): string {
     let result: string;
 
     if (value || !isStrictNullOrUndefined(value)) {
-        result = asString(value);
+        result = _toBinary(asString(value));
 
         try {
-            // Use native btoa if available
-            !_btoa && (_btoa = safeGetDeferred(() => !isUndefined(btoa) ? btoa : _encodeBase64Polyfill, _encodeBase64Polyfill));
+            // Use native btoa if available, wrapped as it can't be called with the cached value as `this` in a browser
+            !_btoa && (_btoa = safeGetDeferred(() => !isUndefined(btoa) ? (theValue: string) => btoa(theValue) : _encodeBase64Polyfill, _encodeBase64Polyfill));
             result = _btoa.v(result);
         } catch (e) {
             // Use polyfill on error
@@ -223,7 +309,9 @@ export function encodeAsBase64(value: string): string {
 }
 
 /**
- * Decode a Base64 encoded string
+ * Decode a Base64 encoded string.
+ * A value that starts with the UTF-8 byte order mark and contains valid UTF-8 is decoded as UTF-8 text, all other
+ * values are decoded as one character per byte.
  * @since 0.13.0
  * @group Encoding
  * @group Conversion
@@ -234,6 +322,7 @@ export function encodeAsBase64(value: string): string {
  * decodeBase64("SGVsbG8="); // "Hello"
  * decodeBase64("SGVsbG8gV29ybGQ="); // "Hello World"
  * decodeBase64(""); // ""
+ * decodeBase64("77u/4oKs"); // "€"
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
@@ -244,20 +333,24 @@ export function decodeBase64(value: string): string {
         result = asString(value);
 
         try {
-            // Use native atob if available
-            !_atob && (_atob = safeGetDeferred(() => !isUndefined(atob) ? atob : _decodeBase64Polyfill, _decodeBase64Polyfill));
+            // Use native atob if available, wrapped as it can't be called with the cached value as `this` in a browser
+            !_atob && (_atob = safeGetDeferred(() => !isUndefined(atob) ? (theValue: string) => atob(theValue) : _decodeBase64Polyfill, _decodeBase64Polyfill));
             result = _atob.v(result);
         } catch (e) {
             // Use polyfill on error
             result = _decodeBase64Polyfill(result);
         }
+
+        result = _fromBinary(result);
     }
 
     return result || value || EMPTY;
 }
 
 /**
- * Encode a string as URL-safe Base64
+ * Encode a string as URL-safe Base64.
+ * Text containing characters above `U+00FF` is encoded as the UTF-8 byte order mark followed by its UTF-8 bytes, so
+ * it can be restored by the matching decode function. All other text is encoded as one byte per character.
  * @since 0.13.0
  * @group Encoding
  * @group Conversion
@@ -281,7 +374,9 @@ export function encodeAsBase64Url(value: string): string {
 }
 
 /**
- * Decode a URL-safe Base64 encoded string
+ * Decode a URL-safe Base64 encoded string.
+ * A value that starts with the UTF-8 byte order mark and contains valid UTF-8 is decoded as UTF-8 text, all other
+ * values are decoded as one character per byte.
  * @since 0.13.0
  * @group Encoding
  * @group Conversion
@@ -312,7 +407,9 @@ export function decodeBase64Url(value: string): string {
 }
 
 /**
- * Encode a string as hexadecimal
+ * Encode a string as hexadecimal.
+ * Text containing characters above `U+00FF` is encoded as the UTF-8 byte order mark followed by its UTF-8 bytes, so
+ * it can be restored by the matching decode function. All other text is encoded as one byte per character.
  * @since 0.13.0
  * @group Encoding
  * @group Conversion
@@ -323,6 +420,7 @@ export function decodeBase64Url(value: string): string {
  * encodeAsHex("Hello"); // "48656c6c6f"
  * encodeAsHex("A"); // "41"
  * encodeAsHex(""); // ""
+ * encodeAsHex("€"); // "efbbbfe282ac"
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
@@ -330,7 +428,7 @@ export function encodeAsHex(value: string): string {
     let result: string;
 
     if (value || !isStrictNullOrUndefined(value)) {
-        result = asString(value);
+        result = _toBinary(asString(value));
 
         let hex = [];
         for (let idx = 0; idx < result.length; idx++) {
@@ -347,7 +445,9 @@ export function encodeAsHex(value: string): string {
 }
 
 /**
- * Decode a hexadecimal encoded string
+ * Decode a hexadecimal encoded string.
+ * A value that starts with the UTF-8 byte order mark and contains valid UTF-8 is decoded as UTF-8 text, all other
+ * values are decoded as one character per byte.
  * @since 0.13.0
  * @group Encoding
  * @group Conversion
@@ -358,6 +458,7 @@ export function encodeAsHex(value: string): string {
  * decodeHex("48656c6c6f"); // "Hello"
  * decodeHex("41"); // "A"
  * decodeHex(""); // ""
+ * decodeHex("efbbbfe282ac"); // "€"
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
@@ -368,11 +469,11 @@ export function decodeHex(value: string): string {
         let theValue = asString(value);
 
         for (let idx = 0; idx < theValue.length; idx += 2) {
-            result.push(String.fromCharCode(parseInt(strSubstr(theValue, idx, 2), 16)));
+            result.push(_fromCharCode(parseInt(strSubstr(theValue, idx, 2), 16)));
         }
     }
 
-    return result.join("");
+    return _fromBinary(result.join(""));
 }
 
 /**
@@ -504,14 +605,14 @@ export function _decodeBase64Polyfill(str: string): string {
             let d = _base64Cache[str[idx++]] || 0;
             let bitmap = (a << 18) | (b << 12) | (c << 6) | d;
 
-            result.push(String.fromCharCode((bitmap >> 16) & 255));
+            result.push(_fromCharCode((bitmap >> 16) & 255));
 
             if (str[idx - 2] !== "=") {
-                result.push(String.fromCharCode((bitmap >> 8) & 255));
+                result.push(_fromCharCode((bitmap >> 8) & 255));
             }
 
             if (str[idx - 1] !== "=") {
-                result.push(String.fromCharCode(bitmap & 255));
+                result.push(_fromCharCode(bitmap & 255));
             }
         }
     }

@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { isArrayLike } from "../helpers/base";
 import { arrUnique } from "./unique";
 import { arrAppend } from "./append";
 import { arrSlice } from "./slice";
@@ -39,7 +40,9 @@ export function arrUnion<T>(): T[] {
     let theArgs = arguments;
 
     arrForEach(theArgs, (arr) => {
-        combined = arrAppend(combined, arrSlice(arr));
+        if (isArrayLike(arr)) {
+            combined = arrAppend(combined, arrSlice(arr));
+        }
     });
     
     return arrUnique(combined);

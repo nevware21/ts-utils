@@ -50,4 +50,10 @@ describe("arrIntersection", () => {
     it("should remove duplicates from result", () => {
         assert.deepEqual(arrIntersection([1, 2, 2, 3, 3], [2, 3]), [2, 3]);
     });
+
+    it("should treat a later null or undefined array as empty", () => {
+        assert.deepEqual(arrIntersection([1, 2], null), []);
+        assert.deepEqual(arrIntersection([1, 2], [1], undefined), []);
+        assert.deepEqual(arrIntersection(null, [1, 2]), []);
+    });
 });

@@ -10,7 +10,6 @@ import { polyArrAt } from "../array/at";
 import { StrProto } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
-import { mathToInt } from "../math/to_int";
 import { asString } from "./as_string";
 
 /**
@@ -71,5 +70,5 @@ export function polyStrAt(value: string, index: number): string | undefined {
     _throwIfNullOrUndefined(value);
 
     // Reuse the Array.at polyfill for index normalization and bounds behavior.
-    return polyArrAt(asString(value), mathToInt(index));
+    return polyArrAt(asString(value), index);
 }

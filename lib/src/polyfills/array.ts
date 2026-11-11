@@ -271,8 +271,9 @@ export function polyArrFindLast<T, E extends T>(theArray: ArrayLike<T>, callback
 export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
     let result = -1;
     let len = theArray[LENGTH] >>> 0;
+    // Like the native function every index is visited (an empty slot is undefined), so there is no "in" check
     for (let idx = len - 1; idx >= 0; idx--) {
-        if (idx in theArray && callbackFn[CALL](isStrictNullOrUndefined(thisArg) ? theArray as any : thisArg, theArray[idx], idx, theArray)) {
+        if (callbackFn[CALL](isStrictNullOrUndefined(thisArg) ? theArray as any : thisArg, theArray[idx], idx, theArray)) {
             result = idx;
             break;
         }

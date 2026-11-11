@@ -7,6 +7,8 @@
  */
 
 import { isArrayLike } from "../helpers/base";
+import { FUNCTION, OBJECT } from "../internal/constants";
+import { _createIdentityMap } from "../internal/identity_map";
 import { objCreate } from "../object/create";
 import { objHasOwn } from "../object/has_own";
 import { arrForEach } from "./forEach";
@@ -39,13 +41,24 @@ export function arrUnique<T>(theArray: ArrayLike<T> | null | undefined): T[] {
 
     if (isArrayLike(theArray)) {
         const seen: any = objCreate(null);
+        const seenRefs = _createIdentityMap<number>();
 
         arrForEach(theArray, (item) => {
-            const key = ((typeof item) + "_" + item);
-            
-            if (!objHasOwn(seen, key)) {
-                seen[key] = 1;
-                result.push(item);
+            const theType = typeof item;
+
+            if (theType === "symbol" || theType === FUNCTION || (item && theType === OBJECT)) {
+                // Objects, functions and symbols are only equal to themselves
+                if (!seenRefs.g(item)) {
+                    seenRefs.s(item, 1);
+                    result.push(item);
+                }
+            } else {
+                const key = theType + "_" + item;
+
+                if (!objHasOwn(seen, key)) {
+                    seen[key] = 1;
+                    result.push(item);
+                }
             }
         });
     }

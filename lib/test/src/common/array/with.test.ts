@@ -189,3 +189,43 @@ describe("polyArrWith", () => {
         }
     });
 });
+
+describe("polyArrWith index conversion", () => {
+    it("should convert the index to an integer like the native function", () => {
+        assert.deepEqual(polyArrWith([1, 2, 3], 1.5, 9), [1, 9, 3], "A fraction is truncated");
+        assert.deepEqual(polyArrWith([1, 2, 3], -1.5, 9), [1, 2, 9], "A negative fraction is truncated");
+        assert.deepEqual(polyArrWith([1, 2, 3], NaN, 9), [9, 2, 3], "NaN is treated as 0");
+    });
+});
+
+describe("polyArrWith compared to the native function", () => {
+    const nativeWith = (Array.prototype as any).with;
+    const values: any[] = [
+        0, 1, 2, 3, 4, 5, -1, -2, -3, -4, -5, -6,
+        0.5, 1.5, 2.5, 3.5, -0.5, -1.5, -2.5, -3.5, -4.5, -5.5,
+        NaN, Infinity, -Infinity, "1", "-1", "1.5", "abc", "", null, undefined, true, false,
+        2147483647, 2147483648, -2147483648, -2147483649, 4294967295, 4294967296, 4294967297, -4294967296,
+        9007199254740991, -9007199254740991, { valueOf: () => 1 }
+    ];
+
+    function _run(fn: () => number[]) {
+        try {
+            return fn();
+        } catch (e) {
+            return (e as any).name;
+        }
+    }
+
+    (nativeWith ? it : it.skip)("should return the same result or throw for every kind of index", () => {
+        const arrays = [[], [1], [1, 2, 3, 4]];
+
+        for (let lp = 0; lp < arrays.length; lp++) {
+            for (let idx = 0; idx < values.length; idx++) {
+                const theArray = arrays[lp];
+                const value = values[idx];
+
+                assert.deepEqual(_run(() => polyArrWith(theArray, value, 9)), _run(() => nativeWith.call(theArray, value, 9)), "length " + theArray.length + " index [" + String(value) + "]");
+            }
+        }
+    });
+});

@@ -6,9 +6,9 @@
  * Licensed under the MIT license.
  */
 
-import { arrForEach } from "../array/forEach";
-import { isArray, isDate, isPrimitiveType } from "../helpers/base";
+import { isArray, isDate, isPrimitiveType, isStrictUndefined } from "../helpers/base";
 import { CALL, FUNCTION, NULL_VALUE, OBJECT } from "../internal/constants";
+import { _IdentityMap, _createIdentityMap } from "../internal/identity_map";
 import { objDefine } from "./define";
 import { forEachOwnKeySafe } from "./forEachOwnKey";
 import { isPlainObject } from "./is_plain_object";
@@ -76,20 +76,14 @@ const defaultDeepCopyHandlers: ObjDeepCopyHandler[] = [
  * @returns The new deep copied property, may be incomplete as the object is recursive and is still in the process of being copied
  */
 /*#__NO_SIDE_EFFECTS__*/
-function _getSetVisited(visitMap: _RecursiveVisitMap[], source: any, newPath: Array<string | number | symbol>, cb: (newEntry: _RecursiveVisitMap) => void) {
-    let theEntry: _RecursiveVisitMap;
-    arrForEach(visitMap, (entry) => {
-        if (entry.k === source) {
-            theEntry = entry;
-            return -1;
-        }
-    });
+function _getSetVisited(visitMap: _IdentityMap<_RecursiveVisitMap>, source: any, newPath: Array<string | number | symbol>, cb: (newEntry: _RecursiveVisitMap) => void) {
+    let theEntry = visitMap.g(source);
 
     if (!theEntry) {
         // Add the target to the visit map so that deep nested objects refer to the single instance
         // Even if we have not finished processing it yet.
         theEntry = { k: source, v: source };
-        visitMap.push(theEntry);
+        visitMap.s(source, theEntry);
 
         // Now call the copy callback so that it populates the target
         cb(theEntry);
@@ -108,9 +102,15 @@ function _getSetVisited(visitMap: _RecursiveVisitMap[], source: any, newPath: Ar
  * @param key - [Optional] the current `key` for the value from the source object
  * @returns The new deep copied instance of the value.
  */
-function _deepCopy<T>(visitMap: _RecursiveVisitMap[], value: T, ctx: _DeepCopyContext, key?: string | number | symbol): T {
+function _deepCopy<T>(visitMap: _IdentityMap<_RecursiveVisitMap>, value: T, ctx: _DeepCopyContext, key?: string | number | symbol): T {
     let userHandler = ctx.handler;
-    let newPath = ctx.path ? (key ? ctx.path.concat(key) : ctx.path) : [];
+
+    if (!userHandler && (value === NULL_VALUE || isPrimitiveType(typeof value))) {
+        // A primitive is returned as-is and without a handler nothing can observe it, so don't create the context
+        return value;
+    }
+
+    let newPath = ctx.path ? (isStrictUndefined(key) ? ctx.path : ctx.path.concat(key)) : [];
 
     let newCtx: _DeepCopyContext = {
         handler: ctx.handler,
@@ -138,7 +138,7 @@ function _deepCopy<T>(visitMap: _RecursiveVisitMap[], value: T, ctx: _DeepCopyCo
         path: newPath,
         origin: ctx.src,
         copy: <T>(source: T, newKey?: string | number | symbol): T => {
-            return _deepCopy(visitMap, source, newKey ? newCtx : ctx, newKey);
+            return _deepCopy(visitMap, source, isStrictUndefined(newKey) ? ctx : newCtx, newKey);
         },
         copyTo: <T>(target: T, source: T): T => {
             return _copyProps(visitMap, target, source, newCtx);
@@ -177,15 +177,15 @@ function _deepCopy<T>(visitMap: _RecursiveVisitMap[], value: T, ctx: _DeepCopyCo
 /**
  * @internal
  * @ignore
- * Internal helper to copy all of the enumerable properties from the source object to the new target object
+ * Internal helper to copy the own enumerable properties from the source object to the new target object
  * @param visitMap - The current map of objects that have been visited
  * @param target - The target object to copy the properties to.
  * @param source - The source object to copy the properties from.
  * @param ctx - The current deep copy context
  * @returns The populated target object
  */
-function _copyProps<T>(visitMap: _RecursiveVisitMap[], target: T, source: T, ctx: _DeepCopyContext) {
-    if (!isUnsafeTarget(source)) {
+function _copyProps<T>(visitMap: _IdentityMap<_RecursiveVisitMap>, target: T, source: T, ctx: _DeepCopyContext) {
+    if (!isUnsafeTarget(target)) {
         // Copy own enumerable properties while skipping special object poisoning keys.
         forEachOwnKeySafe(source, (key, value) => {
             (target as any)[key] = _deepCopy(visitMap, value, ctx, key);
@@ -196,8 +196,10 @@ function _copyProps<T>(visitMap: _RecursiveVisitMap[], target: T, source: T, ctx
 }
 
 /**
- * Object helper to copy all of the enumerable properties from the source object to the target, the
- * properties are copied via {@link objDeepCopy}. Automatic handling of recursive properties was added in v0.4.4
+ * Object helper to copy the own enumerable properties from the source object to the target, the properties are
+ * copied via {@link objDeepCopy}. Inherited properties and properties named `__proto__`, `constructor` or `prototype`
+ * are not copied, and a target identified by {@link isUnsafeTarget} (a built-in prototype) is not changed.
+ * Automatic handling of recursive properties was added in v0.4.4
  * @group Object
  * @param target - The target object to populated
  * @param source - The source object to copy the properties from
@@ -249,7 +251,7 @@ export function objCopyProps<T>(target: T, source: any, handler?: ObjDeepCopyHan
         path: []
     };
 
-    return _copyProps([], target, source, ctx);
+    return _copyProps(_createIdentityMap<_RecursiveVisitMap>(), target, source, ctx);
 }
 
 /**
@@ -337,7 +339,7 @@ export type ObjDeepCopyHandler = (details: IObjDeepCopyHandlerDetails) => boolea
  * Performs a deep copy of the source object, this is designed to work with base (plain) objects, arrays and primitives
  * if the source object contains class objects they will either be not cloned or may be considered non-operational after
  * performing a deep copy. ie. This is performing a deep copy of the objects properties so that altering the copy will
- * not mutate the source object hierarchy.
+ * not mutate the source object hierarchy. Properties named `__proto__`, `constructor` or `prototype` are not copied.
  * Automatic handling of recursive properties was added in v0.4.4.
  * @group Object
  * @group Object - Deep Copy
@@ -390,7 +392,7 @@ export function objDeepCopy<T>(source: T, handler?: ObjDeepCopyHandler): T {
         src: source
     };
 
-    return _deepCopy([], source, ctx);
+    return _deepCopy(_createIdentityMap<_RecursiveVisitMap>(), source, ctx);
 }
 
 /**

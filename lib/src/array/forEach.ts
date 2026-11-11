@@ -6,8 +6,8 @@
  * Licensed under the MIT license.
  */
 
-import { isStrictNullOrUndefined } from "../helpers/base";
-import { CALL, LENGTH } from "../internal/constants";
+import { isStrictNullOrUndefined, isString } from "../helpers/base";
+import { CALL, LENGTH, ObjClass } from "../internal/constants";
 
 /**
  * Calls the provided `callbackFn` function once for each element in an array in ascending index order. It is not invoked for index properties
@@ -56,8 +56,10 @@ export function arrForEach<T = any>(theArray: ArrayLike<T>, callbackfn: (value: 
 export function arrForEach<T = any, A extends ArrayLike<T> = ArrayLike<T>>(theArray: A, callbackfn: (value: T, index: number, array: A) => void | number, thisArg?: any): void {
     if (theArray) {
         const len = theArray[LENGTH] >>> 0;
+        // The "in" operator throws for a string primitive (which is ArrayLike), so use its object form
+        const theObj: any = isString(theArray) ? ObjClass(theArray) : theArray;
         for (let idx = 0; idx < len; idx++) {
-            if (idx in theArray) {
+            if (idx in theObj) {
                 if (callbackfn[CALL](isStrictNullOrUndefined(thisArg) ? theArray as any : thisArg, theArray[idx], idx, theArray) === -1) {
                     break;
                 }

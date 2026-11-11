@@ -6,9 +6,9 @@
  * Licensed under the MIT license.
  */
 
-import { ArrProto } from "../internal/constants";
+import { ArrProto, ArrSlice, CALL } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
-import { isArrayLike } from "../helpers/base";
+import { isArrayLike, isString } from "../helpers/base";
 import { getLength } from "../helpers/length";
 import { arrSlice } from "./slice";
 import { throwRangeError } from "../helpers/throw";
@@ -65,20 +65,24 @@ export function polyArrWith<T>(theArray: ArrayLike<T>, index: number, value: T):
     }
     
     const len = getLength(theArray);
-    let idx = index;
-    
+    // Convert the index (NaN becomes 0), any other value outside of the range is rejected by the check
+    let idx = +index || 0;
+
+    // Check bounds first, as the bitwise truncation is only valid for values within the range of the array
+    if (!len || idx <= -len - 1 || idx >= len) {
+        throwRangeError("Index out of bounds");
+    }
+
+    idx |= 0;
+
     // Convert negative index to positive
     if (idx < 0) {
         idx = len + idx;
     }
     
-    // Check bounds
-    if (idx < 0 || idx >= len) {
-        throwRangeError("Index out of bounds");
-    }
-    
     // Create a copy and set value
-    result = arrSlice(theArray);
+    // A string has its own slice which returns a string, which can't be changed
+    result = isString(theArray) ? ArrSlice[CALL](theArray) : arrSlice(theArray);
     result[idx] = value;
     
     return result;

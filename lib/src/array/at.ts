@@ -54,16 +54,13 @@ export function polyArrAt<T>(theArray: ArrayLike<T>, index: number): T | undefin
     
     if (isArrayLike(theArray)) {
         const len = theArray.length;
-        let idx = index;
-        
-        // Convert negative index to positive
-        if (idx < 0) {
-            idx = len + idx;
-        }
-        
-        // Check bounds and get value
-        if (idx >= 0 && idx < len) {
-            result = theArray[idx];
+        // Convert the index (NaN becomes 0), any other value outside of the range is rejected by the check
+        let idx = +index || 0;
+
+        // Check bounds first, as the bitwise truncation is only valid for values within the range of the array
+        if (len && idx > -len - 1 && idx < len) {
+            idx |= 0;
+            result = theArray[idx < 0 ? len + idx : idx];
         }
     }
     

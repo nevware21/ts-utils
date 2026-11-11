@@ -26,6 +26,19 @@
   - `ObjDefinePropDescriptorMap` is now `Record<PropertyKey, ObjDefinePropDescriptor>` (unchanged on TypeScript v4.4 and later)
   - `isAsyncGenerator` now narrows to the new `IAsyncGeneratorFunction` (assignable to `AsyncGeneratorFunction`), and `RequestIdleCallback` / `scheduleIdleCallback` use the new `IdleCallbackFn`, `IIdleDeadline` and `IIdleRequestOptions` (the same shapes as the DOM types) as these are not provided by older TypeScript versions
   - `isAsyncIterable` now narrows to the new `IAsyncIterable` (and `IAsyncIterator`) so the exported types no longer require the ES2018 lib. With TypeScript v4.3 and later it is interchangeable with the native `AsyncIterable`, older compilers using the ES2018 lib see `any` (so a value declared as a union with `AsyncIterable` is no longer narrowed on those versions)
+- `arrUnique` and `arrUnion` no longer discard distinct values. Objects, arrays, functions and dates were compared by their string form, so `arrUnique([{ a: 1 }, { b: 2 }])` returned `[{ a: 1 }]` and a `Symbol` threw a `TypeError`; these are now compared by identity, as documented
+- `encodeAsBase64`, `decodeBase64` and the URL-safe variants now use the native `btoa` / `atob` in browsers. The native functions were called with the wrong `this` so every call failed and used the polyfill, which gave different results to Node, eg. `decodeBase64("QQ")` returned `"A\0\0"` (now `"A"`) and values containing a line break were corrupted
+- `encodeAsHex`, `encodeAsBase64` and `encodeAsBase64Url` no longer corrupt text containing characters above `U+00FF`, and it is restored by the matching decode function
+  - **Output change:** only for text which was previously corrupted, this is now encoded as the UTF-8 byte order mark followed by the UTF-8 bytes, eg. `encodeAsHex("€")` -> `"efbbbfe282ac"` (was `"ac"`). The encoding of all other text is unchanged, except for text that itself starts with the characters of that marker
+  - **Decoding change:** `decodeHex`, `decodeBase64` and `decodeBase64Url` decode a value that starts with the marker and contains valid UTF-8 as text, all other values are decoded as before
+- `objCopyProps` and `objExtend` now refuse to change a built-in prototype such as `Object.prototype` (the prototype pollution guard was checking the source rather than the target), and their documentation now states that only own enumerable properties are copied and that `__proto__`, `constructor` and `prototype` are skipped
+- `arrForEach` no longer throws when passed a string, which also fixes `arrChunk`, `arrCompact`, `arrUnique`, `arrGroupBy`, `arrPartition`, `arrDropWhile`, `arrTakeWhile`, `arrIntersection`, `arrDifference` and `arrFlatten`, and `arrShuffle` and the `polyArrWith` polyfill also now support a string
+- `polyArrFindLastIndex` and `polyArrFindLast` (used by `arrFindLastIndex` / `arrFindLast` when there is no native function) now visit every index like the native functions and as documented, previously the empty slots of a sparse array were skipped and a string threw a `TypeError`
+- `iterTake` now closes the source iterator on the `next()` following the last value (like the native `Iterator.prototype.take`), previously it was closed before the consumer received the last value
+- `arrIntersection` and `arrUnion` no longer throw for a `null` or `undefined` array after the first, `arrIntersection` treats it as empty and `arrUnion` ignores it
+- `scheduleMicrotask` and `scheduleNextTick` no longer report `enabled` for a task that was rejected by, or run synchronously by, a custom `scheduleFn`
+- `polyArrAt`, `polyArrWith` and `polyArrFill` now convert their indexes to integers like the native functions, so fractional and `NaN` indexes no longer return the wrong result or add fractional properties
+- `objDeepCopy` handlers now receive the correct `path` for an empty string key and for a key of `0` passed to `details.copy()`
 
 ### Performance Improvements
 
@@ -36,6 +49,9 @@
 - `fnBind()` now forwards the arguments object to the intrinsic `Function.prototype.bind` (`FuncCall.apply(FuncBind, arguments)`, which is `fn.bind(thisArg, ...args)`) rather than slicing the arguments into a new array and calling `fn.bind.apply()`, ~60-69% faster per call in V8 micro-benchmarks. It remains a function so the existing overloads are unchanged, and it no longer depends on the function's own (overridable) `bind` / `call` / `apply` properties
 - `arrSlice()` now uses the same native function wrapper as `arrIndexOf()` / `arrMap()` (`_unwrapFunction("slice", ArrProto)`) rather than slicing its own arguments into a new array before calling `slice`, ~16% faster in a V8 micro-benchmark (and smaller). It still uses the value's own `slice` function when present, otherwise `Array.prototype.slice`, and as it's now a `const` its `name` and `length` have changed
 - `createFnDeferredProxy()`, `objExtend()`, `deepExtend()`, `createCustomError()` (when calling the base class) and the `scheduleTimeout()` / `createTimeout()` callback wrapper now pass their `arguments` object directly rather than slicing it into a new array on every call (`objExtend()` ~29% faster in a V8 micro-benchmark). The arguments are still copied where they are kept or modified after the call returns (the timer `refresh()` arguments)
+- `objCopyProps`, `objExtend`, `deepExtend` and `objDeepCopy` no longer allocate a deep copy context for primitive values when there is no handler, ~80% faster for objects of primitive values
+- `objDeepCopy` and `objCopyProps` now track visited objects with a `Map` when available (a linear search otherwise), so they no longer slow down quadratically as the number of objects grows, eg. copying 16,000 objects went from ~585ms to ~48ms
+- `encodeAsBase64` and `decodeBase64` are ~10x faster in browsers now the native functions are used, as they no longer throw and fall back to the polyfill on every call
 
 # v0.16.0 July 18th, 2026
 

@@ -44,7 +44,7 @@ export function arrIntersection<T>(): T[] {
             arrForEach(firstArray, (item) => {
                 let inAll = true;
                 arrForEach(theArrays, (arr, index) => {
-                    if (index > 0 && !arrIncludes(arr, item)) {
+                    if (index > 0 && !(isArrayLike(arr) && arrIncludes(arr, item))) {
                         inAll = false;
                         return -1; // Break out of forEach
                     }

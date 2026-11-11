@@ -555,3 +555,79 @@ describe("Base64 Polyfill Verification Against Native Implementation", () => {
         });
     }
 });
+
+describe("encoding text which is not Latin-1", () => {
+    const texts = [
+        "\u20AC",
+        "Price: \u20AC5",
+        "\u65E5\u672C\u8A9E",
+        "caf\u00E9 \u20AC",
+        "\uD83D\uDE00",
+        "a\uD83D\uDE00b\u20AC",
+        "\uD83D",
+        "\uDE00x",
+        "\u0100",
+        "\uFFFF",
+        "\uD7FF\uE000",
+        "\uFEFF",
+        "\uFEFFabc",
+        "\xEF\xBB\xBF",
+        "\xEF\xBB\xBFabc"
+    ];
+
+    function _roundTrip(name: string, encode: (value: string) => string, decode: (value: string) => string) {
+        it("round trips with " + name, () => {
+            for (let lp = 0; lp < texts.length; lp++) {
+                assert.equal(decode(encode(texts[lp])), texts[lp], "Text index " + lp);
+            }
+        });
+    }
+
+    _roundTrip("hex", encodeAsHex, decodeHex);
+    _roundTrip("base64", encodeAsBase64, decodeBase64);
+    _roundTrip("base64url", encodeAsBase64Url, decodeBase64Url);
+
+    it("encodes as the UTF-8 byte order mark followed by the UTF-8 bytes", () => {
+        assert.equal(encodeAsHex("\u20AC"), "efbbbfe282ac");
+        assert.equal(encodeAsBase64("\u20AC"), "77u/4oKs");
+        assert.equal(encodeAsBase64Url("\u20AC"), "77u_4oKs");
+        assert.equal(encodeAsHex("\uD83D\uDE00"), "efbbbff09f9880", "A surrogate pair is a single 4 byte character");
+    });
+
+    it("does not change the encoding of Latin-1 text", () => {
+        assert.equal(encodeAsHex("Hello"), "48656c6c6f");
+        assert.equal(encodeAsHex("\u00E9"), "e9");
+        assert.equal(encodeAsHex("\u00FF"), "ff");
+        assert.equal(encodeAsBase64("\u00E9"), "6Q==");
+        assert.equal(encodeAsBase64("caf\u00E9"), "Y2Fm6Q==");
+        assert.equal(decodeHex("e9"), "\u00E9");
+        assert.equal(decodeBase64("6Q=="), "\u00E9");
+    });
+
+    it("does not change how values without the marker are decoded", () => {
+        assert.equal(decodeHex("e282ac"), "\xE2\x82\xAC");
+        assert.equal(decodeBase64("4oKs"), "\xE2\x82\xAC");
+        assert.equal(decodeHex("c3a9"), "\xC3\xA9");
+    });
+
+    it("returns the bytes when the marker is not followed by valid UTF-8", () => {
+        assert.equal(decodeHex("efbbbf"), "\xEF\xBB\xBF", "Only the marker");
+        assert.equal(decodeHex("efbbbfff"), "\xEF\xBB\xBF\xFF", "Invalid byte");
+        assert.equal(decodeHex("efbbbfe282"), "\xEF\xBB\xBF\xE2\x82", "Truncated sequence");
+        assert.equal(decodeHex("efbbbfc0af"), "\xEF\xBB\xBF\xC0\xAF", "Overlong 2 byte sequence");
+        assert.equal(decodeHex("efbbbfe08080"), "\xEF\xBB\xBF\xE0\x80\x80", "Overlong 3 byte sequence");
+        assert.equal(decodeHex("efbbbff0808080"), "\xEF\xBB\xBF\xF0\x80\x80\x80", "Overlong 4 byte sequence");
+        assert.equal(decodeHex("efbbbff4908080"), "\xEF\xBB\xBF\xF4\x90\x80\x80", "Above the maximum code point");
+    });
+
+    it("decodes text with a byte order mark from another encoder", () => {
+        assert.equal(decodeHex("efbbbf48656c6c6f"), "Hello");
+        assert.equal(decodeBase64("77u/SGVsbG8="), "Hello");
+    });
+
+    (typeof atob === "function" ? it : it.skip)("decodes unpadded and wrapped values as the native function does", () => {
+        // A browser rejects the native function when called with the wrong `this`, which used the polyfill instead
+        assert.equal(decodeBase64("QQ"), "A");
+        assert.equal(decodeBase64("SGVs\nbG8="), "Hello");
+    });
+});

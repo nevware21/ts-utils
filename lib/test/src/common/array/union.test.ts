@@ -45,4 +45,20 @@ describe("arrUnion", () => {
     it("should preserve insertion order", () => {
         assert.deepEqual(arrUnion([3, 1], [2, 4]), [3, 1, 2, 4]);
     });
+
+    it("should keep distinct objects", () => {
+        const a = { a: 1 };
+        const b = { b: 2 };
+        const result = arrUnion([a], [b, a]);
+
+        assert.equal(result.length, 2);
+        assert.equal(result[0], a);
+        assert.equal(result[1], b);
+    });
+
+    it("should ignore null and undefined arrays", () => {
+        assert.deepEqual(arrUnion([1], null, [2], undefined), [1, 2]);
+        assert.deepEqual(arrUnion(null, [1]), [1]);
+        assert.deepEqual(arrUnion(null, undefined), []);
+    });
 });

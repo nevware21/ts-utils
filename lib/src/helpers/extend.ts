@@ -28,6 +28,8 @@ function _doExtend<T>(target: T, theArgs: ArrayLike<any>): any {
 /**
  * Create a new object by merging the passed arguments, this is effectively the same as calling `objExtend({}, ...theArgs)` where
  * all of the arguments are added to a new object that is returned.
+ * Only own enumerable properties are copied, inherited properties and properties named `__proto__`, `constructor` or
+ * `prototype` are not.
  * @group Object
  * @param target - The original object to be extended.
  * @param theArgs - The optional number of arguments to be copied
@@ -38,6 +40,8 @@ export function deepExtend<T>(target: T, ...theArgs: any): T & any;
 /**
  * Create a new object by merging the passed arguments, this is effectively the same as calling `objExtend({}, ...theArgs)` where
  * all of the arguments are added to a new object that is returned.
+ * Only own enumerable properties are copied, inherited properties and properties named `__proto__`, `constructor` or
+ * `prototype` are not.
  * @group Object
  * @param target - The original object to be extended.
  * @param objN - The optional number of arguments to be copied
@@ -49,6 +53,8 @@ export function deepExtend<T, T1, T2, T3, T4, T5, T6>(target: T, obj1?: T1, obj2
  
 /**
  * Extend the target object by merging the passed arguments into it
+ * Only own enumerable properties are copied, inherited properties and properties named `__proto__`, `constructor` or
+ * `prototype` are not.
  * @group Object
  * @param target - The object to be extended or overwritten
  * @param theArgs - The optional number of arguments to be copied
@@ -58,6 +64,8 @@ export function objExtend<T>(target: T, ...theArgs: any): T & any;
 
 /**
  * Extend the target object by merging the passed arguments into it
+ * Only own enumerable properties are copied, inherited properties and properties named `__proto__`, `constructor` or
+ * `prototype` are not.
  * @group Object
  * @param target - The object to be extended or overwritten
  * @param objN - The optional number of arguments to be copied

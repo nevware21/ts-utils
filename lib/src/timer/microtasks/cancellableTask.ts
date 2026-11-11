@@ -16,21 +16,24 @@ import { ITimerHandler, _TimerHandler, _createTimerHandler } from "../handler";
 export function _createCancellableTask(callback: () => void, queueFn: ScheduleMicrotaskFn, maxQueuedTasks?: number): ITimerHandler {
     let handler: _TimerHandler;
     let currentTask = 0;
+    let pendingTask = 0;
 
     function _scheduleTask() {
-        let taskId = ++currentTask;
+        let taskId = pendingTask = ++currentTask;
         let queued = queueFn(() => {
             if (taskId === currentTask) {
+                pendingTask = 0;
                 handler.dn();
                 callback();
             }
         }, maxQueuedTasks);
 
-        if (queued === false) {
-            handler.dn();
+        if (queued === false && taskId === currentTask) {
+            pendingTask = 0;
         }
 
-        return taskId;
+        // Only a task which is still waiting to run is active (it may have been rejected or have already run)
+        return pendingTask;
     }
 
     function _cancelTask(taskId: number) {

@@ -250,6 +250,26 @@ describe("array polyfills", () => {
     });
 
     describe("polyArrFindLastIndex", () => {
+        it("visits every index of a sparse array like the native function", () => {
+            const sparse: Array<number | undefined> = [1];
+            sparse[2] = 3;
+            const visited: number[] = [];
+            assert.equal(polyArrFindLastIndex(sparse, (value, index) => {
+                visited.push(index);
+                return value === undefined;
+            }), 1, "The empty slot is treated as undefined");
+            assert.deepEqual(visited, [2, 1]);
+
+            if ((Array.prototype as any).findLastIndex) {
+                const nativeVisited: number[] = [];
+                assert.equal((sparse as any).findLastIndex((value: any, index: number) => {
+                    nativeVisited.push(index);
+                    return value === undefined;
+                }), 1);
+                assert.deepEqual(visited, nativeVisited, "Matches the native function");
+            }
+        });
+
         it ("example 1", () => {
             const inventory: Array<{ name: string, quantity: number}> = [
                 { name: "apples", quantity: 2 },
