@@ -9,6 +9,7 @@
 import { isArrayLike } from "../helpers/base";
 import { arrForEach } from "./forEach";
 import { arrIncludes } from "./includes";
+import { _strArgsToArr } from "./slice";
 
 /**
  * The arrDifference() method returns a new array containing elements from the first array
@@ -35,8 +36,11 @@ import { arrIncludes } from "./includes";
 /*#__NO_SIDE_EFFECTS__*/
 export function arrDifference<T>(theArray: ArrayLike<T> | null | undefined, ...excludeArrays: ArrayLike<T>[]): T[] {
     let result: T[] = [];
-    
+
     if (isArrayLike(theArray)) {
+        // A string's own includes() matches a substring, so its characters are compared instead
+        excludeArrays = _strArgsToArr(excludeArrays) as ArrayLike<T>[];
+
         arrForEach(theArray, (item) => {
             let excluded = false;
             for (let lp = 0; lp < excludeArrays.length; lp++) {

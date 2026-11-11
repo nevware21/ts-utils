@@ -7,12 +7,12 @@
  */
 
 import { ArrFromMapFn, ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "../array/callbacks";
-import { arrForEach } from "../array/forEach";
 import { arrIndexOf } from "../array/indexOf";
 import { arrMap } from "../array/map";
 import { arrSlice } from "../array/slice";
 import { isArray, isNullOrUndefined, isStrictNullOrUndefined, objToString } from "../helpers/base";
 import { CALL, LENGTH } from "../internal/constants";
+import { _toLength } from "../helpers/length";
 import { iterForOf } from "../iterator/forOf";
 
 /**
@@ -156,15 +156,16 @@ export function polyArrFind<T, E extends T>(theArray: ArrayLike<T>, callbackFn: 
  * @return The index of the first element in the array that passes the test. Otherwise, -1.
  */
 export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
-    let result = -1;
-    arrForEach(theArray, (value, index) => {
-        if (callbackFn[CALL](isStrictNullOrUndefined(thisArg) ? theArray as any : thisArg, value, index, theArray)) {
-            result = index;
-            return -1;
-        }
-    });
+    let len = _toLength(theArray[LENGTH]);
 
-    return result;
+    // Like the native function every index is visited (an empty slot is undefined), so there is no "in" check
+    for (let idx = 0; idx < len; idx++) {
+        if (callbackFn[CALL](isStrictNullOrUndefined(thisArg) ? theArray as any : thisArg, theArray[idx], idx, theArray)) {
+            return idx;
+        }
+    }
+
+    return -1;
 }
 
 /**
@@ -270,7 +271,7 @@ export function polyArrFindLast<T, E extends T>(theArray: ArrayLike<T>, callback
  */
 export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
     let result = -1;
-    let len = theArray[LENGTH] >>> 0;
+    let len = _toLength(theArray[LENGTH]);
     // Like the native function every index is visited (an empty slot is undefined), so there is no "in" check
     for (let idx = len - 1; idx >= 0; idx--) {
         if (callbackFn[CALL](isStrictNullOrUndefined(thisArg) ? theArray as any : thisArg, theArray[idx], idx, theArray)) {

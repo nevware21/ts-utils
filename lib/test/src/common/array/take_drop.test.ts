@@ -11,6 +11,11 @@ import { arrTake } from "../../../../src/array/take";
 import { arrDrop } from "../../../../src/array/drop";
 import { arrTakeWhile } from "../../../../src/array/take_while";
 import { arrDropWhile } from "../../../../src/array/drop_while";
+import { arrRotate } from "../../../../src/array/rotate";
+import { arrShuffle } from "../../../../src/array/shuffle";
+import { arrUnion } from "../../../../src/array/union";
+import { polyArrWith } from "../../../../src/array/with";
+import { getGlobal } from "../../../../src/helpers/environment";
 
 describe("arrTake", () => {
     it("should take first n elements", () => {
@@ -137,5 +142,56 @@ describe("arrDropWhile", () => {
             return x < this.value;
         }, threshold);
         assert.deepEqual(result, [3, 4, 5]);
+    });
+});
+
+describe("array helpers return a new array for a typed array or a Buffer", () => {
+    // A value whose own slice() returns a view of the same memory, like a Node Buffer (which isn't available in a browser)
+    function _viewArray(values: number[]): Uint8Array {
+        const theArray = new Uint8Array(values);
+        (theArray as any).slice = function (start?: number, end?: number) {
+            return this.subarray(start, end);
+        };
+
+        return theArray;
+    }
+
+    function _check(name: string, fn: (value: any) => any[], expected: number[] | null) {
+        it(name, () => {
+            const sources: any[] = [_viewArray([1, 2, 3, 4]), new Uint8Array([1, 2, 3, 4])];
+            const theBuffer = (getGlobal() as any).Buffer;
+            if (theBuffer && theBuffer.from) {
+                sources.push(theBuffer.from([1, 2, 3, 4]));
+            }
+
+            for (let lp = 0; lp < sources.length; lp++) {
+                const source = sources[lp];
+                const result = fn(source);
+
+                assert.ok(Array.isArray(result), "An array is returned for source " + lp);
+                assert.deepEqual(expected ? result : result.slice().sort(), expected || [1, 2, 3, 4], "The values for source " + lp);
+
+                // Changing the result must not change the source
+                result[0] = 99;
+                assert.deepEqual(Array.prototype.slice.call(source), [1, 2, 3, 4], "The source is unchanged for source " + lp);
+            }
+        });
+    }
+
+    _check("arrDrop", (value) => arrDrop(value, 1), [2, 3, 4]);
+    _check("arrTake", (value) => arrTake(value, 2), [1, 2]);
+    _check("arrDropWhile", (value) => arrDropWhile(value, (item: number) => item < 2), [2, 3, 4]);
+    _check("arrShuffle", (value) => arrShuffle(value), null);
+    _check("arrRotate without a rotation", (value) => arrRotate(value, 0), [1, 2, 3, 4]);
+    _check("arrRotate", (value) => arrRotate(value, 1), [2, 3, 4, 1]);
+    _check("arrUnion", (value) => arrUnion(value), [1, 2, 3, 4]);
+    _check("polyArrWith", (value) => polyArrWith(value, 0, 300), [300, 2, 3, 4]);
+
+    it("polyArrWith matches the native Array with() for a typed array", () => {
+        const nativeWith = (Array.prototype as any)["with"];
+        if (nativeWith) {
+            const source = new Uint8Array([1, 2]);
+            assert.deepEqual(polyArrWith(source as any, 0, 300), nativeWith.call(source, 0, 300));
+        }
     });
 });

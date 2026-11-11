@@ -136,3 +136,30 @@ describe("polyArrAt compared to the native function", () => {
         }
     });
 });
+
+describe("polyArrAt with indexes above 2^31", () => {
+    const BIG = 0x80000000;
+
+    it("should not wrap a large index of an array-like", () => {
+        const arrayLike: any = { length: BIG + 1, 1: "wrong" };
+        arrayLike[BIG] = "x";
+
+        assert.equal(polyArrAt(arrayLike, BIG), "x");
+        assert.equal(polyArrAt(arrayLike, BIG + 0.5), "x", "A fractional index is still truncated");
+    });
+
+    it("should not wrap a large negative index", () => {
+        const arrayLike: any = { length: BIG + 2, 1: "target" };
+
+        assert.equal(polyArrAt(arrayLike, -(BIG + 1)), "target");
+    });
+
+    it("should support a sparse array longer than 2^31", () => {
+        const sparse: string[] = [];
+        sparse[1] = "wrong";
+        sparse[BIG] = "x";
+
+        assert.equal(polyArrAt(sparse, BIG), "x");
+        assert.equal(polyArrAt(sparse, -1), "x");
+    });
+});

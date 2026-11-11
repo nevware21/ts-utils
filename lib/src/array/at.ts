@@ -9,6 +9,7 @@
 import { ArrProto } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { isArrayLike } from "../helpers/base";
+import { _toLength } from "../helpers/length";
 
 /**
  * The arrAt() method takes an integer value and returns the item at that index, allowing for
@@ -53,13 +54,13 @@ export function polyArrAt<T>(theArray: ArrayLike<T>, index: number): T | undefin
     let result: T | undefined;
     
     if (isArrayLike(theArray)) {
-        const len = theArray.length;
+        const len = _toLength(theArray.length);
         // Convert the index (NaN becomes 0), any other value outside of the range is rejected by the check
         let idx = +index || 0;
 
-        // Check bounds first, as the bitwise truncation is only valid for values within the range of the array
+        // Check the bounds before truncating, which uses % as a bitwise operator would wrap the indexes of an array longer than 2^31
         if (len && idx > -len - 1 && idx < len) {
-            idx |= 0;
+            idx -= idx % 1;
             result = theArray[idx < 0 ? len + idx : idx];
         }
     }

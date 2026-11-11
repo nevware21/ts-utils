@@ -190,3 +190,25 @@ describe("polyArrFill compared to the native function", () => {
         }
     });
 });
+
+describe("polyArrFill with indexes above 2^31", () => {
+    const BIG = 0x80000000;
+
+    function _filled(value: any) {
+        return Object.keys(value).filter((key) => key !== "length");
+    }
+
+    it("should not wrap a large index", () => {
+        const arrayLike: any = { length: BIG + 3 };
+
+        polyArrFill(arrayLike, 9, BIG, BIG + 1);
+        assert.deepEqual(_filled(arrayLike), [String(BIG)]);
+    });
+
+    it("should not wrap a large negative index", () => {
+        const arrayLike: any = { length: BIG + 3 };
+
+        polyArrFill(arrayLike, 9, -(BIG + 1), 3);
+        assert.deepEqual(_filled(arrayLike), ["2"]);
+    });
+});

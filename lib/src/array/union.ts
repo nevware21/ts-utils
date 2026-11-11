@@ -9,7 +9,7 @@
 import { isArrayLike } from "../helpers/base";
 import { arrUnique } from "./unique";
 import { arrAppend } from "./append";
-import { arrSlice } from "./slice";
+import { _arrSliceToArr } from "./slice";
 import { arrForEach } from "./forEach";
 
 /**
@@ -41,7 +41,7 @@ export function arrUnion<T>(): T[] {
 
     arrForEach(theArgs, (arr) => {
         if (isArrayLike(arr)) {
-            combined = arrAppend(combined, arrSlice(arr));
+            combined = arrAppend(combined, _arrSliceToArr(arr));
         }
     });
     

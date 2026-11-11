@@ -12,12 +12,11 @@ import { asString } from "../string/as_string";
 import { strCamelCase } from "../string/conversion";
 import { strPadStart } from "../string/pad";
 import { strReplace } from "../string/replace";
-import { strRepeat } from "../string/repeat";
 import { strSubstr } from "../string/substring";
 import { strUpper } from "../string/upper_lower";
 import { isNumber, isStrictNullOrUndefined, isString, isUndefined } from "./base";
-import { ICachedValue } from "./cache";
-import { safeGetDeferred } from "./safe_lazy";
+import { getInst } from "./environment";
+import { throwError } from "./throw";
 import { dumpObj } from "./diagnostics";
 
 const DBL_QUOTE = "\"";
@@ -28,32 +27,24 @@ const _fromCharCode = (/*#__PURE__*/_pureRef<typeof String.fromCharCode>(StrCls,
 // The UTF-8 byte order mark, used to identify an encoded value as containing UTF-8 text
 const UTF8_BOM = "\xEF\xBB\xBF";
 const NON_LATIN1 = /[^\0-\xFF]/;
-const NON_ASCII_CHAR = /[\uD800-\uDBFF][\uDC00-\uDFFF]|[\x80-\uFFFF]/g;
-const UTF8_SEQUENCE = /[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF]{2}|[\xF0-\xF7][\x80-\xBF]{3}|[\x80-\xFF]/g;
-let _btoa: ICachedValue<(value: string) => string>;
-let _atob: ICachedValue<(value: string) => string>;
+const SURROGATES = /[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDFFF]/g;
+const _btoa = (/*#__PURE__*/_createBase64Fn("btoa", _encodeBase64Polyfill));
+const _atob = (/*#__PURE__*/_createBase64Fn("atob", _decodeBase64Polyfill));
 let _htmlEntityCache: { [key: string]: string};
 let _base64Cache: { [key: string]: number };
 
 /**
  * @internal
  * @ignore
- * Returns the UTF-8 bytes (one per character) of the matched character or surrogate pair. A lone surrogate
- * is encoded like any other 3 byte character, so that it is also reversible.
+ * Creates the function which calls the named native function when available, otherwise the polyfill (the decoding
+ * polyfill follows the same rules as atob(), so it also throws for a value which isn't valid). The native function is
+ * called without a `this`, as it fails in a browser when called as a member of another object.
  */
-function _utf8Encode(match: string): string {
-    let code = match.charCodeAt(0);
-    if (match.length > 1) {
-        code = 0x10000 + ((code - 0xD800) << 10) + match.charCodeAt(1) - 0xDC00;
-    }
+/*#__NO_SIDE_EFFECTS__*/
+function _createBase64Fn(name: string, polyFn: (value: string) => string) {
+    let theFn: (value: string) => string;
 
-    const count = code < 0x800 ? 1 : (code < 0x10000 ? 2 : 3);
-    let result = _fromCharCode(((0xF0 << (3 - count)) & 0xFF) | (code >> (count * 6)));
-    for (let lp = count - 1; lp >= 0; lp--) {
-        result += _fromCharCode(0x80 | ((code >> (lp * 6)) & 0x3F));
-    }
-
-    return result;
+    return (value: string) => (theFn || (theFn = getInst<(value: string) => string>(name) || polyFn))(value);
 }
 
 /**
@@ -62,7 +53,7 @@ function _utf8Encode(match: string): string {
  * Identifies whether the value starts with the marker, checking the first byte first as very few values will have it
  */
 function _hasUtf8Bom(value: string): boolean {
-    return value.charCodeAt(0) === 0xEF && strSubstr(value, 0, 3) === UTF8_BOM;
+    return value.charCodeAt(0) === 0xEF && value.substring(0, 3) === UTF8_BOM;
 }
 
 /**
@@ -73,7 +64,27 @@ function _hasUtf8Bom(value: string): boolean {
  * mark followed by the UTF-8 bytes, so that it can be identified and restored by {@link _fromBinary}.
  */
 function _toBinary(value: string): string {
-    return NON_LATIN1.test(value) || _hasUtf8Bom(value) ? UTF8_BOM + strReplace(value, NON_ASCII_CHAR, _utf8Encode) : value;
+    // An unpaired surrogate is not valid text and encodeURIComponent() rejects it, so like TextEncoder it becomes U+FFFD
+    return NON_LATIN1.test(value) || _hasUtf8Bom(value) ?
+        UTF8_BOM + strReplace(encodeURIComponent(strReplace(value, SURROGATES, (match) => match[1] ? match : "\uFFFD")), /%../g, (match) => _fromCharCode(parseInt(match.substring(1), 16))) :
+        value;
+}
+
+/**
+ * @internal
+ * @ignore
+ * Decodes the base64 value, returning undefined when it isn't valid
+ */
+function _decodeBase64(value: string): string {
+    let result: string;
+
+    try {
+        result = _fromBinary(_atob(value));
+    } catch (e) {
+        // Not a valid base64 value
+    }
+
+    return result;
 }
 
 /**
@@ -84,27 +95,10 @@ function _toBinary(value: string): string {
  */
 function _fromBinary(value: string): string {
     if (value.length > 3 && _hasUtf8Bom(value)) {
-        let isValid = true;
-
-        const result = strReplace(strSubstr(value, 3), UTF8_SEQUENCE, (match) => {
-            const count = match.length - 1;
-            let code = match.charCodeAt(0) & (0x3F >> count);
-
-            for (let lp = 1; lp <= count; lp++) {
-                code = (code << 6) | (match.charCodeAt(lp) & 0x3F);
-            }
-
-            // Reject stray bytes, overlong sequences and values which are not valid code points
-            if (!count || code < (1 << (count * 5 + 1)) || code > 0x10FFFF) {
-                isValid = false;
-                return match;
-            }
-
-            return code < 0x10000 ? _fromCharCode(code) : _fromCharCode(0xD800 + ((code - 0x10000) >> 10), 0xDC00 + ((code - 0x10000) & 0x3FF));
-        });
-
-        if (isValid) {
-            return result;
+        try {
+            return decodeURIComponent(strReplace(value.substring(3), /[%\x80-\xFF]/g, (match) => "%" + match.charCodeAt(0)[TO_STRING](16)));
+        } catch (e) {
+            // Not valid UTF-8, so the bytes are returned as-is
         }
     }
 
@@ -293,16 +287,7 @@ export function encodeAsBase64(value: string): string {
     let result: string;
 
     if (value || !isStrictNullOrUndefined(value)) {
-        result = _toBinary(asString(value));
-
-        try {
-            // Use native btoa if available, wrapped as it can't be called with the cached value as `this` in a browser
-            !_btoa && (_btoa = safeGetDeferred(() => !isUndefined(btoa) ? (theValue: string) => btoa(theValue) : _encodeBase64Polyfill, _encodeBase64Polyfill));
-            result = _btoa.v(result);
-        } catch (e) {
-            // Use polyfill on error
-            result = _encodeBase64Polyfill(result);
-        }
+        result = _btoa(_toBinary(asString(value)));
     }
 
     return result || EMPTY;
@@ -311,7 +296,8 @@ export function encodeAsBase64(value: string): string {
 /**
  * Decode a Base64 encoded string.
  * A value that starts with the UTF-8 byte order mark and contains valid UTF-8 is decoded as UTF-8 text, all other
- * values are decoded as one character per byte.
+ * values are decoded as one character per byte. Like `atob()`, ASCII whitespace is ignored and the padding is optional,
+ * a value which isn't valid Base64 is returned as-is.
  * @since 0.13.0
  * @group Encoding
  * @group Conversion
@@ -330,18 +316,7 @@ export function decodeBase64(value: string): string {
     let result: string;
 
     if (value || !isStrictNullOrUndefined(value)) {
-        result = asString(value);
-
-        try {
-            // Use native atob if available, wrapped as it can't be called with the cached value as `this` in a browser
-            !_atob && (_atob = safeGetDeferred(() => !isUndefined(atob) ? (theValue: string) => atob(theValue) : _decodeBase64Polyfill, _decodeBase64Polyfill));
-            result = _atob.v(result);
-        } catch (e) {
-            // Use polyfill on error
-            result = _decodeBase64Polyfill(result);
-        }
-
-        result = _fromBinary(result);
+        result = _decodeBase64(asString(value));
     }
 
     return result || value || EMPTY;
@@ -376,7 +351,8 @@ export function encodeAsBase64Url(value: string): string {
 /**
  * Decode a URL-safe Base64 encoded string.
  * A value that starts with the UTF-8 byte order mark and contains valid UTF-8 is decoded as UTF-8 text, all other
- * values are decoded as one character per byte.
+ * values are decoded as one character per byte. Like `atob()`, ASCII whitespace is ignored and the padding is optional,
+ * a value which isn't valid Base64 is returned as-is.
  * @since 0.13.0
  * @group Encoding
  * @group Conversion
@@ -393,14 +369,8 @@ export function decodeBase64Url(value: string): string {
     let result: string;
 
     if (value || !isStrictNullOrUndefined(value)) {
-        result = asString(value);
-        let pad = 4 - (result.length % 4);      // Add padding back
-
-        if (pad && pad !== 4) {
-            result = result + strRepeat("=", pad);
-        }
-
-        result = decodeBase64(strReplace(strReplace(result, /-/g, "+"), /_/g, "/")) || EMPTY;
+        // Like atob() the padding is optional, so only the URL-safe characters need to be converted back
+        result = _decodeBase64(strReplace(strReplace(asString(value), /-/g, "+"), /_/g, "/"));
     }
 
     return result || value || EMPTY;
@@ -434,8 +404,7 @@ export function encodeAsHex(value: string): string {
         for (let idx = 0; idx < result.length; idx++) {
             let code = result.charCodeAt(idx);
 
-            hex.push(HEX_CHARS[(code >> 4) & 0xf]);
-            hex.push(HEX_CHARS[code & 0xf]);
+            hex.push(HEX_CHARS[(code >> 4) & 0xf], HEX_CHARS[code & 0xf]);
         }
 
         result = hex.join("");
@@ -557,20 +526,12 @@ export function _encodeBase64Polyfill(str: string): string {
 
             let bitmap = (a << 16) | (b << 8) | c;
 
-            result.push(BASE64_CHARS[(bitmap >> 18) & 63]);
-            result.push(BASE64_CHARS[(bitmap >> 12) & 63]);
-
-            if (hasB) {
-                result.push(BASE64_CHARS[(bitmap >> 6) & 63]);
-            } else {
-                result.push("=");
-            }
-
-            if (hasC) {
-                result.push(BASE64_CHARS[bitmap & 63]);
-            } else {
-                result.push("=");
-            }
+            result.push(
+                BASE64_CHARS[(bitmap >> 18) & 63],
+                BASE64_CHARS[(bitmap >> 12) & 63],
+                hasB ? BASE64_CHARS[(bitmap >> 6) & 63] : "=",
+                hasC ? BASE64_CHARS[bitmap & 63] : "="
+            );
         }
     }
 
@@ -586,33 +547,34 @@ export function _decodeBase64Polyfill(str: string): string {
     let result = [];
 
     if (str || !isStrictNullOrUndefined(str)) {
-        str = asString(str);
-        let len = str.length;
+        // Like atob(), ASCII whitespace is ignored and the padding is optional
+        str = strReplace(asString(str), /[\t\n\f\r ]+/g, EMPTY);
+        if (!(str.length % 4)) {
+            str = strReplace(str, /==?$/, EMPTY);
+        }
+
+        if (str.length % 4 === 1 || /[^A-Za-z0-9+\/]/.test(str)) {
+            throwError("Invalid character");
+        }
 
         // Build the Base64 character cache if it doesn't exist
-        !_base64Cache && (_base64Cache = {});
-        if (!_base64Cache["A"]) {
+        if (!_base64Cache) {
+            _base64Cache = {};
             for (let i = 0; i < BASE64_CHARS.length; i++) {
                 _base64Cache[BASE64_CHARS[i]] = i;
             }
         }
-        
-        let idx = 0;
-        while (idx < len) {
-            let a = _base64Cache[str[idx++]] || 0;
-            let b = _base64Cache[str[idx++]] || 0;
-            let c = _base64Cache[str[idx++]] || 0;
-            let d = _base64Cache[str[idx++]] || 0;
-            let bitmap = (a << 18) | (b << 12) | (c << 6) | d;
 
-            result.push(_fromCharCode((bitmap >> 16) & 255));
+        // Each character is 6 bits, every 8 bits is a byte and any remaining bits are discarded (like atob())
+        let bits = 0;
+        let bitCount = 0;
+        for (let idx = 0; idx < str.length; idx++) {
+            bits = (bits << 6) | _base64Cache[str[idx]];
+            bitCount += 6;
 
-            if (str[idx - 2] !== "=") {
-                result.push(_fromCharCode((bitmap >> 8) & 255));
-            }
-
-            if (str[idx - 1] !== "=") {
-                result.push(_fromCharCode(bitmap & 255));
+            if (bitCount >= 8) {
+                bitCount -= 8;
+                result.push(_fromCharCode((bits >> bitCount) & 255));
             }
         }
     }

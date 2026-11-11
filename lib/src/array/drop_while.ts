@@ -10,7 +10,7 @@ import { fnCall } from "../funcs/funcs";
 import { isArrayLike } from "../helpers/base";
 import { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "./callbacks";
 import { arrForEach } from "./forEach";
-import { arrSlice } from "./slice";
+import { _arrSliceToArr } from "./slice";
 
 /**
  * The arrDropWhile() method returns a new array with elements from the beginning removed
@@ -47,7 +47,7 @@ export function arrDropWhile<T, E extends T = T>(
     if (isArrayLike(theArray)) {
         arrForEach(theArray, (item, index) => {
             if (!fnCall(callbackFn, thisArg, item, index, theArray as any)) {
-                result = arrSlice(theArray, index);
+                result = _arrSliceToArr(theArray, index);
                 return -1; // Break out of forEach
             }
         });

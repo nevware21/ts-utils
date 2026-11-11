@@ -9,7 +9,7 @@
 import { ArrProto, UNDEF_VALUE } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { isArrayLike } from "../helpers/base";
-import { getLength } from "../helpers/length";
+import { _toLength } from "../helpers/length";
 import { WritableArrayLike } from "../helpers/arrayLike";
 
 /**
@@ -24,7 +24,7 @@ import { WritableArrayLike } from "../helpers/arrayLike";
 function _getFillIdx(value: number, len: number): number {
     let idx = +value || 0;
 
-    // Check bounds first, as the bitwise truncation is only valid for values within the range of the array
+    // Check the bounds before truncating, which uses % as a bitwise operator would wrap the indexes of an array longer than 2^31
     if (idx <= -len) {
         return 0;
     }
@@ -33,7 +33,7 @@ function _getFillIdx(value: number, len: number): number {
         return len;
     }
 
-    idx |= 0;
+    idx -= idx % 1;
 
     return idx < 0 ? len + idx : idx;
 }
@@ -79,7 +79,7 @@ export const arrFill = (/*#__PURE__*/_unwrapFunctionWithPoly("fill", ArrProto, p
 /*#__NO_SIDE_EFFECTS__*/
 export function polyArrFill<T>(theArray: WritableArrayLike<T>, value: T, start?: number, end?: number): WritableArrayLike<T> {
     if (isArrayLike(theArray)) {
-        const len = getLength(theArray);
+        const len = _toLength(theArray.length);
         const startIdx = _getFillIdx(start, len);
         const endIdx = end === UNDEF_VALUE ? len : _getFillIdx(end, len);
         

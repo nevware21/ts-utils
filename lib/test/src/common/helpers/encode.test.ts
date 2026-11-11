@@ -564,8 +564,8 @@ describe("encoding text which is not Latin-1", () => {
         "caf\u00E9 \u20AC",
         "\uD83D\uDE00",
         "a\uD83D\uDE00b\u20AC",
-        "\uD83D",
-        "\uDE00x",
+        "100% \u20AC",
+        "%41 %E2%82%AC \u20AC",
         "\u0100",
         "\uFFFF",
         "\uD7FF\uE000",
@@ -592,6 +592,13 @@ describe("encoding text which is not Latin-1", () => {
         assert.equal(encodeAsBase64("\u20AC"), "77u/4oKs");
         assert.equal(encodeAsBase64Url("\u20AC"), "77u_4oKs");
         assert.equal(encodeAsHex("\uD83D\uDE00"), "efbbbff09f9880", "A surrogate pair is a single 4 byte character");
+    });
+
+    it("encodes an unpaired surrogate as U+FFFD like TextEncoder", () => {
+        assert.equal(decodeHex(encodeAsHex("\uD83D")), "\uFFFD");
+        assert.equal(decodeHex(encodeAsHex("\uDE00x")), "\uFFFDx");
+        assert.equal(decodeBase64(encodeAsBase64("a\uD83Db\uDE00\uD83D\uDE00")), "a\uFFFDb\uFFFD\uD83D\uDE00");
+        assert.equal(encodeAsHex("\uD83D"), "efbbbfefbfbd");
     });
 
     it("does not change the encoding of Latin-1 text", () => {
@@ -629,5 +636,72 @@ describe("encoding text which is not Latin-1", () => {
         // A browser rejects the native function when called with the wrong `this`, which used the polyfill instead
         assert.equal(decodeBase64("QQ"), "A");
         assert.equal(decodeBase64("SGVs\nbG8="), "Hello");
+    });
+});
+
+describe("base64 polyfills give the same results as atob() and btoa()", () => {
+    const decodeValues = [
+        "", "QQ", "QQ=", "QQ==", "QUI", "QUI=", "QUJD", "QUJDRA", "SGVsbG8=", "SGVs\nbG8=", " SGVs bG8= ", "SGVs\tbG8\r\n",
+        "SGVs\fbG8", "Q", "QQ===", "QQ=Q", "QQ==QQ==", "=", "==", "====", "A===", "AA=", "AB==", "@@@@", "a", "abc!",
+        "_-__", "+/+/", "Zm9v\u00A0YmFy", "Zm9v\u000BYmFy", "77u/4oKs"
+    ];
+
+    function _result(fn: (value: string) => string, value: string): string {
+        try {
+            return JSON.stringify(fn(value));
+        } catch (e) {
+            return "throws";
+        }
+    }
+
+    it("decodes like the documented atob() rules", () => {
+        assert.equal(_decodeBase64Polyfill("QQ"), "A", "The padding is optional");
+        assert.equal(_decodeBase64Polyfill("QUI"), "AB");
+        assert.equal(_decodeBase64Polyfill("SGVs\nbG8="), "Hello", "ASCII whitespace is ignored");
+        assert.equal(_decodeBase64Polyfill(" S G V s\tb G 8 = \r\n"), "Hello");
+        assert.equal(_result(_decodeBase64Polyfill, "@@@@"), "throws", "An invalid character throws");
+        assert.equal(_result(_decodeBase64Polyfill, "a"), "throws", "A single remaining character throws");
+        assert.equal(_result(_decodeBase64Polyfill, "QQ=Q"), "throws", "Padding before the end throws");
+    });
+
+    (typeof atob === "function" ? it : it.skip)("decodes the same values as the native atob()", () => {
+        for (let lp = 0; lp < decodeValues.length; lp++) {
+            const value = decodeValues[lp];
+            assert.equal(_result(_decodeBase64Polyfill, value), _result((theValue) => atob(theValue), value), "Value " + JSON.stringify(value));
+        }
+    });
+
+    (typeof btoa === "function" ? it : it.skip)("encodes the same values as the native btoa()", () => {
+        let allBytes = "";
+        for (let lp = 0; lp < 256; lp++) {
+            allBytes += String.fromCharCode(lp);
+        }
+
+        const values = ["", "a", "ab", "abc", "abcd", allBytes, "\u00FF\u00FE"];
+        for (let lp = 0; lp < values.length; lp++) {
+            assert.equal(_result(_encodeBase64Polyfill, values[lp]), _result((theValue) => btoa(theValue), values[lp]), "Value index " + lp);
+        }
+    });
+});
+
+describe("decoding a value which isn't valid Base64", () => {
+    it("decodeBase64 returns the value as-is", () => {
+        assert.equal(decodeBase64("@@@@"), "@@@@");
+        assert.equal(decodeBase64("a"), "a");
+        assert.equal(decodeBase64("QQ=Q"), "QQ=Q");
+    });
+
+    it("decodeBase64Url returns the value as-is", () => {
+        assert.equal(decodeBase64Url("@@@@"), "@@@@");
+        assert.equal(decodeBase64Url("a"), "a");
+        assert.equal(decodeBase64Url("ab$c"), "ab$c");
+    });
+
+    it("decodes unpadded and wrapped values", () => {
+        assert.equal(decodeBase64("SGVsbG8"), "Hello");
+        assert.equal(decodeBase64("SGVs\r\nbG8="), "Hello");
+        assert.equal(decodeBase64Url("SGVsbG8"), "Hello");
+        assert.equal(decodeBase64Url("SGVs\nbG8"), "Hello");
+        assert.equal(decodeBase64Url("_-8"), "\u00FF\u00EF");
     });
 });

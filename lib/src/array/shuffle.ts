@@ -8,10 +8,8 @@
 
 import { mathFloor } from "../math/floor";
 import { mathRandom } from "../math/random";
-import { isString } from "../helpers/base";
 import { getLength } from "../helpers/length";
-import { ArrSlice, CALL } from "../internal/constants";
-import { arrSlice } from "./slice";
+import { _arrSliceToArr } from "./slice";
 
 /**
  * The arrShuffle() method returns a new array with elements randomly shuffled.
@@ -35,8 +33,7 @@ import { arrSlice } from "./slice";
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function arrShuffle<T>(theArray: ArrayLike<T> | null | undefined): T[] {
-    // A string has its own slice which returns a string, which can't be changed
-    const result: T[] = isString(theArray) ? ArrSlice[CALL](theArray) : arrSlice(theArray);
+    const result: T[] = _arrSliceToArr(theArray);
     const len = getLength(result);
     
     // Fisher-Yates shuffle

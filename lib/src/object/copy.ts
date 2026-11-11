@@ -32,7 +32,6 @@ interface _DeepCopyContext {
  * objects.
  */
 interface _RecursiveVisitMap {
-    k: any;
     v: any;
 }
 
@@ -71,25 +70,21 @@ const defaultDeepCopyHandlers: ObjDeepCopyHandler[] = [
  * Helper function used for detecting and handling recursive properties
  * @param visitMap - The current map of objects that have been visited
  * @param source - The value (object) to be copied
- * @param newPath - The new access path from the origin to the current property
  * @param cb - The callback function to call if the current object has not already been processed.
  * @returns The new deep copied property, may be incomplete as the object is recursive and is still in the process of being copied
  */
 /*#__NO_SIDE_EFFECTS__*/
-function _getSetVisited(visitMap: _IdentityMap<_RecursiveVisitMap>, source: any, newPath: Array<string | number | symbol>, cb: (newEntry: _RecursiveVisitMap) => void) {
-    let theEntry = visitMap.g(source);
+function _getSetVisited(visitMap: _IdentityMap<_RecursiveVisitMap>, source: any, cb: (newEntry: _RecursiveVisitMap) => void) {
+    const newEntry: _RecursiveVisitMap = { v: source };
 
-    if (!theEntry) {
-        // Add the target to the visit map so that deep nested objects refer to the single instance
-        // Even if we have not finished processing it yet.
-        theEntry = { k: source, v: source };
-        visitMap.s(source, theEntry);
+    // Add the target to the visit map so that deep nested objects refer to the single instance
+    // Even if we have not finished processing it yet.
+    const theEntry = visitMap(source, newEntry);
 
-        // Now call the copy callback so that it populates the target
-        cb(theEntry);
-    }
+    // Now call the copy callback so that it populates the target
+    !theEntry && cb(newEntry);
 
-    return theEntry.v;
+    return (theEntry || newEntry).v;
 }
 
 /**
@@ -105,7 +100,19 @@ function _getSetVisited(visitMap: _IdentityMap<_RecursiveVisitMap>, source: any,
 function _deepCopy<T>(visitMap: _IdentityMap<_RecursiveVisitMap>, value: T, ctx: _DeepCopyContext, key?: string | number | symbol): T {
     let userHandler = ctx.handler;
 
-    if (!userHandler && (value === NULL_VALUE || isPrimitiveType(typeof value))) {
+    // Identify the value with at most one helper call (isPlainObject() for an object, isPrimitiveType() otherwise)
+    const theType = typeof value;
+    let isPlain = false;
+    let isPrim = value === NULL_VALUE;
+    if (!isPrim) {
+        if (value && theType === OBJECT) {
+            isPlain = isPlainObject(value);
+        } else {
+            isPrim = isPrimitiveType(theType);
+        }
+    }
+
+    if (!userHandler && isPrim) {
         // A primitive is returned as-is and without a handler nothing can observe it, so don't create the context
         return value;
     }
@@ -117,17 +124,6 @@ function _deepCopy<T>(visitMap: _IdentityMap<_RecursiveVisitMap>, value: T, ctx:
         src: ctx.src,
         path: newPath
     };
-
-    const theType = typeof value;
-    let isPlain = false;
-    let isPrim = value === NULL_VALUE;
-    if (!isPrim) {
-        if (value && theType === OBJECT) {
-            isPlain = isPlainObject(value);
-        } else {
-            isPrim = isPrimitiveType(theType);
-        }
-    }
 
     let details: IObjDeepCopyHandlerDetails = {
         type: theType,
@@ -145,8 +141,8 @@ function _deepCopy<T>(visitMap: _IdentityMap<_RecursiveVisitMap>, value: T, ctx:
         }
     };
 
-    if (!details.isPrim) {
-        return _getSetVisited(visitMap, value, newPath, (newEntry) => {
+    if (!isPrim) {
+        return _getSetVisited(visitMap, value, (newEntry) => {
 
             // Use an accessor to set the new value onto the new entry
             objDefine(details, "result", {
@@ -166,12 +162,8 @@ function _deepCopy<T>(visitMap: _IdentityMap<_RecursiveVisitMap>, value: T, ctx:
         });
     }
 
-    // Allow the user handler to override the provided value
-    if (userHandler && userHandler[CALL](ctx, details)) {
-        return details.result;
-    }
-
-    return value;
+    // Only a primitive with a user handler gets here, which can override the provided value
+    return userHandler[CALL](ctx, details) ? details.result : value;
 }
 
 /**

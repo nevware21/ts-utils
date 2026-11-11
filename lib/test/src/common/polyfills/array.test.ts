@@ -9,6 +9,9 @@
 import { assert } from "@nevware21/tripwire-chai";
 import { polyArrFind, polyArrFindIndex, polyArrFindLast, polyArrFindLastIndex, polyArrFrom, polyArrIncludes, polyIsArray } from "../../../../src/polyfills/array";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
+import { polyArrAt } from "../../../../src/array/at";
+import { polyArrFill } from "../../../../src/array/fill";
+import { polyArrWith } from "../../../../src/array/with";
 
 describe("array polyfills", () => {
     it("polyIsArray", () => {
@@ -498,4 +501,83 @@ describe("array polyfills", () => {
             super(message);
         }
     }
+});
+
+describe("array polyfills compared to the native functions", () => {
+    function _visits(fn: (value: any, callback: (value: any, index: number) => boolean) => any, theValue: any) {
+        const visited: number[] = [];
+        let result: any;
+
+        try {
+            // Stop after a few calls, so a length which isn't converted correctly can't loop for a long time
+            result = fn(theValue, (value: any, index: number) => {
+                visited.push(index);
+                return visited.length > 4;
+            });
+        } catch (e) {
+            result = "throws";
+        }
+
+        return { result: result, visited: visited };
+    }
+
+    const finds: Array<[string, Function]> = [
+        ["find", polyArrFind],
+        ["findIndex", polyArrFindIndex],
+        ["findLast", polyArrFindLast],
+        ["findLastIndex", polyArrFindLastIndex]
+    ];
+
+    const lengths: any[] = [3, 2.5, 0.5, 0, -1, -2.5, NaN, "2", "abc", true, null, undefined, Infinity];
+
+    for (let lp = 0; lp < finds.length; lp++) {
+        const name = finds[lp][0];
+        const polyFn = finds[lp][1];
+
+        it(name + " visits every index of a sparse array", () => {
+            const sparse: any[] = [1];
+            sparse[2] = 3;
+            const actual = _visits((value, cb) => polyFn(value, cb), sparse);
+            assert.deepEqual(actual.visited, name.indexOf("Last") !== -1 ? [2, 1, 0] : [0, 1, 2]);
+
+            const nativeFn = (Array.prototype as any)[name];
+            if (nativeFn) {
+                assert.deepEqual(actual, _visits((value, cb) => nativeFn.call(value, cb), sparse), "Matches the native function");
+            }
+        });
+
+        it(name + " converts the length like the native function", () => {
+            const nativeFn = (Array.prototype as any)[name];
+            for (let idx = 0; idx < lengths.length; idx++) {
+                const length = lengths[idx];
+                const actual = _visits((value, cb) => polyFn(value, cb), { length: length, 0: "a", 1: "b", 2: "c" });
+                if (nativeFn) {
+                    const expected = _visits((value, cb) => nativeFn.call(value, cb), { length: length, 0: "a", 1: "b", 2: "c" });
+                    assert.deepEqual(actual, expected, "Length " + String(length));
+                }
+            }
+
+            const noCalls = _visits((value, cb) => polyFn(value, cb), { length: -1, 0: "a" });
+            assert.deepEqual(noCalls.visited, [], "A negative length is 0");
+        });
+    }
+
+    it("at, with and fill truncate a fractional length", () => {
+        const arrayLike = () => ({ length: 2.5, 0: "a", 1: "b", 2: "c" } as any);
+
+        assert.equal(polyArrAt(arrayLike(), -1), "b");
+        assert.equal(polyArrAt(arrayLike(), 2), undefined);
+        assert.deepEqual(polyArrWith(arrayLike(), -1, "z"), ["a", "z"]);
+
+        const filled = polyArrFill(arrayLike(), "z" as any, -1);
+        assert.deepEqual([filled[0], filled[1], filled[2]], ["a", "z", "c"]);
+        assert.equal(Object.keys(filled).indexOf("1.5"), -1, "No fractional index is added");
+
+        if ((Array.prototype as any).at) {
+            const proto: any = Array.prototype;
+            assert.equal(polyArrAt(arrayLike(), -1), proto.at.call(arrayLike(), -1));
+            assert.deepEqual(polyArrWith(arrayLike(), -1, "z"), proto.with.call(arrayLike(), -1, "z"));
+            assert.deepEqual(Object.keys(polyArrFill(arrayLike(), "z" as any, -1)), Object.keys(proto.fill.call(arrayLike(), "z", -1)));
+        }
+    });
 });

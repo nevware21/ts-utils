@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { arrSlice } from "./slice";
+import { _arrSliceToArr } from "./slice";
 import { isArrayLike } from "../helpers/base";
 import { arrAppend } from "./append";
 
@@ -54,13 +54,13 @@ export function arrRotate<T>(theArray: ArrayLike<T> | null | undefined, count: n
                 // Split at rotation point and recombine
                 // For positive count: rotate left (elements shift forward)
                 result = [];
-                arrAppend(result, arrSlice(theArray, rotations));
-                arrAppend(result, arrSlice(theArray, 0, rotations));
+                arrAppend(result, _arrSliceToArr(theArray, rotations));
+                arrAppend(result, _arrSliceToArr(theArray, 0, rotations));
             }
         }
 
         if (!result) {
-            result = arrSlice(theArray);
+            result = _arrSliceToArr(theArray);
         }
     }
 

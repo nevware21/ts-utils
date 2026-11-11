@@ -6,11 +6,11 @@
  * Licensed under the MIT license.
  */
 
-import { ArrProto, ArrSlice, CALL } from "../internal/constants";
+import { ArrProto } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
-import { isArrayLike, isString } from "../helpers/base";
-import { getLength } from "../helpers/length";
-import { arrSlice } from "./slice";
+import { isArrayLike } from "../helpers/base";
+import { _toLength } from "../helpers/length";
+import { _arrSliceToArr } from "./slice";
 import { throwRangeError } from "../helpers/throw";
 
 /**
@@ -64,16 +64,16 @@ export function polyArrWith<T>(theArray: ArrayLike<T>, index: number, value: T):
         throwRangeError("Invalid array");
     }
     
-    const len = getLength(theArray);
+    const len = _toLength(theArray.length);
     // Convert the index (NaN becomes 0), any other value outside of the range is rejected by the check
     let idx = +index || 0;
 
-    // Check bounds first, as the bitwise truncation is only valid for values within the range of the array
+    // Check the bounds before truncating, which uses % as a bitwise operator would wrap the indexes of an array longer than 2^31
     if (!len || idx <= -len - 1 || idx >= len) {
         throwRangeError("Index out of bounds");
     }
 
-    idx |= 0;
+    idx -= idx % 1;
 
     // Convert negative index to positive
     if (idx < 0) {
@@ -81,8 +81,7 @@ export function polyArrWith<T>(theArray: ArrayLike<T>, index: number, value: T):
     }
     
     // Create a copy and set value
-    // A string has its own slice which returns a string, which can't be changed
-    result = isString(theArray) ? ArrSlice[CALL](theArray) : arrSlice(theArray);
+    result = _arrSliceToArr(theArray);
     result[idx] = value;
     
     return result;

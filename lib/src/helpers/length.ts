@@ -49,3 +49,19 @@ export interface IGetLength {
  * ```
  */
 export const getLength: <T extends IGetLength>(value: T) => T["length"] = (/*#__PURE__*/_unwrapProp<IGetLength>(LENGTH));
+
+/**
+ * @internal
+ * @ignore
+ * Converts the value into a length like the native array functions do (the ECMAScript ToLength() operation), which is an
+ * integer from 0 to 2^53 - 1. So NaN and negative values are 0 and fractions are truncated.
+ * @param value - The value to convert
+ * @returns The length
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function _toLength(value: any): number {
+    let len = +value;
+
+    // A length which is already a valid integer (the normal case) is returned as-is
+    return len >>> 0 === len ? len : (len > 0 ? (len < 0x1FFFFFFFFFFFFF ? len - len % 1 : 0x1FFFFFFFFFFFFF) : 0);
+}

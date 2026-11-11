@@ -9,6 +9,7 @@
 import { isArrayLike } from "../helpers/base";
 import { arrForEach } from "./forEach";
 import { arrIncludes } from "./includes";
+import { _strArgsToArr } from "./slice";
 
 /**
  * The arrIntersection() method returns a new array containing elements that exist in all provided arrays.
@@ -35,7 +36,8 @@ import { arrIncludes } from "./includes";
 export function arrIntersection<T>(...arrays: ArrayLike<T>[]): T[];
 export function arrIntersection<T>(): T[] {
     const result: T[] = [];
-    let theArrays = arguments;
+    // A string's own includes() matches a substring, so its characters are compared instead
+    let theArrays = _strArgsToArr(arguments as ArrayLike<ArrayLike<T>>);
     
     if (theArrays.length > 0) {
         
