@@ -1013,6 +1013,33 @@ describe("array helpers", () => {
     });
 
     describe("arrSlice", () => {
+        it("is declared as the type of a value whose own slice() returns its own type", () => {
+            // These are also compile time checks of the declared types
+            const typed: Uint8Array = arrSlice(new Uint8Array([1, 2, 3]), 1);
+            assert.ok(typed instanceof Uint8Array);
+            assert.deepEqual(Array.prototype.slice.call(typed), [2, 3]);
+
+            const values: number[] = arrSlice([1, 2, 3], 1);
+            assert.deepEqual(values, [2, 3]);
+
+            const arrayLike: string[] = arrSlice({ length: 2, 0: "a", 1: "b" });
+            assert.deepEqual(arrayLike, ["a", "b"]);
+
+            // A string uses its own slice(), so the result is a string
+            const str: string = arrSlice("Hello", 1, 3);
+            assert.equal(str, "el");
+
+            // A readonly array's slice() returns a new (mutable) array
+            const readOnly: ReadonlyArray<number> = [1, 2];
+            const fromReadOnly: number[] = arrSlice(readOnly);
+            fromReadOnly.push(3);
+            assert.deepEqual(fromReadOnly, [1, 2, 3]);
+
+            const anyValue: any = [1, 2];
+            const fromAny: number[] = arrSlice(anyValue);
+            assert.deepEqual(fromAny, [1, 2]);
+        });
+
         it("examples", () => {
             const lyrics = ["Hello", "Darkness", "my", "old", "friend.", "I've", "come", "to", "talk" ];
 

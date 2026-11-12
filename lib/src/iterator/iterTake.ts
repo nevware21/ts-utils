@@ -49,10 +49,6 @@ export function iterTake<T>(iter: Iterator<T> | Iterable<T>, count: number): Ite
                     } else {
                         this.v = next.value;
                         remaining--;
-                        if (remaining <= 0) {
-                            _complete();
-                        }
-
                         isDone = false;
                     }
                 }

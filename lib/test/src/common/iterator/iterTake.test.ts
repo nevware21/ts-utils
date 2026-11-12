@@ -46,4 +46,27 @@ describe("iterTake", () => {
         assert.equal(nextCount, 2, "source.next() should only be called for yielded values");
         assert.equal(returnCount, 1, "source.return() should be called once when limit is reached");
     });
+
+    it("closes the wrapped iterator after the consumer has received the last value", () => {
+        const log: string[] = [];
+        let value = 0;
+        const source: Iterator<number> = {
+            next: () => ({ done: false, value: ++value }),
+            return: (result?: any) => {
+                log.push("closed");
+                return { done: true, value: result };
+            }
+        };
+
+        const iter = iterTake(source, 2);
+        log.push("got" + iter.next().value);
+        log.push("got" + iter.next().value);
+
+        assert.deepEqual(log, ["got1", "got2"], "The source is still open when the last value is received");
+
+        assert.equal(iter.next().done, true, "The iteration is complete");
+        assert.deepEqual(log, ["got1", "got2", "closed"], "The source is closed by the following next()");
+        assert.equal(iter.next().done, true, "The iteration stays complete");
+        assert.deepEqual(log, ["got1", "got2", "closed"], "The source is only closed once");
+    });
 });

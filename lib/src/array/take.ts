@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { arrSlice } from "./slice";
+import { _arrSliceToArr } from "./slice";
 import { mathMax } from "../math/min_max";
 
 /**
@@ -33,5 +33,5 @@ import { mathMax } from "../math/min_max";
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function arrTake<T>(theArray: ArrayLike<T> | null | undefined, count: number): T[] {
-    return arrSlice(theArray, 0, mathMax(0, count));
+    return _arrSliceToArr(theArray, 0, mathMax(0, count));
 }

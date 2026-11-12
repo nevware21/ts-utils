@@ -9,9 +9,34 @@
 import { ArrProto, UNDEF_VALUE } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { isArrayLike } from "../helpers/base";
-import { getLength } from "../helpers/length";
+import { _toLength } from "../helpers/length";
 import { WritableArrayLike } from "../helpers/arrayLike";
-import { mathMax, mathMin } from "../math/min_max";
+
+/**
+ * @internal
+ * @ignore
+ * Converts a start / end value into the position within the array that it identifies, which is always in range.
+ * @param value - The value to convert (NaN becomes 0)
+ * @param len - The length of the array
+ * @returns The position within the array
+ */
+/*#__NO_SIDE_EFFECTS__*/
+function _getFillIdx(value: number, len: number): number {
+    let idx = +value || 0;
+
+    // Check the bounds before truncating, which uses % as a bitwise operator would wrap the indexes of an array longer than 2^31
+    if (idx <= -len) {
+        return 0;
+    }
+
+    if (idx >= len) {
+        return len;
+    }
+
+    idx -= idx % 1;
+
+    return idx < 0 ? len + idx : idx;
+}
 
 /**
  * The arrFill() method changes all elements in an array to a static value, from a start index
@@ -54,22 +79,9 @@ export const arrFill = (/*#__PURE__*/_unwrapFunctionWithPoly("fill", ArrProto, p
 /*#__NO_SIDE_EFFECTS__*/
 export function polyArrFill<T>(theArray: WritableArrayLike<T>, value: T, start?: number, end?: number): WritableArrayLike<T> {
     if (isArrayLike(theArray)) {
-        const len = getLength(theArray);
-        let startIdx = start === UNDEF_VALUE ? 0 : start;
-        let endIdx = end === UNDEF_VALUE ? len : end;
-        
-        // Handle negative indices
-        if (startIdx < 0) {
-            startIdx = mathMax(len + startIdx, 0);
-        } else {
-            startIdx = mathMin(startIdx, len);
-        }
-        
-        if (endIdx < 0) {
-            endIdx = mathMax(len + endIdx, 0);
-        } else {
-            endIdx = mathMin(endIdx, len);
-        }
+        const len = _toLength(theArray.length);
+        const startIdx = _getFillIdx(start, len);
+        const endIdx = end === UNDEF_VALUE ? len : _getFillIdx(end, len);
         
         // Fill the array
         for (let i = startIdx; i < endIdx; i++) {

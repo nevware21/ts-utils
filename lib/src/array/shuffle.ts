@@ -9,7 +9,7 @@
 import { mathFloor } from "../math/floor";
 import { mathRandom } from "../math/random";
 import { getLength } from "../helpers/length";
-import { arrSlice } from "./slice";
+import { _arrSliceToArr } from "./slice";
 
 /**
  * The arrShuffle() method returns a new array with elements randomly shuffled.
@@ -33,7 +33,7 @@ import { arrSlice } from "./slice";
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function arrShuffle<T>(theArray: ArrayLike<T> | null | undefined): T[] {
-    const result = arrSlice(theArray);
+    const result: T[] = _arrSliceToArr(theArray);
     const len = getLength(result);
     
     // Fisher-Yates shuffle

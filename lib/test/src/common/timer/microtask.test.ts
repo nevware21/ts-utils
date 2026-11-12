@@ -607,3 +607,92 @@ describe("microtask tests", () => {
         });
     });
 });
+
+describe("microtask handler enabled state", () => {
+    let orgQueueMicrotask: any;
+
+    beforeEach(() => {
+        orgQueueMicrotask = (<any>getGlobal()).queueMicrotask;
+        (<any>getGlobal()).queueMicrotask = undefined;
+        setBypassLazyCache(true);
+    });
+
+    afterEach(() => {
+        (<any>getGlobal()).queueMicrotask = orgQueueMicrotask;
+        setBypassLazyCache(false);
+    });
+
+    it("is not enabled when the scheduleFn rejects the task", () => {
+        let called = 0;
+        const handler = scheduleMicrotask(() => {
+            called++;
+        }, {
+            scheduleFn: () => false
+        });
+
+        assert.equal(handler.enabled, false, "The rejected task is not active");
+        assert.equal(called, 0, "The callback was not called");
+    });
+
+    it("is not enabled when the scheduleFn runs the task synchronously", () => {
+        let called = 0;
+        const handler = scheduleMicrotask(() => {
+            called++;
+        }, {
+            scheduleFn: (cb) => {
+                cb();
+            }
+        });
+
+        assert.equal(called, 1, "The callback was called");
+        assert.equal(handler.enabled, false, "The completed task is not active");
+    });
+
+    it("is enabled until a queued task has run", () => {
+        const queue: Array<() => void> = [];
+        let called = 0;
+        const handler = scheduleMicrotask(() => {
+            called++;
+        }, {
+            scheduleFn: (cb) => {
+                queue.push(cb);
+            }
+        });
+
+        assert.equal(handler.enabled, true, "The task is waiting to run");
+        queue[0]();
+        assert.equal(called, 1, "The callback was called");
+        assert.equal(handler.enabled, false, "The task has run");
+    });
+
+    it("stays enabled when a synchronous callback schedules another task", () => {
+        const queue: Array<() => void> = [];
+        let runNow = false;
+        let called = 0;
+        const handler = scheduleMicrotask(() => {
+            called++;
+            if (called === 1) {
+                handler.refresh();
+            }
+        }, {
+            scheduleFn: (cb) => {
+                if (runNow) {
+                    runNow = false;
+                    cb();
+                } else {
+                    queue.push(cb);
+                }
+            }
+        });
+
+        runNow = true;
+        handler.refresh();
+
+        assert.equal(called, 1, "The callback was called synchronously");
+        assert.equal(handler.enabled, true, "The new task is waiting to run");
+
+        queue[queue.length - 1]();
+        assert.equal(called, 2, "The new task ran");
+        assert.equal(handler.enabled, false, "There is nothing left to run");
+    });
+});
