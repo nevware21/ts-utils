@@ -6,36 +6,17 @@
  * Licensed under the MIT license.
  */
 
-import { isFunction, isObject, isStrictNullOrUndefined } from "../../helpers/base";
-import { objGetOwnPropertyDescriptor } from "../../object/get_own_property";
+import { polyObjIsSealed } from "./objIsSealed";
 
 /**
- * Polyfill implementation for Object.isFrozen
+ * Polyfill implementation for Object.isFrozen. Like the native function (since ES2015) a primitive value, including
+ * `null` and `undefined`, is always frozen, while an object or function is reported as not frozen: `Object.isFrozen`
+ * is defined by every supported (ES5) runtime, so this is only used by a runtime which can't freeze an object. It is
+ * the same function as {@link polyObjIsSealed}, as without the native functions the result is the same.
  * @since 0.12.0
  * @group Polyfill
  * @group Object
  * @param obj - The object to check if it is frozen
- * @returns A Boolean indicating whether or not the object is frozen
+ * @returns `true` for a primitive value (including `null` and `undefined`), otherwise `false`
  */
-export function polyObjIsFrozen(obj: any): boolean {
-    // In ES5, if the object is not an object (primitive), then it is frozen
-    if (isStrictNullOrUndefined(obj) || (!isObject(obj) && !isFunction(obj))) {
-        return true;
-    }
-
-    // First check if the object is extensible
-    if (isFunction(obj)) {
-        return false;
-    }
-
-    // Then check if all properties are non-configurable and non-writable
-    for (const prop in obj) {
-        const desc = objGetOwnPropertyDescriptor(obj, prop);
-        // If the property descriptor is configurable or writable, the object is not frozen
-        if (desc && (desc.configurable || (desc.writable !== false && "value" in desc))) {
-            return false;
-        }
-    }
-
-    return true;
-}
+export const polyObjIsFrozen: (obj: any) => boolean = polyObjIsSealed;

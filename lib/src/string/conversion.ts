@@ -10,10 +10,16 @@ import { EMPTY, SUBSTRING, TO_LOWER_CASE, TO_UPPER_CASE } from "../internal/cons
 import { asString } from "./as_string";
 import { strReplace } from "./replace";
 
+const SEPARATORS = "\\s\0-/:-@[-`{-\xA9\xAB-\xB1\xB4\xB6-\xB8\xBB\xBF\xD7\xF7\u2000-\u206F\u20A0-\u20CF\u2190-\u245F\u2500-\u2775\u2794-\u2BFF\u3000-\u3004\u3008-\u3020\u3030\u3036\u3037\u303D-\u303F";
+const UPPER = "A-Z\xC0-\xD6\xD8-\xDE\u0386\u0388-\u038F\u0391-\u03AB\u0400-\u042F";
+
+let _caseWords: RegExp;
+let _wordRuns: RegExp;
+
 /**
  * @internal
  * @ignore
- * Word tokenizer used by {@link strCamelCase}, {@link strKebabCase} and {@link strSnakeCase}, every
+ * Returns the word tokenizer used by {@link strCamelCase}, {@link strKebabCase} and {@link strSnakeCase}, every
  * match is `whitespace* (separators*) (word)` or only the trailing separators (with an empty word). As the
  * matches are contiguous the replacer can use the match offset to identify the first word (any leading
  * separators are part of its match), and the leading `(?!$)` stops an empty match at the end of the string.
@@ -45,19 +51,35 @@ import { strReplace } from "./replace";
  * Cyrillic Supplement, Greek Extended, etc) are not listed as that would require each letter individually,
  * so a precomposed letter from those blocks (eg. `Č`) doesn't start a new word while its decomposed form
  * (`C` followed by a combining caron) does.
+ *
+ * The character classes are strings (rather than regular expression literals) so each class is only included
+ * once in the minified output, and the ASCII ranges are the characters themselves as they are shorter than the
+ * escapes, eg. `\0-/:-@` is `\0-\x2F\x3A-\x40`. The regular expressions are created when first used, as
+ * creating them when the module is loaded (from the strings) would stop them from being tree-shaken.
  */
-// Each uppercase unit must start with an uppercase letter (marks are never uppercase) so there is only one
-// way to split a run, and the last alternative always matches, so this can't backtrack catastrophically
-// eslint-disable-next-line security/detect-unsafe-regex
-const CASE_WORDS = /(?!$)\s*([\s\0-\x2F\x3A-\x40\x5B-\x60\x7B-\xA9\xAB-\xB1\xB4\xB6-\xB8\xBB\xBF\xD7\xF7\u2000-\u206F\u20A0-\u20CF\u2190-\u245F\u2500-\u2775\u2794-\u2BFF\u3000-\u3004\u3008-\u3020\u3030\u3036\u3037\u303D-\u303F]*)((?:[A-Z\xC0-\xD6\xD8-\xDE\u0386\u0388-\u038F\u0391-\u03AB\u0400-\u042F][\u0300-\u036F]*)+(?=[A-Z\xC0-\xD6\xD8-\xDE\u0386\u0388-\u038F\u0391-\u03AB\u0400-\u042F][\u0300-\u036F]*[a-z\xDF-\xF6\xF8-\xFF\u0390\u03AC-\u03CE\u0430-\u045F])|(?:[A-Z\xC0-\xD6\xD8-\xDE\u0386\u0388-\u038F\u0391-\u03AB\u0400-\u042F][\u0300-\u036F]*)*[^\s\0-\x2F\x3A-\x40\x5B-\x60\x7B-\xA9\xAB-\xB1\xB4\xB6-\xB8\xBB\xBF\xD7\xF7\u2000-\u206F\u20A0-\u20CF\u2190-\u245F\u2500-\u2775\u2794-\u2BFF\u3000-\u3004\u3008-\u3020\u3030\u3036\u3037\u303D-\u303FA-Z\xC0-\xD6\xD8-\xDE\u0386\u0388-\u038F\u0391-\u03AB\u0400-\u042F]*)/g;
+function _getCaseWords(): RegExp {
+    if (!_caseWords) {
+        let upperLetter = "[" + UPPER + "][̀-ͯ]*";
+
+        // Each uppercase unit must start with an uppercase letter (marks are never uppercase) so there is only one
+        // way to split a run, and the last alternative always matches, so this can't backtrack catastrophically
+        // eslint-disable-next-line security/detect-non-literal-regexp
+        _caseWords = new RegExp("(?!$)\\s*([" + SEPARATORS + "]*)((?:" + upperLetter + ")+(?=" + upperLetter + "[a-z\xDF-\xF6\xF8-\xFFΐά-ώа-џ])|(?:" + upperLetter + ")*[^" + SEPARATORS + UPPER + "]*)", "g");
+    }
+
+    return _caseWords;
+}
 
 /**
  * @internal
  * @ignore
- * Each run of word characters (anything that is not a separator, see {@link CASE_WORDS}) used by
- * {@link strLetterCase} and {@link strCapitalizeWords}
+ * Returns the regular expression matching each run of word characters (anything that is not a separator, see
+ * {@link _getCaseWords}) used by {@link strLetterCase} and {@link strCapitalizeWords}
  */
-const WORD_RUNS = /[^\s\0-\x2F\x3A-\x40\x5B-\x60\x7B-\xA9\xAB-\xB1\xB4\xB6-\xB8\xBB\xBF\xD7\xF7\u2000-\u206F\u20A0-\u20CF\u2190-\u245F\u2500-\u2775\u2794-\u2BFF\u3000-\u3004\u3008-\u3020\u3030\u3036\u3037\u303D-\u303F]+/g;
+function _getWordRuns(): RegExp {
+    // eslint-disable-next-line security/detect-non-literal-regexp
+    return _wordRuns || (_wordRuns = new RegExp("[^" + SEPARATORS + "]+", "g"));
+}
 
 /**
  * @internal
@@ -143,7 +165,7 @@ function _capitalWord(word: string): string {
  */
 /*#__NO_SIDE_EFFECTS__*/
 function _convertCase<T>(value: T, newPrefix: string, firstFn: (word: string) => string, wordFn: (word: string) => string): string {
-    return strReplace(asString(value), CASE_WORDS, (_match: string, sep: string, word: string, offset: number) => {
+    return strReplace(asString(value), _getCaseWords(), (_match: string, sep: string, word: string, offset: number) => {
         // The first word is always at offset 0 (any leading separators are part of its match), a match without
         // a word is the trailing separators. The leading whitespace is not part of sep, so sep is only empty when
         // the separators are all whitespace (or there are none), which (like trimming) doesn't add a newPrefix
@@ -176,7 +198,7 @@ function _convertCase<T>(value: T, newPrefix: string, firstFn: (word: string) =>
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function strLetterCase<T>(value: T): string {
-    return strReplace(asString(value), WORD_RUNS, _letterWord);
+    return strReplace(asString(value), _getWordRuns(), _letterWord);
 }
 
 /**
@@ -209,7 +231,7 @@ export function strLetterCase<T>(value: T): string {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function strCapitalizeWords<T>(value: T): string {
-    return strReplace(asString(value), WORD_RUNS, _capitalWord);
+    return strReplace(asString(value), _getWordRuns(), _capitalWord);
 }
 
 /**

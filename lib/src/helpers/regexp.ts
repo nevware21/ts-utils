@@ -13,6 +13,11 @@ import { strReplace } from "../string/replace";
 const MATCH_ANY = "(.*)";
 const MATCH_SINGLE = "(.)";
 
+// Shared by createFilenameRegex and makeGlobRegex, a global regular expression used by replace() always starts from the
+// beginning so one instance can be shared
+const PATH_ESCAPE_RGX = /([-+|^$#\.{}()\\\/\[\]\"\'])/g;
+const MATCH_FOLDER_SEP = "[\\\\\\/]{1}";
+
 /**
  * @internal
  * @ignore
@@ -120,10 +125,10 @@ export function createWildcardRegex(value: string, ignoreCase?: boolean, fullMat
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function createFilenameRegex(value: string, ignoreCase?: boolean, fullMatch?: boolean) {
-    return _createRegExp(asString(value), /([-+|^$#\.{}()\\\/\[\]\"\'])/g, (value: string) => {
+    return _createRegExp(asString(value), PATH_ESCAPE_RGX, (value: string) => {
         return strReplace(value, /(\\\\|\\\/|\*|\?)/g, function (_all, g1) {
             if (g1 == "\\/" || g1 == "\\\\") {
-                return "[\\\\\\/]{1}";
+                return MATCH_FOLDER_SEP;
             }
             return g1 == "*" ? MATCH_ANY : MATCH_SINGLE;
         });
@@ -194,15 +199,15 @@ export function createFilenameRegex(value: string, ignoreCase?: boolean, fullMat
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function makeGlobRegex(value: string, ignoreCase?: boolean, fullMatch?: boolean) {
-    return _createRegExp(asString(value), /([-+|^$#\.{}()\\\/\[\]\"\'])/g, (value: string) => {
+    return _createRegExp(asString(value), PATH_ESCAPE_RGX, (value: string) => {
         //"**\/*\.txt"
         return strReplace(value, /(\*\*\\[\\\/]|\\\\|\\\/|\*\*|\*|\?)/g, function (_all, g1) {
             if (g1 == "**\\/" || g1 == "**\\\\") {
                 return "(.*[\\\\\\/])*";
             }
-            
+
             if (g1 === "\\/" || g1 == "\\\\") {
-                return "[\\\\\\/]{1}";
+                return MATCH_FOLDER_SEP;
             }
             
             if (g1 === "**") {

@@ -169,6 +169,21 @@ describe("substring string helpers", () => {
             _checkPolySubStr("Nevware21", -20, 2);
             _checkPolySubStr("Nevware21", 20, 2);
         });
+
+        it("converts the start and length to integers like String.prototype.substr", () => {
+            assert.equal(polyStrSubstr("abcdef", 1.5, 2.5), "bc");
+            assert.equal(polyStrSubstr("abcdef", -2.5, 1.9), "e");
+            assert.equal(polyStrSubstr("abcdef", 1, 0.5), "");
+            assert.equal(polyStrSubstr("abcdef", undefined as any, 2), "ab");
+
+            const starts: any[] = [1.5, -2.5, -0.5, 0.9, NaN, null, undefined, "2", Infinity, -Infinity, 10];
+            const lengths: any[] = [2.5, 0.5, -0.5, -1, 0, NaN, null, undefined, "2", Infinity, -Infinity];
+            for (let slp = 0; slp < starts.length; slp++) {
+                for (let llp = 0; llp < lengths.length; llp++) {
+                    _checkPolySubStr("abcdef", starts[slp], lengths[llp]);
+                }
+            }
+        });
     });
 
     function _expectThrow(cb: () => void): Error {

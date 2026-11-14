@@ -7,12 +7,15 @@
  */
 
 import { ObjClass } from "../internal/constants";
-import { _returnFalse } from "../internal/stubs";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
+import { polyObjIsFrozen } from "../polyfills/object/objIsFrozen";
+import { polyObjIsSealed } from "../polyfills/object/objIsSealed";
 
 /**
  * The `objIsFrozen()` method determines if an object is frozen. An object is frozen if and only if it is not
  * extensible, all its properties are non-configurable, and all its data properties are non-writable.
+ * Where there is no native `Object.isFrozen` (a runtime which can't freeze an object) a primitive value, including
+ * `null` and `undefined`, is frozen and an object or function is not.
  *
  * @function
  * @since 0.12.0
@@ -28,11 +31,13 @@ import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
  * console.log(objIsFrozen(frozen)); // true
  * ```
  */
-export const objIsFrozen: (obj: any) => boolean = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.isFrozen>(ObjClass, "isFrozen")), _returnFalse));
+export const objIsFrozen: (obj: any) => boolean = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.isFrozen>(ObjClass, "isFrozen")), polyObjIsFrozen));
 
 /**
  * The `objIsSealed()` method determines if an object is sealed. An object is sealed if it is not
  * extensible and if all its properties are non-configurable (but potentially still writable).
+ * Where there is no native `Object.isSealed` (a runtime which can't seal an object) a primitive value, including
+ * `null` and `undefined`, is sealed and an object or function is not.
  *
  * @function
  * @since 0.12.0
@@ -52,4 +57,4 @@ export const objIsFrozen: (obj: any) => boolean = (/*#__PURE__*/_pureAssign((/*#
  * console.log(objIsSealed(frozen)); // true
  * ```
  */
-export const objIsSealed: (obj: any) => boolean = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.isSealed>(ObjClass, "isSealed")), _returnFalse));
+export const objIsSealed: (obj: any) => boolean = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.isSealed>(ObjClass, "isSealed")), polyObjIsSealed));

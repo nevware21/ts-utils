@@ -31,7 +31,12 @@ import { mathMin } from "../math/min_max";
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function arrZip(...arrays: ArrayLike<any>[]): any[][] {
+export function arrZip(...arrays: ArrayLike<any>[]): any[][];
+
+/*#__NO_SIDE_EFFECTS__*/
+export function arrZip(): any[][] {
+    // The arrays are only read, so the arguments are used rather than copied into a new array
+    let arrays: ArrayLike<ArrayLike<any>> = arguments;
     let result: any[][];
 
     if (arrays.length !== 0) {

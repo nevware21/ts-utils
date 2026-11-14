@@ -20,7 +20,12 @@ import { iterToArray } from "./iterToArray";
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function iterIntersection<T>(...iters: Array<Iterator<T> | Iterable<T>>): T[] {
+export function iterIntersection<T>(...iters: Array<Iterator<T> | Iterable<T>>): T[];
+
+/*#__NO_SIDE_EFFECTS__*/
+export function iterIntersection<T>(): T[] {
+    // The iterators are only read, so the arguments are used rather than copied into a new array
+    let iters: ArrayLike<Iterator<T> | Iterable<T>> = arguments;
     if (iters.length === 0) {
         return [];
     }

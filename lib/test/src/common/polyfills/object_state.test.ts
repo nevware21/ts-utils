@@ -130,7 +130,16 @@ describe("object state polyfills", () => {
             const arr = [1, 2, 3];
             assert.isFalse(polyObjIsFrozen(arr), "Arrays should not be frozen by default");
         });
-        
+
+        // Object.isFrozen is defined by every supported (ES5) runtime, so the polyfill is only used by a runtime which
+        // can't freeze an object, so it reports every object and function as not frozen (it doesn't check the properties)
+        it("should return false for empty and frozen objects", () => {
+            assert.isFalse(polyObjIsFrozen({}), "Empty objects should not be frozen");
+            assert.isFalse(polyObjIsFrozen([]), "Empty arrays should not be frozen");
+            assert.isFalse(polyObjIsFrozen(Object.freeze({ a: 1 })), "Frozen objects are not reported as frozen");
+            assert.isFalse(polyObjIsFrozen(Object.seal({ a: 1 })), "Sealed objects are not reported as frozen");
+        });
+
         it("should be compatible with native implementation if available", function() {
             // Skip if native method isn't available
             if (typeof Object.isFrozen !== "function") {
@@ -197,7 +206,16 @@ describe("object state polyfills", () => {
             const arr = [1, 2, 3];
             assert.isFalse(polyObjIsSealed(arr), "Arrays should not be sealed by default");
         });
-        
+
+        // Object.isSealed is defined by every supported (ES5) runtime, so the polyfill is only used by a runtime which
+        // can't seal an object, so it reports every object and function as not sealed (it doesn't check the properties)
+        it("should return false for empty and sealed objects", () => {
+            assert.isFalse(polyObjIsSealed({}), "Empty objects should not be sealed");
+            assert.isFalse(polyObjIsSealed([]), "Empty arrays should not be sealed");
+            assert.isFalse(polyObjIsSealed(Object.seal({ a: 1 })), "Sealed objects are not reported as sealed");
+            assert.isFalse(polyObjIsSealed(Object.freeze({ a: 1 })), "Frozen objects are not reported as sealed");
+        });
+
         it("should be compatible with native implementation if available", function() {
             // Skip if native method isn't available
             if (typeof Object.isSealed !== "function") {

@@ -78,6 +78,26 @@ describe("object polyfills", () => {
     });
 
     describe("polyObjEntries", () => {
+        it("strings, primitives, null and undefined like the native function", () => {
+            assert.deepEqual(polyObjEntries("ab"), [["0", "a"], ["1", "b"]]);
+            assert.deepEqual(polyObjEntries(""), []);
+            assert.deepEqual(polyObjEntries(42 as any), []);
+            assert.deepEqual(polyObjEntries(true as any), []);
+            assert.throws(() => polyObjEntries(null as any), TypeError);
+            assert.throws(() => polyObjEntries(undefined as any), TypeError);
+
+            const nativeEntries = (Object as any).entries;
+            if (nativeEntries) {
+                assert.deepEqual(polyObjEntries("ab"), nativeEntries("ab"));
+                assert.deepEqual(polyObjEntries(""), nativeEntries(""));
+                assert.deepEqual(polyObjEntries(42 as any), nativeEntries(42));
+                assert.deepEqual(polyObjEntries(true as any), nativeEntries(true));
+                assert.deepEqual(polyObjEntries(new String("xy")), nativeEntries(new String("xy")));
+                assert.deepEqual(polyObjEntries([1, 2]), nativeEntries([1, 2]));
+                assert.deepEqual(polyObjEntries({ a: 1 }), nativeEntries({ a: 1 }));
+            }
+        });
+
         it("examples", () => {
             assert.deepEqual(polyObjEntries({ Hello: "Darkness", my: "old", friend: "." }), [ [ "Hello", "Darkness" ], [ "my", "old"], [ "friend", "." ] ]);
 
@@ -118,6 +138,25 @@ describe("object polyfills", () => {
     });
 
     describe("polyObjValues", () => {
+        it("strings, primitives, null and undefined like the native function", () => {
+            assert.deepEqual(polyObjValues("ab"), ["a", "b"]);
+            assert.deepEqual(polyObjValues(""), []);
+            assert.deepEqual(polyObjValues(42 as any), []);
+            assert.throws(() => polyObjValues(null as any), TypeError);
+            assert.throws(() => polyObjValues(undefined as any), TypeError);
+
+            const nativeValues = (Object as any).values;
+            if (nativeValues) {
+                assert.deepEqual(polyObjValues("ab"), nativeValues("ab"));
+                assert.deepEqual(polyObjValues(""), nativeValues(""));
+                assert.deepEqual(polyObjValues(42 as any), nativeValues(42));
+                assert.deepEqual(polyObjValues(true as any), nativeValues(true));
+                assert.deepEqual(polyObjValues(new String("xy")), nativeValues(new String("xy")));
+                assert.deepEqual(polyObjValues([1, 2]), nativeValues([1, 2]));
+                assert.deepEqual(polyObjValues({ a: 1 }), nativeValues({ a: 1 }));
+            }
+        });
+
         it("examples", () => {
             assert.deepEqual(polyObjValues({ Hello: "Darkness", my: "old", friend: "." }), [ "Darkness", "old", "." ]);
 
@@ -330,21 +369,44 @@ describe("object polyfills", () => {
             assert.equal(result.b, 2);
         });
 
-        it("should handle non-iterable input gracefully", () => {
-            const result = polyObjFromEntries(42 as any);
-            
-            assert.equal(Object.keys(result).length, 0);
+        it("should throw for a non-iterable value like the native function", () => {
+            assert.throws(() => polyObjFromEntries(42 as any), TypeError);
+            assert.throws(() => polyObjFromEntries({ a: 1 } as any), TypeError);
         });
 
-        it("should handle null or undefined input gracefully", () => {
-            assert.doesNotThrow(() => polyObjFromEntries(null as any));
-            assert.doesNotThrow(() => polyObjFromEntries(undefined as any));
-            
-            const result1 = polyObjFromEntries(null as any);
-            const result2 = polyObjFromEntries(undefined as any);
-            
-            assert.equal(Object.keys(result1).length, 0);
-            assert.equal(Object.keys(result2).length, 0);
+        it("should throw for null or undefined like the native function", () => {
+            assert.throws(() => polyObjFromEntries(null as any), TypeError);
+            assert.throws(() => polyObjFromEntries(undefined as any), TypeError);
+        });
+
+        it("should throw for an entry which is not an object like the native function", () => {
+            assert.throws(() => polyObjFromEntries([["valid", 1], "invalid"] as any), TypeError);
+            assert.throws(() => polyObjFromEntries([["valid", 1], null] as any), TypeError);
+            assert.throws(() => polyObjFromEntries([1] as any), TypeError);
+
+            // An empty slot of a sparse array is undefined, which is not an entry
+            const sparse: any[] = [["a", 1]];
+            sparse[2] = ["b", 2];
+            assert.throws(() => polyObjFromEntries(sparse), TypeError);
+        });
+
+        it("should use the 0 and 1 properties of any object entry like the native function", () => {
+            assert.deepEqual(polyObjFromEntries([["key"], ["another"]]), { key: undefined, another: undefined });
+            assert.deepEqual(polyObjFromEntries([[]] as any), { "undefined": undefined });
+            assert.deepEqual(polyObjFromEntries([{ 0: "a", 1: 1 }] as any), { a: 1 });
+            assert.deepEqual(polyObjFromEntries([["a", 1, "ignored"]] as any), { a: 1 });
+        });
+
+        it("should convert a key which converts to __proto__ before adding it", () => {
+            const protoKey = {
+                toString: () => "__proto__"
+            };
+            const protoValue = { polluted: true };
+            const result = polyObjFromEntries([[protoKey, protoValue]] as any);
+
+            assert.isTrue(Object.prototype.hasOwnProperty.call(result, "__proto__"), "__proto__ should be an own property");
+            assert.strictEqual(Object.getPrototypeOf(result), Object.prototype, "Result prototype should remain Object.prototype");
+            assert.isUndefined((result as any).polluted);
         });
 
         it("should handle empty iterables", () => {
@@ -502,43 +564,95 @@ describe("object polyfills", () => {
                 }
             });
             
-            it("should demonstrate the behavioral differences with invalid inputs", () => {
-                // In native implementation (objFromEntries), these will throw
-                // In polyfill (polyObjFromEntries), these will return an empty object
-                
+            it("should demonstrate the same behavior with invalid inputs", () => {
+                // Both the native implementation (objFromEntries) and the polyfill (polyObjFromEntries) will throw
+
                 // Test with null
-                assert.doesNotThrow(() => polyObjFromEntries(null as any));
+                assert.throws(() => polyObjFromEntries(null as any), TypeError);
                 if (typeof Object.fromEntries === "function") {
                     assert.throws(() => objFromEntries(null as any));
                 }
-                assert.deepEqual(polyObjFromEntries(null as any), {});
-                
+
                 // Test with undefined
-                assert.doesNotThrow(() => polyObjFromEntries(undefined as any));
+                assert.throws(() => polyObjFromEntries(undefined as any), TypeError);
                 if (typeof Object.fromEntries === "function") {
                     assert.throws(() => objFromEntries(undefined as any));
                 }
-                assert.deepEqual(polyObjFromEntries(undefined as any), {});
-                
+
                 // Test with non-iterable
-                assert.doesNotThrow(() => polyObjFromEntries(42 as any));
+                assert.throws(() => polyObjFromEntries(42 as any), TypeError);
                 if (typeof Object.fromEntries === "function") {
                     assert.throws(() => objFromEntries(42 as any));
                 }
-                assert.deepEqual(polyObjFromEntries(42 as any), {});
-                
+
                 // Test with invalid entries (not arrays or too short)
                 const invalidEntries = [["valid", 1], "invalid" as any];
-                assert.doesNotThrow(() => polyObjFromEntries(invalidEntries as any));
+                assert.throws(() => polyObjFromEntries(invalidEntries as any), TypeError);
                 if (typeof Object.fromEntries === "function") {
                     assert.throws(() => objFromEntries(invalidEntries as any));
                 }
-                
-                // Test with single-item entries (should be ignored by polyfill)
+
+                // Test with single-item entries (the missing value is undefined, like the native function)
                 const singleItemEntries = [["key"], ["another"]];
                 assert.doesNotThrow(() => polyObjFromEntries(singleItemEntries));
                 const result = polyObjFromEntries(singleItemEntries);
-                assert.deepEqual(result, {});
+                assert.deepEqual(result, { key: undefined, another: undefined });
+                if (typeof Object.fromEntries === "function") {
+                    assert.deepEqual(objFromEntries(singleItemEntries), { key: undefined, another: undefined });
+                }
+            });
+
+            it("should return the same result or throw the same error as the native function", function() {
+                const nativeFromEntries = (Object as any).fromEntries;
+                if (typeof nativeFromEntries !== "function") {
+                    this.skip();
+                    return;
+                }
+
+                // Returns the result, or the name of the error thrown
+                function _run(fn: Function, value: any) {
+                    try {
+                        return { result: fn(value) };
+                    } catch (e) {
+                        return { threw: (e as any).name };
+                    }
+                }
+
+                function _checkMatchesNative(value: any) {
+                    const polyResult = _run(polyObjFromEntries, value);
+                    const nativeResult = _run(nativeFromEntries, value);
+                    assert.deepEqual(polyResult, nativeResult, "fromEntries(" + dumpObj(value) + ")");
+                }
+
+                // Values which are not iterable
+                _checkMatchesNative(null);
+                _checkMatchesNative(undefined);
+                _checkMatchesNative(42);
+                _checkMatchesNative({});
+
+                // A string is iterable, but its characters are not entry objects
+                _checkMatchesNative("ab");
+
+                // Valid entries
+                _checkMatchesNative([]);
+                _checkMatchesNative([["a", 1], ["b", 2]]);
+                _checkMatchesNative(new Map([["m", 1]]));
+
+                // Keys which are converted to strings
+                _checkMatchesNative([[1, "one"], [true, "true"], [null, "null"]]);
+
+                // An entry which is not an object
+                _checkMatchesNative([["a", 1], "invalid"]);
+
+                // Entries which are too short or are not arrays use their 0 and 1 properties
+                _checkMatchesNative([["key"], ["another"]]);
+                _checkMatchesNative([[]]);
+                _checkMatchesNative([{ 0: "x", 1: 2 }]);
+
+                // An empty slot of a sparse array is undefined, which is not an entry object
+                const sparse: any[] = [["a", 1]];
+                sparse[2] = ["b", 2];
+                _checkMatchesNative(sparse);
             });
         });
     });

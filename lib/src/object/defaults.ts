@@ -6,7 +6,6 @@
  * Licensed under the MIT license.
  */
 
-import { arrForEach } from "../array/forEach";
 import { isStrictUndefined } from "../helpers/base";
 import { forEachOwnKeySafe } from "./forEachOwnKey";
 import { isUnsafeTarget } from "./isUnsafeTarget";
@@ -107,9 +106,13 @@ export function objMergeIf<T>(
  * // => { host: "localhost" }  — __proto__ and constructor were never written
  * ```
  */
-export function objDefaults<T>(target: T, ...sources: Array<Partial<T> | null | undefined>): T {
+export function objDefaults<T>(target: T, ...sources: Array<Partial<T> | null | undefined>): T;
+export function objDefaults<T>(target: T): T {
+    // The sources are the arguments after the target, which are only read so they are not copied into a new array
+    let theArgs = arguments;
     if (target && !isUnsafeTarget(target)) {
-        arrForEach(sources, (source) => {
+        for (let lp = 1; lp < theArgs.length; lp++) {
+            let source = theArgs[lp];
             if (source) {
                 forEachOwnKeySafe(source, (key, value) => {
                     if (isStrictUndefined((target as any)[key])) {
@@ -117,7 +120,7 @@ export function objDefaults<T>(target: T, ...sources: Array<Partial<T> | null | 
                     }
                 });
             }
-        });
+        }
     }
     return target;
 }

@@ -11,6 +11,8 @@ import { EMPTY, LENGTH, StrProto, SUBSTRING } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunction, _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { mathMax } from "../math/min_max";
+import { mathToInt } from "../math/to_int";
+import { asString } from "./as_string";
 import { strSlice } from "./slice";
 
 /**
@@ -88,22 +90,17 @@ export const strSubstr: (value: string, start: number, length?: number) => strin
 export function polyStrSubstr(value: string, start: number, length?: number): string {
     _throwIfNullOrUndefined(value);
 
-    if (length < 0) {
-        return EMPTY;
+    value = asString(value);
+
+    // Like the native function the start and length are converted to integers (NaN and an omitted start are 0)
+    let theStart = mathToInt(start);
+    if (theStart < 0) {
+        theStart = mathMax(theStart + value[LENGTH], 0);
     }
 
-    // If start is omitted or undefined, its treated as zero
-    start = start || 0;
+    let theLength = isUndefined(length) ? value[LENGTH] : mathToInt(length);
 
-    if (start < 0) {
-        start = mathMax(start + value[LENGTH], 0);
-    }
-
-    if (isUndefined(length)) {
-        return strSlice(value, start);
-    }
-
-    return strSlice(value, start, start + length);
+    return theLength > 0 ? strSlice(value, theStart, theStart + theLength) : EMPTY;
 }
 
 /**

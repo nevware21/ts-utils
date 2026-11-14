@@ -53,14 +53,85 @@ describe("array polyfills", () => {
     });
 
     describe("polyArrIncludes", () => {
-        assert.equal(polyArrIncludes([1, 2, 3], 2), true);
-        assert.equal(polyArrIncludes([1, 2, 3], 4), false);
-        assert.equal(polyArrIncludes([1, 2, 3], 3, 3), false);
-        assert.equal(polyArrIncludes([1, 2, 3], 3, -1), true);
-        assert.equal(polyArrIncludes(["1", "2", "3"], 3 as any), false);
+        // These were previously asserted directly in the describe (so ran when the tests were loaded)
+        it("examples", () => {
+            assert.equal(polyArrIncludes([1, 2, 3], 2), true);
+            assert.equal(polyArrIncludes([1, 2, 3], 4), false);
+            assert.equal(polyArrIncludes([1, 2, 3], 3, 3), false);
+            assert.equal(polyArrIncludes([1, 2, 3], 3, -1), true);
+            assert.equal(polyArrIncludes(["1", "2", "3"], 3 as any), false);
 
-        // Note: This (should) be true, but the polyfill does not handle NaN comparison correctly
-        assert.equal(polyArrIncludes([1, 2, NaN], NaN), false);
+            // NaN is found, as the polyfill now uses the same SameValueZero comparison as the native function
+            assert.equal(polyArrIncludes([1, 2, NaN], NaN), true);
+        });
+
+        it("array-like objects", () => {
+            assert.equal(polyArrIncludes({ length: 3, 0: 1, 1: 2, 2: 3 }, 2), true);
+            assert.equal(polyArrIncludes({ length: 3, 0: 1, 1: 2, 2: 3 }, 4), false);
+        });
+
+        it("matches NaN (SameValueZero) like the native function", () => {
+            assert.equal(polyArrIncludes({ length: 3, 0: 1, 1: 2, 2: NaN }, NaN), true);
+            assert.equal(polyArrIncludes([1, 2, 3], NaN), false);
+            assert.equal(polyArrIncludes([0], -0), true);
+            assert.equal(polyArrIncludes([-0], 0), true);
+        });
+
+        it("an empty slot or missing index matches undefined like the native function", () => {
+            const sparse: any[] = [1];
+            sparse[2] = 3;
+            assert.equal(polyArrIncludes(sparse, undefined), true);
+            assert.equal(polyArrIncludes({ length: 3, 0: "a", 2: "c" } as any, undefined), true);
+            assert.equal(polyArrIncludes([1, 2, 3], undefined), false);
+        });
+
+        it("throws for null or undefined like the native function", () => {
+            assert.throws(() => polyArrIncludes(null as any, 1), TypeError);
+            assert.throws(() => polyArrIncludes(undefined as any, 1), TypeError);
+        });
+
+        it("matches the native function", function() {
+            const nativeIncludes = (Array.prototype as any).includes;
+            if (!nativeIncludes) {
+                this.skip();
+                return;
+            }
+
+            // The values searched for and the fromIndex values (including fractions, out of range and non-numeric
+            // values, which are converted to an integer) each value is checked with
+            const searches: any[] = [1, 3, NaN, undefined, "b", "c", 0];
+            const fromIndexes: any[] = [undefined, 0, 1, 1.5, -1, -2.5, -10, 10, NaN, null, "1", Infinity, -Infinity];
+
+            function _checkMatchesNative(value: any) {
+                for (let slp = 0; slp < searches.length; slp++) {
+                    for (let flp = 0; flp < fromIndexes.length; flp++) {
+                        const search = searches[slp];
+                        const fromIndex = fromIndexes[flp];
+                        assert.equal(
+                            polyArrIncludes(value, search, fromIndex),
+                            nativeIncludes.call(value, search, fromIndex),
+                            "includes(" + dumpObj(value) + ", " + String(search) + ", " + String(fromIndex) + ")");
+                    }
+                }
+            }
+
+            // Arrays
+            _checkMatchesNative([1, 2, 3]);
+            _checkMatchesNative([1, NaN, 3]);
+
+            // A sparse array, where an empty slot is undefined
+            const sparse: any[] = [1];
+            sparse[3] = NaN;
+            _checkMatchesNative(sparse);
+
+            // A string
+            _checkMatchesNative("abc");
+
+            // Array-like objects with a fractional, negative and string length
+            _checkMatchesNative({ length: 2.5, 0: "a", 1: "b", 2: "c" });
+            _checkMatchesNative({ length: -1, 0: "a" });
+            _checkMatchesNative({ length: "2", 0: "a", 1: undefined });
+        });
     });
 
     describe("polyArrFind", () => {
@@ -427,6 +498,114 @@ describe("array polyfills", () => {
             assert.equal(reformattedArray.length, 5);
             assert.equal(JSON.stringify(reformattedArray), "[{\"1\":\"Hello\"},{\"2\":\"Darkness\"},{\"3\":\"my\"},{\"4\":\"old\"},{\"5\":\"friend\"}]");
         });
+
+        it("array-like values which are not iterable", () => {
+            assert.deepEqual(polyArrFrom({ length: 2, 0: "a", 1: "b" }), ["a", "b"]);
+            assert.deepEqual(polyArrFrom({ length: 3, 0: "a", 2: "c" } as any), ["a", undefined, "c"]);
+            assert.deepEqual(polyArrFrom({ length: 2 } as any), [undefined, undefined]);
+            assert.deepEqual(polyArrFrom({ length: 2.5, 0: "a", 1: "b", 2: "c" }), ["a", "b"]);
+            assert.deepEqual(polyArrFrom({ length: -1, 0: "a" }), []);
+            assert.deepEqual(polyArrFrom({ length: "2", 0: "a", 1: "b" } as any), ["a", "b"]);
+            assert.deepEqual(polyArrFrom({ length: 2, 0: 1, 1: 2 }, (value: number, idx?: number) => value * 10 + (idx as number)), [10, 21]);
+
+            // A value with no length (including a number and an iterator which isn't iterable) is an empty array
+            assert.deepEqual(polyArrFrom({} as any), []);
+            assert.deepEqual(polyArrFrom(42 as any), []);
+            assert.deepEqual(polyArrFrom({ next: () => ({ done: false, value: 1 }) } as any), []);
+        });
+
+        it("arguments", () => {
+            function _getArgs(..._args: any[]) {
+                return arguments;
+            }
+
+            assert.deepEqual(polyArrFrom(_getArgs(1, "a", null)), [1, "a", null]);
+        });
+
+        it("an empty slot of a sparse array is undefined", () => {
+            const sparse: any[] = [1];
+            sparse[2] = 3;
+            const result = polyArrFrom(sparse);
+
+            assert.deepEqual(result, [1, undefined, 3]);
+            assert.isTrue(1 in result, "The empty slot is not kept");
+        });
+
+        it("a string is split into its code points", () => {
+            assert.deepEqual(polyArrFrom("Hello"), ["H", "e", "l", "l", "o"]);
+            assert.deepEqual(polyArrFrom("a𐐨b"), ["a", "𐐨", "b"]);
+            assert.deepEqual(polyArrFrom("\uD801a\uDC28"), ["\uD801", "a", "\uDC28"], "Unpaired surrogates are a single value");
+            assert.deepEqual(polyArrFrom(""), []);
+        });
+
+        it("the mapFn is only passed the value and index", () => {
+            const calls: any[] = [];
+            const thisArg = { name: "thisArg" };
+            const mapFn = function (this: any) {
+                calls.push({ args: Array.prototype.slice.call(arguments), self: this });
+                return arguments.length;
+            };
+
+            assert.deepEqual(polyArrFrom<any, number>([1, 2], mapFn as any, thisArg), [2, 2]);
+            assert.deepEqual(polyArrFrom<any, number>({ length: 1, 0: "a" }, mapFn as any, thisArg), [2]);
+            assert.deepEqual(polyArrFrom<any, number>(new Set(["x"]), mapFn as any, thisArg), [2]);
+            assert.deepEqual(calls[0].args, [1, 0]);
+            assert.deepEqual(calls[1].args, [2, 1]);
+            assert.deepEqual(calls[2].args, ["a", 0]);
+            assert.deepEqual(calls[3].args, ["x", 0]);
+            assert.strictEqual(calls[0].self, thisArg);
+        });
+
+        it("throws for null, undefined or a mapFn which is not a function", () => {
+            assert.throws(() => polyArrFrom(null as any), TypeError);
+            assert.throws(() => polyArrFrom(undefined as any), TypeError);
+            assert.throws(() => polyArrFrom([1], null as any), TypeError);
+            assert.throws(() => polyArrFrom([1], "fn" as any), TypeError);
+            assert.deepEqual(polyArrFrom([1], undefined), [1], "An undefined mapFn is no mapping");
+        });
+
+        it("matches the native function", function() {
+            const nativeFrom = (Array as any).from;
+            if (!nativeFrom) {
+                this.skip();
+                return;
+            }
+
+            // Checks the result without and with a mapFn (which returns the value and index it was passed)
+            function _checkMatchesNative(value: any) {
+                assert.deepEqual(polyArrFrom(value), nativeFrom(value), "Array.from(" + dumpObj(value) + ")");
+                assert.deepEqual(
+                    polyArrFrom(value, (item: any, idx?: number) => [item, idx]),
+                    nativeFrom(value, (item: any, idx?: number) => [item, idx]),
+                    "Array.from(" + dumpObj(value) + ", mapFn)");
+            }
+
+            // An array
+            _checkMatchesNative([1, 2, 3]);
+
+            // A sparse array, where an empty slot is undefined
+            const sparse: any[] = [1];
+            sparse[2] = 3;
+            _checkMatchesNative(sparse);
+
+            // A string with a surrogate pair, which is a single code point
+            _checkMatchesNative("a𐐨b");
+
+            // Array-like objects with a missing index, a fractional length and a negative length
+            _checkMatchesNative({ length: 3, 0: "a", 2: "c" });
+            _checkMatchesNative({ length: 2.5, 0: 1, 1: 2, 2: 3 });
+            _checkMatchesNative({ length: -1 });
+
+            // Values with no length
+            _checkMatchesNative({});
+            _checkMatchesNative(42);
+            _checkMatchesNative(true);
+
+            // Iterables
+            _checkMatchesNative(new Set([1, 2]));
+            _checkMatchesNative(new Map([[1, "a"]]));
+            _checkMatchesNative(new Uint8Array([1, 2]));
+        });
     });
 
     function _checkIsArray(value: any) {
@@ -578,6 +757,23 @@ describe("array polyfills compared to the native functions", () => {
             assert.equal(polyArrAt(arrayLike(), -1), proto.at.call(arrayLike(), -1));
             assert.deepEqual(polyArrWith(arrayLike(), -1, "z"), proto.with.call(arrayLike(), -1, "z"));
             assert.deepEqual(Object.keys(polyArrFill(arrayLike(), "z" as any, -1)), Object.keys(proto.fill.call(arrayLike(), "z", -1)));
+        }
+    });
+
+    it("with reads every other index, so an empty slot is undefined", () => {
+        const sparse: any[] = [1];
+        sparse[2] = 3;
+        const result = polyArrWith(sparse, 0, 9);
+
+        assert.deepEqual(result, [9, undefined, 3]);
+        assert.isTrue(1 in result, "The empty slot is not kept");
+        assert.deepEqual(polyArrWith({ length: 3, 0: "a", 2: "c" } as any, 2, "z"), ["a", undefined, "z"]);
+        assert.deepEqual(polyArrWith("abc" as any, 1, "z"), ["a", "z", "c"]);
+
+        const proto: any = Array.prototype;
+        if (proto.with) {
+            assert.deepEqual(result, proto.with.call(sparse, 0, 9));
+            assert.deepEqual(polyArrWith({ length: 3, 0: "a", 2: "c" } as any, 2, "z"), proto.with.call({ length: 3, 0: "a", 2: "c" }, 2, "z"));
         }
     });
 });

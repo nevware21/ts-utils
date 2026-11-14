@@ -6,13 +6,11 @@
  * Licensed under the MIT license.
  */
 
-import { isNullOrUndefined } from "../helpers/base";
+import { isUndefined } from "../helpers/base";
 import { EMPTY, LENGTH, StrProto } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
-import { mathCeil } from "../math/floor";
 import { mathToInt } from "../math/to_int";
 import { asString } from "./as_string";
-import { strRepeat } from "./repeat";
 import { strSubstring } from "./substring";
 
 /*#__NO_SIDE_EFFECTS__*/
@@ -23,15 +21,18 @@ function _padValue(value: string, targetLength: number, padString?: string) {
 
     let len = value[LENGTH];
     if (len < targetLength) {
-        result = isNullOrUndefined(padString) ? " " : asString(padString);
+        // Like the native functions only an undefined padString uses the default, any other value (including null) is
+        // converted into a string
+        result = isUndefined(padString) ? " " : asString(padString);
         targetLength = targetLength - len;
-        if (targetLength > result[LENGTH]) {
-            result = strRepeat(result, mathCeil(targetLength / result[LENGTH]));
+
+        // Doubled until it is long enough and then truncated, an empty padString can't pad the value so it is returned as-is
+        // (rather than doubling "" forever). This doesn't use strRepeat() so the polyfills don't include its polyfill.
+        while (result && result[LENGTH] < targetLength) {
+            result += result;
         }
 
-        if (result[LENGTH] > targetLength) {
-            result = strSubstring(result, 0, targetLength);
-        }
+        result = strSubstring(result, 0, targetLength);
     }
 
     return result;

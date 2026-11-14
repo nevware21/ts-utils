@@ -19,7 +19,12 @@ import { iterForOf } from "./forOf";
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function iterUnion<T>(...iters: Array<Iterator<T> | Iterable<T>>): T[] {
+export function iterUnion<T>(...iters: Array<Iterator<T> | Iterable<T>>): T[];
+
+/*#__NO_SIDE_EFFECTS__*/
+export function iterUnion<T>(): T[] {
+    // The iterators are only read, so the arguments are used rather than copied into a new array
+    let iters: ArrayLike<Iterator<T> | Iterable<T>> = arguments;
     let result: T[] = [];
 
     for (let lp = 0; lp < iters.length; lp++) {

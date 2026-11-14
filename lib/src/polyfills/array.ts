@@ -7,13 +7,16 @@
  */
 
 import { ArrFromMapFn, ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "../array/callbacks";
-import { arrIndexOf } from "../array/indexOf";
-import { arrMap } from "../array/map";
-import { arrSlice } from "../array/slice";
-import { isArray, isNullOrUndefined, isStrictNullOrUndefined, objToString } from "../helpers/base";
+import { isArray, isFunction, isNullOrUndefined, isStrictNullOrUndefined, isString, isUndefined, objToString } from "../helpers/base";
+import { dumpObj } from "../helpers/diagnostics";
+import { throwTypeError } from "../helpers/throw";
 import { CALL, LENGTH } from "../internal/constants";
+import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _toLength } from "../helpers/length";
 import { iterForOf } from "../iterator/forOf";
+import { isIterable } from "../iterator/iterator";
+import { mathMax } from "../math/min_max";
+import { mathToInt } from "../math/to_int";
 
 /**
  * Polyfill support function for Array.isArray
@@ -34,7 +37,10 @@ export function polyIsArray<T>(value: any): value is T[] {
 /**
  * The polyArrIncludes() method determines whether an array includes a certain value among its
  * entries, returning true or false as appropriate.
- * Note: The polyfill does not handle NaN correctly.
+ *
+ * Like the native function the values are compared using SameValueZero, which is the same as strict equality
+ * (`===`) except that NaN matches NaN, and every index is checked so an empty slot of a sparse array (or a
+ * missing index of an array-like object) matches `undefined`.
  * @since 0.8.0
  * @group Array
  * @group Polyfill
@@ -50,7 +56,27 @@ export function polyIsArray<T>(value: any): value is T[] {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyArrIncludes<T>(theArray: ArrayLike<T>, searchElement: T, fromIndex?: number): boolean {
-    return arrIndexOf(theArray, searchElement, fromIndex) !== -1;
+    _throwIfNullOrUndefined(theArray);
+
+    let len = _toLength(theArray[LENGTH]);
+    if (len) {
+        // Convert the fromIndex like the native function (NaN is 0 and Infinity searches nothing)
+        let idx = mathToInt(fromIndex);
+        if (idx < 0) {
+            idx = mathMax(len + idx, 0);
+        }
+
+        // SameValueZero, NaN is the only value which is not equal to itself
+        let isNaNValue = searchElement !== searchElement;
+        for (; idx < len; idx++) {
+            let value = theArray[idx];
+            if (value === searchElement || (isNaNValue && value !== value)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 /**
@@ -285,6 +311,15 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
 
 /**
  * The polyArrFrom creates an new shallow-copied array from an array-like object or an iterable.
+ *
+ * Like the native `Array.from()`:
+ * - An iterable value is iterated, otherwise it is used as an array-like value (eg. `arguments` or a `NodeList`), so
+ * every index up to its length is read (an empty slot or missing index is `undefined`) and any other value (eg. a number)
+ * returns an empty array.
+ * - A string is split into its code points (so a surrogate pair is a single value), this is also done for runtimes
+ * which don't support `Symbol.iterator`.
+ * - The `mapFn` is called with the value and its index.
+ * - A `null` or `undefined` value, or a `mapFn` which is not a function, throws a `TypeError`.
  * @since 0.9.7
  * @group Polyfill
  * @group ArrayLike
@@ -327,15 +362,29 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
  * ```
  */
 export function polyArrFrom<T, U = T>(theValue: ArrayLike<T> | Iterable<T>, mapFn?: ArrFromMapFn<T, U>, thisArg?: any): U[] {
-    if (isArray(theValue)) {
-        let result = arrSlice(theValue);
-        return mapFn ? arrMap<T, U>(result, mapFn, thisArg) : result;
+    let result: any[] = [];
+
+    if (!isUndefined(mapFn) && !isFunction(mapFn)) {
+        throwTypeError(dumpObj(mapFn) + " is not a function");
     }
 
-    let result: U[] = [];
-    iterForOf(theValue as any, (value: U, cnt) => {
-        return result.push(mapFn ? mapFn[CALL](thisArg, value, cnt) : value);
-    });
+    _throwIfNullOrUndefined(theValue);
+
+    // Each value's index is the number of values added before it
+    function _addValue(value: T) {
+        let idx = result[LENGTH];
+        result[idx] = mapFn ? mapFn[CALL](thisArg, value, idx) : value;
+    }
+
+    if (!isString(theValue) && !isArray(theValue) && isIterable(theValue)) {
+        iterForOf(theValue, _addValue);
+    } else {
+        // A string is split into each surrogate pair (or any other single code unit, including an unpaired surrogate)
+        let values: ArrayLike<any> = isString(theValue) ? theValue.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\s\S]/g) || [] : theValue;
+        for (let idx = 0, len = _toLength(values[LENGTH]); idx < len; idx++) {
+            _addValue(values[idx]);
+        }
+    }
 
     return result;
 }
