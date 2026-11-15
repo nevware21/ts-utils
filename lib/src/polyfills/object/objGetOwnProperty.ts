@@ -48,26 +48,21 @@ export function polyObjGetOwnPropertyDescriptors(obj: any): PropertyDescriptorMa
     _throwIfNullOrUndefined(obj);
 
     if (!_recursionCheckOwnDescriptors) {
+        // Add the descriptor for each property
+        const _addDescriptor = (key: PropertyKey) => {
+            const descriptor = _objGetOwnPropertyDescriptor(obj, key);
+            if (descriptor !== undefined) {
+                result[key as any] = descriptor;
+            }
+        };
+
         try {
             _recursionCheckOwnDescriptors = true;
-            
-            // Get all property names, including non-enumerable ones if the environment supports it
-            arrForEach(_objGetOwnPropertyNames(obj), (propName) => {
-                // Add descriptor for each property
-                const descriptor = _objGetOwnPropertyDescriptor(obj, propName);
-                if (descriptor !== undefined) {
-                    result[propName] = descriptor;
-                }
-            });
-            
-            // Handle symbol properties if supported in the environment
-            arrForEach(_polyObjGetOwnPropertySymbols(obj), (sym) => {
-                const descriptor = _objGetOwnPropertyDescriptor(obj, sym);
-                    
-                if (descriptor !== undefined) {
-                    result[sym as any] = descriptor;
-                }
-            });
+
+            // Get all property names, including non-enumerable ones if the environment supports it, and the
+            // symbol properties if supported in the environment
+            arrForEach(_objGetOwnPropertyNames(obj), _addDescriptor);
+            arrForEach(_polyObjGetOwnPropertySymbols(obj), _addDescriptor);
         } finally {
             _recursionCheckOwnDescriptors = false;
         }

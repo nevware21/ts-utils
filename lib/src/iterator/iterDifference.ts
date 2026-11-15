@@ -21,17 +21,22 @@ import { iterToArray } from "./iterToArray";
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function iterDifference<T>(iter: Iterator<T> | Iterable<T>, ...excludeIters: Array<Iterator<T> | Iterable<T>>): T[] {
+export function iterDifference<T>(iter: Iterator<T> | Iterable<T>, ...excludeIters: Array<Iterator<T> | Iterable<T>>): T[];
+
+/*#__NO_SIDE_EFFECTS__*/
+export function iterDifference<T>(iter: Iterator<T> | Iterable<T>): T[] {
+    // The iterators to exclude are the arguments after iter, which are only read so they are not copied into a new array
+    let theArgs = arguments;
     let sourceValues = iterToArray(iter);
     let excludedValues: T[] = [];
 
-    arrForEach(excludeIters, (excludeIter) => {
-        iterForOf(excludeIter, (value) => {
+    for (let lp = 1; lp < theArgs.length; lp++) {
+        iterForOf(theArgs[lp], (value: T) => {
             if (!arrIncludes(excludedValues, value)) {
                 excludedValues.push(value);
             }
         });
-    });
+    }
 
     let result: T[] = [];
     arrForEach(sourceValues, (value) => {

@@ -10,7 +10,6 @@ import { ArrProto } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { isArrayLike } from "../helpers/base";
 import { _toLength } from "../helpers/length";
-import { _arrSliceToArr } from "./slice";
 import { throwRangeError } from "../helpers/throw";
 
 /**
@@ -25,7 +24,9 @@ import { throwRangeError } from "../helpers/throw";
  * @param theArray - The array or array-like object to copy from
  * @param index - The index at which to change the value. Negative index counts from the end
  * @param value - The new value to set at the index
- * @returns A new array with the element at index replaced, or the original array if index is out of range
+ * @returns A new array with the element at index replaced, every other index is read from `theArray` so an
+ * empty slot of a sparse array is `undefined` in the new array
+ * @throws RangeError if the index is out of bounds
  * @example
  * ```ts
  * arrWith([1, 2, 3], 1, 5);       // [1, 5, 3]
@@ -53,7 +54,8 @@ export const arrWith = (/*#__PURE__*/_unwrapFunctionWithPoly("with", ArrProto as
  * @param theArray - The array or array-like object to copy from
  * @param index - The index at which to change the value
  * @param value - The new value to set at the index
- * @returns A new array with the element at index replaced
+ * @returns A new array with the element at index replaced, every other index is read from `theArray` so an
+ * empty slot of a sparse array is `undefined` in the new array
  * @throws RangeError if the index is out of bounds
  */
 /*#__NO_SIDE_EFFECTS__*/
@@ -80,9 +82,11 @@ export function polyArrWith<T>(theArray: ArrayLike<T>, index: number, value: T):
         idx = len + idx;
     }
     
-    // Create a copy and set value
-    result = _arrSliceToArr(theArray);
-    result[idx] = value;
-    
+    // Like the native function every other index is read into the new array (so an empty slot is undefined)
+    result = [];
+    for (let lp = 0; lp < len; lp++) {
+        result[lp] = lp === idx ? value : theArray[lp];
+    }
+
     return result;
 }

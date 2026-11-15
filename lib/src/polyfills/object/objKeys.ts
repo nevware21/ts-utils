@@ -6,9 +6,10 @@
  * Licensed under the MIT license.
  */
 
-import { isFunction, isObject } from "../../helpers/base";
+import { isObject } from "../../helpers/base";
 import { dumpObj } from "../../helpers/diagnostics";
 import { throwTypeError } from "../../helpers/throw";
+import { ObjClass } from "../../internal/constants";
 import { _throwIfNullOrUndefined } from "../../internal/throwIf";
 import { objHasOwn } from "../../object/has_own";
 
@@ -17,14 +18,17 @@ import { objHasOwn } from "../../object/has_own";
  * does not use objForEachKey (which reads every value and swallows getter exceptions) so that, like the native
  * implementations, polyObjKeys never invokes getters and polyObjEntries / polyObjValues invoke each getter once
  * and propagate any exception it throws.
+ * Like the native implementations the value is converted into an object, so a null or undefined value throws, the keys
+ * of a string are the indexes of its characters and any other primitive value has no keys.
  */
 function _objIterateEntries<R>(obj: any, mapper: (key: string) => R): R[] {
     const result: R[] = [];
-    if (obj && (isObject(obj) || isFunction(obj))) {
-        for (const key in obj) {
-            if (objHasOwn(obj, key)) {
-                result.push(mapper(key));
-            }
+
+    _throwIfNullOrUndefined(obj);
+    const theObj = ObjClass(obj);
+    for (const key in theObj) {
+        if (objHasOwn(theObj, key)) {
+            result.push(mapper(key));
         }
     }
 
@@ -68,6 +72,10 @@ export function polyObjKeys(obj: any): string[] {
  * // Array-like object with random key ordering
  * polyObjEntries({ 100: "a", 2: "b", 7: "c" });
  * // [ ['2', 'b'], ['7', 'c'], ['100', 'a'] ]*
+ *
+ * // Like Object.entries() a string returns its characters and null or undefined throws a TypeError
+ * polyObjEntries("ab");
+ * // [ ['0', 'a'], ['1', 'b'] ]
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
@@ -94,6 +102,10 @@ export function polyObjEntries<T = any>(value: {} | { [s: string]: T } | ArrayLi
  * // Array-like object with random key ordering
  * polyObjValues({ 100: "a", 2: "b", 7: "c" });
  * // [ 'b', 'c', 'a']
+ *
+ * // Like Object.values() a string returns its characters and null or undefined throws a TypeError
+ * polyObjValues("ab");
+ * // [ 'a', 'b' ]
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/

@@ -81,6 +81,29 @@ describe("arrIndexOfSubset", () => {
 
         assert.equal(arrIndexOfSubset(arrayLike, ["tomato", "chillies"]), 1);
         assert.equal(arrIndexOfSubset(arrayLike, ["chillies", "tomato"]), -1);
+        assert.equal(arrIndexOfSubset({ length: 2.5, 0: "a", 1: "b", 2: "c" }, ["c"]), -1, "A fractional length is truncated");
+    });
+
+    it("string compares characters, not substrings", () => {
+        assert.equal(arrIndexOfSubset("abc", ["bc"]), -1);
+        assert.equal(arrIndexOfSubset("abc", ["b", "c"]), 1);
+        assert.equal(arrIndexOfSubset("abcabc", "ca"), 2);
+        assert.equal(arrIndexOfSubset("abcabc", ["a", "b"], 1), 3);
+        assert.equal(arrIndexOfSubset("abc", ["a"], -1), -1, "A negative fromIndex is an offset from the end");
+        assert.equal(arrIndexOfSubset(["ab", "c"], "abc"), -1);
+        assert.equal(arrIndexOfSubset(["a", "b", "c"], "bc"), 1);
+    });
+
+    it("an empty slot is compared as undefined", () => {
+        const sparse: any[] = [1];
+        sparse[2] = 3;
+        assert.equal(arrIndexOfSubset(sparse, [undefined, 3]), 1);
+        assert.equal(arrIndexOfSubset(sparse, [undefined]), 1);
+    });
+
+    it("NaN never matches", () => {
+        assert.equal(arrIndexOfSubset([1, NaN, 2], [NaN, 2]), -1);
+        assert.equal(arrIndexOfSubset([1, NaN, 2], [1, NaN]), -1);
     });
 });
 
@@ -171,5 +194,30 @@ describe("arrLastIndexOfSubset", () => {
         const array = [1, 2, 3, 4, 5];
         assert.equal(arrLastIndexOfSubset(array, [3, 4]), 2, "omitted fromIndex finds it from the end");
         assert.equal(arrLastIndexOfSubset(array, [3, 4], null as any), -1, "null fromIndex only searches index 0");
+    });
+
+    it("Infinity fromIndex", () => {
+        const array = [1, 2, 3, 1, 2];
+        assert.equal(arrLastIndexOfSubset(array, [1, 2], Infinity), 3);
+        assert.equal(arrLastIndexOfSubset(array, [1, 2], -Infinity), -1);
+        assert.equal(arrLastIndexOfSubset(array, [], Infinity), 5);
+        assert.equal(arrLastIndexOfSubset(array, [], -Infinity), 0);
+        assert.equal(arrIndexOfSubset(array, [1, 2], Infinity), -1);
+        assert.equal(arrIndexOfSubset(array, [1, 2], -Infinity), 0);
+    });
+
+    it("string compares characters, not substrings", () => {
+        assert.equal(arrLastIndexOfSubset("abcbc", ["bc"]), -1);
+        assert.equal(arrLastIndexOfSubset("abcbc", ["b", "c"]), 3);
+        assert.equal(arrLastIndexOfSubset("abcabc", "ab"), 3);
+        assert.equal(arrLastIndexOfSubset("abcabc", "ab", 2), 0);
+        assert.equal(arrLastIndexOfSubset(["a", "b", "c"], "bc"), 1);
+    });
+
+    it("an empty slot is compared as undefined", () => {
+        const sparse: any[] = [1];
+        sparse[2] = 3;
+        assert.equal(arrLastIndexOfSubset(sparse, [1, undefined]), 0);
+        assert.equal(arrLastIndexOfSubset(sparse, [undefined]), 1);
     });
 });

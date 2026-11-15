@@ -6,25 +6,49 @@
  * Licensed under the MIT license.
  */
 
-import { isArrayLike } from "../helpers/base";
-import { mathTrunc } from "../math/trunc";
-import { arrIndexOf, arrLastIndexOf } from "./indexOf";
+import { isArrayLike, isUndefined } from "../helpers/base";
+import { _toLength } from "../helpers/length";
+import { mathToInt } from "../math/to_int";
 
 /**
- * Normalizes a fromIndex argument the same way the native `indexOf()` / `lastIndexOf()` do -- an
- * omitted (`undefined`) value falls back to defValue, while `null` and `NaN` both coerce to `0`
- * (matching `ToInteger(null) === 0`), and any other finite value is truncated towards zero.
+ * Searches theArray for the subset, forwards from the fromIndex (default 0) or backwards (isLast) from the fromIndex
+ * (default the length). The fromIndex is normalized like the native `indexOf()` / `lastIndexOf()`, so `null` and `NaN`
+ * are `0` (only an omitted value uses the default), it is truncated towards zero and a negative value is an offset
+ * from the end. Only as many elements as are available in theArray from each position are compared, the elements are
+ * read by index and compared with ===, so the characters of a string are compared (rather than a string's own
+ * indexOf() matching a substring) and an empty slot is undefined.
  */
-function _normalizeFromIndex(value: number | null | undefined, defValue: number): number {
-    if (value === undefined) {
-        return defValue;
+/*#__NO_SIDE_EFFECTS__*/
+function _findSubset<T>(theArray: ArrayLike<T>, subset: ArrayLike<T>, fromIndex: number | undefined, isLast?: boolean): number {
+    if (isArrayLike(theArray) && isArrayLike(subset)) {
+        let len = _toLength(theArray.length);
+        let subsetLen = _toLength(subset.length);
+        let pos = isUndefined(fromIndex) ? (isLast ? len : 0) : mathToInt(fromIndex);
+
+        if (pos < 0) {
+            pos += len;
+        }
+
+        // Forwards starts from 0 when before the start, backwards finds nothing when before the start
+        pos = pos > len ? len : (pos < 0 && !isLast ? 0 : pos);
+        if (!subsetLen) {
+            return pos < 0 ? 0 : pos;
+        }
+
+        for (pos = isLast && pos === len ? len - 1 : pos; pos >= 0 && pos < len; pos += isLast ? -1 : 1) {
+            let matchLen = subsetLen < len - pos ? subsetLen : len - pos;
+            let lp = 0;
+            while (lp < matchLen && theArray[pos + lp] === subset[lp]) {
+                lp++;
+            }
+
+            if (lp === matchLen) {
+                return pos;
+            }
+        }
     }
 
-    if (value === null || isNaN(value)) {
-        return 0;
-    }
-
-    return mathTrunc(value);
+    return -1;
 }
 
 /**
@@ -41,6 +65,10 @@ function _normalizeFromIndex(value: number | null | undefined, defValue: number)
  * comparison is limited to just those available elements -- so a `subset` that "runs off the end"
  * of `theArray` is still considered a match against its available prefix. This makes it possible
  * to match a shorter (eg. truncated) array against a longer one, or vice-versa.
+ *
+ * The elements are read by index, so for a string its characters (UTF-16 code units) are compared
+ * (a string element of `subset` never matches a substring) and an empty slot of a sparse array is
+ * compared as `undefined`. As strict equality is used `NaN` never matches.
  * @function
  * @since 0.20.0
  * @group Array
@@ -60,6 +88,8 @@ function _normalizeFromIndex(value: number | null | undefined, defValue: number)
  * arrIndexOfSubset(["a", "b", "a", "b", "c"], ["b", "c"]); // 3
  * arrIndexOfSubset([1, 2, 3], [3, 4, 5]);           // 2 (matches the available "3")
  * arrIndexOfSubset([1, 2, 3], []);                  // 0
+ * arrIndexOfSubset("abcabc", ["c", "a"]);           // 2
+ * arrIndexOfSubset("abc", ["bc"]);                  // -1 (the characters are compared)
  *
  * // Repeated values -- a plain indexOf() of the first element would land on index 0
  * let haystack = ["at foo", "at bar", "at foo", "at bar", "at baz"];
@@ -68,47 +98,7 @@ function _normalizeFromIndex(value: number | null | undefined, defValue: number)
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function arrIndexOfSubset<T>(theArray: ArrayLike<T>, subset: ArrayLike<T>, fromIndex?: number): number {
-    if (!isArrayLike(theArray) || !isArrayLike(subset)) {
-        return -1;
-    }
-
-    let haystackLen = theArray.length;
-    let subsetLen = subset.length;
-
-    let searchFrom = _normalizeFromIndex(fromIndex, 0);
-    if (searchFrom < 0) {
-        searchFrom = haystackLen + searchFrom;
-    }
-
-    if (searchFrom < 0) {
-        searchFrom = 0;
-    }
-
-    if (subsetLen === 0) {
-        return searchFrom < haystackLen ? searchFrom : haystackLen;
-    }
-
-    while (searchFrom < haystackLen) {
-        let pos = arrIndexOf(theArray, subset[0], searchFrom);
-        if (pos === -1) {
-            return -1;
-        }
-
-        // Only compare as many elements as are actually available in theArray from pos
-        let matchLen = subsetLen < (haystackLen - pos) ? subsetLen : (haystackLen - pos);
-        let isMatch = true;
-        for (let lp = 1; isMatch && lp < matchLen; lp++) {
-            isMatch = theArray[pos + lp] === subset[lp];
-        }
-
-        if (isMatch) {
-            return pos;
-        }
-
-        searchFrom = pos + 1;
-    }
-
-    return -1;
+    return _findSubset(theArray, subset, fromIndex);
 }
 
 /**
@@ -120,7 +110,8 @@ export function arrIndexOfSubset<T>(theArray: ArrayLike<T>, subset: ArrayLike<T>
  * As with {@link arrIndexOfSubset}, if `theArray` has fewer remaining elements than
  * `subset` from a candidate position, the comparison is limited to just those available
  * elements -- so a `subset` that "runs off the end" of `theArray` is still considered a
- * match against its available prefix.
+ * match against its available prefix. The elements are also read by index, so for a string
+ * its characters are compared and an empty slot of a sparse array is compared as `undefined`.
  * @function
  * @since 0.20.0
  * @group Array
@@ -149,49 +140,5 @@ export function arrIndexOfSubset<T>(theArray: ArrayLike<T>, subset: ArrayLike<T>
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function arrLastIndexOfSubset<T>(theArray: ArrayLike<T>, subset: ArrayLike<T>, fromIndex?: number): number {
-    if (!isArrayLike(theArray) || !isArrayLike(subset)) {
-        return -1;
-    }
-
-    let haystackLen = theArray.length;
-    let subsetLen = subset.length;
-
-    let searchFrom = _normalizeFromIndex(fromIndex, haystackLen);
-    if (searchFrom < 0) {
-        searchFrom = haystackLen + searchFrom;
-    }
-
-    if (searchFrom > haystackLen) {
-        searchFrom = haystackLen;
-    }
-
-    if (subsetLen === 0) {
-        return searchFrom < 0 ? 0 : searchFrom;
-    }
-
-    if (searchFrom > haystackLen - 1) {
-        searchFrom = haystackLen - 1;
-    }
-
-    while (searchFrom >= 0) {
-        let pos = arrLastIndexOf(theArray, subset[0], searchFrom);
-        if (pos === -1) {
-            return -1;
-        }
-
-        // Only compare as many elements as are actually available in theArray from pos
-        let matchLen = subsetLen < (haystackLen - pos) ? subsetLen : (haystackLen - pos);
-        let isMatch = true;
-        for (let lp = 1; isMatch && lp < matchLen; lp++) {
-            isMatch = theArray[pos + lp] === subset[lp];
-        }
-
-        if (isMatch) {
-            return pos;
-        }
-
-        searchFrom = pos - 1;
-    }
-
-    return -1;
+    return _findSubset(theArray, subset, fromIndex, true);
 }

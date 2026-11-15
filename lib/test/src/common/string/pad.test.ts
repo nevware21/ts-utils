@@ -287,6 +287,32 @@ describe("string helpers", () => {
         _checkImplPadEnd("abc", 1/0, "foo");
     });
 
+    describe("polyfills with an empty or non-string padString", () => {
+        it("an empty padString returns the value as-is, like the native functions", () => {
+            assert.equal(polyStrPadStart("abc", 6, ""), "abc");
+            assert.equal(polyStrPadEnd("abc", 6, ""), "abc");
+            assert.equal(polyStrPadStart("", 3, ""), "");
+
+            _checkPolyPadStart("abc", 6, "");
+            _checkPolyPadStart("", 3, "");
+            _checkPolyPadEnd("abc", 6, "");
+            _checkPolyPadEnd("", 3, "");
+        });
+
+        it("only an undefined padString uses the default, like the native functions", () => {
+            assert.equal(polyStrPadStart("abc", 6, null as any), "nulabc");
+            assert.equal(polyStrPadEnd("abc", 6, null as any), "abcnul");
+            assert.equal(polyStrPadStart("abc", 5, undefined), "  abc");
+            assert.equal(polyStrPadStart("abc", 5, 0 as any), "00abc");
+            assert.equal(polyStrPadEnd("abc", 5, false as any), "abcfa");
+
+            _checkPolyPadStart("abc", 6, null as any);
+            _checkPolyPadStart("abc", 5, 0 as any);
+            _checkPolyPadEnd("abc", 6, null as any);
+            _checkPolyPadEnd("abc", 5, false as any);
+        });
+    });
+
     function _checkPadStart(value: any, count: number, fill?: string) {
         let padStartResult: any;
         let nativeResult: any;

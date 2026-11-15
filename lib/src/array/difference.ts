@@ -34,16 +34,20 @@ import { _strArgsToArr } from "./slice";
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function arrDifference<T>(theArray: ArrayLike<T> | null | undefined, ...excludeArrays: ArrayLike<T>[]): T[] {
+export function arrDifference<T>(theArray: ArrayLike<T> | null | undefined, ...excludeArrays: ArrayLike<T>[]): T[];
+
+/*#__NO_SIDE_EFFECTS__*/
+export function arrDifference<T>(theArray: ArrayLike<T> | null | undefined): T[] {
     let result: T[] = [];
 
     if (isArrayLike(theArray)) {
-        // A string's own includes() matches a substring, so its characters are compared instead
-        excludeArrays = _strArgsToArr(excludeArrays) as ArrayLike<T>[];
+        // The arrays to exclude are the arguments after theArray, which are only read so they are not copied into a new
+        // array. A string's own includes() matches a substring, so its characters are compared instead
+        let excludeArrays = _strArgsToArr(arguments as ArrayLike<ArrayLike<T>>);
 
         arrForEach(theArray, (item) => {
             let excluded = false;
-            for (let lp = 0; lp < excludeArrays.length; lp++) {
+            for (let lp = 1; lp < excludeArrays.length; lp++) {
                 let exclValue = excludeArrays[lp];
                 // Check if excludeArray is valid before using arrIncludes
                 if (isArrayLike(exclValue) && arrIncludes(exclValue, item)) {

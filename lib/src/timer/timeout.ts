@@ -20,30 +20,35 @@ let _setTimeoutFn: TimeoutOverrideFn | undefined;
 let _clearTimeoutFn: ClearTimeoutOverrideFn | undefined;
 let _microtaskCallback: (() => void) | undefined;
 
-function _resolveTimeoutFn(timeoutFn: TimeoutOverrideFn): TimeoutOverrideFn {
-    let result = isFunction(timeoutFn) ? timeoutFn : _setTimeoutFn;
-    if (!result) {
-        // Get global timeout overrides if available
-        let globalOverrides = _getGlobalConfig().tmOut || [];
-        if (isArray(globalOverrides) && globalOverrides.length > 0 && isFunction(globalOverrides[0])) {
-            result = (globalOverrides as TimeoutOverrideFuncs)[0];
-        }
-    }
+/**
+ * Returns the [setTimeout, clearTimeout] overrides of an override, which is either the setTimeout function alone or the
+ * pair, with defValue for any that isn't given
+ */
+function _getOverrides(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs | undefined, defValue: null | undefined): [any, any] {
+    let isArr = isArray(overrideFn);
+    let len = isArr ? (overrideFn as TimeoutOverrideFuncs).length : 0;
 
-    return result || setTimeout;
+    return [
+        len > 0 ? (overrideFn as TimeoutOverrideFuncs)[0] : (!isArr ? overrideFn : defValue),
+        len > 1 ? (overrideFn as TimeoutOverrideFuncs)[1] : defValue
+    ];
 }
 
-function _resolveClearTimeoutFn(timeoutFn: ClearTimeoutOverrideFn): ClearTimeoutOverrideFn {
-    let result = isFunction(timeoutFn) ? timeoutFn : _clearTimeoutFn;
+/**
+ * Returns the function to use: the given one, else the package instance override, else the global override (at idx of
+ * the global [setTimeout, clearTimeout] pair), else the native function
+ */
+function _resolveFn<F>(theFn: F, packageFn: F | undefined, idx: number, nativeFn: F): F {
+    let result = isFunction(theFn) ? theFn : packageFn;
     if (!result) {
         // Get global timeout overrides if available
-        let globalOverrides = _getGlobalConfig().tmOut || [];
-        if (isArray(globalOverrides) && globalOverrides.length > 1 && isFunction(globalOverrides[1])) {
-            result = (globalOverrides as TimeoutOverrideFuncs)[1];
+        let globalOverrides = _getGlobalConfig().tmOut;
+        if (isArray(globalOverrides) && isFunction(globalOverrides[idx])) {
+            result = globalOverrides[idx] as any;
         }
     }
 
-    return result || clearTimeout;
+    return result || nativeFn;
 }
 
 /**
@@ -54,13 +59,12 @@ function _resolveClearTimeoutFn(timeoutFn: ClearTimeoutOverrideFn): ClearTimeout
  * after the callers have returned.
  */
 function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs, theArgs: any[]): ITimerHandler {
-    let isArr = isArray(overrideFn);
-    let len = isArr ? overrideFn.length : 0;
-    
+    let overrides = _getOverrides(overrideFn, UNDEF_VALUE);
+
     // Use package instance override functions if provided and no specific override was given
     // If no package overrides, try global overrides before falling back to native functions
-    let setFn = _resolveTimeoutFn(len > 0 ? (overrideFn as TimeoutOverrideFuncs)[0] : (!isArr ? overrideFn as TimeoutOverrideFn: UNDEF_VALUE));
-    let clearFn = _resolveClearTimeoutFn(len > 1 ? (overrideFn as TimeoutOverrideFuncs)[1] : UNDEF_VALUE);
+    let setFn = _resolveFn(overrides[0], _setTimeoutFn, 0, setTimeout as TimeoutOverrideFn);
+    let clearFn = _resolveFn(overrides[1], _clearTimeoutFn, 1, clearTimeout as ClearTimeoutOverrideFn);
 
     let timerFn = theArgs[0];
     theArgs[0] = function () {
@@ -176,11 +180,10 @@ export function _setMicrotaskCallback(queueFn: (() => void) | undefined): void {
  * ```
  */
 export function setTimeoutOverrides(overrideFn?: TimeoutOverrideFn | TimeoutOverrideFuncs): void {
-    let isArr = isArray(overrideFn);
-    let len = isArr ? overrideFn.length : 0;
-    
-    _setTimeoutFn = (len > 0 ? (overrideFn as TimeoutOverrideFuncs)[0] : (!isArr ? overrideFn as TimeoutOverrideFn: UNDEF_VALUE));
-    _clearTimeoutFn = (len > 1 ? (overrideFn as TimeoutOverrideFuncs)[1] : UNDEF_VALUE);
+    let overrides = _getOverrides(overrideFn, UNDEF_VALUE);
+
+    _setTimeoutFn = overrides[0];
+    _clearTimeoutFn = overrides[1];
 }
 
 /**
@@ -228,21 +231,8 @@ export function setTimeoutOverrides(overrideFn?: TimeoutOverrideFn | TimeoutOver
  * ```
  */
 export function setGlobalTimeoutOverrides(overrideFn?: TimeoutOverrideFn | TimeoutOverrideFuncs): void {
-    let isArr = isArray(overrideFn);
-    let len = isArr ? overrideFn.length : 0;
-    
-    let globalCfg = _getGlobalConfig();
-    
-    if (!overrideFn) {
-        // If no override provided, reset the global overrides
-        globalCfg.tmOut = undefined;
-    } else {
-        // Set the global timeout overrides
-        globalCfg.tmOut = [
-            (len > 0 ? (overrideFn as TimeoutOverrideFuncs)[0] : (!isArr ? overrideFn as TimeoutOverrideFn : null)),
-            (len > 1 ? (overrideFn as TimeoutOverrideFuncs)[1] : null)
-        ] as TimeoutOverrideFuncs;
-    }
+    // Set the global timeout overrides, or reset them when no override is provided
+    _getGlobalConfig().tmOut = overrideFn ? _getOverrides(overrideFn, null) : undefined;
 }
 
 /**

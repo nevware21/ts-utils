@@ -6,15 +6,26 @@
  * Licensed under the MIT license.
  */
 
-import { arrForEach } from "../../array/forEach";
-import { isArray } from "../../helpers/base";
-import { __PROTO__ } from "../../internal/constants";
+import { isArray, isFunction, isObject } from "../../helpers/base";
+import { dumpObj } from "../../helpers/diagnostics";
+import { throwTypeError } from "../../helpers/throw";
+import { LENGTH, __PROTO__ } from "../../internal/constants";
+import { _throwIfNullOrUndefined } from "../../internal/throwIf";
 import { iterForOf } from "../../iterator/forOf";
 import { isIterable } from "../../iterator/iterator";
+import { objDefine } from "../../object/define";
+import { asString } from "../../string/as_string";
 
 /**
  * Creates a new object from an array of [key, value] pairs.
  * Supports both native symbols and polyfilled symbols.
+ *
+ * Like the native `Object.fromEntries()`:
+ * - Each entry must be an object, its `0` property is the key and its `1` property is the value (so an entry
+ * with only a key has an `undefined` value).
+ * - A `__proto__` key is added as an own property, it does not change the prototype of the new object.
+ * - A `null` or `undefined` value, a value which is not iterable (an array is always supported) or an entry
+ * which is not an object (including an empty slot of a sparse array) throws a `TypeError`.
  *
  * @since 0.12.0
  * @group Polyfill
@@ -27,30 +38,35 @@ export function polyObjFromEntries(entries: Iterable<readonly any[]>): any;
 export function polyObjFromEntries<T = any>(entries: any): T {
     const result = {} as any;
 
-    function _defineProtoValue(value: any) {
-        Object.defineProperty(result, __PROTO__, {
-            value: value,
-            enumerable: true,
-            configurable: true,
-            writable: true
-        });
-    }
-    
     function addEntry(entry: any) {
-        if (isArray(entry) && entry.length >= 2) {
-            if (entry[0] === __PROTO__) {
-                _defineProtoValue(entry[1]);
-            } else {
-                result[entry[0]] = entry[1];
-            }
+        if (!isObject(entry) && !isFunction(entry)) {
+            throwTypeError(dumpObj(entry) + " is not an entry object");
+        }
+
+        // Convert the key once (like the native function) before checking for __proto__, so an object key which converts
+        // to "__proto__" can't change the prototype of the result
+        let key = entry[0];
+        let value = entry[1];
+        key = typeof key === "symbol" ? key : asString(key);
+        if (key === __PROTO__) {
+            // Added as an own (enumerable, configurable and writable) property, rather than changing the prototype
+            objDefine(result, key, { v: value, w: true });
+        } else {
+            result[key] = value;
         }
     }
-    
+
+    _throwIfNullOrUndefined(entries);
     if (isArray(entries)) {
-        arrForEach(entries, addEntry);
+        // Like the array iterator every index is visited (an empty slot is undefined, which throws)
+        for (let idx = 0; idx < entries[LENGTH]; idx++) {
+            addEntry(entries[idx]);
+        }
     } else if (isIterable(entries)) {
         iterForOf(entries, addEntry);
+    } else {
+        throwTypeError(dumpObj(entries) + " is not iterable");
     }
-    
+
     return result as T;
 }

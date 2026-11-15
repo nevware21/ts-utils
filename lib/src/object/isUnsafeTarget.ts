@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { arrForEach } from "../array/forEach";
 import { arrIndexOf } from "../array/indexOf";
 import { createCachedValue, ICachedValue } from "../helpers/cache";
 import { getInst } from "../helpers/environment";
@@ -14,66 +15,30 @@ import { ArrProto, BooleanProto, DateProto, ErrorProto, FuncProto, NumberProto, 
 
 let _unsafeTargets: ICachedValue<Array<any>>;
 
-/*#__NO_SIDE_EFFECTS__*/
-function _addTarget(targets: any[], target: any) {
-    if (target) {
-        targets.push(target);
-    }
-}
-
-/*#__NO_SIDE_EFFECTS__*/
-function _addTargetProto(targets: any[], ctor: any) {
-    if (ctor) {
-        _addTarget(targets, ctor[PROTOTYPE]);
-    }
-}
+/**
+ * The global classes whose prototype (where the class is defined) is also an unsafe target, as one string rather than a call
+ * for each as that is smaller.
+ */
+const UNSAFE_CLASSES = "TypeError,RangeError,SyntaxError,ReferenceError,EvalError,URIError,Map,Set,WeakMap,WeakSet,Promise,Symbol," +
+    "ArrayBuffer,SharedArrayBuffer,DataView,Int8Array,Uint8Array,Uint8ClampedArray,Int16Array,Uint16Array,Int32Array,Uint32Array," +
+    "Float32Array,Float64Array,BigInt64Array,BigUint64Array,WeakRef,FinalizationRegistry";
 
 /**
  * @ignore
+ * Returns the built-in prototypes. Nothing that adds to the list may be annotated as having no side effects
+ * (`#__NO_SIDE_EFFECTS__`): a bundler removes every call to such a function whose result is unused, which removed every
+ * prototype added that way from the bundles (and from a consumer's esbuild bundle) from v0.14.0 until v0.20.0.
  */
-/*#__NO_SIDE_EFFECTS__*/
 function _getUnsafeTargets(): any[] {
+    let targets: any[] = [ObjProto, StrProto, ArrProto, NumberProto, FuncProto, DateProto, RegExpProto, BooleanProto, ErrorProto];
 
-    let targets = [
-        ObjProto,
-        StrProto,
-        ArrProto,
-        NumberProto,
-        FuncProto,
-        DateProto,
-        RegExpProto,
-        BooleanProto,
-        ErrorProto
-    ];
-
-    _addTargetProto(targets, TypeError);
-    _addTargetProto(targets, RangeError);
-    _addTargetProto(targets, SyntaxError);
-    _addTargetProto(targets, ReferenceError);
-    _addTargetProto(targets, EvalError);
-    _addTargetProto(targets, URIError);
-    _addTargetProto(targets, safe(getInst as any, ["Map"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["Set"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["WeakMap"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["WeakSet"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["Promise"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["Symbol"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["ArrayBuffer"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["SharedArrayBuffer"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["DataView"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["Int8Array"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["Uint8Array"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["Uint8ClampedArray"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["Int16Array"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["Uint16Array"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["Int32Array"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["Uint32Array"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["Float32Array"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["Float64Array"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["BigInt64Array"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["BigUint64Array"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["WeakRef"]).v);
-    _addTargetProto(targets, safe(getInst as any, ["FinalizationRegistry"]).v);
+    arrForEach(UNSAFE_CLASSES.split(","), (name) => {
+        let theClass = safe(getInst as any, [name]).v;
+        let proto = theClass && theClass[PROTOTYPE];
+        if (proto) {
+            targets.push(proto);
+        }
+    });
 
     return targets;
 }

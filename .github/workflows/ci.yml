@@ -53,5 +53,10 @@ jobs:
     - name: Bundle Size Checks
       run: npm run size-check
 
+    - name: TypeScript version checks
+      if: matrix.node == 22
+      run: npm run ts-versions-check
+      timeout-minutes: 15
+
     - name: Docs link check
       run: npm run readme-link-check
