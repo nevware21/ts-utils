@@ -27,4 +27,15 @@ describe("iterIntersection", () => {
         assert.equal(intersection.length, 1);
         assert.equal(intersection[0] !== intersection[0], true);
     });
+
+    it("returns an empty array when called with no iterables", () => {
+        assert.deepEqual((iterIntersection as any)(), []);
+    });
+
+    it("returns the unique values when called with one iterable", () => {
+        assert.deepEqual(iterIntersection([1, 1, 2]), [1, 2]);
+        assert.deepEqual(iterIntersection(createArrayIterator([3, 3, 4])), [3, 4]);
+        assert.deepEqual(iterIntersection([]), []);
+        assert.deepEqual(iterIntersection(null as any), []);
+    });
 });

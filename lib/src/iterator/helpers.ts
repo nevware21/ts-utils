@@ -16,7 +16,9 @@ import { createIterableIterator } from "./create";
 import { isIterable, isIterator } from "./iterator";
 
 export function _asIterator<T>(iter: Iterator<T> | Iterable<T> | ArrayLike<T>): Iterator<T> {
-    if (isIterator(iter)) {
+    // Like for...of (and iterForOf), only an iterator which is not iterable is used as-is, so an iterable which also has
+    // a next() function (eg. a jQuery collection) is processed using its values rather than its next() function
+    if (isIterator(iter) && !isIterable(iter)) {
         return iter;
     }
 

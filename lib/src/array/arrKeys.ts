@@ -6,11 +6,11 @@
  * Licensed under the MIT license.
  */
 
+import { _toLength } from "../helpers/length";
 import { ArrProto } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { createIterableIterator } from "../iterator/create";
-import { mathToInt } from "../math/to_int";
 
 /**
  * Returns an iterator over all numeric keys from `0` to `length - 1`.
@@ -60,10 +60,7 @@ export function polyArrKeys<T = any>(value: ArrayLike<T>): IterableIterator<numb
     _throwIfNullOrUndefined(value);
 
     let idx = -1;
-    let len = mathToInt(value.length);
-    if (len < 0) {
-        len = 0;
-    }
+    let len = _toLength(value);
 
     return createIterableIterator<number>({
         n: function() {

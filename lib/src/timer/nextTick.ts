@@ -15,7 +15,7 @@ import { _resolveScheduleFn } from "./microtasks/resolveScheduleFn";
 import { _addNextTickToQueue } from "./microtasks/timerQueue";
 import { _eTaskQueueType } from "./microtasks/taskQueue";
 import { fnBindArgs } from "../funcs/fnBindArgs";
-import { UNDEF_VALUE } from "../internal/constants";
+import { LENGTH, UNDEF_VALUE } from "../internal/constants";
 import { MicrotaskFn, ScheduleMicrotaskFn } from "../helpers/types";
 import { _getMicrotaskQueueFn } from "./microtasks/microtaskQueue";
 
@@ -212,7 +212,7 @@ export function scheduleNextTick<TArgs extends any[]>(callback: (...args: TArgs)
     let callbackArgs: TArgs | undefined;
     let theOptions: NextTickOptions | undefined;
 
-    if (arguments.length > 1 && argsOrOptions && isArray(argsOrOptions)) {
+    if (arguments[LENGTH] > 1 && argsOrOptions && isArray(argsOrOptions)) {
         callbackArgs = argsOrOptions as TArgs;
         theOptions = options;
     } else {

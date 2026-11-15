@@ -76,10 +76,9 @@ export const arrFill = (/*#__PURE__*/_unwrapFunctionWithPoly("fill", ArrProto, p
  * @param end - End index (exclusive), defaults to array.length
  * @returns The modified array
  */
-/*#__NO_SIDE_EFFECTS__*/
 export function polyArrFill<T>(theArray: WritableArrayLike<T>, value: T, start?: number, end?: number): WritableArrayLike<T> {
     if (isArrayLike(theArray)) {
-        const len = _toLength(theArray.length);
+        const len = _toLength(theArray);
         const startIdx = _getFillIdx(start, len);
         const endIdx = end === UNDEF_VALUE ? len : _getFillIdx(end, len);
         

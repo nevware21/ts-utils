@@ -9,6 +9,7 @@
 import { _arrSliceToArr } from "./slice";
 import { isArrayLike } from "../helpers/base";
 import { arrAppend } from "./append";
+import { _toLength } from "../helpers/length";
 
 /**
  * The arrRotate() method returns a new array with elements rotated by the specified number of positions.
@@ -40,7 +41,8 @@ export function arrRotate<T>(theArray: ArrayLike<T> | null | undefined, count: n
     let result: T[];
 
     if (isArrayLike(theArray)) {
-        const len = theArray.length;
+        // A fractional length is truncated (like the native functions), so the rotation is a whole number of positions
+        const len = _toLength(theArray);
 
         if (!(len === 0 || count === 0)) {
             // Normalize the rotation count to be within array bounds

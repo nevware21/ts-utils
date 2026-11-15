@@ -8,6 +8,7 @@
 
 import { LENGTH } from "../internal/constants";
 import { _unwrapProp } from "../internal/unwrapFunction";
+import { throwRangeError } from "./throw";
 
 /**
  * Interface to identify that an object contains the length property used as a type
@@ -53,15 +54,35 @@ export const getLength: <T extends IGetLength>(value: T) => T["length"] = (/*#__
 /**
  * @internal
  * @ignore
- * Converts the value into a length like the native array functions do (the ECMAScript ToLength() operation), which is an
- * integer from 0 to 2^53 - 1. So NaN and negative values are 0 and fractions are truncated.
- * @param value - The value to convert
+ * Returns the length of the array or array-like value, converting its `length` property like the native array functions
+ * do (the ECMAScript LengthOfArrayLike() operation) into an integer from 0 to 2^53 - 1. So NaN and negative values are 0
+ * and fractions are truncated.
+ * @param value - The array or array-like value to return the length of
  * @returns The length
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function _toLength(value: any): number {
-    let len = +value;
+export function _toLength(value: ArrayLike<any>): number {
+    let len = +value[LENGTH];
 
     // A length which is already a valid integer (the normal case) is returned as-is
     return len >>> 0 === len ? len : (len > 0 ? (len < 0x1FFFFFFFFFFFFF ? len - len % 1 : 0x1FFFFFFFFFFFFF) : 0);
+}
+
+/**
+ * @internal
+ * @ignore
+ * Returns the length of the array or array-like value as the length of a new array, like {@link _toLength} but (like
+ * the native functions) it throws a RangeError for a length which is longer than an array can be (2^32 - 1), rather
+ * than adding values until the runtime runs out of memory. It is not annotated as having no side effects as it can
+ * throw.
+ * @param value - The array or array-like value to return the length of
+ * @returns The length
+ */
+export function _toArrayLength(value: ArrayLike<any>): number {
+    let len = _toLength(value);
+    if (len > 0xFFFFFFFF) {
+        throwRangeError("Invalid array length");
+    }
+
+    return len;
 }

@@ -9,7 +9,7 @@
 import { isArray, isFunction, isObject } from "../../helpers/base";
 import { dumpObj } from "../../helpers/diagnostics";
 import { throwTypeError } from "../../helpers/throw";
-import { LENGTH, __PROTO__ } from "../../internal/constants";
+import { LENGTH } from "../../internal/constants";
 import { _throwIfNullOrUndefined } from "../../internal/throwIf";
 import { iterForOf } from "../../iterator/forOf";
 import { isIterable } from "../../iterator/iterator";
@@ -23,7 +23,9 @@ import { asString } from "../../string/as_string";
  * Like the native `Object.fromEntries()`:
  * - Each entry must be an object, its `0` property is the key and its `1` property is the value (so an entry
  * with only a key has an `undefined` value).
- * - A `__proto__` key is added as an own property, it does not change the prototype of the new object.
+ * - Each key is defined as an own property (rather than assigned), so a `__proto__` key does not change the
+ * prototype of the new object, and a setter or read-only property of the same name on `Object.prototype` doesn't
+ * stop the key being added.
  * - A `null` or `undefined` value, a value which is not iterable (an array is always supported) or an entry
  * which is not an object (including an empty slot of a sparse array) throws a `TypeError`.
  *
@@ -43,17 +45,14 @@ export function polyObjFromEntries<T = any>(entries: any): T {
             throwTypeError(dumpObj(entry) + " is not an entry object");
         }
 
-        // Convert the key once (like the native function) before checking for __proto__, so an object key which converts
-        // to "__proto__" can't change the prototype of the result
+        // Convert the key once (like the native function), then define it as an own (enumerable, configurable and
+        // writable) property rather than assigning it, so a "__proto__" key (including an object key which converts to
+        // it) can't change the prototype of the result, and a setter or a read-only property of the same name on
+        // Object.prototype (eg. when it is frozen) doesn't stop it being added. Object.defineProperty is defined by
+        // every runtime which needs this polyfill (ES5).
         let key = entry[0];
         let value = entry[1];
-        key = typeof key === "symbol" ? key : asString(key);
-        if (key === __PROTO__) {
-            // Added as an own (enumerable, configurable and writable) property, rather than changing the prototype
-            objDefine(result, key, { v: value, w: true });
-        } else {
-            result[key] = value;
-        }
+        objDefine(result, typeof key === "symbol" ? key : asString(key), { v: value, w: true });
     }
 
     _throwIfNullOrUndefined(entries);

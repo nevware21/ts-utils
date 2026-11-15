@@ -192,6 +192,46 @@ describe("array helpers", () => {
             }, false);
             assert.strictEqual(capturedThis, false, "thisArg of false should be used as-is");
         });
+
+        it("converts the length of an array like object like the native forEach", () => {
+            function _visits(value: any, expected: number[]) {
+                let visited: number[] = [];
+                arrForEach(value, (item: any, idx: number) => {
+                    visited.push(idx);
+
+                    // Stop once the expected number of values are visited (or after the first value when none are
+                    // expected), so a length which is too long fails rather than taking forever
+                    if (visited.length >= (expected.length || 1)) {
+                        return -1;
+                    }
+                });
+
+                return visited;
+            }
+
+            function _checkVisits(value: any, expected: number[], checkNative: boolean) {
+                assert.deepEqual(_visits(value, expected), expected, "Checking the visited indexes for a length of " + dumpObj(value.length));
+                if (checkNative) {
+                    let nativeVisits: number[] = [];
+                    Array.prototype.forEach.call(value, (item: any, idx: number) => {
+                        nativeVisits.push(idx);
+                    });
+                    assert.deepEqual(nativeVisits, expected, "Checking the native visited indexes for a length of " + dumpObj(value.length));
+                }
+            }
+
+            // A length which is negative or 2^32 or more was converted with ">>> 0", so it wrapped around, eg. -1 was
+            // 4294967295 (which effectively never ended), -4294967295 was 1 and 4294967297 was 1
+            _checkVisits({ length: -1, 0: "a" }, [], true);
+            _checkVisits({ length: -4294967295, 0: "a", 1: "b" }, [], true);
+            _checkVisits({ length: 2.5, 0: "a", 1: "b", 2: "c" }, [0, 1], true);
+            _checkVisits({ length: "2", 0: "a", 1: "b", 2: "c" }, [0, 1], true);
+            _checkVisits({ length: NaN, 0: "a" }, [], true);
+            _checkVisits({ 0: "a" }, [], true);
+
+            // The native forEach would check every index up to the length, so it is only compared for the shorter lengths
+            _checkVisits({ length: 4294967297, 0: "a", 1: "b", 2: "c" }, [0, 1, 2], false);
+        });
     });
 
     describe("arrAppend", () => {

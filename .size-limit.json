@@ -23,7 +23,7 @@
   {
     "name": "es6-full-brotli",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "13.75 kb",
+    "limit": "14 kb",
     "brotli": true,
     "running": false
   },
@@ -75,7 +75,7 @@
   {
     "name": "es5-strEndsWith",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "700 b",
+    "limit": "800 b",
     "import": "{ strEndsWith }",
     "gzip": true,
     "running": false
@@ -91,7 +91,7 @@
   {
     "name": "es5-simple-string",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "1 kb",
+    "limit": "1.125 kb",
     "import": "{ getWindow, strEndsWith }",
     "gzip": true,
     "running": false

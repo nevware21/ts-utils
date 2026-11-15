@@ -71,7 +71,7 @@ export const strContains: (value: string, searchString: string, position?: numbe
 /*#__NO_SIDE_EFFECTS__*/
 export function polyStrIncludes(value: string, searchString: string, position?: number): boolean {
     if (isRegExp(searchString)) {
-        throwTypeError("'searchString' must not be a regular expression" + dumpObj(searchString))
+        throwTypeError("'searchString' must not be a regular expression " + dumpObj(searchString))
     }
 
     return strIndexOf(value, asString(searchString), position) !== -1;

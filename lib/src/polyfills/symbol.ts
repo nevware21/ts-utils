@@ -8,7 +8,7 @@
 
 import { WellKnownSymbols, _wellKnownSymbolMap } from "../symbol/well_known";
 import { throwTypeError } from "../helpers/throw";
-import { SYMBOL, TO_STRING } from "../internal/constants";
+import { LENGTH, SYMBOL, TO_STRING } from "../internal/constants";
 import { objHasOwn } from "../object/has_own";
 import { asString } from "../string/as_string";
 import { _GlobalPolySymbols, _getGlobalConfig } from "../internal/global";
@@ -86,7 +86,7 @@ export function polySymbolFor(key: string): symbol {
     let registry = _globalSymbolRegistry();
     if (!objHasOwn(registry.k, key)) {
         let newSymbol: any = polyNewSymbol(key);
-        let regId = objKeys(registry.s).length;
+        let regId = objKeys(registry.s)[LENGTH];
         newSymbol[UNIQUE_REGISTRY_ID] = () => regId + "_" + newSymbol[TO_STRING]();
         registry.k[key] = newSymbol;
         registry.s[newSymbol[UNIQUE_REGISTRY_ID]()] = asString(key);

@@ -49,6 +49,34 @@ describe("arrZip", () => {
     });
 });
 
+describe("arrZip array-like lengths", () => {
+    it("should truncate a fractional length, like the native functions", () => {
+        // Previously a length of 1.5 included the value at index 1
+        assert.deepEqual(arrZip({ length: 1.5, 0: 1, 1: 2 } as any, { length: 1.5, 0: 3, 1: 4 } as any), [[1, 3]]);
+        assert.deepEqual(arrZip({ length: 2.5, 0: 1, 1: 2, 2: 3 } as any, [4, 5, 6]), [[1, 4], [2, 5]]);
+        assert.deepEqual(arrZip({ length: 0.5, 0: 1 } as any, [2]), []);
+    });
+
+    it("should return an empty array when the result would be longer than an array can be", () => {
+        assert.deepEqual(arrZip({ length: Infinity } as any, { length: Infinity } as any), []);
+        assert.deepEqual(arrZip({ length: 4294967296 } as any), []);
+
+        // The shortest array still sets the length of the result
+        assert.deepEqual(arrZip({ length: Infinity, 0: 1 } as any, ["a"]), [[1, "a"]]);
+    });
+});
+
+describe("arrZip arguments", () => {
+    it("should return an empty array when called with no arrays", () => {
+        assert.deepEqual((arrZip as any)(), []);
+    });
+
+    it("should wrap each value when called with one array", () => {
+        assert.deepEqual(arrZip([1, 2]), [[1], [2]]);
+        assert.deepEqual(arrZip([]), []);
+    });
+});
+
 describe("arrUnzip", () => {
     it("should reverse zip operation", () => {
         const zipped = [[1, "a"], [2, "b"], [3, "c"]];
@@ -92,5 +120,12 @@ describe("arrUnzip", () => {
         
         assert.deepEqual(unzipped[0], arr1);
         assert.deepEqual(unzipped[1], arr2);
+    });
+
+    it("should truncate a fractional length, like the native functions", () => {
+        // Previously a sub-array length of 1.5 or 2.5 added an extra group
+        assert.deepEqual(arrUnzip([{ length: 1.5, 0: 1, 1: 2 }, { length: 1.5, 0: 3, 1: 4 }] as any), [[1, 3]]);
+        assert.deepEqual(arrUnzip([{ length: 2.5, 0: 1, 1: 2, 2: 3 }, [4, 5]] as any), [[1, 4], [2, 5]]);
+        assert.deepEqual(arrUnzip({ length: 1.5, 0: [1, 2], 1: [3, 4] } as any), [[1], [2]]);
     });
 });

@@ -12,6 +12,7 @@ import { strSplit } from "../string/split";
 import { iterForOf } from "../iterator/forOf";
 import { isUnsafeTarget } from "../object/isUnsafeTarget";
 import { isUnsafePropKey } from "../object/isUnsafePropKey";
+import { LENGTH } from "../internal/constants";
 
 /**
  * Get the named value from the target object where the path may be presented by a string which
@@ -59,7 +60,7 @@ export function getValueByKey<V, T extends object = any>(target: T, path: string
     }
 
     let parts = strSplit(path, ".");
-    let cnt = parts.length;
+    let cnt = parts[LENGTH];
 
     for (let lp = 0; lp < cnt && !isNullOrUndefined(target); lp++) {
         target = (target as any)[parts[lp]];

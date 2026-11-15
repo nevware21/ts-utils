@@ -20,4 +20,15 @@ describe("iterDifference", () => {
         let difference = iterDifference([NaN], [NaN]);
         assert.deepEqual(difference, []);
     });
+
+    it("returns an empty array when called with no iterables", () => {
+        assert.deepEqual((iterDifference as any)(), []);
+    });
+
+    it("returns every value (including duplicates) of the source when there are no exclude iterables", () => {
+        assert.deepEqual(iterDifference([1, 1, 2]), [1, 1, 2]);
+        assert.deepEqual(iterDifference(createArrayIterator([3, 3, 4])), [3, 3, 4]);
+        assert.deepEqual(iterDifference([]), []);
+        assert.deepEqual(iterDifference(null as any), []);
+    });
 });

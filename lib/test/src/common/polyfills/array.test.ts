@@ -564,6 +564,21 @@ describe("array polyfills", () => {
             assert.deepEqual(polyArrFrom([1], undefined), [1], "An undefined mapFn is no mapping");
         });
 
+        it("throws for a mapFn which is the string \"undefined\", as it is not a function", () => {
+            assert.throws(() => polyArrFrom([1], "undefined" as any), TypeError);
+            assert.throws(() => polyArrFrom([], "undefined" as any), TypeError);
+        });
+
+        it("throws a RangeError for a length which is longer than an array can be, like the native function", () => {
+            // Without the check these would add values until the runtime runs out of memory
+            assert.throws(() => polyArrFrom({ length: Math.pow(2, 32) } as any), RangeError);
+            assert.throws(() => polyArrFrom({ length: Infinity } as any), RangeError);
+            assert.throws(() => polyArrFrom({ length: Number.MAX_VALUE } as any, (value: any) => value), RangeError);
+
+            // A length which an array can be is not rejected
+            assert.deepEqual(polyArrFrom({ length: 3 } as any), [undefined, undefined, undefined]);
+        });
+
         it("matches the native function", function() {
             const nativeFrom = (Array as any).from;
             if (!nativeFrom) {
@@ -752,11 +767,29 @@ describe("array polyfills compared to the native functions", () => {
         assert.deepEqual([filled[0], filled[1], filled[2]], ["a", "z", "c"]);
         assert.equal(Object.keys(filled).indexOf("1.5"), -1, "No fractional index is added");
 
-        if ((Array.prototype as any).at) {
-            const proto: any = Array.prototype;
+        // Each native function is checked only when it exists (eg. Node 18 has at but not with)
+        const proto: any = Array.prototype;
+        if (proto.at) {
             assert.equal(polyArrAt(arrayLike(), -1), proto.at.call(arrayLike(), -1));
+        }
+
+        if (proto.with) {
             assert.deepEqual(polyArrWith(arrayLike(), -1, "z"), proto.with.call(arrayLike(), -1, "z"));
+        }
+
+        if (proto.fill) {
             assert.deepEqual(Object.keys(polyArrFill(arrayLike(), "z" as any, -1)), Object.keys(proto.fill.call(arrayLike(), "z", -1)));
+        }
+    });
+
+    it("with throws a RangeError for a length which is longer than an array can be, like the native function", () => {
+        // Without the check this would add values until the runtime runs out of memory
+        assert.throws(() => polyArrWith({ length: Math.pow(2, 32) + 1 } as any, 0, 1), RangeError);
+        assert.throws(() => polyArrWith({ length: Infinity } as any, 0, 1), RangeError);
+
+        const proto: any = Array.prototype;
+        if (proto.with) {
+            assert.throws(() => proto.with.call({ length: Math.pow(2, 32) + 1 }, 0, 1), RangeError);
         }
     });
 

@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { NULL_VALUE, ObjClass, __PROTO__ } from "../internal/constants";
+import { LENGTH, NULL_VALUE, ObjClass, __PROTO__ } from "../internal/constants";
 import { isArray, isFunction, isObject } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
 import { polyObjEntries, polyObjValues } from "../polyfills/object/objKeys";
@@ -123,7 +123,7 @@ export const objKeys: (value: any) => string[] = (/*#__PURE__*/_pureRef<typeof O
 function _deepFreeze(val: any, visited: any[]): any {
     if ((isArray(val) || isObject(val) || isFunction(val)) && !objIsFrozen(val)) {
         // If already visited, don't process again to prevent infinite recursion
-        for (let lp = 0; lp < visited.length; lp++) {
+        for (let lp = 0; lp < visited[LENGTH]; lp++) {
             if (visited[lp] === val) {
                 return val;
             }

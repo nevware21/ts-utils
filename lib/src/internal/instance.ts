@@ -9,6 +9,7 @@
 import { utcNow } from "../helpers/date";
 import { getLazy, ILazyValue } from "../helpers/lazy";
 import { mathRandom } from "../math/random";
+import { LENGTH } from "./constants";
 
 /**
  * @internal
@@ -18,7 +19,7 @@ import { mathRandom } from "../math/random";
  */
 export let _uniqueInstanceId: ILazyValue<string> = (/*#__PURE__*/getLazy(() => {
     let value = (utcNow().toString(36).slice(2));
-    while(value.length < 16) {
+    while(value[LENGTH] < 16) {
         value += mathRandom().toString(36).slice(2);
     }
 

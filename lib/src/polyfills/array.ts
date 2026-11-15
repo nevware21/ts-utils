@@ -7,12 +7,12 @@
  */
 
 import { ArrFromMapFn, ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "../array/callbacks";
-import { isArray, isFunction, isNullOrUndefined, isStrictNullOrUndefined, isString, isUndefined, objToString } from "../helpers/base";
+import { isArray, isFunction, isNullOrUndefined, isStrictNullOrUndefined, isString, isStrictUndefined, objToString } from "../helpers/base";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
 import { CALL, LENGTH } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
-import { _toLength } from "../helpers/length";
+import { _toArrayLength, _toLength } from "../helpers/length";
 import { iterForOf } from "../iterator/forOf";
 import { isIterable } from "../iterator/iterator";
 import { mathMax } from "../math/min_max";
@@ -58,7 +58,7 @@ export function polyIsArray<T>(value: any): value is T[] {
 export function polyArrIncludes<T>(theArray: ArrayLike<T>, searchElement: T, fromIndex?: number): boolean {
     _throwIfNullOrUndefined(theArray);
 
-    let len = _toLength(theArray[LENGTH]);
+    let len = _toLength(theArray);
     if (len) {
         // Convert the fromIndex like the native function (NaN is 0 and Infinity searches nothing)
         let idx = mathToInt(fromIndex);
@@ -182,7 +182,7 @@ export function polyArrFind<T, E extends T>(theArray: ArrayLike<T>, callbackFn: 
  * @return The index of the first element in the array that passes the test. Otherwise, -1.
  */
 export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
-    let len = _toLength(theArray[LENGTH]);
+    let len = _toLength(theArray);
 
     // Like the native function every index is visited (an empty slot is undefined), so there is no "in" check
     for (let idx = 0; idx < len; idx++) {
@@ -297,7 +297,7 @@ export function polyArrFindLast<T, E extends T>(theArray: ArrayLike<T>, callback
  */
 export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
     let result = -1;
-    let len = _toLength(theArray[LENGTH]);
+    let len = _toLength(theArray);
     // Like the native function every index is visited (an empty slot is undefined), so there is no "in" check
     for (let idx = len - 1; idx >= 0; idx--) {
         if (callbackFn[CALL](isStrictNullOrUndefined(thisArg) ? theArray as any : thisArg, theArray[idx], idx, theArray)) {
@@ -364,7 +364,7 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
 export function polyArrFrom<T, U = T>(theValue: ArrayLike<T> | Iterable<T>, mapFn?: ArrFromMapFn<T, U>, thisArg?: any): U[] {
     let result: any[] = [];
 
-    if (!isUndefined(mapFn) && !isFunction(mapFn)) {
+    if (!isStrictUndefined(mapFn) && !isFunction(mapFn)) {
         throwTypeError(dumpObj(mapFn) + " is not a function");
     }
 
@@ -381,7 +381,7 @@ export function polyArrFrom<T, U = T>(theValue: ArrayLike<T> | Iterable<T>, mapF
     } else {
         // A string is split into each surrogate pair (or any other single code unit, including an unpaired surrogate)
         let values: ArrayLike<any> = isString(theValue) ? theValue.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\s\S]/g) || [] : theValue;
-        for (let idx = 0, len = _toLength(values[LENGTH]); idx < len; idx++) {
+        for (let idx = 0, len = _toArrayLength(values); idx < len; idx++) {
             _addValue(values[idx]);
         }
     }

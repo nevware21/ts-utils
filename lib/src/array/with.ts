@@ -9,7 +9,7 @@
 import { ArrProto } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { isArrayLike } from "../helpers/base";
-import { _toLength } from "../helpers/length";
+import { _toArrayLength } from "../helpers/length";
 import { throwRangeError } from "../helpers/throw";
 
 /**
@@ -66,7 +66,7 @@ export function polyArrWith<T>(theArray: ArrayLike<T>, index: number, value: T):
         throwRangeError("Invalid array");
     }
     
-    const len = _toLength(theArray.length);
+    const len = _toArrayLength(theArray);
     // Convert the index (NaN becomes 0), any other value outside of the range is rejected by the check
     let idx = +index || 0;
 

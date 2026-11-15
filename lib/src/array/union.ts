@@ -35,6 +35,7 @@ import { arrForEach } from "./forEach";
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function arrUnion<T>(...arrays: ArrayLike<T>[]): T[];
+/*#__NO_SIDE_EFFECTS__*/
 export function arrUnion<T>(): T[] {
     let combined: T[] = [];
     let theArgs = arguments;

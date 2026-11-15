@@ -206,6 +206,17 @@ describe("arrLastIndexOfSubset", () => {
         assert.equal(arrIndexOfSubset(array, [1, 2], -Infinity), 0);
     });
 
+    it("the string \"undefined\" fromIndex is converted (NaN is 0), it is not the default", () => {
+        const array = ["a", "b", "a"];
+        assert.equal(arrLastIndexOfSubset(array, ["a"], "undefined" as any), 0);
+        assert.equal(arrLastIndexOfSubset(array, ["a"], undefined), 2);
+        assert.equal(arrIndexOfSubset(array, ["a"], "undefined" as any), 0);
+        assert.equal(arrIndexOfSubset(array, ["b"], "undefined" as any), 1);
+
+        // Like lastIndexOf, which converts the fromIndex the same way
+        assert.equal(arrLastIndexOfSubset(array, ["a"], "undefined" as any), array.lastIndexOf("a", "undefined" as any));
+    });
+
     it("string compares characters, not substrings", () => {
         assert.equal(arrLastIndexOfSubset("abcbc", ["bc"]), -1);
         assert.equal(arrLastIndexOfSubset("abcbc", ["b", "c"]), 3);

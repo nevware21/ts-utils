@@ -54,7 +54,7 @@ export function polyArrAt<T>(theArray: ArrayLike<T>, index: number): T | undefin
     let result: T | undefined;
     
     if (isArrayLike(theArray)) {
-        const len = _toLength(theArray.length);
+        const len = _toLength(theArray);
         // Convert the index (NaN becomes 0), any other value outside of the range is rejected by the check
         let idx = +index || 0;
 

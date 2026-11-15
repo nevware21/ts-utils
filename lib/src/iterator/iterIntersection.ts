@@ -9,6 +9,7 @@
 import { arrForEach } from "../array/forEach";
 import { arrIncludes } from "../array/includes";
 import { iterToArray } from "./iterToArray";
+import { LENGTH } from "../internal/constants";
 
 /**
  * Returns values that are present in every provided iterator / iterable.
@@ -26,7 +27,7 @@ export function iterIntersection<T>(...iters: Array<Iterator<T> | Iterable<T>>):
 export function iterIntersection<T>(): T[] {
     // The iterators are only read, so the arguments are used rather than copied into a new array
     let iters: ArrayLike<Iterator<T> | Iterable<T>> = arguments;
-    if (iters.length === 0) {
+    if (iters[LENGTH] === 0) {
         return [];
     }
 
@@ -34,7 +35,7 @@ export function iterIntersection<T>(): T[] {
     let firstValues = iterToArray(iters[0]);
     let otherValues: T[][] = [];
 
-    for (let lp = 1; lp < iters.length; lp++) {
+    for (let lp = 1; lp < iters[LENGTH]; lp++) {
         otherValues.push(iterToArray(iters[lp]));
     }
 

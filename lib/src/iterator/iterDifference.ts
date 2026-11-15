@@ -10,6 +10,7 @@ import { arrForEach } from "../array/forEach";
 import { arrIncludes } from "../array/includes";
 import { iterForOf } from "./forOf";
 import { iterToArray } from "./iterToArray";
+import { LENGTH } from "../internal/constants";
 
 /**
  * Returns values from `iter` that are absent from all `excludeIters`.
@@ -30,7 +31,7 @@ export function iterDifference<T>(iter: Iterator<T> | Iterable<T>): T[] {
     let sourceValues = iterToArray(iter);
     let excludedValues: T[] = [];
 
-    for (let lp = 1; lp < theArgs.length; lp++) {
+    for (let lp = 1; lp < theArgs[LENGTH]; lp++) {
         iterForOf(theArgs[lp], (value: T) => {
             if (!arrIncludes(excludedValues, value)) {
                 excludedValues.push(value);

@@ -311,6 +311,14 @@ describe("string helpers", () => {
             _checkPolyPadEnd("abc", 6, null as any);
             _checkPolyPadEnd("abc", 5, false as any);
         });
+
+        it("the string \"undefined\" is a padString, it doesn't use the default", () => {
+            assert.equal(polyStrPadStart("abc", 6, "undefined"), "undabc");
+            assert.equal(polyStrPadEnd("abc", 6, "undefined"), "abcund");
+
+            _checkPolyPadStart("abc", 6, "undefined");
+            _checkPolyPadEnd("abc", 6, "undefined");
+        });
     });
 
     function _checkPadStart(value: any, count: number, fill?: string) {

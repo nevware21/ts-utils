@@ -41,6 +41,7 @@ export function objPick<T, K extends keyof T>(source: T, keys: ArrayLike<K>): Pi
 export function objPick<T>(source: T, keys: ArrayLike<string>): Partial<T>;
 /*#__NO_SIDE_EFFECTS__*/
 export function objPick<T>(source: T, keys: ArrayLike<PropertyKey>): Partial<T>;
+/*#__NO_SIDE_EFFECTS__*/
 export function objPick<T>(source: T, keys: ArrayLike<PropertyKey>): Partial<T> {
     const result: Partial<T> = objCreate(null);
     if (source && isArrayLike(keys)) {
@@ -80,6 +81,7 @@ export function objOmit<T, K extends keyof T>(source: T, keys: ArrayLike<K>): Pi
 export function objOmit<T>(source: T, keys: ArrayLike<string>): Partial<T>;
 /*#__NO_SIDE_EFFECTS__*/
 export function objOmit<T>(source: T, keys: ArrayLike<PropertyKey>): Partial<T>;
+/*#__NO_SIDE_EFFECTS__*/
 export function objOmit<T>(source: T, keys: ArrayLike<PropertyKey>): Partial<T> {
     const result: Partial<T> = objCreate(null);
     if (source && isArrayLike(keys)) {

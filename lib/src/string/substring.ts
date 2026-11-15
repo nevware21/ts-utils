@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { isUndefined } from "../helpers/base";
+import { isStrictUndefined } from "../helpers/base";
 import { EMPTY, LENGTH, StrProto, SUBSTRING } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunction, _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
@@ -98,7 +98,7 @@ export function polyStrSubstr(value: string, start: number, length?: number): st
         theStart = mathMax(theStart + value[LENGTH], 0);
     }
 
-    let theLength = isUndefined(length) ? value[LENGTH] : mathToInt(length);
+    let theLength = isStrictUndefined(length) ? value[LENGTH] : mathToInt(length);
 
     return theLength > 0 ? strSlice(value, theStart, theStart + theLength) : EMPTY;
 }

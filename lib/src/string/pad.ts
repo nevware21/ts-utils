@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { isUndefined } from "../helpers/base";
+import { isStrictUndefined } from "../helpers/base";
 import { EMPTY, LENGTH, StrProto } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { mathToInt } from "../math/to_int";
@@ -23,7 +23,7 @@ function _padValue(value: string, targetLength: number, padString?: string) {
     if (len < targetLength) {
         // Like the native functions only an undefined padString uses the default, any other value (including null) is
         // converted into a string
-        result = isUndefined(padString) ? " " : asString(padString);
+        result = isStrictUndefined(padString) ? " " : asString(padString);
         targetLength = targetLength - len;
 
         // Doubled until it is long enough and then truncated, an empty padString can't pad the value so it is returned as-is

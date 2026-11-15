@@ -59,4 +59,16 @@ describe("arrRotate", () => {
         
         assert.deepEqual(original, copy);
     });
+
+    it("should truncate a fractional length, like the native functions", () => {
+        const arrayLike: any = { length: 2.5, 0: "a", 1: "b", 2: "c" };
+
+        // The rotation is a whole number of positions of the 2 values, previously 3 and 4 positions were 0.5 and 1.5
+        assert.deepEqual(arrRotate(arrayLike, 1), ["b", "a"]);
+        assert.deepEqual(arrRotate(arrayLike, 2), ["a", "b"]);
+        assert.deepEqual(arrRotate(arrayLike, 3), ["b", "a"], "3 positions of 2 values is 1 position");
+        assert.deepEqual(arrRotate(arrayLike, 4), ["a", "b"], "4 positions of 2 values is no rotation");
+        assert.deepEqual(arrRotate(arrayLike, -1), ["b", "a"]);
+        assert.deepEqual(arrRotate({ length: 0.5, 0: "a" } as any, 1), []);
+    });
 });

@@ -7,13 +7,25 @@
  */
 
 import { ICachedValue, createCachedValue } from "../helpers/cache";
-import { isStrictNullOrUndefined } from "../helpers/base";
-import { CALL, NULL_VALUE, UNDEF_VALUE } from "../internal/constants";
+import { isFunction, isPrimitive, isStrictNullOrUndefined } from "../helpers/base";
+import { safe } from "../helpers/safe";
+import { throwTypeError } from "../helpers/throw";
+import { CALL } from "../internal/constants";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 import { isIterator } from "./iterator";
 
 let _iterSymbol: ICachedValue<symbol>;
+
+/**
+ * @internal
+ * @ignore
+ * Closes the iterator, by calling its `return()` function (if it has one) with no arguments like for...of.
+ * @param iter - The iterator to close
+ */
+function _closeIter(iter: any): void {
+    iter.return && iter.return();
+}
 
 /**
  * Calls the provided `callbackFn` function once for each element in the iterator or iterator returned by
@@ -23,7 +35,16 @@ let _iterSymbol: ICachedValue<symbol>;
  * The order of processing is not reset if you add or remove elements to the iterator, the actual behavior
  * will depend on the iterator imeplementation.
  *
- * If the passed `iter` is both an Iterable<T> and Iterator<T> the Iterator<T> interface takes preceedence.
+ * Like `for...of`:
+ * - An iterable is processed using the iterator returned by its `[Symbol.iterator]()`, even when it is also an
+ * iterator (has a `next()` function), and only an iterator which is not iterable is used as-is. The built-in
+ * iterators and generators return themselves, while an object such as a jQuery collection (which has a `next()`
+ * function that is not an iterator function) is processed using its iterator.
+ * - When the iteration stops before the iterator is done, because the `callbackFn` returns -1 or throws, the
+ * iterator is closed by calling its `return()` function (if any), so a generator's `finally` block is run. The
+ * error thrown by the `callbackFn` is then re-thrown (rather than any error thrown by `return()`). The iterator is
+ * not closed when the iterator itself throws.
+ * - A `TypeError` is thrown when `next()` returns a value which is not an object.
  * @remarks
  * If Symbols are NOT supported then the iterable MUST be using the same polyFill for the well know symbols,
  * if you are targetting a mixed environment you SHOULD either
@@ -41,6 +62,7 @@ let _iterSymbol: ICachedValue<symbol>;
  * @param thisArg - An object to which the this keyword can refer in the callbackfn function. If thisArg is
  * omitted, null or undefined the iterator will be used as the this value.
  * @throws Any exception thrown while processing the iterator
+ * @throws TypeError when the iterator's `next()` returns a value which is not an object
  * @example
  * ```ts
  * const items = {
@@ -58,40 +80,51 @@ let _iterSymbol: ICachedValue<symbol>;
  */
 export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value: T, count?: number, iter?: Iterator<T>) => void | number, thisArg?: any): void {
     if (iter) {
-        if (!isIterator(iter)) {
-            !_iterSymbol && (_iterSymbol = createCachedValue(getKnownSymbol(WellKnownSymbols.iterator)));
-            iter = (iter as any)[_iterSymbol.v] ? (iter as any)[_iterSymbol.v]() : NULL_VALUE;
+        !_iterSymbol && (_iterSymbol = createCachedValue(getKnownSymbol(WellKnownSymbols.iterator)));
+
+        // Like for...of, an iterable (even when it also has a next() function) is processed using the iterator
+        // returned by its [Symbol.iterator](), and only an iterator which is not iterable is used as-is
+        if (isFunction((iter as any)[_iterSymbol.v])) {
+            iter = (iter as any)[_iterSymbol.v]();
         }
-        
+
         if (isIterator(iter)) {
-            let err: { e: any } | undefined = UNDEF_VALUE;
-            let iterResult: IteratorResult<T> | null | undefined = UNDEF_VALUE;
+            let count = 0;
+            let iterResult: IteratorResult<T>;
+            let value: T;
+
+            // Only set while the callbackfn is processing a value, so (like for...of) the iterator is closed when the
+            // callbackfn throws or stops the iteration (returns -1), but not when the iterator itself throws, returns
+            // a result which is not an object or is done
+            let closeIter = false;
             try {
-                let count = 0;
-                while(!(iterResult = iter.next()).done) {
-                    if (callbackfn[CALL](isStrictNullOrUndefined(thisArg) ? iter : thisArg, iterResult.value, count, iter) === -1) {
+                for (;;) {
+                    iterResult = iter.next();
+                    if (isPrimitive(iterResult)) {
+                        throwTypeError("Iterator result is not an object");
+                    }
+
+                    if (iterResult.done) {
                         break;
                     }
-        
-                    count++;
-                }
-            } catch (failed) {
-                err = { e: failed };
-                if (iter.throw) {
-                    iterResult = NULL_VALUE;
-                    iter.throw(err);
-                }
-            } finally {
-                try {
-                    if (iterResult && !iterResult.done) {
-                        iter.return && iter.return(iterResult);
+
+                    value = iterResult.value;
+                    closeIter = true;
+                    if (callbackfn[CALL](isStrictNullOrUndefined(thisArg) ? iter : thisArg, value, count++, iter) === -1) {
+                        break;
                     }
-                } finally {
-                    if (err) {
-                        // eslint-disable-next-line no-unsafe-finally
-                        throw err.e;
-                    }
+
+                    closeIter = false;
                 }
+            } catch (e) {
+                // Like for...of, the error from the callbackfn is thrown rather than any error thrown by return()
+                closeIter && safe(_closeIter, [iter]);
+
+                throw e;
+            }
+
+            if (closeIter) {
+                _closeIter(iter);
             }
         }
     }

@@ -8,6 +8,7 @@
 
 import { isArray, isMapLike, isObject, isSetLike, isStrictNullOrUndefined, isString } from "./base";
 import { objKeys } from "../object/object";
+import { LENGTH } from "../internal/constants";
 
 /**
  * Checks if a value is empty. Works with strings, arrays, objects, maps, and sets.
@@ -37,11 +38,11 @@ export function isEmpty(value: any): boolean {
 
     if (!result) {
         if (isString(value) || isArray(value)) {
-            result = (value.length === 0);
+            result = (value[LENGTH] === 0);
         } else if (isMapLike(value) || isSetLike(value)) {
             result = (value.size === 0);
         } else if (isObject(value)) {
-            result = objKeys(value).length === 0;
+            result = objKeys(value)[LENGTH] === 0;
         }
     }
     

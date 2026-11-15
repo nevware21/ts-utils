@@ -10,6 +10,7 @@ import { throwTypeError } from "../helpers/throw";
 import { iterForOf } from "./forOf";
 import { _asIterator } from "./helpers";
 import { IterReduceCallbackFn } from "./types";
+import { LENGTH } from "../internal/constants";
 
 /**
  * Reduces an iterator / iterable into a single value.
@@ -24,7 +25,7 @@ import { IterReduceCallbackFn } from "./types";
 /*#__NO_SIDE_EFFECTS__*/
 export function iterReduce<T, R = T>(iter: Iterator<T> | Iterable<T>, callbackfn: IterReduceCallbackFn<T, R>, initialValue?: T | R): R {
     let source = _asIterator(iter);
-    let hasAccumulator = arguments.length > 2;
+    let hasAccumulator = arguments[LENGTH] > 2;
     let accumulator = initialValue as T | R;
 
     iterForOf(source, (value, count) => {

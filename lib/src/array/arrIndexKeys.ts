@@ -6,9 +6,8 @@
  * Licensed under the MIT license.
  */
 
-import { getLength } from "../helpers/length";
+import { _toLength } from "../helpers/length";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
-import { mathToInt } from "../math/to_int";
 import { objHasOwn } from "../object/has_own";
 
 /**
@@ -38,12 +37,10 @@ export function arrIndexKeys<T = any>(value: ArrayLike<T>): number[] {
     _throwIfNullOrUndefined(value);
 
     let keys: number[] = [];
-    let len = mathToInt(getLength(value));
-    if (len > 0) {
-        for (let lp = 0; lp < len; lp++) {
-            if (objHasOwn(value, lp)) {
-                keys.push(lp);
-            }
+    let len = _toLength(value);
+    for (let lp = 0; lp < len; lp++) {
+        if (objHasOwn(value, lp)) {
+            keys.push(lp);
         }
     }
 

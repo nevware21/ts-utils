@@ -7,6 +7,7 @@
  */
 
 import { arrForEach } from "../array/forEach";
+import { objDefine } from "../object/define";
 import { ArrCls, ArrProto, GET_OWN_PROPERTY_NAMES, GET_OWN_PROPERTY_SYMBOLS, ObjClass, StrProto } from "./constants";
 import { polyIsArray, polyArrIncludes, polyArrFind, polyArrFindIndex, polyArrFindLastIndex, polyArrFindLast, polyArrFrom } from "../polyfills/array";
 import { polyObjIs } from "../polyfills/object/objIs";
@@ -37,8 +38,14 @@ function _addPolyfills(target: any, polyfills: any, isProto?: boolean) {
     arrForEach(polyObjKeys(polyfills), (key) => {
         if (!target[key]) {
             // A prototype polyfill passes the instance (this) as the first argument, while a static (class) function
-            // like Object.entries() or Array.from() is called with its arguments as-is
-            target[key] = isProto ? makePolyFn(polyfills[key]) : polyfills[key];
+            // like Object.entries() or Array.from() is called with its arguments as-is. It is defined (writable and
+            // configurable but not enumerable) like the native functions, so for-in over an array, a string object
+            // or the classes doesn't include it (Object.defineProperty is defined by every supported ES5 runtime)
+            objDefine(target, key, {
+                v: isProto ? makePolyFn(polyfills[key]) : polyfills[key],
+                w: true,
+                e: false
+            });
         }
     });
 }

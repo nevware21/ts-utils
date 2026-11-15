@@ -7,7 +7,8 @@
  */
 
 import { isStrictNullOrUndefined, isString } from "../helpers/base";
-import { CALL, LENGTH, ObjClass } from "../internal/constants";
+import { _toLength } from "../helpers/length";
+import { CALL, ObjClass } from "../internal/constants";
 
 /**
  * Calls the provided `callbackFn` function once for each element in an array in ascending index order. It is not invoked for index properties
@@ -15,7 +16,8 @@ import { CALL, LENGTH, ObjClass } from "../internal/constants";
  * `callbackFn` function.
  *
  * The range (number of elements) processed by arrForEach() is set before the first call to the `callbackFn`. Any elements added beyond the range
- * or elements which as assigned to indexes already processed will not be visited by the `callbackFn`.
+ * or elements which as assigned to indexes already processed will not be visited by the `callbackFn`. Like the native forEach() the length of an
+ * array like object is converted to an integer from 0 to 2^53 - 1, so a NaN or negative length is 0 and a fraction is truncated.
  * @group Array
  * @group ArrayLike
  * @typeParam T - Identifies the element type of the array
@@ -55,7 +57,7 @@ export function arrForEach<T = any>(theArray: ArrayLike<T>, callbackfn: (value: 
 export function arrForEach<T = any>(theArray: ArrayLike<T>, callbackfn: (value: T, index: number, array: ArrayLike<T>) => void | number, thisArg?: any): void;
 export function arrForEach<T = any, A extends ArrayLike<T> = ArrayLike<T>>(theArray: A, callbackfn: (value: T, index: number, array: A) => void | number, thisArg?: any): void {
     if (theArray) {
-        const len = theArray[LENGTH] >>> 0;
+        const len = _toLength(theArray);
         // The "in" operator throws for a string primitive (which is ArrayLike), so use its object form
         const theObj: any = isString(theArray) ? ObjClass(theArray) : theArray;
         for (let idx = 0; idx < len; idx++) {

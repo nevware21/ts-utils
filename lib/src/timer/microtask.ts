@@ -14,7 +14,7 @@ import { _resolveScheduleFn } from "./microtasks/resolveScheduleFn";
 import { _eTaskQueueType } from "./microtasks/taskQueue";
 import { _addMicrotaskQueue } from "./microtasks/timerQueue";
 import { fnBindArgs } from "../funcs/fnBindArgs";
-import { UNDEF_VALUE } from "../internal/constants";
+import { LENGTH, UNDEF_VALUE } from "../internal/constants";
 import { MicrotaskFn, ScheduleMicrotaskFn } from "../helpers/types";
 
 let _defaultOptions: MicroTaskOptions | undefined;
@@ -155,7 +155,7 @@ export function scheduleMicrotask<TArgs extends any[]>(callback: (...args: TArgs
     let callbackArgs: TArgs | undefined;
     let theOptions: MicroTaskOptions | undefined;
 
-    if (arguments.length > 1 && argsOrOptions && isArray(argsOrOptions)) {
+    if (arguments[LENGTH] > 1 && argsOrOptions && isArray(argsOrOptions)) {
         callbackArgs = argsOrOptions as TArgs;
         theOptions = options;
     } else {

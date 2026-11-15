@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { ArrProto } from "../internal/constants";
+import { ArrProto, LENGTH } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { isArray, isFunction } from "../helpers/base";
@@ -87,7 +87,7 @@ export function polyArrFlatMap<T, R = T>(theArray: ArrayLike<T>, callbackFn: Arr
     }
 
     let result: R[] = [];
-    let callbackThis = arguments.length > 2 ? thisArg : undefined;
+    let callbackThis = arguments[LENGTH] > 2 ? thisArg : undefined;
 
     arrForEach(theArray, (theValue, index) => {
         let value = fnCall(callbackFn, callbackThis, theValue, index, theArray as any);

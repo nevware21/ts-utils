@@ -409,6 +409,45 @@ describe("object polyfills", () => {
             assert.isUndefined((result as any).polluted);
         });
 
+        it("should define each key, so a read-only or setter property of Object.prototype doesn't stop it being added", () => {
+            const readOnlyKey = "__testFromEntriesReadOnly";
+            const setterKey = "__testFromEntriesSetter";
+            let setterCalled = false;
+
+            // Like a frozen Object.prototype (eg. SES lockdown) or a setter added to it
+            Object.defineProperty(Object.prototype, readOnlyKey, { value: "proto", writable: false, configurable: true });
+            Object.defineProperty(Object.prototype, setterKey, {
+                set: function () {
+                    setterCalled = true;
+                },
+                configurable: true
+            });
+
+            try {
+                const result = polyObjFromEntries([[readOnlyKey, 1], [setterKey, 2]] as any);
+
+                assert.isTrue(Object.prototype.hasOwnProperty.call(result, readOnlyKey), "The read-only key is an own property");
+                assert.equal(result[readOnlyKey], 1);
+                assert.isTrue(Object.prototype.hasOwnProperty.call(result, setterKey), "The setter key is an own property");
+                assert.equal(result[setterKey], 2);
+                assert.isFalse(setterCalled, "The setter of Object.prototype was not called");
+
+                // Each property is enumerable, writable and configurable, like the native function
+                const desc = Object.getOwnPropertyDescriptor(result, readOnlyKey);
+                assert.isTrue(desc.enumerable);
+                assert.isTrue(desc.writable);
+                assert.isTrue(desc.configurable);
+                assert.deepEqual(Object.keys(result), [readOnlyKey, setterKey]);
+
+                if (typeof (Object as any).fromEntries === "function") {
+                    assert.deepEqual(Object.keys((Object as any).fromEntries([[readOnlyKey, 1], [setterKey, 2]])), [readOnlyKey, setterKey]);
+                }
+            } finally {
+                delete (Object.prototype as any)[readOnlyKey];
+                delete (Object.prototype as any)[setterKey];
+            }
+        });
+
         it("should handle empty iterables", () => {
             const emptyArray: any[] = [];
             const emptyMap = new Map();

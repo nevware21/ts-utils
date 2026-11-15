@@ -8,6 +8,7 @@
 
 import { arrIncludes } from "../array/includes";
 import { iterForOf } from "./forOf";
+import { LENGTH } from "../internal/constants";
 
 /**
  * Returns unique values from all provided iterators / iterables.
@@ -27,7 +28,7 @@ export function iterUnion<T>(): T[] {
     let iters: ArrayLike<Iterator<T> | Iterable<T>> = arguments;
     let result: T[] = [];
 
-    for (let lp = 0; lp < iters.length; lp++) {
+    for (let lp = 0; lp < iters[LENGTH]; lp++) {
         iterForOf(iters[lp], (value) => {
             if (!arrIncludes(result, value)) {
                 result.push(value);

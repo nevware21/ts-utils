@@ -6,11 +6,12 @@
  * Licensed under the MIT license.
  */
 
-import { isString, isUndefined } from "../helpers/base";
+import { isStrictUndefined } from "../helpers/base";
 import { LENGTH, StrProto } from "../internal/constants";
-import { _throwIfNotString } from "../internal/throwIf";
+import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { asString } from "./as_string";
+import { polyStrIncludes } from "./includes";
 import { strSubstring } from "./substring";
 
 /**
@@ -20,6 +21,8 @@ import { strSubstring } from "./substring";
  * @param value - The value to be checked
  * @param searchString - The characters to be searched for at the end of `value` string.
  * @param length - If provided, it is used as the length of `value`. Defaults to value.length.
+ * @returns `true` if the given characters are found at the end of the string; otherwise, `false`.
+ * @throws TypeError If searchString is a regex.
  */
 export const strEndsWith: (value: string, searchString: string, length?: number) => boolean = (/*#__PURE__*/_unwrapFunctionWithPoly("endsWith", StrProto, polyStrEndsWith));
 
@@ -30,13 +33,22 @@ export const strEndsWith: (value: string, searchString: string, length?: number)
  * @param value - The value to be checked
  * @param searchString - The characters to be searched for at the end of `value` string.
  * @param length - If provided, it is used as the length of `value`. Defaults to value.length.
+ * @returns `true` if the given characters are found at the end of the string; otherwise, `false`.
+ * @throws TypeError If searchString is a regex.
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyStrEndsWith(value: string, searchString: string, length?: number): boolean {
-    _throwIfNotString(value);
+    _throwIfNullOrUndefined(value);
 
-    let searchValue = isString(searchString) ? searchString : asString(searchString);
-    let end = (!isUndefined(length) && length < value[LENGTH]) ? length : value[LENGTH];
+    // Like the native function the value (eg. a String object or a number) and searchString are converted to strings,
+    // and the length to a number (so NaN, the "undefined" string and a value which isn't a number are 0) which can't
+    // be longer than the value, substring() truncates a fraction and treats a negative index as 0
+    let theValue = asString(value);
+    let len = theValue[LENGTH];
+    let end = +length;
+    end = isStrictUndefined(length) || end > len ? len : (end || 0);
 
-    return strSubstring(value, end - searchValue[LENGTH], end) === searchValue;
+    // The substring is never longer than the searchString, so it only includes the searchString when they are equal,
+    // polyStrIncludes() also throws a TypeError (like the native function) when the searchString is a RegExp
+    return polyStrIncludes(strSubstring(theValue, end - asString(searchString)[LENGTH], end), searchString);
 }

@@ -59,12 +59,12 @@ let _wordRuns: RegExp;
  */
 function _getCaseWords(): RegExp {
     if (!_caseWords) {
-        let upperLetter = "[" + UPPER + "][̀-ͯ]*";
+        let upperLetter = "[" + UPPER + "][\u0300-\u036F]*";
 
         // Each uppercase unit must start with an uppercase letter (marks are never uppercase) so there is only one
         // way to split a run, and the last alternative always matches, so this can't backtrack catastrophically
         // eslint-disable-next-line security/detect-non-literal-regexp
-        _caseWords = new RegExp("(?!$)\\s*([" + SEPARATORS + "]*)((?:" + upperLetter + ")+(?=" + upperLetter + "[a-z\xDF-\xF6\xF8-\xFFΐά-ώа-џ])|(?:" + upperLetter + ")*[^" + SEPARATORS + UPPER + "]*)", "g");
+        _caseWords = new RegExp("(?!$)\\s*([" + SEPARATORS + "]*)((?:" + upperLetter + ")+(?=" + upperLetter + "[a-z\xDF-\xF6\xF8-\xFF\u0390\u03AC-\u03CE\u0430-\u045F])|(?:" + upperLetter + ")*[^" + SEPARATORS + UPPER + "]*)", "g");
     }
 
     return _caseWords;

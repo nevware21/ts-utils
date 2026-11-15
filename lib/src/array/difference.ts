@@ -10,6 +10,7 @@ import { isArrayLike } from "../helpers/base";
 import { arrForEach } from "./forEach";
 import { arrIncludes } from "./includes";
 import { _strArgsToArr } from "./slice";
+import { LENGTH } from "../internal/constants";
 
 /**
  * The arrDifference() method returns a new array containing elements from the first array
@@ -47,7 +48,7 @@ export function arrDifference<T>(theArray: ArrayLike<T> | null | undefined): T[]
 
         arrForEach(theArray, (item) => {
             let excluded = false;
-            for (let lp = 1; lp < excludeArrays.length; lp++) {
+            for (let lp = 1; lp < excludeArrays[LENGTH]; lp++) {
                 let exclValue = excludeArrays[lp];
                 // Check if excludeArray is valid before using arrIncludes
                 if (isArrayLike(exclValue) && arrIncludes(exclValue, item)) {

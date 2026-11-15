@@ -8,9 +8,10 @@
 
 import { isArray, isArrayLike, isUndefined } from "../helpers/base";
 import { arrForEach } from "./forEach";
+import { LENGTH } from "../internal/constants";
 
 function _addItems(result: any[], arr: any, d: number): void {
-    const arrLen = arr.length;
+    const arrLen = arr[LENGTH];
     let arrIdx = 0;
     
     while (arrIdx < arrLen) {

@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { isArrayLike, isUndefined } from "../helpers/base";
+import { isArrayLike, isStrictUndefined } from "../helpers/base";
 import { _toLength } from "../helpers/length";
 import { mathToInt } from "../math/to_int";
 
@@ -21,9 +21,9 @@ import { mathToInt } from "../math/to_int";
 /*#__NO_SIDE_EFFECTS__*/
 function _findSubset<T>(theArray: ArrayLike<T>, subset: ArrayLike<T>, fromIndex: number | undefined, isLast?: boolean): number {
     if (isArrayLike(theArray) && isArrayLike(subset)) {
-        let len = _toLength(theArray.length);
-        let subsetLen = _toLength(subset.length);
-        let pos = isUndefined(fromIndex) ? (isLast ? len : 0) : mathToInt(fromIndex);
+        let len = _toLength(theArray);
+        let subsetLen = _toLength(subset);
+        let pos = isStrictUndefined(fromIndex) ? (isLast ? len : 0) : mathToInt(fromIndex);
 
         if (pos < 0) {
             pos += len;

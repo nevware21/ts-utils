@@ -11,6 +11,7 @@ import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { polyStrStartsWith } from "../../../../src/string/starts_with";
 import { polyStrEndsWith } from "../../../../src/string/ends_with";
 import { isUndefined } from "../../../../src/helpers/base";
+import { arrForEach } from "../../../../src/array/forEach";
 
 describe("string polyfills", () => {
     describe("polyStrStartsWith null / undefined", () => {
@@ -136,6 +137,75 @@ describe("string polyfills", () => {
         _checkEndsWith("zyxyvutsrqponmlkjihgfedcba", "zyxw", 10);
         _checkEndsWith("zyxyvutsrqponmlkjihgfedcba", "ponm", 14);
     });
+
+    describe("polyStrStartsWith / polyStrEndsWith value conversions", () => {
+        it("should accept a String object, like the native functions", () => {
+            let value: any = new String("abc");
+
+            assert.isTrue(polyStrStartsWith(value, "ab"));
+            assert.isFalse(polyStrStartsWith(value, "bc"));
+            assert.isTrue(polyStrStartsWith(value, "bc", 1));
+            assert.isTrue(polyStrEndsWith(value, "bc"));
+            assert.isFalse(polyStrEndsWith(value, "ab"));
+            assert.isTrue(polyStrEndsWith(value, "ab", 2));
+
+            arrForEach(["", "a", "ab", "abc", "b", "bc", "c", "abcd"], (search) => {
+                _checkNativeCall(value, search);
+                _checkNativeCall(value, search, 1);
+                _checkNativeCall(value, search, 2);
+            });
+        });
+
+        it("should convert a value which is not a string (eg. a number), like the native functions", () => {
+            assert.isTrue(polyStrStartsWith(123 as any, "12"));
+            assert.isTrue(polyStrEndsWith(123 as any, "23"));
+
+            arrForEach([123, true, ["a", "b"], { toString: () => "abc" }], (value) => {
+                arrForEach(["", "1", "12", "23", "tr", "ue", "a,b", "ab", "bc"], (search) => {
+                    _checkNativeCall(value, search);
+                    _checkNativeCall(value, search, 1);
+                });
+            });
+        });
+
+        it("should convert the position and length to an integer, like the native functions", () => {
+            // A position or length which is a string or NaN (or converts to NaN) is not used as-is
+            assert.isTrue(polyStrStartsWith("abc", "c", "2.5" as any), "startsWith position \"2.5\" is 2");
+            assert.isTrue(polyStrStartsWith("abc", "", "2" as any), "startsWith position \"2\" is 2");
+            assert.isFalse(polyStrEndsWith("abc", "c", NaN), "endsWith length NaN is 0");
+            assert.isFalse(polyStrEndsWith("abc", "c", "x" as any), "endsWith length \"x\" is 0");
+            assert.isFalse(polyStrEndsWith("abc", "c", "undefined" as any), "endsWith length \"undefined\" is 0");
+            assert.isTrue(polyStrEndsWith("abc", "c", undefined), "endsWith length undefined is the length of the value");
+
+            arrForEach<any>([0, 1, 1.5, 2, 2.5, 3, 3.5, 4, -1, -0.5, NaN, Infinity, -Infinity, null, undefined, "2", "2.5", "x", "undefined", true, {}, [2], { valueOf: () => 2 }], (pos) => {
+                arrForEach(["", "a", "b", "c", "ab", "bc", "abc", "abcd"], (search) => {
+                    _checkNativeCall("abc", search, pos);
+                });
+            });
+        });
+
+        it("should throw a TypeError when the searchString is a RegExp, like the native functions", () => {
+            arrForEach([/a/, /c/g, new RegExp("abc")], (search) => {
+                assert.throws(() => String.prototype.startsWith.call("abc", search), TypeError);
+                assert.throws(() => String.prototype.endsWith.call("abc", search), TypeError);
+                assert.throws(() => polyStrStartsWith("abc", search as any), TypeError);
+                assert.throws(() => polyStrEndsWith("abc", search as any), TypeError);
+                assert.throws(() => polyStrStartsWith("abc", search as any, 1), TypeError);
+                assert.throws(() => polyStrEndsWith("abc", search as any, 1), TypeError);
+            });
+
+            // The source of the RegExp is not matched as a string
+            assert.throws(() => polyStrStartsWith("/a/", /a/ as any), TypeError);
+            assert.throws(() => polyStrEndsWith("/c/g", /c/g as any), TypeError);
+        });
+    });
+
+    function _checkNativeCall(value: any, search: any, pos?: any) {
+        assert.equal(polyStrStartsWith(value, search, pos), String.prototype.startsWith.call(value, search, pos),
+            "Checking startsWith of [" + dumpObj(value) + "] for [" + search + "] @ " + dumpObj(pos));
+        assert.equal(polyStrEndsWith(value, search, pos), String.prototype.endsWith.call(value, search, pos),
+            "Checking endsWith of [" + dumpObj(value) + "] for [" + search + "] with length " + dumpObj(pos));
+    }
 
     function _checkStartsWith(value: any, search: any, position?: number) {
         let polyResult: any;

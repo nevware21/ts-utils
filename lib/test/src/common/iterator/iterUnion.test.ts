@@ -22,4 +22,15 @@ describe("iterUnion", () => {
         assert.equal(union.length, 1);
         assert.equal(union[0] !== union[0], true);
     });
+
+    it("returns an empty array when called with no iterables", () => {
+        assert.deepEqual((iterUnion as any)(), []);
+    });
+
+    it("returns the unique values when called with one iterable", () => {
+        assert.deepEqual(iterUnion([1, 1, 2]), [1, 2]);
+        assert.deepEqual(iterUnion(createArrayIterator([3, 3, 4])), [3, 4]);
+        assert.deepEqual(iterUnion([]), []);
+        assert.deepEqual(iterUnion(null as any), []);
+    });
 });

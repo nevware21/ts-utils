@@ -7,7 +7,7 @@
  */
 
 import { isArray, isDate, isPrimitiveType, isStrictUndefined } from "../helpers/base";
-import { CALL, FUNCTION, NULL_VALUE, OBJECT } from "../internal/constants";
+import { CALL, FUNCTION, LENGTH, NULL_VALUE, OBJECT } from "../internal/constants";
 import { _IdentityMap, _createIdentityMap } from "../internal/identity_map";
 import { objDefine } from "./define";
 import { forEachOwnKeySafe } from "./forEachOwnKey";
@@ -156,7 +156,7 @@ function _deepCopy<T>(visitMap: _IdentityMap<_RecursiveVisitMap>, value: T, ctx:
 
             let idx = 0;
             let handler: ObjDeepCopyHandler | null = userHandler;
-            while (!(handler || (idx < defaultDeepCopyHandlers.length ? defaultDeepCopyHandlers[idx++] : _defaultDeepCopyHandler))[CALL](ctx, details)) {
+            while (!(handler || (idx < defaultDeepCopyHandlers[LENGTH] ? defaultDeepCopyHandlers[idx++] : _defaultDeepCopyHandler))[CALL](ctx, details)) {
                 handler = NULL_VALUE;
             }
         });
@@ -399,7 +399,7 @@ export function arrayDeepCopyHandler(details: IObjDeepCopyHandlerDetails): boole
     if (isArray(value)) {
         // Assign the "result" value before performing any additional deep Copying, so any recursive object get a reference to this instance
         let target: any[] = details.result = [];
-        target.length = value.length;
+        target[LENGTH] = value[LENGTH];
 
         // Copying all properties as arrays can contain non-indexed based properties
         details.copyTo(target, value);

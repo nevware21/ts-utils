@@ -8,7 +8,7 @@
 
 import { isFunction, isRegExp, isStrictNullOrUndefined } from "../helpers/base";
 import { throwTypeError } from "../helpers/throw";
-import { EMPTY, StrProto } from "../internal/constants";
+import { EMPTY, LENGTH, StrProto } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { asString } from "./as_string";
@@ -105,7 +105,7 @@ function _cloneRegExp(theRegex: RegExp): RegExp {
 function _advanceStringIndex(value: string, index: number, unicode: boolean): number {
     let newIndex = index + 1;
     if (unicode) {
-        if (index < value.length) {
+        if (index < value[LENGTH]) {
             let first = value.charCodeAt(index);
             if (first >= 0xD800  && first <= 0xDBFF) {
                 let second = value.charCodeAt(index + 1);

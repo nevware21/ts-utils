@@ -9,7 +9,7 @@
 import { fnApply } from "../funcs/funcs";
 import { isArray, isFunction } from "../helpers/base";
 import { ClearTimeoutOverrideFn, TimeoutOverrideFn, TimeoutOverrideFuncs } from "../helpers/types";
-import { ArrSlice, CALL, UNDEF_VALUE } from "../internal/constants";
+import { ArrSlice, CALL, LENGTH, UNDEF_VALUE } from "../internal/constants";
 import { _getGlobalConfig } from "../internal/global";
 import { ITimerHandler, _createTimerHandler } from "./handler";
 
@@ -26,7 +26,7 @@ let _microtaskCallback: (() => void) | undefined;
  */
 function _getOverrides(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs | undefined, defValue: null | undefined): [any, any] {
     let isArr = isArray(overrideFn);
-    let len = isArr ? (overrideFn as TimeoutOverrideFuncs).length : 0;
+    let len = isArr ? (overrideFn as TimeoutOverrideFuncs)[LENGTH] : 0;
 
     return [
         len > 0 ? (overrideFn as TimeoutOverrideFuncs)[0] : (!isArr ? overrideFn : defValue),
@@ -35,10 +35,11 @@ function _getOverrides(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs | un
 }
 
 /**
- * Returns the function to use: the given one, else the package instance override, else the global override (at idx of
- * the global [setTimeout, clearTimeout] pair), else the native function
+ * Returns the override function to use: the given one, else the package instance override, else the global override
+ * (at idx of the global [setTimeout, clearTimeout] pair). The caller falls back to the native function, which is only
+ * read when there is no override, as a runtime may not define it (and only supply the overrides).
  */
-function _resolveFn<F>(theFn: F, packageFn: F | undefined, idx: number, nativeFn: F): F {
+function _resolveFn<F>(theFn: F, packageFn: F | undefined, idx: number): F | undefined {
     let result = isFunction(theFn) ? theFn : packageFn;
     if (!result) {
         // Get global timeout overrides if available
@@ -48,7 +49,7 @@ function _resolveFn<F>(theFn: F, packageFn: F | undefined, idx: number, nativeFn
         }
     }
 
-    return result || nativeFn;
+    return result;
 }
 
 /**
@@ -63,8 +64,8 @@ function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn |
 
     // Use package instance override functions if provided and no specific override was given
     // If no package overrides, try global overrides before falling back to native functions
-    let setFn = _resolveFn(overrides[0], _setTimeoutFn, 0, setTimeout as TimeoutOverrideFn);
-    let clearFn = _resolveFn(overrides[1], _clearTimeoutFn, 1, clearTimeout as ClearTimeoutOverrideFn);
+    let setFn = _resolveFn(overrides[0], _setTimeoutFn, 0) || setTimeout;
+    let clearFn = _resolveFn(overrides[1], _clearTimeoutFn, 1) || clearTimeout;
 
     let timerFn = theArgs[0];
     theArgs[0] = function () {
