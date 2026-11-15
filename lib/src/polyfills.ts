@@ -96,7 +96,7 @@ import { polyStrMatchAll } from "./string/match_all";
     
     arrForEach(polyObjKeys(arrayClsPolyfills), (key) => {
         if (!(ArrCls as any)[key]) {
-            (ArrCls as any)[key] = makePolyFn((arrayClsPolyfills as any)[key]);
+            (ArrCls as any)[key] = (arrayClsPolyfills as any)[key];
         }
     });
 

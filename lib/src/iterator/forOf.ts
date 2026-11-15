@@ -8,7 +8,7 @@
 
 import { ICachedValue, createCachedValue } from "../helpers/cache";
 import { isStrictNullOrUndefined } from "../helpers/base";
-import { CALL, NULL_VALUE, UNDEF_VALUE } from "../internal/constants";
+import { CALL, NULL_VALUE } from "../internal/constants";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 import { isIterator } from "./iterator";
@@ -63,34 +63,43 @@ export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value
             iter = (iter as any)[_iterSymbol.v] ? (iter as any)[_iterSymbol.v]() : NULL_VALUE;
         }
         
-        if (isIterator(iter)) {
-            let err: { e: any } | undefined = UNDEF_VALUE;
-            let iterResult: IteratorResult<T> | null | undefined = UNDEF_VALUE;
-            try {
-                let count = 0;
-                while(!(iterResult = iter.next()).done) {
-                    if (callbackfn[CALL](isStrictNullOrUndefined(thisArg) ? iter : thisArg, iterResult.value, count, iter) === -1) {
-                        break;
-                    }
-        
-                    count++;
+        _iterForOf(iter as Iterator<T>, callbackfn, thisArg);
+    }
+}
+
+/**
+ * @internal
+ * @ignore
+ * Runs an already resolved iterator using the same error and cleanup behavior as iterForOf.
+ */
+export function _iterForOf<T>(iter: Iterator<T>, callbackfn: (value: T, count?: number, iter?: Iterator<T>) => void | number, thisArg?: any): void {
+    let err: { e: any } | undefined;
+    let iterResult: IteratorResult<T> | null | undefined;
+    if (isIterator(iter)) {
+        try {
+            let count = 0;
+            while(!(iterResult = iter.next()).done) {
+                if (callbackfn[CALL](isStrictNullOrUndefined(thisArg) ? iter : thisArg, iterResult.value, count, iter) === -1) {
+                    break;
                 }
-            } catch (failed) {
-                err = { e: failed };
-                if (iter.throw) {
-                    iterResult = NULL_VALUE;
-                    iter.throw(err);
+
+                count++;
+            }
+        } catch (failed) {
+            err = { e: failed };
+            if (iter.throw) {
+                iterResult = NULL_VALUE;
+                iter.throw(err);
+            }
+        } finally {
+            try {
+                if (iterResult && !iterResult.done) {
+                    iter.return && iter.return(iterResult);
                 }
             } finally {
-                try {
-                    if (iterResult && !iterResult.done) {
-                        iter.return && iter.return(iterResult);
-                    }
-                } finally {
-                    if (err) {
-                        // eslint-disable-next-line no-unsafe-finally
-                        throw err.e;
-                    }
+                if (err) {
+                    // eslint-disable-next-line no-unsafe-finally
+                    throw err.e;
                 }
             }
         }

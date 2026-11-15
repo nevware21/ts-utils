@@ -11,9 +11,15 @@ import { arrIndexOf } from "../array/indexOf";
 import { arrMap } from "../array/map";
 import { arrSlice } from "../array/slice";
 import { isArray, isNullOrUndefined, isStrictNullOrUndefined, objToString } from "../helpers/base";
-import { CALL, LENGTH } from "../internal/constants";
+import { CALL, LENGTH, UNDEF_VALUE } from "../internal/constants";
 import { _toLength } from "../helpers/length";
-import { iterForOf } from "../iterator/forOf";
+import { _iterForOf } from "../iterator/forOf";
+import { isIterator } from "../iterator/iterator";
+import { fnCall } from "../funcs/funcs";
+import { objDefine } from "../object/define";
+import { objHasOwnProperty } from "../object/has_own_prop";
+import { getKnownSymbol } from "../symbol/symbol";
+import { WellKnownSymbols } from "../symbol/well_known";
 
 /**
  * Polyfill support function for Array.isArray
@@ -327,15 +333,29 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
  * ```
  */
 export function polyArrFrom<T, U = T>(theValue: ArrayLike<T> | Iterable<T>, mapFn?: ArrFromMapFn<T, U>, thisArg?: any): U[] {
-    if (isArray(theValue)) {
-        let result = arrSlice(theValue);
-        return mapFn ? arrMap<T, U>(result, mapFn, thisArg) : result;
+    let arrayInput = isArray(theValue);
+    let result: any[] = arrayInput ? arrSlice(theValue as T[]) : [];
+    if (!arrayInput) {
+        let directIterator = isIterator<T>(theValue);
+        let iteratorOrMethod = directIterator || (theValue as any)[getKnownSymbol(WellKnownSymbols.iterator)];
+        if (!isStrictNullOrUndefined(iteratorOrMethod)) {
+            _iterForOf(directIterator ? theValue : fnCall(iteratorOrMethod, theValue), (value: T, cnt) => {
+                result.push(mapFn ? fnCall(mapFn, thisArg, value, cnt) : value);
+            });
+            return result;
+        }
+        result[LENGTH] = _toLength((theValue as ArrayLike<T>)[LENGTH]);
     }
 
-    let result: U[] = [];
-    iterForOf(theValue as any, (value: U, cnt) => {
-        return result.push(mapFn ? mapFn[CALL](thisArg, value, cnt) : value);
-    });
+    // Array clones only need their missing own slots filled; array-like inputs need every indexed value.
+    for (let idx = 0; idx < result[LENGTH]; idx++) {
+        if (!arrayInput || !objHasOwnProperty(result, idx)) {
+            objDefine(result, idx, {
+                v: arrayInput ? UNDEF_VALUE : (mapFn ? fnCall(mapFn, thisArg, (theValue as ArrayLike<T>)[idx], idx) : (theValue as ArrayLike<T>)[idx]),
+                w: true
+            });
+        }
+    }
 
-    return result;
+    return arrayInput && mapFn ? arrMap<T, U>(result, mapFn, thisArg) : result;
 }
