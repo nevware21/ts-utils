@@ -81,13 +81,15 @@ export function scheduleInterval<A extends any[]>(callback: (...args: A) => void
     // Copy the arguments as they are kept and reused by refresh() after this call has returned
     let theArguments = ArrSlice[CALL](arguments);
     let intervalFn = theArguments[0];
-    theArguments[0] = function () {
+    theArguments[0] = function (this: any) {
         let enabled = handler.h.enabled;
 
         // Like a timeout, any pending fallback microtasks are run first, and (like a native microtask, which runs
-        // before the timer) one which cancels the interval stops this call
+        // before the timer) one which cancels the interval stops this call. The callback is called with the `this` which
+        // setInterval passes (eg. Node's Timeout, so `clearInterval(this)` or `this.unref()` work as they did when the
+        // callback was passed to setInterval directly)
         _runMicrotasks();
-        (!enabled || handler.h.enabled) && fnApply(intervalFn, UNDEF_VALUE, arguments);
+        (!enabled || handler.h.enabled) && fnApply(intervalFn, this, arguments);
     };
 
     let handler = _createTimerHandler((intervalId: any) => {

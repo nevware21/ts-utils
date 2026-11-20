@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { LENGTH } from "../internal/constants";
+import { LENGTH, UNDEF_VALUE } from "../internal/constants";
 import { createIterator, CreateIteratorContext } from "./create";
 
 /**
@@ -37,7 +37,9 @@ export function createArrayIterator<T>(values: T[]): Iterator<T> {
     let theValues = values ? values.slice() : [];
     let len = theValues[LENGTH];
 
+    // The ctx has its own v (so setting it doesn't call an inherited setter, eg. an Object.prototype.v accessor)
     let ctx: CreateIteratorContext<T> = {
+        v: UNDEF_VALUE,
         n: function () {
             idx++;
             let isDone = idx >= len;

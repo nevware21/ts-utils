@@ -31,12 +31,13 @@ export function _throwIfNotResult(result: any): void {
  * @internal
  * @ignore
  * Closes the iterator, by calling its `return()` function (if it has one) with no arguments like for...of, which
- * must return an object
+ * must return an object. Like for...of only a `null` or `undefined` `return` is ignored, any other value which isn't a
+ * function (including a falsy one, eg. `0` or `false`) throws a TypeError (the runtime's own, from calling it)
  * @param iter - The iterator to close
  */
 export function _closeIter(iter: any): void {
     let returnFn = iter.return;
-    returnFn && _throwIfNotResult(fnCall(returnFn, iter));
+    !isStrictNullOrUndefined(returnFn) && _throwIfNotResult(fnCall(returnFn, iter));
 }
 
 /**

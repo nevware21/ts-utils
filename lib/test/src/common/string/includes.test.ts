@@ -8,6 +8,8 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { strIncludes, polyStrIncludes, strContains } from "../../../../src/string/includes";
+import { polyStrEndsWith } from "../../../../src/string/ends_with";
+import { polyStrStartsWith } from "../../../../src/string/starts_with";
 
 function _expectThrow(cb: () => void): Error {
     try {
@@ -253,5 +255,46 @@ describe("polyStrIncludes Symbol values", () => {
         // behaviour, as the value and searchString are converted with asString()
         assert.isTrue(polyStrIncludes(Symbol("abc") as any, "b"), "The value is converted to \"Symbol(abc)\"");
         assert.isTrue(polyStrIncludes("Symbol(abc)", Symbol("abc") as any), "The searchString is converted to \"Symbol(abc)\"");
+    });
+});
+
+describe("polyStrIncludes / polyStrStartsWith / polyStrEndsWith with a Symbol.match", () => {
+    it("use a defined Symbol.match to decide whether the searchString is a RegExp, like the native functions", function () {
+        if (typeof Symbol !== "function" || !Symbol.match) {
+            this.skip();
+            return;
+        }
+
+        const notRegExp: any = /a/;
+        notRegExp[Symbol.match] = false;
+        const regExpLike: any = {
+            toString: () => "x"
+        };
+        regExpLike[Symbol.match] = true;
+
+        // A RegExp whose Symbol.match is false is searched for as a string (its source)
+        assert.isTrue(polyStrIncludes("x/a/y", notRegExp));
+        assert.isTrue(polyStrStartsWith("/a/y", notRegExp));
+        assert.isTrue(polyStrEndsWith("x/a/", notRegExp));
+
+        // An object whose Symbol.match is truthy is treated as a RegExp
+        assert.throws(() => polyStrIncludes("x", regExpLike), TypeError);
+        assert.throws(() => polyStrStartsWith("x", regExpLike), TypeError);
+        assert.throws(() => polyStrEndsWith("x", regExpLike), TypeError);
+
+        // A RegExp without a Symbol.match override still throws, and a falsy Symbol.match isn't a RegExp
+        assert.throws(() => polyStrIncludes("a", /a/ as any), TypeError);
+        const falsyMatch: any = {
+            toString: () => "b"
+        };
+        falsyMatch[Symbol.match] = 0;
+        assert.isTrue(polyStrIncludes("abc", falsyMatch));
+
+        const nativeIncludes = (String.prototype as any).includes;
+        if (nativeIncludes) {
+            assert.equal(polyStrIncludes("x/a/y", notRegExp), nativeIncludes.call("x/a/y", notRegExp));
+            assert.equal(polyStrIncludes("abc", falsyMatch), nativeIncludes.call("abc", falsyMatch));
+            assert.throws(() => nativeIncludes.call("x", regExpLike), TypeError);
+        }
     });
 });

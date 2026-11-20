@@ -10,6 +10,7 @@ import { fnCall } from "../funcs/funcs";
 import { isArrayLike, isStrictNullOrUndefined } from "../helpers/base";
 import { safe } from "../helpers/safe";
 import { throwTypeError } from "../helpers/throw";
+import { UNDEF_VALUE } from "../internal/constants";
 import { createIterableIterator, CreateIteratorContext } from "./create";
 import { _closeIter, _createIndexIterator, _getMapSetValues, _throwIfNotResult } from "./forOf";
 import { _getIterKey, isIterator } from "./iterator";
@@ -71,7 +72,10 @@ export function _createIterHelper<T, R>(source: Iterator<T>, step: (ctx: CreateI
         }
     }
 
+    // The ctx (the step's ctx) has its own v, so setting it doesn't call an inherited setter (eg. an Object.prototype.v
+    // accessor)
     return createIterableIterator<R>({
+        v: UNDEF_VALUE,
         n: function() {
             _throwIfRunning();
             if (!isDone) {

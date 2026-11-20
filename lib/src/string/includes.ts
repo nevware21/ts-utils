@@ -9,7 +9,7 @@
 import { isRegExp } from "../helpers/base";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
-import { DUMP_ERR_MAX_LENGTH, StrProto } from "../internal/constants";
+import { DUMP_ERR_MAX_LENGTH, FUNCTION, OBJECT, StrProto, UNDEF_VALUE } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _pureAssign } from "../internal/treeshake_helpers";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction"
@@ -90,11 +90,18 @@ export function polyStrIncludes(value: string, searchString: string, position?: 
  * functions a RegExp throws a TypeError (rather than its source being searched for) and the value is only converted
  * once (so a toString() function is only called once). It is not annotated as having no side effects, as every caller
  * uses its result (so an annotation wouldn't allow any call to be removed).
+ * Like the native IsRegExp() an object's `Symbol.match` decides whether it is a RegExp when it is defined (so a RegExp
+ * whose `Symbol.match` is false is searched for as a string, and an object whose `Symbol.match` is truthy throws),
+ * otherwise (and on a runtime without Symbol) its type does. The native Symbol is read directly (rather than with
+ * getKnownSymbol(), which would include the Symbol polyfill in every bundle which uses these functions).
  * @param searchString - The value to convert
  * @returns The searchString as a string
  */
 export function _toSearchString(searchString: any): string {
-    if (isRegExp(searchString)) {
+    let theType = typeof searchString;
+    let isMatch = typeof Symbol === FUNCTION && searchString && (theType === OBJECT || theType === FUNCTION) ? searchString[(Symbol as any).match] : UNDEF_VALUE;
+
+    if (isMatch !== UNDEF_VALUE ? !!isMatch : isRegExp(searchString)) {
         throwTypeError("'searchString' must not be a regular expression " + dumpObj(searchString, 0, DUMP_ERR_MAX_LENGTH));
     }
 

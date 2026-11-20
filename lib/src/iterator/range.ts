@@ -7,6 +7,7 @@
  */
 
 import { isNullOrUndefined } from "../helpers/base";
+import { UNDEF_VALUE } from "../internal/constants";
 import { createIterator, CreateIteratorContext } from "./create";
 
 /**
@@ -115,7 +116,9 @@ export function createRangeIterator(start: number, end: number, step?: number): 
         theStep = (start <= end) ? 1 : -1;
     }
 
+    // The ctx has its own v (so setting it doesn't call an inherited setter, eg. an Object.prototype.v accessor)
     let ctx: CreateIteratorContext<number> = {
+        v: UNDEF_VALUE,
         n: function () {
             let isDone = (theStep > 0) ? (nextValue > end) : (nextValue < end);
             if (!isDone) {
