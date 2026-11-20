@@ -8,7 +8,6 @@
 
 import { ArrProto } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
-import { isArrayLike } from "../helpers/base";
 import { _toArrayLength } from "../helpers/length";
 import { throwRangeError } from "../helpers/throw";
 import { _pushOwnValue } from "../object/define";
@@ -62,11 +61,9 @@ export const arrWith = (/*#__PURE__*/_unwrapFunctionWithPoly("with", ArrProto as
 /*#__NO_SIDE_EFFECTS__*/
 export function polyArrWith<T>(theArray: ArrayLike<T>, index: number, value: T): T[] {
     let result: T[];
-    
-    if (!isArrayLike(theArray)) {
-        throwRangeError("Invalid array");
-    }
-    
+
+    // Like the native function the length of the value is converted (eg. a string length), reading it throws a
+    // TypeError for null and undefined (rather than including a message)
     const len = _toArrayLength(theArray);
     // Convert the index (NaN becomes 0), any other value outside of the range is rejected by the check
     let idx = +index || 0;

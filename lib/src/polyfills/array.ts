@@ -10,9 +10,9 @@ import { ArrFromMapFn, ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from ".
 import { isArray, isFunction, isNullOrUndefined, isStrictNullOrUndefined, isString, isStringObject, isStrictUndefined, objToString } from "../helpers/base";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
-import { CALL, DUMP_ERR_MAX_LENGTH, LENGTH, NULL_VALUE } from "../internal/constants";
+import { CALL, DUMP_ERR_MAX_LENGTH, LENGTH, NULL_VALUE, ObjClass } from "../internal/constants";
 import { asString } from "../string/as_string";
-import { _throwIfNullOrUndefined } from "../internal/throwIf";
+import { _throwIfNotCallbackFn, _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _toArrayLength, _toLength, _toRelIndex } from "../helpers/length";
 import { fnCall } from "../funcs/funcs";
 import { _getMapSetValues, _iterForOf } from "../iterator/forOf";
@@ -182,11 +182,16 @@ export function polyArrFind<T, E extends T>(theArray: ArrayLike<T>, callbackFn: 
  * @return The index of the first element in the array that passes the test. Otherwise, -1.
  */
 export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
+    // Like the native function the length is read before the callbackFn is checked (reading it throws a TypeError for
+    // null and undefined, rather than including a message), and the array is converted to an object (so a string's
+    // callbackFn is passed its String object)
     let len = _toLength(theArray);
+    let theObj = ObjClass(theArray);
+    _throwIfNotCallbackFn(callbackFn);
 
     // Like the native function every index is visited (an empty slot is undefined), so there is no "in" check
     for (let idx = 0; idx < len; idx++) {
-        if (callbackFn[CALL](thisArg, theArray[idx], idx, theArray)) {
+        if (callbackFn[CALL](thisArg, theObj[idx], idx, theObj)) {
             return idx;
         }
     }
@@ -296,11 +301,14 @@ export function polyArrFindLast<T, E extends T>(theArray: ArrayLike<T>, callback
  * no matching element is found.
  */
 export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
+    // See polyArrFindIndex(), the length is read before the callbackFn is checked and the array is converted to an object
     let len = _toLength(theArray);
+    let theObj = ObjClass(theArray);
+    _throwIfNotCallbackFn(callbackFn);
 
     // Like the native function every index is visited (an empty slot is undefined), so there is no "in" check
     for (let idx = len - 1; idx >= 0; idx--) {
-        if (callbackFn[CALL](thisArg, theArray[idx], idx, theArray)) {
+        if (callbackFn[CALL](thisArg, theObj[idx], idx, theObj)) {
             return idx;
         }
     }

@@ -8,9 +8,8 @@
 
 import { ArrProto, LENGTH } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
-import { _throwIfNullOrUndefined } from "../internal/throwIf";
-import { isArray, isFunction } from "../helpers/base";
-import { throwTypeError } from "../helpers/throw";
+import { _throwIfNotCallbackFn, _toObject } from "../internal/throwIf";
+import { isArray } from "../helpers/base";
 import { ArrFlatMapCallbackFn } from "./callbacks";
 import { arrForEach } from "./forEach";
 import { fnCall } from "../funcs/funcs";
@@ -80,17 +79,15 @@ export const arrFlatMap = (/*#__PURE__*/_unwrapFunctionWithPoly("flatMap", ArrPr
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyArrFlatMap<T, R = T>(theArray: ArrayLike<T>, callbackFn: ArrFlatMapCallbackFn<T, R>, thisArg?: any): R[] {
-    _throwIfNullOrUndefined(theArray);
-
-    if (!isFunction(callbackFn)) {
-        throwTypeError("callbackFn must be a function");
-    }
+    // Like the native function the array is converted to an object, so a string's callbackFn is passed its String object
+    let theObj = _toObject(theArray);
+    _throwIfNotCallbackFn(callbackFn);
 
     let result: R[] = [];
     let callbackThis = arguments[LENGTH] > 2 ? thisArg : undefined;
 
-    arrForEach(theArray, (theValue, index) => {
-        let value = fnCall(callbackFn, callbackThis, theValue, index, theArray as any);
+    arrForEach(theObj, (theValue, index) => {
+        let value = fnCall(callbackFn, callbackThis, theValue, index, theObj as any);
         if (isArray(value)) {
             arrForEach(value as any, (mappedValue) => {
                 result.push(mappedValue);
