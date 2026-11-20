@@ -11,7 +11,7 @@ import { LENGTH, StrProto } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { asString } from "./as_string";
-import { polyStrIncludes } from "./includes";
+import { _toSearchString } from "./includes";
 import { strSubstring } from "./substring";
 
 /**
@@ -40,15 +40,15 @@ export const strEndsWith: (value: string, searchString: string, length?: number)
 export function polyStrEndsWith(value: string, searchString: string, length?: number): boolean {
     _throwIfNullOrUndefined(value);
 
-    // Like the native function the value (eg. a String object or a number) and searchString are converted to strings,
-    // and the length to a number (so NaN, the "undefined" string and a value which isn't a number are 0) which can't
-    // be longer than the value, substring() truncates a fraction and treats a negative index as 0
+    // Like the native function the value (eg. a String object or a number) and then the searchString are converted to
+    // strings (the searchString only once, and like polyStrIncludes() a RegExp throws a TypeError), and then the length
+    // to a number (so NaN, the "undefined" string and a value which isn't a number are 0) which can't be longer than
+    // the value, substring() truncates a fraction and treats a negative index as 0
     let theValue = asString(value);
+    let searchValue = _toSearchString(searchString);
     let len = theValue[LENGTH];
     let end = +length;
     end = isStrictUndefined(length) || end > len ? len : (end || 0);
 
-    // The substring is never longer than the searchString, so it only includes the searchString when they are equal,
-    // polyStrIncludes() also throws a TypeError (like the native function) when the searchString is a RegExp
-    return polyStrIncludes(strSubstring(theValue, end - asString(searchString)[LENGTH], end), searchString);
+    return strSubstring(theValue, end - searchValue[LENGTH], end) === searchValue;
 }

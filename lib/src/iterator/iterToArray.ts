@@ -8,7 +8,7 @@
 
 import { fnCall } from "../funcs/funcs";
 import { isFunction } from "../helpers/base";
-import { iterForOf } from "./forOf";
+import { _iterForOf } from "./forOf";
 import { _asIterator, _getIteratorThisArg } from "./helpers";
 import { IterMapCallbackFn } from "./types";
 
@@ -28,11 +28,11 @@ export function iterToArray<T, R = T>(iter: Iterator<T> | Iterable<T> | ArrayLik
     let values: R[] = [];
 
     if (isFunction(mapFn)) {
-        iterForOf(source, (value, count) => {
+        _iterForOf(source, (value, count) => {
             values.push(fnCall(mapFn, _getIteratorThisArg(source, thisArg), value, count || 0));
         });
     } else {
-        iterForOf(source, (value) => {
+        _iterForOf(source, (value) => {
             values.push(value as any as R);
         });
     }

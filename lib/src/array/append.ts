@@ -8,8 +8,9 @@
 
 import { isArray, isUndefined } from "../helpers/base";
 import { isIterable, isIterator } from "../iterator/iterator";
-import { iterForOf } from "../iterator/forOf";
+import { _getMapSetValues, iterForOf } from "../iterator/forOf";
 import { fnApply } from "../funcs/funcs";
+import { OBJECT } from "../internal/constants";
 
 /**
  * Appends the `elms` to the `target` where the elms may be an array, a single object
@@ -50,15 +51,19 @@ import { fnApply } from "../funcs/funcs";
  */
 export function arrAppend<T>(target: T[], elms: T | T[] | Iterator<T>): T[] {
     if (!isUndefined(elms) && target) {
+        let values: any[];
         if (isArray(elms)) {
             // This is not just "target.push(elms)" but becomes effectively "target.push(elms[0], elms[1], ...)"
             fnApply(target.push, target, elms);
-        } else if (isIterator<T>(elms) || isIterable<T>(elms)) {
-            iterForOf(elms, (elm) => {
+        } else if (isIterator<T>(elms) || isIterable<T>(elms) || (values = typeof elms === OBJECT && _getMapSetValues(elms))) {
+            // A Map or Set which isn't iterable (eg. IE 11, which has no iterator functions) appends a copy of its
+            // entries / values, each is pushed (like an iterable) so a large Map or Set can't exceed the argument limit
+            // of apply(). Any other value is appended as-is
+            iterForOf(values || elms as Iterable<T>, (elm) => {
                 target.push(elm);
             });
         } else {
-            target.push(elms);
+            target.push(elms as T);
         }
     }
 

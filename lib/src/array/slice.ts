@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { isString } from "../helpers/base";
+import { isStringLike } from "../helpers/base";
 import { ArrProto, ArrSlice, CALL, FuncCall, LENGTH } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 import { arrMap } from "./map";
@@ -103,8 +103,8 @@ export function _arrSliceToArr<T>(theArray: ArrayLike<T> | null | undefined, sta
 /*#__NO_SIDE_EFFECTS__*/
 export function _strArgsToArr<T>(values: ArrayLike<ArrayLike<T>>): ArrayLike<ArrayLike<T>> {
     for (let lp = 0; lp < values[LENGTH]; lp++) {
-        if (isString(values[lp])) {
-            return arrMap(values, (value) => isString(value) ? ArrSlice[CALL](value) : value);
+        if (isStringLike(values[lp])) {
+            return arrMap(values, (value) => isStringLike(value) ? ArrSlice[CALL](value) : value);
         }
     }
 

@@ -7,7 +7,7 @@
  */
 
 import { fnCall } from "../funcs/funcs";
-import { iterForOf } from "./forOf";
+import { _iterForOf } from "./forOf";
 import { _asIterator, _getIteratorThisArg } from "./helpers";
 import { IterPredicateCallbackFn } from "./types";
 
@@ -26,7 +26,7 @@ export function iterEvery<T>(iter: Iterator<T> | Iterable<T>, callbackfn: IterPr
     let source = _asIterator(iter);
     let allMatched = true;
 
-    iterForOf(source, (value, count) => {
+    _iterForOf(source, (value, count) => {
         if (!fnCall(callbackfn, _getIteratorThisArg(source, thisArg), value, count)) {
             allMatched = false;
             return -1;

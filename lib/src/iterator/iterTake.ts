@@ -7,7 +7,8 @@
  */
 
 import { createIterableIterator } from "./create";
-import { _asIterator, _doIteratorReturn } from "./helpers";
+import { _closeIter } from "./forOf";
+import { _IterHelperState, _asIterator, _iterNext, _iterReturn, _iterStep } from "./helpers";
 import { mathFloor } from "../math/floor";
 
 /**
@@ -24,40 +25,32 @@ import { mathFloor } from "../math/floor";
 export function iterTake<T>(iter: Iterator<T> | Iterable<T>, count: number): IterableIterator<T> {
     let source = _asIterator(iter);
     let remaining = count > 0 ? mathFloor(count) : 0;
-    let complete = false;
-
-    function _complete(value?: T): T | undefined {
-        if (!complete) {
-            complete = true;
-            return _doIteratorReturn(source, value);
-        }
-
-        return value;
-    }
+    let state: _IterHelperState = {};
 
     return createIterableIterator<T>({
         n: function() {
-            let isDone = true;
+            let ctx = this;
 
-            if (!complete) {
+            return _iterStep(state, () => {
                 if (remaining <= 0) {
-                    _complete();
-                } else {
-                    let next = source.next();
-                    if (next.done) {
-                        complete = true;
-                    } else {
-                        this.v = next.value;
-                        remaining--;
-                        isDone = false;
-                    }
+                    // Like the native take() the source is closed when the count is reached
+                    _closeIter(source);
+                    return true;
                 }
-            }
 
-            return isDone;
+                // Like the native take() the result's done (and value) is only read once
+                let next = _iterNext(source);
+                if (next.done) {
+                    return true;
+                }
+
+                ctx.v = next.value;
+                remaining--;
+                return false;
+            });
         },
         r: function(value?: T) {
-            return _complete(value);
+            return _iterReturn(state, source, value);
         }
     });
 }

@@ -25,6 +25,12 @@ let _unsafeTargets: any[];
 let _missingClasses: string[];
 
 /**
+ * The constructor of the class prototype which last caused the missing classes to be looked up again, so checking the
+ * prototype of the same class repeatedly (eg. for each property copied to it) doesn't repeat the lookups
+ */
+let _lastCtor: any;
+
+/**
  * The global classes whose prototype (where the class is defined) is also an unsafe target, as one string rather than a call
  * for each as that is smaller.
  */
@@ -48,8 +54,14 @@ function _addUnsafeClasses(names: string[]): string[] {
     let missing: string[] = [];
 
     arrForEach(names, (name) => {
-        let theClass = safe(getInst as any, [name]).v;
-        let proto = theClass && theClass[PROTOTYPE];
+        // The class and its prototype are both read inside safe(), so a class whose prototype can't be read (eg. a
+        // revoked Proxy) is treated as not defined, rather than the lookup throwing before the missing classes are
+        // saved (which left the remaining classes unchecked for every later call)
+        let proto = safe(() => {
+            let theClass = getInst<any>(name);
+            return theClass && theClass[PROTOTYPE];
+        }).v;
+
         if (proto) {
             arrForEach([proto, safe(objGetPrototypeOf, [proto]).v], (value) => {
                 if (value && arrIndexOf(_unsafeTargets, value) === -1) {
@@ -94,12 +106,29 @@ export function isUnsafeTarget(target: any): boolean {
 
     // A class prototype (the prototype of its own constructor) which isn't known may be from a class (eg. a polyfill)
     // added since the last check, so look for the classes which were missing again. Only a class prototype is
-    // checked, so this isn't repeated for every other object.
-    if (!result && _missingClasses[LENGTH] && objHasOwnProperty(target, "constructor")) {
-        let ctor = target.constructor;
-        if (ctor && ctor[PROTOTYPE] === target) {
-            _missingClasses = _addUnsafeClasses(_missingClasses);
-            result = arrIndexOf(_unsafeTargets, target) >= 0;
+    // checked, so this isn't repeated for every other object, and only when its class isn't the last one that was
+    // looked up for (as each missing class is looked up again, which is slow). A target which can't be checked (eg. a
+    // revoked Proxy, or an own constructor getter which throws) is not a class prototype, rather than the check
+    // throwing. While the classes are being looked up there are no missing classes (they are not defined during the
+    // first call, and empty during a later one), so when reading a class (eg. a global getter) calls this again, that
+    // call only uses the prototypes which have already been added rather than looking them up again (and again).
+    if (!result && _missingClasses && _missingClasses[LENGTH]) {
+        try {
+            if (objHasOwnProperty(target, "constructor")) {
+                let ctor = target.constructor;
+                if (ctor && ctor[PROTOTYPE] === target && ctor !== _lastCtor) {
+                    let missing = _missingClasses;
+
+                    // There are no missing classes while they are looked up, so a call made while reading a class (eg.
+                    // a global getter which creates a new class each time it is read) doesn't look them up again
+                    _lastCtor = ctor;
+                    _missingClasses = [];
+                    _missingClasses = _addUnsafeClasses(missing);
+                    result = arrIndexOf(_unsafeTargets, target) >= 0;
+                }
+            }
+        } catch (e) {
+            // Not a class prototype
         }
     }
 

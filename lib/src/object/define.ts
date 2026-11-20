@@ -6,9 +6,11 @@
  * Licensed under the MIT license.
  */
 
-import { GET_OWN_PROPERTY_DESCRIPTOR, GET_OWN_PROPERTY_SYMBOLS, ObjClass } from "../internal/constants";
+import { GET_OWN_PROPERTY_DESCRIPTOR, GET_OWN_PROPERTY_SYMBOLS, LENGTH, ObjClass } from "../internal/constants";
 import { isFunction, isStrictUndefined } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
+import { objHasOwn } from "./has_own";
+import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { ILazyValue } from "../helpers/types";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { arrForEach } from "../array/forEach";
@@ -17,6 +19,7 @@ import { _returnEmptyArray, _returnNothing } from "../internal/stubs";
 
 const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR)), _returnNothing));
 const _objGetOwnPropertySymbols: (obj: any) => symbol[] = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertySymbols>(ObjClass, GET_OWN_PROPERTY_SYMBOLS)), _returnEmptyArray));
+const _objCreate: (proto: null) => any = (/*#__PURE__*/_pureRef<typeof Object.create>(ObjClass, "create"));
 
 /**
  * Definition of the Property Descriptor mappings for the objDefine functions.
@@ -111,28 +114,44 @@ const propMap: { [key in keyof ObjDefinePropDescriptor]: keyof PropertyDescripto
  * @param value - The prop descriptor to convert
  * @returns
  */
-/*#__NO_SIDE_EFFECTS__*/
 function _createProp(value: ObjDefinePropDescriptor): PropertyDescriptor {
-    let prop: PropertyDescriptor = {};
+    // Like Object.defineProperty() a null or undefined descriptor throws (it is not annotated as having no side effects,
+    // as the check is part of what it does, unlike eg. readArgs() where an unused call can be removed)
+    _throwIfNullOrUndefined(value);
+
+    // Object.defineProperty() also reads the inherited properties of the descriptor, so it has no prototype (and only
+    // the own properties of the value are used), so a property added to Object.prototype (eg. by prototype pollution
+    // of "value", "get" or "l") can't change the defined property
+    let prop: PropertyDescriptor = _objCreate(null);
+    let lazyValue: ILazyValue<any>;
     prop[propMap["c"]] = true;
     prop[propMap["e"]] = true;
 
-    if (value.l) {
-        // Asign a getter function to return the value when requested
-        prop.get = () => value.l.v;
+    // Only the own keys of the value which are own keys of the propMap are used (an allow-list), so an unexpected key such
+    // as "constructor" or one added to Object.prototype (eg. Object.prototype.x = "get") can't map to a descriptor key
+    objForEachKey(value, (key: keyof ObjDefinePropDescriptor, propValue) => {
+        if (key === "l") {
+            lazyValue = propValue;
+        } else if (objHasOwn(propMap, key)) {
+            prop[propMap[key]] = isStrictUndefined(propValue) ? prop[propMap[key]] : propValue;
+        }
+    });
 
-        // If it has a setter then expose it as well
-        let desc = _objGetOwnPropertyDescriptor(value.l, "v");
-        if (desc && desc.set) {
+    if (lazyValue) {
+        // Asign a getter function to return the value when requested, a getter ("g") takes precedence
+        if (!prop.get) {
+            prop.get = () => lazyValue.v;
+        }
+
+        // If it has a setter then expose it as well, a setter ("s") takes precedence
+        // The setter is only read from the descriptor's own "set", rather than an inherited one
+        let desc = _objGetOwnPropertyDescriptor(lazyValue, "v");
+        if (desc && objHasOwn(desc, "set") && desc.set && !prop.set) {
             prop.set = (newValue: any) => {
-                value.l.v = newValue;
+                lazyValue.v = newValue;
             };
         }
     }
-
-    objForEachKey(value, (key: keyof ObjDefinePropDescriptor, value) => {
-        prop[propMap[key]] = isStrictUndefined(value) ? prop[propMap[key]] : value;
-    });
 
     return prop;
 }
@@ -246,6 +265,25 @@ export function objDefine<T>(target: T, key: keyof T, propDesc: ObjDefinePropDes
 }
 
 /**
+ * @internal
+ * @ignore
+ * Adds the value to the end of the array as an own property, like the native functions which create an array (eg.
+ * `Array.from()`), so a setter or read-only property of the same index on `Array.prototype` (or `Object.prototype`)
+ * doesn't stop it being added. The value is only defined when the array "has" the index, which is when it is
+ * inherited (which is rare), as defining every value is ~65x slower than assigning it.
+ * @param theArray - The array to add the value to
+ * @param value - The value to add
+ */
+export function _pushOwnValue<T>(theArray: T[], value: T): void {
+    let idx = theArray[LENGTH];
+    if (idx in theArray) {
+        objDefine(theArray, idx, { v: value, w: true });
+    } else {
+        theArray[idx] = value;
+    }
+}
+
+/**
  * The objDefineProps() method defines new or modifies existing properties directly for the target object using the keys
  * and configuration from the propDescMap argument. This will call {@link objDefineProperties} after creating the required
  * PropertyDescriptorMap from the propDescMap values.
@@ -259,7 +297,9 @@ export function objDefine<T>(target: T, key: keyof T, propDesc: ObjDefinePropDes
  * @returns The target object.
  */
 export function objDefineProps<T>(target: T, propDescMap: ObjDefinePropDescriptorMap) {
-    let props: PropertyDescriptorMap = {};
+    // The map has no prototype, so (like Object.defineProperties) a "__proto__" key (eg. from JSON.parse) is defined, and
+    // a read-only property of Object.prototype (eg. when it is frozen) doesn't stop a key being added
+    let props: PropertyDescriptorMap = _objCreate(null);
 
     objForEachKey(propDescMap, (key, value: ObjDefinePropDescriptor) => {
         props[key] = _createProp(value);

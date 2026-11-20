@@ -9,8 +9,9 @@
 import { LENGTH, StrProto } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
+import { mathFloor } from "../math/floor";
 import { asString } from "./as_string";
-import { polyStrIncludes } from "./includes";
+import { _toSearchString } from "./includes";
 import { strSubstring } from "./substring";
 
 /**
@@ -41,12 +42,15 @@ export const strStartsWith: (value: string, searchString: string, position?: num
 export function polyStrStartsWith(value: string, searchString: string, position?: number): boolean {
     _throwIfNullOrUndefined(value);
 
-    // Like the native function the value (eg. a String object or a number) and searchString are converted to strings,
-    // and the position to a number (so NaN and a value which isn't a number are 0), substring() truncates a fraction
+    // Like the native function the value (eg. a String object or a number) and then the searchString are converted to
+    // strings (the searchString only once, and like polyStrIncludes() a RegExp throws a TypeError), and then the position
+    // to a number (so NaN and a value which isn't a number are 0)
+    let theValue = asString(value);
+    let searchValue = _toSearchString(searchString);
     let pos = +position;
-    pos = pos > 0 ? pos : 0;
 
-    // The substring is never longer than the searchString, so it only includes the searchString when they are equal,
-    // polyStrIncludes() also throws a TypeError (like the native function) when the searchString is a RegExp
-    return polyStrIncludes(strSubstring(asString(value), pos, pos + asString(searchString)[LENGTH]), searchString);
+    // A fractional position is truncated before the length is added, as the sum could otherwise round up
+    pos = pos > 0 ? mathFloor(pos) : 0;
+
+    return strSubstring(theValue, pos, pos + searchValue[LENGTH]) === searchValue;
 }

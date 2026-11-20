@@ -6,9 +6,8 @@
  * Licensed under the MIT license.
  */
 
-import { fnCall } from "../funcs/funcs";
 import { createIterableIterator } from "./create";
-import { _asIterator, _doIteratorReturn, _getIteratorThisArg } from "./helpers";
+import { _IterHelperState, _asIterator, _callIterFn, _iterNext, _iterReturn, _iterStep } from "./helpers";
 import { IterPredicateCallbackFn } from "./types";
 
 /**
@@ -25,28 +24,30 @@ import { IterPredicateCallbackFn } from "./types";
 export function iterFilter<T>(iter: Iterator<T> | Iterable<T>, callbackfn: IterPredicateCallbackFn<T>, thisArg?: any): IterableIterator<T> {
     let source = _asIterator(iter);
     let index = 0;
-    let isDone = false;
+    let state: _IterHelperState = {};
 
     return createIterableIterator<T>({
         n: function() {
-            let hasValue = false;
-            while (!isDone && !hasValue) {
-                let next = source.next();
-                isDone = !!next.done;
-                if (!isDone) {
-                    hasValue = !!fnCall(callbackfn, _getIteratorThisArg(source, thisArg), next.value, index);
-                    if (hasValue) {
-                        this.v = next.value;
+            let ctx = this;
+
+            return _iterStep(state, () => {
+                for (;;) {
+                    let next = _iterNext(source);
+                    if (next.done) {
+                        return true;
                     }
 
-                    index++;
+                    // The value is only read once
+                    let value = next.value;
+                    if (_callIterFn(source, callbackfn, thisArg, value, index++)) {
+                        ctx.v = value;
+                        return false;
+                    }
                 }
-            }
-
-            return !hasValue;
+            });
         },
         r: function(value?: T) {
-            return _doIteratorReturn(source, value);
+            return _iterReturn(state, source, value);
         }
     });
 }

@@ -64,8 +64,8 @@ export const getLength: <T extends IGetLength>(value: T) => T["length"] = (/*#__
 export function _toLength(value: ArrayLike<any>): number {
     let len = +value[LENGTH];
 
-    // A length which is already a valid integer (the normal case) is returned as-is
-    return len >>> 0 === len ? len : (len > 0 ? (len < 0x1FFFFFFFFFFFFF ? len - len % 1 : 0x1FFFFFFFFFFFFF) : 0);
+    // A length which is already a valid integer (the normal case) is returned as-is, except -0 which is 0 (like ToLength)
+    return len >>> 0 === len ? len || 0 : (len > 0 ? (len < 0x1FFFFFFFFFFFFF ? len - len % 1 : 0x1FFFFFFFFFFFFF) : 0);
 }
 
 /**

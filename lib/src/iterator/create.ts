@@ -6,7 +6,6 @@
  * Licensed under the MIT license.
  */
 
-import { objDefine } from "../object/define";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 
@@ -262,7 +261,9 @@ export function createIterator<T>(ctx: CreateIteratorContext<T>): Iterator<T> {
         };
 
         if (!isDone) {
-            objDefine<IteratorResult<T>>(result as any, "value", { g: _value });
+            // Like the native iterators the value is read when the result is created, so a result keeps its value
+            // (previously it was a getter which returned the current value, so an earlier result had a later value)
+            (result as any).value = _value();
         }
 
         return result as IteratorResult<T>;

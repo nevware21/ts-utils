@@ -148,7 +148,7 @@ export interface _TimerHandler {
      * has completed and will not automatically rescheduled
      * @returns
      */
-    dn: () => void
+    dn: (keep?: boolean) => void
 }
 
 /**
@@ -167,6 +167,13 @@ export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId:
     let timerId: T = startTimer ? refreshFn(NULL_VALUE) : NULL_VALUE;
     let theTimerHandler: ITimerHandler;
 
+    // Incremented each time the timer's callback runs (dn()), so a refresh whose callback was run synchronously while
+    // the timer was being started (eg. by a setTimeout override) doesn't keep the id of that (already run) timer, and
+    // keeps the timer of a refresh() (or the cancel()) made by that callback. Only the callback is counted, so a
+    // cancel() or refresh() made by another callback (eg. one run by the override while starting this timer) doesn't
+    // stop the new timer from being kept
+    let changes = 0;
+
     function _unref() {
         ref = false;
         timerId && (timerId as any)[UNREF] && (timerId as any)[UNREF]();
@@ -179,7 +186,12 @@ export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId:
     }
 
     function _refresh() {
-        timerId = refreshFn(timerId);
+        let change = changes;
+        let newTimerId = refreshFn(timerId);
+        if (change === changes) {
+            timerId = newTimerId;
+        }
+
         if (!ref) {
             _unref();
         }
@@ -220,8 +232,9 @@ export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId:
 
     return {
         h: theTimerHandler,
-        dn: () => {
-            timerId = NULL_VALUE;
+        dn: (keep?: boolean) => {
+            !keep && (timerId = NULL_VALUE);
+            changes++;
         }
     };
 }

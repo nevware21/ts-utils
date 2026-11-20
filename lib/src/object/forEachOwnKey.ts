@@ -8,7 +8,7 @@
 
 import { arrForEach } from "../array/forEach";
 import { isStrictNullOrUndefined } from "../helpers/base";
-import { CALL, UNDEF_VALUE } from "../internal/constants";
+import { CALL } from "../internal/constants";
 import { _objForEachKey } from "./for_each_key";
 import { objGetOwnPropertySymbols } from "./get_own_property";
 import { isUnsafePropKey } from "./isUnsafePropKey";
@@ -75,11 +75,12 @@ export function forEachOwnKey<T>(theObject: T, callbackfn: (key: PropertyKey, va
         if (_objForEachKey(theObject, callbackfn, thisArg) !== -1) {
             arrForEach(objGetOwnPropertySymbols(theObject), (key) => {
                 if (_objPropertyIsEnumerable(theObject, key)) {
-                    let value: any = UNDEF_VALUE;
+                    let value: any;
                     try {
                         value = theObject[key as keyof T];
                     } catch (e) {
-                        // A throwing getter, so just pass undefined as the value
+                        // A throwing getter, so the key is skipped
+                        return;
                     }
 
                     // arrForEach stops when -1 is returned

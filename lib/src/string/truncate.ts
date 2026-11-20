@@ -8,6 +8,7 @@
 
 import { isNullOrUndefined } from "../helpers/base";
 import { EMPTY, LENGTH } from "../internal/constants";
+import { _cutLength } from "../internal/surrogate";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { mathToInt } from "../math/to_int";
 import { asString } from "./as_string";
@@ -55,9 +56,9 @@ export function strTruncate(value: string, maxLength: number, suffix?: string): 
             let theSuffix = (!suffix && isNullOrUndefined(suffix)) ? EMPTY : asString(suffix);
 
             if (theSuffix[LENGTH] >= length) {
-                result = strLeft(theSuffix, length);
+                result = strLeft(theSuffix, _cutLength(theSuffix, length));
             } else {
-                result = strLeft(result, length - theSuffix[LENGTH]) + theSuffix;
+                result = strLeft(result, _cutLength(result, length - theSuffix[LENGTH])) + theSuffix;
             }
         }
     }

@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { __PROTO__, FUNCTION, ObjClass, OBJECT, PROTOTYPE } from "../internal/constants";
+import { DUMP_ERR_MAX_LENGTH, __PROTO__, FUNCTION, ObjClass, OBJECT, PROTOTYPE } from "../internal/constants";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
@@ -44,7 +44,7 @@ export function polyObjCreate(obj: any, properties?: PropertyDescriptorMap & Thi
     if (!isStrictNullOrUndefined(obj)) {
         let type = typeof obj;
         if (type !== OBJECT && type !== FUNCTION) {
-            throwTypeError("Prototype must be an Object or function: " + dumpObj(obj));
+            throwTypeError("Prototype must be an Object or function: " + dumpObj(obj, 0, DUMP_ERR_MAX_LENGTH));
         }
 
         tempFunc[PROTOTYPE] = obj;

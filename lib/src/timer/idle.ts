@@ -291,7 +291,9 @@ export function scheduleIdleCallback(callback: IdleCallbackFn, options?: IIdleRe
     }
 
     if (hasIdleCallback()) {
-        let handler = _createTimerHandler(true, (idleId: number) => {
+        // The idle callback is requested after the handler is assigned (rather than by _createTimerHandler()), as a
+        // requestIdleCallback (eg. a test shim) may call the callback synchronously, which uses the handler
+        let handler = _createTimerHandler(false, (idleId: number) => {
             idleId && getCancelIdleCallback()(idleId);
             return getIdleCallback()((deadline: IIdleDeadline) => {
                 handler.dn();
@@ -301,7 +303,7 @@ export function scheduleIdleCallback(callback: IdleCallbackFn, options?: IIdleRe
             getCancelIdleCallback()(idleId);
         });
 
-        return handler.h;
+        return handler.h.refresh();
     }
 
     let timeout = (options || {}).timeout;

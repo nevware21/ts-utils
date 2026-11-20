@@ -9,7 +9,7 @@
 import { isObject } from "../../helpers/base";
 import { dumpObj } from "../../helpers/diagnostics";
 import { throwTypeError } from "../../helpers/throw";
-import { ObjClass } from "../../internal/constants";
+import { DUMP_ERR_MAX_LENGTH, ObjClass } from "../../internal/constants";
 import { _throwIfNullOrUndefined } from "../../internal/throwIf";
 import { objHasOwn } from "../../object/has_own";
 
@@ -47,7 +47,7 @@ function _objIterateEntries<R>(obj: any, mapper: (key: string) => R): R[] {
 export function polyObjKeys(obj: any): string[] {
     _throwIfNullOrUndefined(obj);
     if (!isObject(obj)) {
-        throwTypeError("non-object " + dumpObj(obj));
+        throwTypeError("non-object " + dumpObj(obj, 0, DUMP_ERR_MAX_LENGTH));
     }
 
     return _objIterateEntries<string>(obj, (k) => k);

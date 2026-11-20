@@ -7,7 +7,7 @@
  */
 
 import { isFunction, isObject, isStrictNullOrUndefined } from "../helpers/base";
-import { CALL, UNDEF_VALUE } from "../internal/constants";
+import { CALL } from "../internal/constants";
 import { objHasOwn } from "./has_own";
 import { isUnsafePropKey } from "./isUnsafePropKey";
 
@@ -26,11 +26,12 @@ import { isUnsafePropKey } from "./isUnsafePropKey";
 export function _objForEachKey<T>(theObject: T, callbackfn: (key: string, value: T[keyof T]) => void | number, ctx: any): number | void {
     for (const prop in theObject) {
         if (objHasOwn(theObject, prop)) {
-            let value: any = UNDEF_VALUE;
+            let value: any;
             try {
                 value = theObject[prop as keyof T];
             } catch (e) {
-                // A throwing getter, so just pass undefined as the value
+                // A throwing getter, so the key is skipped
+                continue;
             }
 
             if (callbackfn[CALL](ctx, prop, value) === -1) {

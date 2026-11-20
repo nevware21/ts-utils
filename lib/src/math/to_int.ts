@@ -9,6 +9,7 @@
 import { dumpObj } from "../helpers/diagnostics";
 import { throwRangeError } from "../helpers/throw";
 import { mathTrunc } from "./trunc";
+import { DUMP_ERR_MAX_LENGTH } from "../internal/constants";
 
 /**
  * Convert the provided value to an integer
@@ -22,7 +23,7 @@ export function mathToInt(value: any, throwInfinity?: boolean): number {
     let result = +value;
 
     if (throwInfinity && (result === Infinity || result == Infinity)) {
-        throwRangeError("invalid value [" + dumpObj(value) + "]");
+        throwRangeError("invalid value [" + dumpObj(value, 0, DUMP_ERR_MAX_LENGTH) + "]");
     }
     
     return result !== result || result === 0 ? 0 : mathTrunc(result);

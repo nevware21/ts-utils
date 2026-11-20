@@ -10,65 +10,11 @@ import { EMPTY, SUBSTRING, TO_LOWER_CASE, TO_UPPER_CASE } from "../internal/cons
 import { asString } from "./as_string";
 import { strReplace } from "./replace";
 
-const SEPARATORS = "\\s\0-/:-@[-`{-\xA9\xAB-\xB1\xB4\xB6-\xB8\xBB\xBF\xD7\xF7\u2000-\u206F\u20A0-\u20CF\u2190-\u245F\u2500-\u2775\u2794-\u2BFF\u3000-\u3004\u3008-\u3020\u3030\u3036\u3037\u303D-\u303F";
+const SEPARATORS = "\\s\0-/:-@[-`{-\xA9\xAB-\xB1\xB4\xB6-\xB8\xBB\xBF\xD7\xF7\u2000-\u200B\u200E-\u206F\u20A0-\u20CF\u2190-\u245F\u2500-\u2775\u2794-\u2BFF\u3000-\u3004\u3008-\u3020\u3030\u3036\u3037\u303D-\u303F";
 const UPPER = "A-Z\xC0-\xD6\xD8-\xDE\u0386\u0388-\u038F\u0391-\u03AB\u0400-\u042F";
 
 let _caseWords: RegExp;
 let _wordRuns: RegExp;
-
-/**
- * @internal
- * @ignore
- * Returns the word tokenizer used by {@link strCamelCase}, {@link strKebabCase} and {@link strSnakeCase}, every
- * match is `whitespace* (separators*) (word)` or only the trailing separators (with an empty word). As the
- * matches are contiguous the replacer can use the match offset to identify the first word (any leading
- * separators are part of its match), and the leading `(?!$)` stops an empty match at the end of the string.
- * The greedy `\s*` means the captured separators are only empty when the separators are all whitespace,
- * which is used to trim leading / trailing whitespace while retaining any other leading / trailing separator.
- *
- * Words are either:
- * - An uppercase run followed by a capitalized word, eg. `"XML"` from `"XMLHttp"`; or
- * - An optional uppercase run followed by any other word characters, eg. `"Http"`, `"bar2"`, `"ABC123"`, `"ABC"`
- *
- * So words are split at separators, where a lowercase letter or number is followed by an uppercase letter
- * (`"fooBar"`, `"bar2Baz"`) and before the last letter of an uppercase run followed by a lowercase letter.
- *
- * The character classes are fixed code unit ranges so the result is the same on every runtime, Unicode
- * property escapes (`\p{L}`) require ES2018 and a `u` regular expression literal is a SyntaxError on
- * older runtimes (even within a try / catch), they are:
- * - Separators: whitespace and the punctuation and symbols (not the letters, numbers or marks) of ASCII,
- *   Latin-1 (so not `ª²³µ¹º¼½¾`), General Punctuation, Currency Symbols, Arrows to Miscellaneous Symbols and
- *   Arrows (not Enclosed Alphanumerics, eg. `①Ⓐⓐ`, or the Dingbat numbers `❶➀➊`) and CJK Symbols and
- *   Punctuation (not `々〆〇〡〪〱〸〻〼` etc)
- *   `\s\0-\x2F\x3A-\x40\x5B-\x60\x7B-\xA9\xAB-\xB1\xB4\xB6-\xB8\xBB\xBF\xD7\xF7\u2000-\u206F\u20A0-\u20CF\u2190-\u245F\u2500-\u2775\u2794-\u2BFF\u3000-\u3004\u3008-\u3020\u3030\u3036\u3037\u303D-\u303F`
- * - Uppercase: Basic Latin, Latin-1, Greek and Cyrillic `A-Z\xC0-\xD6\xD8-\xDE\u0386\u0388-\u038F\u0391-\u03AB\u0400-\u042F`,
- *   each followed by any combining diacritical marks `\u0300-\u036F` (so decomposed letters are not split)
- * - Lowercase (only used to detect the end of an uppercase run): `a-z\xDF-\xF6\xF8-\xFF\u0390\u03AC-\u03CE\u0430-\u045F`
- * - Other word characters: every other character (lowercase and caseless letters, numbers, marks, etc)
- *
- * So the precomposed and decomposed (NFC / NFD) forms of the letters within these ranges produce the same
- * words, the letters of the other blocks that alternate between upper and lower case (Latin Extended,
- * Cyrillic Supplement, Greek Extended, etc) are not listed as that would require each letter individually,
- * so a precomposed letter from those blocks (eg. `Č`) doesn't start a new word while its decomposed form
- * (`C` followed by a combining caron) does.
- *
- * The character classes are strings (rather than regular expression literals) so each class is only included
- * once in the minified output, and the ASCII ranges are the characters themselves as they are shorter than the
- * escapes, eg. `\0-/:-@` is `\0-\x2F\x3A-\x40`. The regular expressions are created when first used, as
- * creating them when the module is loaded (from the strings) would stop them from being tree-shaken.
- */
-function _getCaseWords(): RegExp {
-    if (!_caseWords) {
-        let upperLetter = "[" + UPPER + "][\u0300-\u036F]*";
-
-        // Each uppercase unit must start with an uppercase letter (marks are never uppercase) so there is only one
-        // way to split a run, and the last alternative always matches, so this can't backtrack catastrophically
-        // eslint-disable-next-line security/detect-non-literal-regexp
-        _caseWords = new RegExp("(?!$)\\s*([" + SEPARATORS + "]*)((?:" + upperLetter + ")+(?=" + upperLetter + "[a-z\xDF-\xF6\xF8-\xFF\u0390\u03AC-\u03CE\u0430-\u045F])|(?:" + upperLetter + ")*[^" + SEPARATORS + UPPER + "]*)", "g");
-    }
-
-    return _caseWords;
-}
 
 /**
  * @internal
@@ -130,29 +76,6 @@ function _letterWord(word: string): string {
 /**
  * @internal
  * @ignore
- * Lowercase the first character of the word and retain the case of the remaining characters
- */
-/*#__NO_SIDE_EFFECTS__*/
-function _lowerFirst(word: string): string {
-    let len = _firstLen(word);
-    return word[SUBSTRING](0, len)[TO_LOWER_CASE]() + word[SUBSTRING](len);
-}
-
-/**
- * @internal
- * @ignore
- * Uppercase the first character of the word and lowercase the remaining characters. The whole word is
- * lowercased first as some lowercase mappings depend on the preceding letters, eg. the Greek final sigma
- * (`"ΟΣ"` becomes `"Ος"` not `"Οσ"`)
- */
-/*#__NO_SIDE_EFFECTS__*/
-function _capitalWord(word: string): string {
-    return _letterWord(word[TO_LOWER_CASE]());
-}
-
-/**
- * @internal
- * @ignore
  * Internal function to split the value into words and convert the case of each word in a single pass.
  * Each run of separators between words is replaced with a single `newPrefix`, leading and trailing
  * whitespace is removed and any other leading / trailing separators are also replaced with a single
@@ -165,7 +88,16 @@ function _capitalWord(word: string): string {
  */
 /*#__NO_SIDE_EFFECTS__*/
 function _convertCase<T>(value: T, newPrefix: string, firstFn: (word: string) => string, wordFn: (word: string) => string): string {
-    return strReplace(asString(value), _getCaseWords(), (_match: string, sep: string, word: string, offset: number) => {
+    if (!_caseWords) {
+        let upperLetter = "[" + UPPER + "][\u0300-\u036F]*";
+
+        // Each uppercase unit must start with an uppercase letter (marks are never uppercase) so there is only one
+        // way to split a run, and the last alternative always matches, so this can't backtrack catastrophically
+        // eslint-disable-next-line security/detect-non-literal-regexp
+        _caseWords = new RegExp("(?!$)\\s*([" + SEPARATORS + "]*)((?:" + upperLetter + ")+(?=" + upperLetter + "(?!s(?![a-z]))[a-z\xDF-\xF6\xF8-\xFF\u0390\u03AC-\u03CE\u0430-\u045F])|(?:" + upperLetter + ")*[^" + SEPARATORS + UPPER + "]*)", "g");
+    }
+
+    return strReplace(asString(value), _caseWords, (_match: string, sep: string, word: string, offset: number) => {
         // The first word is always at offset 0 (any leading separators are part of its match), a match without
         // a word is the trailing separators. The leading whitespace is not part of sep, so sep is only empty when
         // the separators are all whitespace (or there are none), which (like trimming) doesn't add a newPrefix
@@ -231,7 +163,10 @@ export function strLetterCase<T>(value: T): string {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function strCapitalizeWords<T>(value: T): string {
-    return strReplace(asString(value), _getWordRuns(), _capitalWord);
+    // Uppercase the first character of each word and lowercase the remaining characters. The whole word is
+    // lowercased first as some lowercase mappings depend on the preceding letters, eg. the Greek final sigma
+    // (`"ΟΣ"` becomes `"Ος"` not `"Οσ"`)
+    return strReplace(asString(value), _getWordRuns(), (word: string) => _letterWord(word[TO_LOWER_CASE]()));
 }
 
 /**
@@ -287,7 +222,11 @@ export function strCapitalizeWords<T>(value: T): string {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function strCamelCase<T>(value: T, upperFirst?: boolean): string {
-    return _convertCase(value, EMPTY, upperFirst ? _letterWord : _lowerFirst, _letterWord);
+    return _convertCase(value, EMPTY, upperFirst ? _letterWord : (word: string) => {
+        // Lowercase the first character of the word and retain the case of the remaining characters
+        let len = _firstLen(word);
+        return word[SUBSTRING](0, len)[TO_LOWER_CASE]() + word[SUBSTRING](len);
+    }, _letterWord);
 }
 
 /**

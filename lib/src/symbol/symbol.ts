@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { NULL_VALUE, SYMBOL, UNDEF_VALUE } from "../internal/constants";
+import { NULL_VALUE, SYMBOL, SYMBOL_TYPE, UNDEF_VALUE } from "../internal/constants";
 import { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "../polyfills/symbol";
 import { WellKnownSymbols, _wellKnownSymbolMap } from "./well_known";
 import { _createIsWithPoly } from "../helpers/base";
@@ -40,7 +40,7 @@ function _getSymbolKey<R>(key: string) {
  * @param value - Value to be checked.
  * @return True if the value is a symbol, false otherwise.
  */
-export const isSymbol: (value: any) => value is symbol = (/*#__PURE__*/_createIsWithPoly<symbol>("symbol"));
+export const isSymbol: (value: any) => value is symbol = (/*#__PURE__*/_createIsWithPoly<symbol>(SYMBOL_TYPE));
 
 /**
  * Helper to identify whether the runtime support the Symbols either via native or an installed polyfill

@@ -6,15 +6,16 @@
  * Licensed under the MIT license.
  */
 
-import { isArray, isFunction, isObject } from "../../helpers/base";
+import { isArray, isPrimitive, isString } from "../../helpers/base";
 import { dumpObj } from "../../helpers/diagnostics";
 import { throwTypeError } from "../../helpers/throw";
-import { LENGTH } from "../../internal/constants";
+import { DUMP_ERR_MAX_LENGTH, LENGTH, NULL_VALUE } from "../../internal/constants";
 import { _throwIfNullOrUndefined } from "../../internal/throwIf";
-import { iterForOf } from "../../iterator/forOf";
+import { _getMapSetValues, iterForOf } from "../../iterator/forOf";
 import { isIterable } from "../../iterator/iterator";
 import { objDefine } from "../../object/define";
 import { asString } from "../../string/as_string";
+import { isSymbol } from "../../symbol/symbol";
 
 /**
  * Creates a new object from an array of [key, value] pairs.
@@ -41,30 +42,40 @@ export function polyObjFromEntries<T = any>(entries: any): T {
     const result = {} as any;
 
     function addEntry(entry: any) {
-        if (!isObject(entry) && !isFunction(entry)) {
-            throwTypeError(dumpObj(entry) + " is not an entry object");
+        if (isPrimitive(entry)) {
+            throwTypeError(dumpObj(entry, 0, DUMP_ERR_MAX_LENGTH) + " is not an entry object");
         }
 
-        // Convert the key once (like the native function), then define it as an own (enumerable, configurable and
-        // writable) property rather than assigning it, so a "__proto__" key (including an object key which converts to
-        // it) can't change the prototype of the result, and a setter or a read-only property of the same name on
-        // Object.prototype (eg. when it is frozen) doesn't stop it being added. Object.defineProperty is defined by
-        // every runtime which needs this polyfill (ES5).
+        // Convert the key once (like the native function), then add it as an own (enumerable, configurable and
+        // writable) property. When the result already "has" the key (it is inherited, eg. "__proto__" including an
+        // object key which converts to it, or a setter or a read-only property of the same name on Object.prototype,
+        // or it is a duplicate key) it is defined rather than assigned, so the prototype of the result can't be changed
+        // and the key is still added. Otherwise it is assigned, as defining every key is ~25x slower. Object.defineProperty
+        // is defined by every runtime which needs this polyfill (ES5).
         let key = entry[0];
         let value = entry[1];
-        objDefine(result, typeof key === "symbol" ? key : asString(key), { v: value, w: true });
+        // A string key (the usual case) is used as-is, without the symbol check and conversion
+        key = isString(key) || isSymbol(key) ? key : asString(key);
+        if (key in result) {
+            objDefine(result, key, { v: value, w: true });
+        } else {
+            result[key] = value;
+        }
     }
 
     _throwIfNullOrUndefined(entries);
-    if (isArray(entries)) {
+
+    // A Map or Set which isn't iterable (eg. IE 11, which has no iterator functions) uses a copy of its entries / values
+    let values: ArrayLike<any> = isArray(entries) ? entries : (isIterable(entries) ? NULL_VALUE : _getMapSetValues(entries));
+    if (values) {
         // Like the array iterator every index is visited (an empty slot is undefined, which throws)
-        for (let idx = 0; idx < entries[LENGTH]; idx++) {
-            addEntry(entries[idx]);
+        for (let idx = 0; idx < values[LENGTH]; idx++) {
+            addEntry(values[idx]);
         }
     } else if (isIterable(entries)) {
         iterForOf(entries, addEntry);
     } else {
-        throwTypeError(dumpObj(entries) + " is not iterable");
+        throwTypeError(dumpObj(entries, 0, DUMP_ERR_MAX_LENGTH) + " is not iterable");
     }
 
     return result as T;

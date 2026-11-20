@@ -185,6 +185,10 @@ export function createCustomError<T extends ErrorConstructor = CustomErrorConstr
                 let orgProto = objGetPrototypeOf(_this);
                 if (orgProto !== objGetPrototypeOf(_self)) {
                     objSetPrototypeOf(_self, orgProto);
+
+                    // A runtime which can't set the prototype (eg. IE 9 / 10) only copies the prototype's own enumerable
+                    // properties, so also define the (non-enumerable) name on the instance
+                    objGetPrototypeOf(_self) !== orgProto && safe(objDefine, [_self, NAME, { v: name, c: true, e: false }]);
                 }
             }
 

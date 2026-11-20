@@ -18,6 +18,12 @@ export const enum _eTaskQueueType {
 
 let _taskQueues: { [key in _eTaskQueueType]?: (() => void)[] } | undefined;
 
+/**
+ * The number of tasks which have been run from each queue while it is being flushed, the tasks which have run remain
+ * in the queue until the flush completes, so only the remaining (pending) tasks are counted against the maximum
+ */
+let _runCount: number[] = [];
+
 export function _flushQueues(): void {
     if (_taskQueues) {
         _taskQueues[_eTaskQueueType.nextTick] && _flushTaskQueue(_eTaskQueueType.nextTick);
@@ -30,6 +36,8 @@ export function _flushTaskQueue(queueType: _eTaskQueueType): void {
         let queue = _taskQueues[queueType];
         let queueIdx = 0;
         while (queue && queue[LENGTH] > queueIdx) {
+            // Counted before the task runs, so a task which it schedules only counts the tasks which are still pending
+            _runCount[queueType] = queueIdx + 1;
             _runMicroTask(queue[queueIdx++]);
 
             // Special case for microtask queue to ensure nextTick queue is flushed between each microtask callback
@@ -39,6 +47,7 @@ export function _flushTaskQueue(queueType: _eTaskQueueType): void {
         }
 
         _taskQueues[queueType] = UNDEF_VALUE;
+        _runCount[queueType] = 0;
     }
 }
 
@@ -56,7 +65,7 @@ export function _addToQueue(queueType: _eTaskQueueType, callback: () => void, ma
         _taskQueues[queueType] = queue;
     }
 
-    if (isStrictUndefined(maxQueuedTasks) || maxQueuedTasks === 0 || (queue[LENGTH] < maxQueuedTasks)) {
+    if (isStrictUndefined(maxQueuedTasks) || maxQueuedTasks === 0 || (queue[LENGTH] - (_runCount[queueType] || 0) < maxQueuedTasks)) {
         queue.push(callback);
         result = true;
     } else {
@@ -80,4 +89,6 @@ export function _clearTaskQueues(): void {
         _taskQueues[_eTaskQueueType.microtask] = UNDEF_VALUE;
         _taskQueues = UNDEF_VALUE;
     }
+
+    _runCount = [];
 }

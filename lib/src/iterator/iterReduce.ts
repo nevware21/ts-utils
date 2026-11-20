@@ -7,7 +7,7 @@
  */
 
 import { throwTypeError } from "../helpers/throw";
-import { iterForOf } from "./forOf";
+import { _iterForOf } from "./forOf";
 import { _asIterator } from "./helpers";
 import { IterReduceCallbackFn } from "./types";
 import { LENGTH } from "../internal/constants";
@@ -28,7 +28,7 @@ export function iterReduce<T, R = T>(iter: Iterator<T> | Iterable<T>, callbackfn
     let hasAccumulator = arguments[LENGTH] > 2;
     let accumulator = initialValue as T | R;
 
-    iterForOf(source, (value, count) => {
+    _iterForOf(source, (value, count) => {
         if (!hasAccumulator) {
             accumulator = value;
             hasAccumulator = true;

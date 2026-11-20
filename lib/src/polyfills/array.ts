@@ -7,14 +7,18 @@
  */
 
 import { ArrFromMapFn, ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "../array/callbacks";
-import { isArray, isFunction, isNullOrUndefined, isStrictNullOrUndefined, isString, isStrictUndefined, objToString } from "../helpers/base";
+import { isArray, isFunction, isNullOrUndefined, isStrictNullOrUndefined, isString, isStringObject, isStrictUndefined, objToString } from "../helpers/base";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
-import { CALL, LENGTH } from "../internal/constants";
+import { CALL, DUMP_ERR_MAX_LENGTH, LENGTH, NULL_VALUE } from "../internal/constants";
+import { asString } from "../string/as_string";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _toArrayLength, _toLength } from "../helpers/length";
-import { iterForOf } from "../iterator/forOf";
-import { isIterable } from "../iterator/iterator";
+import { fnCall } from "../funcs/funcs";
+import { _getMapSetValues, _iterForOf } from "../iterator/forOf";
+import { _pushOwnValue } from "../object/define";
+import { getKnownSymbol, hasSymbol } from "../symbol/symbol";
+import { WellKnownSymbols } from "../symbol/well_known";
 import { mathMax } from "../math/min_max";
 import { mathToInt } from "../math/to_int";
 
@@ -186,7 +190,7 @@ export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbac
 
     // Like the native function every index is visited (an empty slot is undefined), so there is no "in" check
     for (let idx = 0; idx < len; idx++) {
-        if (callbackFn[CALL](isStrictNullOrUndefined(thisArg) ? theArray as any : thisArg, theArray[idx], idx, theArray)) {
+        if (callbackFn[CALL](thisArg, theArray[idx], idx, theArray)) {
             return idx;
         }
     }
@@ -300,7 +304,7 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
     let len = _toLength(theArray);
     // Like the native function every index is visited (an empty slot is undefined), so there is no "in" check
     for (let idx = len - 1; idx >= 0; idx--) {
-        if (callbackFn[CALL](isStrictNullOrUndefined(thisArg) ? theArray as any : thisArg, theArray[idx], idx, theArray)) {
+        if (callbackFn[CALL](thisArg, theArray[idx], idx, theArray)) {
             result = idx;
             break;
         }
@@ -363,25 +367,47 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
  */
 export function polyArrFrom<T, U = T>(theValue: ArrayLike<T> | Iterable<T>, mapFn?: ArrFromMapFn<T, U>, thisArg?: any): U[] {
     let result: any[] = [];
+    let iterFn: any;
 
-    if (!isStrictUndefined(mapFn) && !isFunction(mapFn)) {
-        throwTypeError(dumpObj(mapFn) + " is not a function");
+    // Like the native function the mapFn and the iterator function (when they are not undefined, or null for the
+    // iterator function) must be functions
+    function _throwIfNotFunction(value: any) {
+        if (!isFunction(value)) {
+            throwTypeError(dumpObj(value, 0, DUMP_ERR_MAX_LENGTH) + " is not a function");
+        }
     }
 
+    !isStrictUndefined(mapFn) && _throwIfNotFunction(mapFn);
     _throwIfNullOrUndefined(theValue);
 
-    // Each value's index is the number of values added before it
+    // Each value's index is the number of values added before it, like the native function the mapFn is called
+    // without using its own (replaceable) call property and each value is added as an own property
     function _addValue(value: T) {
-        let idx = result[LENGTH];
-        result[idx] = mapFn ? mapFn[CALL](thisArg, value, idx) : value;
+        _pushOwnValue(result, mapFn ? fnCall(mapFn, thisArg, value, result[LENGTH]) : value);
     }
 
-    if (!isString(theValue) && !isArray(theValue) && isIterable(theValue)) {
-        iterForOf(theValue, _addValue);
+    if (!isString(theValue) && !isArray(theValue)) {
+        // Like the native function the iterator function is only read once
+        iterFn = (theValue as any)[getKnownSymbol(WellKnownSymbols.iterator)];
+    }
+
+    if (!isStrictNullOrUndefined(iterFn)) {
+        // Like the native function a value (other than null or undefined) which is not a function throws, rather than
+        // the value being used as an array-like, and the iterator it returns is used as-is
+        _throwIfNotFunction(iterFn);
+        _iterForOf(fnCall(iterFn, theValue), _addValue);
     } else {
-        // A string is split into each surrogate pair (or any other single code unit, including an unpaired surrogate)
-        let values: ArrayLike<any> = isString(theValue) ? theValue.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\s\S]/g) || [] : theValue;
-        for (let idx = 0, len = _toArrayLength(values); idx < len; idx++) {
+        // A string is split into each surrogate pair (or any other single code unit, including an unpaired surrogate), as
+        // is a String object on a runtime without Symbol (which has no iterator function), which (like the String iterator
+        // of a runtime with Symbol) is converted to a string, so its own toString() is used. A Map or Set which has no
+        // iterator function (eg. IE 11) returns its entries / values, like the native function where they are iterable
+        let strValue: string = isString(theValue) ? theValue : (!hasSymbol() && isStringObject(theValue) ? asString(theValue) : NULL_VALUE);
+        let values: ArrayLike<any> = isString(strValue) ? strValue.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\s\S]/g) || [] :
+            (isArray(theValue) ? theValue : (_getMapSetValues(theValue) || theValue as ArrayLike<T>));
+        // An array's length is read for each index (like the native array iterator), as the mapFn may change it, while
+        // (like the native function) the length of any other array-like is only read once
+        let isArr = isArray(values);
+        for (let idx = 0, len = _toArrayLength(values); idx < (isArr ? values[LENGTH] : len); idx++) {
             _addValue(values[idx]);
         }
     }

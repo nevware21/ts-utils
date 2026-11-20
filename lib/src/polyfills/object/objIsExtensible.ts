@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { isFunction, isObject, isStrictNullOrUndefined } from "../../helpers/base";
+import { isFunction, isObject } from "../../helpers/base";
 
 /**
  * Polyfill implementation for Object.isExtensible
@@ -17,11 +17,7 @@ import { isFunction, isObject, isStrictNullOrUndefined } from "../../helpers/bas
  * @returns A Boolean indicating whether or not the object is extensible
  */
 export function polyObjIsExtensible(obj: any): boolean {
-    // In ES5, if the object is not an object (primitive), then it is not extensible
-    if (isStrictNullOrUndefined(obj) || (!isObject(obj) && !isFunction(obj))) {
-        return false;
-    }
-    
-    // Default objects are extensible in ES5
-    return true;
+    // Without the native function an object can't be made non-extensible, so every object (or function) is
+    // extensible and a primitive (including null and undefined, which isObject() doesn't match) is not
+    return isObject(obj) || isFunction(obj);
 }

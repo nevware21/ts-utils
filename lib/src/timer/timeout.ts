@@ -68,37 +68,67 @@ function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn |
     let clearFn = _resolveFn(overrides[1], _clearTimeoutFn, 1) || clearTimeout;
 
     let timerFn = theArgs[0];
+    let starts = 0;
+    let starting = 0;
     theArgs[0] = function () {
+        let started = starts;
+        let cancelled: boolean | undefined;
+
         // Microtask fallback hook for environments without native queueMicrotask support, this allows us to
         // simulate the running of microtasks before standard timeouts.
         let microTasksFn = _microtaskCallback;
-        if (microTasksFn) {
-            // Run any pending microtasks before running the timeout callback to allow any microtasks
-            // scheduled within the callback to run before the next timeout.
-            _microtaskCallback = UNDEF_VALUE;
-            microTasksFn();
+        try {
+            if (microTasksFn) {
+                // While a setTimeout override runs the callback synchronously the handler still has the previous
+                // (cleared) timer, which isn't the timer being run
+                let enabled = !starting && handler.h.enabled;
+
+                // Run any pending microtasks before running the timeout callback to allow any microtasks
+                // scheduled within the callback to run before the next timeout.
+                _microtaskCallback = UNDEF_VALUE;
+                microTasksFn();
+
+                // Like a native microtask (which runs before the timer), a microtask which leaves the timer
+                // cancelled stops the callback
+                cancelled = enabled && !handler.h.enabled;
+            }
+        } finally {
+            // The timer has run, a timer started by a microtask (run above) is kept
+            handler.dn(started !== starts);
         }
 
-        handler.dn();
         // Pass this callbacks arguments directly (apply accepts any array-like), this function has no named
         // parameters and the arguments are not modified, so there is no need to slice them into a new array
-        fnApply(timerFn, UNDEF_VALUE, arguments);
+        !cancelled && fnApply(timerFn, UNDEF_VALUE, arguments);
     };
-    
-    let handler = _createTimerHandler(startTimer, (timerId?: any) => {
-        if (timerId) {
-            if (timerId.refresh) {
-                timerId.refresh();
-                return timerId;
-            }
 
-            fnApply(clearFn, UNDEF_VALUE, [ timerId ]);
+    // The timer is started after the handler is assigned (rather than by _createTimerHandler()), as a setTimeout
+    // override may call the callback synchronously, which uses the handler
+    let handler = _createTimerHandler(false, (timerId?: any) => {
+        if (timerId && timerId.refresh) {
+            timerId.refresh();
+        } else {
+            timerId && fnApply(clearFn, UNDEF_VALUE, [ timerId ]);
+
+            // When the callback is run synchronously (handler.dn()) the handler ignores the returned id, so it isn't enabled.
+            // The starts in progress are counted (rather than a flag), as the override may first run another callback which
+            // starts this timer again (a nested start), and the count is restored when the setTimeout throws
+            starting++;
+            try {
+                timerId = fnApply(setFn, UNDEF_VALUE, theArgs);
+            } finally {
+                starting--;
+            }
         }
 
-        return fnApply(setFn, UNDEF_VALUE, theArgs);
+        // Counted once the timer has been started (so not when the setTimeout throws)
+        starts++;
+        return timerId;
     }, function (timerId: any) {
         fnApply(clearFn, UNDEF_VALUE, [ timerId ]);
     });
+
+    startTimer && handler.h.refresh();
 
     return handler.h;
 }

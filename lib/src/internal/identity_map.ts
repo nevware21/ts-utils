@@ -7,7 +7,7 @@
  */
 
 import { arrIndexOf } from "../array/indexOf";
-import { FUNCTION, OBJECT, UNDEFINED, UNDEF_VALUE } from "./constants";
+import { FUNCTION, OBJECT, ObjClass, SYMBOL_TYPE, UNDEFINED, UNDEF_VALUE } from "./constants";
 
 /**
  * @internal
@@ -33,40 +33,7 @@ export interface _IdentityMap<V> {
 function _getPrimKey(key: any): string | undefined {
     const theType = typeof key;
 
-    return theType === "symbol" || theType === FUNCTION || (key && theType === OBJECT) ? UNDEF_VALUE : theType + "_" + key;
-}
-
-/**
- * @internal
- * @ignore
- * Creates the fallback for runtimes without a native Map (IE 9 / 10). Primitives are stored in a dictionary so they
- * are found directly (NaN is equal to itself, as -0 and +0 have the same key), the other keys have to be searched for.
- */
-/*#__NO_SIDE_EFFECTS__*/
-function _createArrayMap<V>() {
-    // A plain object is safe as every key starts with the type, so it can't match an inherited property
-    const prims: { [key: string]: V } = {};
-    const keys: any[] = [];
-    const values: V[] = [];
-
-    return {
-        get: (key: any) => {
-            const primKey = _getPrimKey(key);
-
-            // A key which is not found has an index of -1, which is never a value
-            return primKey ? prims[primKey] : values[arrIndexOf(keys, key)];
-        },
-        set: (key: any, value: V) => {
-            const primKey = _getPrimKey(key);
-
-            if (primKey) {
-                prims[primKey] = value;
-            } else {
-                const idx = arrIndexOf(keys, key);
-                values[idx < 0 ? keys.push(key) - 1 : idx] = value;
-            }
-        }
-    };
+    return theType === SYMBOL_TYPE || theType === FUNCTION || (key && theType === OBJECT) ? UNDEF_VALUE : theType + "_" + key;
 }
 
 /**
@@ -77,17 +44,52 @@ function _createArrayMap<V>() {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function _createIdentityMap<V>(): _IdentityMap<V> {
-    let theMap: any;
+    let getOrAdd: _IdentityMap<V>;
 
     return (key: any, value: V) => {
-        !theMap && (theMap = typeof Map !== UNDEFINED ? new Map<any, V>() : _createArrayMap<V>());
+        if (!getOrAdd) {
+            if (typeof Map !== UNDEFINED) {
+                const theMap = new Map<any, V>();
+
+                getOrAdd = (key: any, value: V) => {
+                    const result = theMap.get(key);
+                    !result && theMap.set(key, value);
+
+                    return result;
+                };
+            } else {
+                // The fallback for runtimes without a native Map (IE 9 / 10). Primitives are stored in a dictionary so
+                // they are found directly (NaN is equal to itself, as -0 and +0 have the same key), the other keys have
+                // to be searched for. The dictionary has no prototype, so a key can't match an inherited property (eg.
+                // one added to Object.prototype), and the key of a primitive is only created once for each value
+                const prims: { [key: string]: V } = ObjClass.create(null);
+                const keys: any[] = [];
+                const values: V[] = [];
+
+                getOrAdd = (key: any, value: V) => {
+                    const primKey = _getPrimKey(key);
+                    let result: V | undefined;
+
+                    if (primKey) {
+                        result = prims[primKey];
+                        !result && (prims[primKey] = value);
+                    } else {
+                        // A key which is not found is added, rather than its index (-1) being used to read a value
+                        const idx = arrIndexOf(keys, key);
+                        if (idx < 0) {
+                            keys.push(key);
+                            values.push(value);
+                        } else {
+                            result = values[idx];
+                        }
+                    }
+
+                    return result;
+                };
+            }
+        }
 
         // The IE 11 Map treats -0 and +0 as different keys, so -0 is always added as +0
-        const theKey = key === 0 ? 0 : key;
-        const result: V = theMap.get(theKey);
-
-        !result && theMap.set(theKey, value);
-
-        return result;
+        return getOrAdd(key === 0 ? 0 : key, value);
     };
 }

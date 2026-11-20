@@ -27,7 +27,10 @@ export const objSetPrototypeOf: (obj: any, proto: object) => any = (/*#__PURE__*
 
 export function _polyObjSetPrototypeOf(obj: any, proto: object) {
     !_isProtoArray && (_isProtoArray = createCachedValue({ [__PROTO__]: [] } instanceof Array));
-    _isProtoArray.v ? obj[__PROTO__] = proto : objForEachKey(proto, (key: any, value: any) => obj[key] = value );
+    // The callback has a block body, as returning the assigned value would stop the copy at a value of -1
+    _isProtoArray.v ? obj[__PROTO__] = proto : objForEachKey(proto, (key: any, value: any) => {
+        obj[key] = value;
+    });
     
     return obj;
 }
