@@ -136,6 +136,14 @@ describe("object pick utilities", () => {
             assert.deepEqual(objOmit(obj, [1]), { 2: "y" });
         });
 
+        it("should omit a NaN key using its runtime property name", () => {
+            const obj: any = { NaN: 1, a: 2 };
+            assert.deepEqual(objOmit(obj, [NaN]), { a: 2 });
+            assert.deepEqual(objOmit(obj, ["NaN"]), { a: 2 });
+            assert.deepEqual(objOmit(obj, [1, NaN]), { a: 2 });
+            assert.deepEqual(objOmit(obj, [1]), { NaN: 1, a: 2 }, "NaN is only omitted by a NaN or \"NaN\" key");
+        });
+
         it("should preserve enumerable symbol properties not in keys", () => {
             if (!hasSymbol()) {
                 return;

@@ -14,7 +14,7 @@ import { isUndefined } from "../../../../src/helpers/base";
 import { arrForEach } from "../../../../src/array/forEach";
 
 describe("string polyfills", () => {
-    describe("polyStrStartsWith null / undefined", () => {
+    it("polyStrStartsWith null / undefined", () => {
         _checkStartsWith(null, null as any);
         _checkStartsWith(null, "" as any);
         _checkStartsWith(null, "n" as any);
@@ -33,7 +33,7 @@ describe("string polyfills", () => {
         _checkStartsWith(undefined, "fined", -4);
     });
 
-    describe("polyStrStartsWith With values", () => {
+    it("polyStrStartsWith With values", () => {
         _checkStartsWith("", "");
         _checkStartsWith("", "", 10);
         _checkStartsWith("", "a");
@@ -75,7 +75,7 @@ describe("string polyfills", () => {
         _checkStartsWith("zyxyvutsrqponmlkjihgfedcba", "ponm", -10);
     });
 
-    describe("polyStrEndsWith null / undefined", () => {
+    it("polyStrEndsWith null / undefined", () => {
         _checkEndsWith(null, null as any);
         _checkEndsWith(null, "" as any);
         _checkEndsWith(null, "n" as any);
@@ -96,7 +96,7 @@ describe("string polyfills", () => {
         _checkEndsWith("", undefined as any);
     });
 
-    describe("polyStrEndsWith With values", () => {
+    it("polyStrEndsWith With values", () => {
         _checkEndsWith("", "");
         _checkEndsWith("", "", 10);
         _checkEndsWith("", "a");
@@ -198,6 +198,33 @@ describe("string polyfills", () => {
             assert.throws(() => polyStrStartsWith("/a/", /a/ as any), TypeError);
             assert.throws(() => polyStrEndsWith("/c/g", /c/g as any), TypeError);
         });
+
+        it("should only convert the searchString once, like the native functions", () => {
+            // Each toString() call returns the next value, so a second conversion would use a different searchString
+            function _createSearch(values: string[]) {
+                let calls = 0;
+                return {
+                    search: { toString: () => values[calls++] } as any,
+                    calls: () => calls
+                };
+            }
+
+            let startsWith = _createSearch(["a", "abc"]);
+            assert.isTrue(polyStrStartsWith("abc", startsWith.search), "startsWith uses the first conversion");
+            assert.equal(startsWith.calls(), 1, "startsWith converts the searchString once");
+
+            let endsWith = _createSearch(["c", "abc"]);
+            assert.isTrue(polyStrEndsWith("abc", endsWith.search), "endsWith uses the first conversion");
+            assert.equal(endsWith.calls(), 1, "endsWith converts the searchString once");
+
+            let nativeStartsWith = _createSearch(["a", "abc"]);
+            assert.isTrue(String.prototype.startsWith.call("abc", nativeStartsWith.search));
+            assert.equal(nativeStartsWith.calls(), 1);
+
+            let nativeEndsWith = _createSearch(["c", "abc"]);
+            assert.isTrue(String.prototype.endsWith.call("abc", nativeEndsWith.search));
+            assert.equal(nativeEndsWith.calls(), 1);
+        });
     });
 
     function _checkNativeCall(value: any, search: any, pos?: any) {
@@ -262,4 +289,58 @@ describe("string polyfills", () => {
                 "Checking whether the Native and polyfill returned the same result [" + dumpObj(polyThrew || polyResult) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
         }
     }
+});
+
+describe("polyStrStartsWith / polyStrEndsWith conversion order", () => {
+    function _getLog(fn: (value: any, search: any, position: any) => boolean) {
+        let log: string[] = [];
+        fn({
+            toString: () => {
+                log.push("value");
+                return "abc";
+            }
+        }, {
+            toString: () => {
+                log.push("search");
+                return "a";
+            }
+        }, {
+            valueOf: () => {
+                log.push("position");
+                return 1;
+            }
+        });
+
+        return log;
+    }
+
+    it("convert the value, then the searchString and then the position, like the native functions", () => {
+        const startsWith = _getLog((value, search, position) => polyStrStartsWith(value, search, position));
+        const endsWith = _getLog((value, search, position) => polyStrEndsWith(value, search, position));
+
+        assert.deepEqual(startsWith, ["value", "search", "position"]);
+        assert.deepEqual(startsWith, _getLog((value, search, position) => String.prototype.startsWith.call(value, search, position)));
+        assert.deepEqual(endsWith, ["value", "search", "position"]);
+        assert.deepEqual(endsWith, _getLog((value, search, position) => String.prototype.endsWith.call(value, search, position)));
+    });
+});
+
+describe("polyStrStartsWith fractional positions", () => {
+    it("truncates a fractional position before adding the length, like the native function", () => {
+        const cases: any[] = [
+            ["abc", "a", 0.9999999999999999],
+            ["abcabc", "a", 3.9999999999999996],
+            ["xab", "ab", 0.9999999999999999],
+            ["abc", "bc", 1.5],
+            ["abc", "c", 2.9999999999999996],
+            ["abc", "", Infinity]
+        ];
+
+        for (let lp = 0; lp < cases.length; lp++) {
+            assert.equal(polyStrStartsWith(cases[lp][0], cases[lp][1], cases[lp][2]), String.prototype.startsWith.call(cases[lp][0], cases[lp][1], cases[lp][2]),
+                "startsWith(" + JSON.stringify(cases[lp][0]) + ", " + JSON.stringify(cases[lp][1]) + ", " + cases[lp][2] + ")");
+        }
+
+        assert.isTrue(polyStrStartsWith("abc", "a", 0.9999999999999999));
+    });
 });

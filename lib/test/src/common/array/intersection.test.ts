@@ -57,3 +57,11 @@ describe("arrIntersection", () => {
         assert.deepEqual(arrIntersection(null, [1, 2]), []);
     });
 });
+
+describe("arrIntersection with a String object", () => {
+    it("compares the characters of a String object, like a string", () => {
+        assert.deepEqual(arrIntersection(["bc"], new String("abc") as any), []);
+        assert.deepEqual(arrIntersection(["b", "z"], new String("abc") as any), ["b"]);
+        assert.deepEqual(arrIntersection(["b", "z"], "abc" as any), ["b"]);
+    });
+});

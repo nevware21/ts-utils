@@ -85,19 +85,17 @@ describe("polyfills entry installs the polyfills", () => {
         assert.strictEqual((Object as any).entries, nativeEntries, "The native function was restored");
     });
 
-    it("getOwnPropertyNames and getOwnPropertySymbols are installed by name", () => {
+    it("getOwnPropertyNames and getOwnPropertySymbols are not installed under their constant names", () => {
         const results: any = {};
 
         _withoutNatives([[Object, "getOwnPropertySymbols"]], () => {
             _installPolyfills();
             results.type = typeof (Object as any).getOwnPropertySymbols;
-            results.symbols = (Object as any).getOwnPropertySymbols({ a: 1 });
             results.hasNamesKey = "GET_OWN_PROPERTY_NAMES" in Object;
             results.hasSymbolsKey = "GET_OWN_PROPERTY_SYMBOLS" in Object;
         });
 
-        assert.equal(results.type, "function");
-        assert.deepEqual(results.symbols, []);
+        assert.equal(results.type, "undefined", "getOwnPropertySymbols is not installed");
         assert.isFalse(results.hasNamesKey, "The constant name is not used as the key");
         assert.isFalse(results.hasSymbolsKey, "The constant name is not used as the key");
     });
@@ -120,18 +118,16 @@ describe("polyfills entry installs the polyfills", () => {
         assert.strictEqual(Object.getOwnPropertyNames, getOwnPropertyNames, "The native function was restored");
     });
 
-    it("getOwnPropertySymbols is installed under its name", () => {
+    it("getOwnPropertySymbols is not installed, as a polyfill symbol key is also a string key", () => {
         const results: any = {};
 
         _withoutNatives([[Object, "getOwnPropertySymbols"]], () => {
             _installPolyfills();
             results.type = typeof (Object as any).getOwnPropertySymbols;
-            results.iteratorSymbols = (Object as any).getOwnPropertySymbols(Array.prototype);
             results.hasSymbolsKey = "GET_OWN_PROPERTY_SYMBOLS" in Object;
         });
 
-        assert.equal(results.type, "function");
-        assert.notEqual(results.iteratorSymbols.indexOf(Symbol.iterator), -1, "The well known symbols that the object has are returned");
+        assert.equal(results.type, "undefined", "getOwnPropertySymbols is not installed");
         assert.isFalse(results.hasSymbolsKey, "The constant name is not used as the key");
     });
 

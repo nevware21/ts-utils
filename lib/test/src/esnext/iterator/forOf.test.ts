@@ -11,6 +11,8 @@ import { arrForEach } from "../../../../src/array/forEach";
 import { iterForOf } from "../../../../src/iterator/forOf";
 import { iterMap } from "../../../../src/iterator/iterMap";
 import { iterToArray } from "../../../../src/iterator/iterToArray";
+import { iterFilter } from "../../../../src/iterator/iterFilter";
+import { iterTake } from "../../../../src/iterator/iterTake";
 
 describe("ESNext iterForOf tests", () => {
     // The generators (like the collection below) are typed as any, so this file also type checks with the ES5 test
@@ -191,6 +193,216 @@ describe("ESNext iterForOf tests", () => {
             }
 
             assert.deepEqual(values, nativeValues);
+        });
+    });
+
+    it("throws a TypeError when return() doesn't return an object after the callbackfn returns -1 like for...of", () => {
+        function _createIterable(returnValue: any): any {
+            return {
+                [Symbol.iterator]: () => ({
+                    next: () => ({ value: 1, done: false }),
+                    return: () => returnValue
+                })
+            };
+        }
+
+        arrForEach([undefined, null, 1, "done"], (returnValue) => {
+            assert.throws(() => {
+                iterForOf(_createIterable(returnValue), () => -1);
+            }, TypeError);
+
+            assert.throws(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                for (let value of _createIterable(returnValue)) {
+                    break;
+                }
+            }, TypeError);
+        });
+
+        // An object is a valid return() result for both
+        iterForOf(_createIterable({}), () => -1);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        for (let value of _createIterable({})) {
+            break;
+        }
+    });
+
+    it("throws a TypeError when [Symbol.iterator]() doesn't return an iterator like for...of", () => {
+        arrForEach([undefined, null, 1, {}, { next: 1 }], (iterator) => {
+            const iterable: any = {
+                [Symbol.iterator]: () => iterator
+            };
+
+            let calls = 0;
+            assert.throws(() => {
+                iterForOf(iterable, () => {
+                    calls++;
+                });
+            }, TypeError);
+
+            assert.throws(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                for (let value of iterable) {
+                    calls++;
+                }
+            }, TypeError);
+
+            assert.equal(calls, 0);
+        });
+    });
+
+    it("iterMap, iterFilter and iterToArray process a string by its code points like for...of", () => {
+        let str = "a" + String.fromCharCode(0xD83D, 0xDE00) + "b";
+        let nativeValues: string[] = [];
+        for (let value of str) {
+            nativeValues.push(value);
+        }
+
+        assert.equal(nativeValues.length, 3, "The surrogate pair is one value");
+        assert.deepEqual(iterToArray(iterMap(str, (value: string) => value)), nativeValues);
+        assert.deepEqual(iterToArray(iterFilter(str, () => true)), nativeValues);
+        assert.deepEqual(iterToArray(str), nativeValues);
+    });
+});
+
+describe("ESNext iterator helpers", () => {
+    it("iterMap and iterFilter use the source like the native iterator helpers", function() {
+        // The native iterator helpers (Iterator.prototype.map etc) are on the prototype of the array iterator's prototype
+        const iteratorProto: any = Object.getPrototypeOf(Object.getPrototypeOf([][Symbol.iterator]()));
+        if (!iteratorProto || !iteratorProto.map || !iteratorProto.filter) {
+            this.skip();
+            return;
+        }
+
+        // A next() result which is not an object throws a TypeError
+        const primitiveSource = () => ({
+            next: (): any => 1
+        });
+
+        assert.throws(() => iterMap(primitiveSource() as any, (value: any) => value).next(), TypeError);
+        assert.throws(() => iteratorProto.map.call(primitiveSource(), (value: any) => value).next(), TypeError);
+        assert.throws(() => iterFilter(primitiveSource() as any, () => true).next(), TypeError);
+        assert.throws(() => iteratorProto.filter.call(primitiveSource(), () => true).next(), TypeError);
+
+        // The source is closed (by calling its return() with no arguments) when the callbackfn throws
+        const helpers: any[] = [
+            [iterMap, iteratorProto.map],
+            [iterFilter, iteratorProto.filter]
+        ];
+
+        arrForEach(helpers, (helper) => {
+            function _createSource(log: number[]): any {
+                return {
+                    next: () => ({ value: 1, done: false }),
+                    return: function() {
+                        log.push(arguments.length);
+                        return {};
+                    }
+                };
+            }
+
+            function _throwError(): any {
+                throw new Error("callbackfn error");
+            }
+
+            let ours: number[] = [];
+            let native: number[] = [];
+            assert.throws(() => helper[0](_createSource(ours), _throwError).next(), /callbackfn error/);
+            assert.throws(() => helper[1].call(_createSource(native), _throwError).next(), /callbackfn error/);
+
+            assert.deepEqual(native, [0], "The native helper calls return() once with no arguments");
+            assert.deepEqual(ours, native);
+        });
+    });
+});
+
+describe("ESNext lazy iterator helpers state", () => {
+    it("iterMap, iterFilter and iterTake are done and closed like the native iterator helpers", function() {
+        const iteratorProto: any = Object.getPrototypeOf(Object.getPrototypeOf([][Symbol.iterator]()));
+        if (!iteratorProto || !iteratorProto.map || !iteratorProto.filter || !iteratorProto.take) {
+            this.skip();
+            return;
+        }
+
+        const helpers: any[] = [
+            ["iterMap", (source: any, cb: any) => iterMap(source, cb || ((value: any) => value)), (source: any, cb: any) => iteratorProto.map.call(source, cb || ((value: any) => value))],
+            ["iterFilter", (source: any, cb: any) => iterFilter(source, cb || (() => true)), (source: any, cb: any) => iteratorProto.filter.call(source, cb || (() => true))],
+            ["iterTake", (source: any) => iterTake(source, 5), (source: any) => iteratorProto.take.call(source, 5)]
+        ];
+
+        arrForEach(helpers, (helper) => {
+            // Done after the source's next() throws
+            function _afterThrow(create: any) {
+                let calls = 0;
+                const source = {
+                    next: (): any => {
+                        calls++;
+                        if (calls === 1) {
+                            throw new Error("next() error");
+                        }
+
+                        return { value: calls, done: false };
+                    }
+                };
+
+                const it = create(source);
+                let threw = false;
+                try {
+                    it.next();
+                } catch (e) {
+                    threw = true;
+                }
+
+                return { threw: threw, done: it.next().done, calls: calls };
+            }
+
+            assert.deepEqual(_afterThrow(helper[1]), _afterThrow(helper[2]), helper[0] + " after the source's next() throws");
+
+            // return() after it is exhausted doesn't close the source
+            function _returnAfterDone(create: any) {
+                let returns = 0;
+                let idx = 0;
+                const source = {
+                    next: (): any => idx++ < 1 ? { value: 1, done: false } : { value: undefined, done: true },
+                    return: (): any => {
+                        returns++;
+                    }
+                };
+
+                const it = create(source);
+                it.next();
+                it.next();
+                it.return();
+
+                return returns;
+            }
+
+            assert.equal(_returnAfterDone(helper[1]), _returnAfterDone(helper[2]), helper[0] + " return() after it is done");
+        });
+
+        // Calling the helper's next() from its callbackfn throws a TypeError
+        arrForEach([helpers[0], helpers[1]], (helper) => {
+            function _reentrant(create: any) {
+                let it: any;
+                let error: any;
+                it = create([1, 2].values(), (value: any) => {
+                    if (value === 1 && !error) {
+                        try {
+                            it.next();
+                        } catch (e) {
+                            error = e;
+                        }
+                    }
+
+                    return value;
+                });
+
+                it.next();
+                return error instanceof TypeError;
+            }
+
+            assert.isTrue(_reentrant(helper[2]), helper[0] + " the native helper throws a TypeError");
+            assert.isTrue(_reentrant(helper[1]), helper[0] + " throws a TypeError");
         });
     });
 });

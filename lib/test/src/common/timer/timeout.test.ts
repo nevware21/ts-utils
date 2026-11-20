@@ -1806,4 +1806,170 @@ describe("timeout tests", () => {
             }
         });
     });
+
+    describe("override timeout which calls the callback synchronously", () => {
+        function syncSetTimeout(callback: (...args: any[]) => void) {
+            callback();
+            return 1;
+        }
+
+        function noopClearTimeout() {
+            // no-op
+        }
+
+        it("scheduleTimeoutWith runs the callback and the handler is not enabled", () => {
+            let timeoutCalled = 0;
+            let theTimeout = scheduleTimeoutWith([syncSetTimeout, noopClearTimeout] as any, () => {
+                timeoutCalled++;
+            }, 0);
+
+            assert.equal(timeoutCalled, 1, "The callback was called synchronously");
+            assert.equal(theTimeout.enabled, false, "The handler is not enabled as the callback has already run");
+
+            theTimeout.refresh();
+            assert.equal(timeoutCalled, 2, "The callback was called again by refresh()");
+            assert.equal(theTimeout.enabled, false, "The handler is still not enabled");
+        });
+
+        it("createTimeoutWith runs the callback when enabled and the handler is not enabled", () => {
+            let timeoutCalled = 0;
+            let theTimeout = createTimeoutWith([syncSetTimeout, noopClearTimeout] as any, () => {
+                timeoutCalled++;
+            }, 0);
+
+            assert.equal(timeoutCalled, 0, "The callback has not been called as the timer is not started");
+            assert.equal(theTimeout.enabled, false, "The handler is not enabled");
+
+            theTimeout.enabled = true;
+            assert.equal(timeoutCalled, 1, "The callback was called synchronously");
+            assert.equal(theTimeout.enabled, false, "The handler is not enabled as the callback has already run");
+        });
+
+        it("scheduleTimeout with setTimeoutOverrides runs the callback and the handler is not enabled", () => {
+            let timeoutCalled = 0;
+
+            setTimeoutOverrides([syncSetTimeout, noopClearTimeout] as any);
+            try {
+                let theTimeout = scheduleTimeout(() => {
+                    timeoutCalled++;
+                }, 0);
+
+                assert.equal(timeoutCalled, 1, "The callback was called synchronously");
+                assert.equal(theTimeout.enabled, false, "The handler is not enabled as the callback has already run");
+            } finally {
+                setTimeoutOverrides(undefined);
+            }
+        });
+    });
+
+    describe("override timeout which only calls the first callback synchronously", () => {
+        let timerCalls: number;
+        let clearedIds: any[];
+
+        // The first timer calls the callback synchronously, later timers are left pending (and are never run). Each
+        // timer returns its own id (not the count after the callback has run, which may have started another timer)
+        function firstSyncSetTimeout(callback: (...args: any[]) => void) {
+            let timerId = ++timerCalls;
+            if (timerId === 1) {
+                callback();
+            }
+
+            return timerId;
+        }
+
+        function recordClearTimeout(timerId: any) {
+            clearedIds.push(timerId);
+        }
+
+        beforeEach(() => {
+            timerCalls = 0;
+            clearedIds = [];
+        });
+
+        it("a callback which calls refresh() while it is run synchronously keeps the timer started by refresh()", () => {
+            let timeoutCalled = 0;
+            let theTimeout = createTimeoutWith([firstSyncSetTimeout, recordClearTimeout] as any, () => {
+                timeoutCalled++;
+                if (timeoutCalled === 1) {
+                    theTimeout.refresh();
+                }
+            }, 0);
+
+            theTimeout.refresh();
+            assert.equal(timeoutCalled, 1, "The callback was called synchronously");
+            assert.equal(timerCalls, 2, "The callback's refresh() started a second timer");
+            assert.equal(theTimeout.enabled, true, "The handler is enabled as the second timer is pending");
+
+            theTimeout.cancel();
+            assert.deepEqual(clearedIds, [2], "cancel() clears the second (pending) timer");
+            assert.equal(theTimeout.enabled, false, "The handler is not enabled once it is cancelled");
+        });
+
+        it("a callback which calls refresh() and then cancel() while it is run synchronously is not enabled", () => {
+            let timeoutCalled = 0;
+            let theTimeout = createTimeoutWith([firstSyncSetTimeout, recordClearTimeout] as any, () => {
+                timeoutCalled++;
+                theTimeout.refresh();
+                theTimeout.cancel();
+            }, 0);
+
+            theTimeout.refresh();
+            assert.equal(timeoutCalled, 1, "The callback was called synchronously");
+            assert.equal(timerCalls, 2, "The callback's refresh() started a second timer");
+            assert.deepEqual(clearedIds, [2], "The callback's cancel() cleared the second timer");
+            assert.equal(theTimeout.enabled, false, "The handler is not enabled as the second timer was cancelled");
+        });
+    });
+
+    describe("override timeout which runs the pending timers when a timer is started", () => {
+        let pending: Array<{ id: number, cb: () => void }>;
+        let nextId: number;
+
+        // Like a fake clock which runs the timers that are due whenever a new timer is set, so the callback of another
+        // timer runs while a timer is being started
+        function runPendingSetTimeout(callback: () => void) {
+            let due = pending;
+            let timerId = nextId++;
+
+            pending = [];
+            due.forEach((timer) => {
+                timer.cb();
+            });
+
+            pending.push({ id: timerId, cb: callback });
+
+            return timerId;
+        }
+
+        function removePendingClearTimeout(timerId: number) {
+            pending = pending.filter((timer) => timer.id !== timerId);
+        }
+
+        beforeEach(() => {
+            pending = [];
+            nextId = 1;
+        });
+
+        it("a cancel() made by another timer's callback while the timer is started keeps the new timer", () => {
+            let aCalled = 0;
+            let timerA = createTimeoutWith([runPendingSetTimeout, removePendingClearTimeout] as any, () => {
+                aCalled++;
+            }, 10);
+            let timerB = createTimeoutWith([runPendingSetTimeout, removePendingClearTimeout] as any, () => {
+                timerA.cancel();
+            }, 10);
+
+            timerB.refresh();
+
+            // Runs B's callback (which cancels A, which isn't running yet) before A's new timer is set
+            timerA.refresh();
+            assert.equal(timerA.enabled, true, "A's new timer is pending");
+            assert.equal(pending.length, 1, "Only A's new timer is pending");
+
+            timerA.cancel();
+            assert.equal(timerA.enabled, false, "A is not enabled once it is cancelled");
+            assert.equal(pending.length, 0, "cancel() cleared A's new timer");
+            assert.equal(aCalled, 0, "A's callback was not called");
+        });
+    });
 });

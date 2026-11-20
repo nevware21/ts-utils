@@ -32,3 +32,21 @@ describe("iterToArray", () => {
         assert.deepEqual(values, [10, 21, 32]);
     });
 });
+
+describe("iterToArray with an array-like which isn't iterable", () => {
+    it("converts the length like the native functions", () => {
+        assert.deepEqual(iterToArray({ length: 2.5, 0: "a", 1: "b", 2: "c" } as any), ["a", "b"], "A fractional length is truncated");
+        assert.deepEqual(iterToArray({ length: -1, 0: "a" } as any), [], "A negative length is 0");
+        assert.deepEqual(iterToArray({ length: NaN, 0: "a" } as any), [], "A NaN length is 0");
+
+        const nativeFrom = (Array as any).from;
+        if (nativeFrom) {
+            assert.deepEqual(iterToArray({ length: 2.5, 0: "a", 1: "b", 2: "c" } as any), nativeFrom({ length: 2.5, 0: "a", 1: "b", 2: "c" }));
+        }
+    });
+
+    it("throws a RangeError for a length which is longer than an array can be, rather than never ending", () => {
+        assert.throws(() => iterToArray({ length: Infinity } as any), RangeError);
+        assert.throws(() => iterToArray({ length: Math.pow(2, 32) } as any), RangeError);
+    });
+});

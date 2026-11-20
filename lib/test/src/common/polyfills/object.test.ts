@@ -1032,6 +1032,34 @@ describe("object polyfills", () => {
             // Ensure the descriptor for 'a' is consistent between methods
             assert.deepEqual(descForA, allDescs.a);
         });
+
+        it("should include every symbol key when there is a native Object.getOwnPropertySymbols", () => {
+            const objGetOwnPropertySymbols = (Object as any).getOwnPropertySymbols;
+            if (typeof Symbol !== "function" || typeof objGetOwnPropertySymbols !== "function") {
+                return;
+            }
+
+            // A symbol which isn't a well-known symbol (eg. on a runtime with Symbol but without the native
+            // Object.getOwnPropertyDescriptors(), the polyfill uses the native Object.getOwnPropertySymbols())
+            const sym = Symbol("test");
+            const registered = Symbol.for("polyObjGetOwnPropertyDescriptors.test");
+            const obj: any = { a: 1 };
+            obj[sym] = "symbol value";
+            Object.defineProperty(obj, registered, { value: 2, enumerable: false });
+
+            const descriptors: any = polyObjGetOwnPropertyDescriptors(obj);
+
+            assert.equal(descriptors[sym].value, "symbol value");
+            assert.isTrue(descriptors[sym].enumerable);
+            assert.equal(descriptors[registered].value, 2);
+            assert.isFalse(descriptors[registered].enumerable);
+            assert.deepEqual(objGetOwnPropertySymbols(descriptors), [sym, registered]);
+
+            const nativeDescriptors = (Object as any).getOwnPropertyDescriptors;
+            if (nativeDescriptors) {
+                assert.deepEqual(descriptors, nativeDescriptors(obj));
+            }
+        });
     });
 
     describe("polyObjGetOwnPropertySymbols", () => {

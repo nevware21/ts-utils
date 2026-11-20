@@ -163,3 +163,24 @@ describe("polyArrAt with indexes above 2^31", () => {
         assert.equal(polyArrAt(sparse, -1), "x");
     });
 });
+
+describe("polyArrAt converts the value like the native function", () => {
+    it("should convert a length which is not a number", () => {
+        const arrayLike: any = { length: "2", 0: "x", 1: "y", 2: "z" };
+
+        assert.equal(polyArrAt(arrayLike, 0), "x");
+        assert.equal(polyArrAt(arrayLike, -1), "y", "The length is 2");
+        assert.isUndefined(polyArrAt(arrayLike, 2), "Index 2 is past the length");
+        assert.equal(polyArrAt({ length: { valueOf: () => 1 }, 0: "a" } as any, -1), "a", "An object length is converted");
+    });
+
+    it("should throw a TypeError for null and undefined", () => {
+        assert.throws(() => polyArrAt(null as any, 0), TypeError);
+        assert.throws(() => polyArrAt(undefined as any, 0), TypeError);
+    });
+
+    it("should return undefined for a value without a length", () => {
+        assert.isUndefined(polyArrAt(5 as any, 0));
+        assert.isUndefined(polyArrAt({ 0: "a" } as any, 0));
+    });
+});

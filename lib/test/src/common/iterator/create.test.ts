@@ -444,3 +444,21 @@ describe("create iterator helpers", () => {
         });
     });
 });
+
+describe("createIterator results keep their value", () => {
+    it("a result's value is the value when it was returned, like the native iterators", () => {
+        const iterator = createArrayIterator([10, 20, 30]);
+        const first = iterator.next();
+        const second = iterator.next();
+
+        // Previously the value was a getter of the iterator's current value, so the first result also returned 20
+        assert.equal(first.value, 10);
+        assert.equal(second.value, 20);
+        assert.deepEqual(Object.getOwnPropertyDescriptor(first, "value"), { value: 10, writable: true, enumerable: true, configurable: true });
+
+        const native = ([10, 20, 30] as any)[getKnownSymbol(WellKnownSymbols.iterator)]();
+        const nativeFirst = native.next();
+        native.next();
+        assert.equal(nativeFirst.value, first.value);
+    });
+});

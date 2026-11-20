@@ -155,6 +155,52 @@ describe("idle tests", () => {
         });
     }
 
+    describe("requestIdleCallback which calls the callback synchronously", () => {
+        let orgRequestIdleCallback: any;
+        let orgCancelIdleCallback: any;
+
+        beforeEach(() => {
+            orgRequestIdleCallback = (<any>getGlobal()).requestIdleCallback;
+            orgCancelIdleCallback = (<any>getGlobal()).cancelIdleCallback;
+        });
+
+        afterEach(() => {
+            (<any>getGlobal()).requestIdleCallback = orgRequestIdleCallback;
+            (<any>getGlobal()).cancelIdleCallback = orgCancelIdleCallback;
+        });
+
+        it("scheduleIdleCallback runs the callback and the handler is not enabled", () => {
+            let deadlines: any[] = [];
+            let requests = 0;
+
+            // Like a test shim, which calls the callback before returning
+            (<any>getGlobal()).requestIdleCallback = (callback: (deadline: any) => void) => {
+                requests++;
+                callback({
+                    didTimeout: false,
+                    timeRemaining: () => 10
+                });
+
+                return requests;
+            };
+            (<any>getGlobal()).cancelIdleCallback = () => {
+                // no-op
+            };
+
+            let theIdleTimer = scheduleIdleCallback((deadline) => {
+                deadlines.push(deadline);
+            });
+
+            assert.equal(deadlines.length, 1, "The callback was called synchronously");
+            assert.equal(deadlines[0].didTimeout, false, "The callback was passed the deadline from requestIdleCallback");
+            assert.equal(theIdleTimer.enabled, false, "The handler is not enabled as the callback has already run");
+
+            theIdleTimer.refresh();
+            assert.equal(deadlines.length, 2, "The callback was called again by refresh()");
+            assert.equal(theIdleTimer.enabled, false, "The handler is still not enabled");
+        });
+    });
+
     it("getIdleCallback and getCancelIdleCallback", () => {
         // Test the getIdleCallback function directly
         const requestIdleFn = getIdleCallback();

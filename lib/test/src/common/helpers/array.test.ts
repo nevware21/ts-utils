@@ -305,6 +305,23 @@ describe("array helpers", () => {
             assert.equal(target[1], 2, "Should have value of 2");
         });
 
+        it("Validate appending null and an object which has a forEach() but isn't a Map or Set", () => {
+            assert.deepEqual(arrAppend([1], null), [1, null], "null is appended as-is");
+
+            let forEachCalls = 0;
+            let withForEach = {
+                forEach: (callback: (value: any, key: any) => void) => {
+                    forEachCalls++;
+                    callback(2, 0);
+                }
+            };
+
+            let target = arrAppend([1], withForEach as any);
+            assert.equal(target.length, 2, "Should have 2 elements");
+            assert.strictEqual(target[1], withForEach, "The object itself is appended");
+            assert.equal(forEachCalls, 0, "Its forEach() was not called");
+        });
+
         it("Validate appending values", () => {
             let target = arrAppend([], [] as number[]);
             assert.equal(target.length, 0, "Should have no elements");

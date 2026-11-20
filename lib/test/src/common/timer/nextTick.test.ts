@@ -758,6 +758,135 @@ describe("nextTick tests", () => {
         assert.equal(thrown && thrown.message, "scheduleNextTick() queue depth exceeded [2]", "Expected Node-like nextTick depth error message");
     });
 
+    it("only counts the pending callbacks against maxQueuedTasks, so a callback can schedule another", (done) => {
+        let theGlobal: any = getGlobal();
+        let called = 0;
+        let errors: any[] = [];
+
+        theGlobal.process = {
+            version: orgProcess && orgProcess.version,
+            versions: orgProcess && orgProcess.versions,
+            nextTick: null
+        };
+        theGlobal.queueMicrotask = null;
+
+        // Each callback schedules the next one, so only one callback is pending at a time, while more callbacks than
+        // the maximum are run during the same flush of the queue
+        function next() {
+            called++;
+            if (called < 5) {
+                try {
+                    scheduleNextTick(next, {
+                        maxQueuedTasks: 2
+                    });
+                } catch (e) {
+                    errors.push(e);
+                }
+            }
+        }
+
+        scheduleNextTick(next, {
+            maxQueuedTasks: 2
+        });
+
+        scheduleTimeout(() => {
+            try {
+                assert.deepEqual(errors, [], "Expected no queue depth errors");
+                assert.equal(called, 5, "Expected every callback in the chain to be called");
+                done();
+            } catch (e) {
+                done(e as Error);
+            }
+        }, 10);
+    });
+
+    it("doesn't count the callback which is running against maxQueuedTasks", () => {
+        let theGlobal: any = getGlobal();
+        let flushes: Array<() => void> = [];
+        let called = 0;
+        let errors: any[] = [];
+
+        theGlobal.process = {
+            version: orgProcess && orgProcess.version,
+            versions: orgProcess && orgProcess.versions,
+            nextTick: null
+        };
+
+        // Keep the flush of the queue, so the test controls when the queued callbacks are run
+        theGlobal.queueMicrotask = (cb: () => void) => {
+            flushes.push(cb);
+        };
+
+        scheduleNextTick(() => {
+            called++;
+
+            // The callback which is running is not pending, so it can schedule the maximum number of callbacks
+            for (let lp = 0; lp < 2; lp++) {
+                try {
+                    scheduleNextTick(() => {
+                        called++;
+                    }, {
+                        maxQueuedTasks: 2
+                    });
+                } catch (e) {
+                    errors.push(e);
+                }
+            }
+        }, {
+            maxQueuedTasks: 2
+        });
+
+        assert.equal(flushes.length, 1, "Expected one flush of the queue to be scheduled");
+        flushes[0]();
+
+        assert.deepEqual(errors, [], "Expected no queue depth errors");
+        assert.equal(called, 3, "Expected the callback and both of the callbacks it scheduled to be called");
+    });
+
+    it("doesn't count the callbacks which ran in an earlier flush against maxQueuedTasks", () => {
+        let theGlobal: any = getGlobal();
+        let flushes: Array<() => void> = [];
+        let called = 0;
+        let thrown: Error | undefined;
+
+        theGlobal.process = {
+            version: orgProcess && orgProcess.version,
+            versions: orgProcess && orgProcess.versions,
+            nextTick: null
+        };
+
+        // Keep the flush of the queue, so the test controls when the queued callbacks are run
+        theGlobal.queueMicrotask = (cb: () => void) => {
+            flushes.push(cb);
+        };
+
+        function callback() {
+            called++;
+        }
+
+        // Three callbacks which are run by the same flush of the queue
+        scheduleNextTick(callback, { maxQueuedTasks: 3 });
+        scheduleNextTick(callback, { maxQueuedTasks: 3 });
+        scheduleNextTick(callback, { maxQueuedTasks: 3 });
+        assert.equal(flushes.length, 1, "Expected one flush of the queue to be scheduled");
+        flushes[0]();
+        assert.equal(called, 3, "Expected the three callbacks to be called");
+
+        // Only the new callbacks are pending, so the maximum is still enforced
+        scheduleNextTick(callback, { maxQueuedTasks: 2 });
+        scheduleNextTick(callback, { maxQueuedTasks: 2 });
+        try {
+            scheduleNextTick(callback, { maxQueuedTasks: 2 });
+        } catch (e) {
+            thrown = e as Error;
+        }
+
+        assert.equal(thrown && thrown.name, "RangeError", "Expected a RangeError for the third pending callback");
+        assert.equal(flushes.length, 2, "Expected a second flush of the queue to be scheduled");
+        flushes[1]();
+        assert.equal(called, 5, "Expected the two pending callbacks to be called");
+    });
+
     it("uses Node-compatible default maxQueuedTasks depth for nextTick fallback", () => {
         let theGlobal: any = getGlobal();
         let thrown: Error | undefined;

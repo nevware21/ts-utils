@@ -84,9 +84,10 @@ describe("arrWith", () => {
 });
 
 describe("polyArrWith", () => {
-    it("should throw RangeError for invalid array-like input", () => {
-        assert.throws(() => polyArrWith(null as any, 0, 99), RangeError);
-        assert.throws(() => polyArrWith(undefined as any, 0, 99), RangeError);
+    it("should throw TypeError for null / undefined and RangeError for a value without a length", () => {
+        // Like the native function null and undefined throw a TypeError, and a value without a length has no index
+        assert.throws(() => polyArrWith(null as any, 0, 99), TypeError);
+        assert.throws(() => polyArrWith(undefined as any, 0, 99), TypeError);
         assert.throws(() => polyArrWith(123 as any, 0, 99), RangeError);
         assert.throws(() => polyArrWith({} as any, 0, 99), RangeError);
     });
@@ -227,5 +228,49 @@ describe("polyArrWith compared to the native function", () => {
                 assert.deepEqual(_run(() => polyArrWith(theArray, value, 9)), _run(() => nativeWith.call(theArray, value, 9)), "length " + theArray.length + " index [" + String(value) + "]");
             }
         }
+    });
+});
+
+describe("polyArrWith with an Array.prototype index", () => {
+    it("adds each value as an own property, even when Array.prototype has a read-only or setter index", () => {
+        let readOnly: any;
+        let withSetter: any;
+        let setterCalls = 0;
+        try {
+            Object.defineProperty(Array.prototype, "2", { value: "RO", writable: false, configurable: true });
+            readOnly = polyArrWith([1, 2, 3], 0, 9);
+        } finally {
+            delete (Array.prototype as any)[2];
+        }
+
+        try {
+            Object.defineProperty(Array.prototype, "1", {
+                get: () => "PROTO",
+                set: () => {
+                    setterCalls++;
+                },
+                configurable: true
+            });
+            withSetter = polyArrWith([1, 2, 3], 0, 9);
+        } finally {
+            delete (Array.prototype as any)[1];
+        }
+
+        assert.deepEqual(readOnly, [9, 2, 3], "The read-only index is still added");
+        assert.isTrue(Object.prototype.hasOwnProperty.call(readOnly, "2"), "The index is an own property");
+        assert.isTrue(Object.prototype.hasOwnProperty.call(withSetter, "1"), "The index is an own property");
+        assert.equal(withSetter[1], 2, "The value is not passed to the setter");
+        assert.equal(setterCalls, 0, "The setter is not called");
+    });
+});
+
+describe("polyArrWith converts the value like the native function", () => {
+    it("should convert a length which is not a number", () => {
+        const arrayLike: any = { length: "2", 0: "x", 1: "y", 2: "z" };
+
+        assert.deepEqual(polyArrWith(arrayLike, 0, "a"), ["a", "y"]);
+        assert.deepEqual(polyArrWith(arrayLike, -1, "b"), ["x", "b"], "The length is 2");
+        // Index 2 is past the length
+        assert.throws(() => polyArrWith(arrayLike, 2, "c"), RangeError);
     });
 });

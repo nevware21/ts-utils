@@ -234,6 +234,14 @@ describe("strKebabCase", () => {
         assert.equal(strKebabCase("hELLo dARKness-my old_friend"), "h-el-lo-d-ar-kness-my-old-friend");
     });
 
+    it("A word which starts with one lowercase letter and then an uppercase letter is split, also after a separator", () => {
+        assert.equal(strKebabCase("the iPhone app"), "the-i-phone-app");
+        assert.equal(strKebabCase("use jQuery here"), "use-j-query-here");
+        assert.equal(strKebabCase("set xPosition"), "set-x-position");
+        assert.equal(strKebabCase("set_xPosition"), "set-x-position");
+        assert.equal(strKebabCase("xPosition"), strKebabCase("set xPosition").substring(4), "Like at the start of the value");
+    });
+
     it("Non-ASCII letters", () => {
         assert.equal(strKebabCase("café crème"), "café-crème");
         assert.equal(strKebabCase("über straße"), "über-straße");
@@ -302,6 +310,12 @@ describe("strSnakeCase", () => {
         assert.equal(strSnakeCase("XMLHttpRequest"), "xml_http_request");
         assert.equal(strSnakeCase("fooBar2Baz"), "foo_bar2_baz");
         assert.equal(strSnakeCase("maxSafeInteger"), "max_safe_integer");
+    });
+
+    it("A word which starts with one lowercase letter and then an uppercase letter is split, also after a separator", () => {
+        assert.equal(strSnakeCase("the iPhone app"), "the_i_phone_app");
+        assert.equal(strSnakeCase("visit eBay now"), "visit_e_bay_now");
+        assert.equal(strSnakeCase("set-xPosition"), "set_x_position");
     });
 
     it("Non-ASCII letters", () => {
@@ -494,5 +508,32 @@ describe("case conversion character ranges", () => {
         assert.equal(strKebabCase("a\uD83D\uDE00b"), "a\uD83D\uDE00b");
         assert.equal(strKebabCase("\u0915\u093E\u0930 \u0915\u0940"), "\u0915\u093E\u0930-\u0915\u0940");
         assert.equal(strCapitalizeWords("\u0301abc"), "\u0301abc");
+    });
+});
+
+describe("case conversion of plural acronyms and zero width joiners", () => {
+    it("doesn't split a plural s (which ends the word) from an uppercase run", () => {
+        assert.equal(strKebabCase("userIDs"), "user-ids");
+        assert.equal(strKebabCase("getURLs"), "get-urls");
+        assert.equal(strKebabCase("listAPIs"), "list-apis");
+        assert.equal(strKebabCase("PDFs"), "pdfs");
+        assert.equal(strKebabCase("getURLsFor"), "get-urls-for");
+        assert.equal(strSnakeCase("maxIDs", true), "MAX_IDS");
+        assert.equal(strCamelCase("user_IDs"), "userIDs");
+
+        // An "s" which is followed by other lowercase letters still starts a new word, as do the other uppercase runs
+        assert.equal(strKebabCase("ABCDsmith"), "abc-dsmith");
+        assert.equal(strKebabCase("XMLHttpRequest"), "xml-http-request");
+        assert.equal(strKebabCase("hELLo"), "h-el-lo");
+    });
+
+    it("doesn't split a word or an emoji sequence at a zero width non-joiner or joiner", () => {
+        const zwnj = String.fromCharCode(0x200C);
+        const zwj = String.fromCharCode(0x200D);
+        const family = String.fromCharCode(0xD83D, 0xDC68) + zwj + String.fromCharCode(0xD83D, 0xDC69);
+
+        assert.equal(strKebabCase("my " + family + " photo"), "my-" + family + "-photo");
+        assert.equal(strKebabCase("a" + zwnj + "b c"), "a" + zwnj + "b-c");
+        assert.equal(strCamelCase("a" + zwj + "b c"), "a" + zwj + "bC");
     });
 });

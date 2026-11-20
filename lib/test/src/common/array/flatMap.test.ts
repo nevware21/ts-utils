@@ -245,3 +245,19 @@ describe("arrFlatMap exports", () => {
         assert.strictEqual((polyfillExports as any).polyArrFlatMap, polyArrFlatMap);
     });
 });
+
+describe("polyArrFlatMap converts the value like the native function", () => {
+    it("should pass the String object of a string to the callbackFn", () => {
+        let arrays: any[] = [];
+        let result = polyArrFlatMap("ab" as any, (value: string, index: number, theArray: any) => {
+            arrays.push(theArray);
+            return [value, index];
+        });
+
+        assert.deepEqual(result, ["a", 0, "b", 1]);
+        assert.equal(arrays.length, 2);
+        assert.equal(typeof arrays[0], "object", "The string is passed as its String object");
+        assert.equal(String(arrays[0]), "ab");
+        assert.strictEqual(arrays[1], arrays[0], "The same object is passed for every value");
+    });
+});

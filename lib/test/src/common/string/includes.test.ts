@@ -16,6 +16,9 @@ function _expectThrow(cb: () => void): Error {
         assert.ok(true, "Expected an exception to be thrown");
         return e;
     }
+
+    // Nothing was thrown
+    assert.fail("Expected an exception to be thrown");
 }
 
 describe("strIncludes", () => {
@@ -165,3 +168,90 @@ describe("polyStrIncludes", () => {
     });
 });
 
+describe("polyStrIncludes value conversion", () => {
+    it("converts the value to a string, like the native function", () => {
+        const values: any[] = [["abc"], [1, 2, 3], 123, new String("abc"), { toString: () => "abc" }, true];
+        const searches: any[] = ["b", 2, "2", "bc", "ab", "rue", "1,2", "z"];
+        for (let lp = 0; lp < values.length; lp++) {
+            for (let sp = 0; sp < searches.length; sp++) {
+                assert.equal(polyStrIncludes(values[lp], searches[sp]), String.prototype.includes.call(values[lp], searches[sp]),
+                    "Checking includes of [" + String(values[lp]) + "] for [" + searches[sp] + "]");
+            }
+        }
+
+        // Previously the value's own indexOf() was used, eg. Array.prototype.indexOf for an array
+        assert.isTrue(polyStrIncludes(["abc"] as any, "b"));
+        assert.isTrue(polyStrIncludes([1, 2, 3] as any, 2 as any));
+        assert.isFalse(polyStrIncludes({ toString: () => "abc", indexOf: () => 0 } as any, "z"), "The value's own indexOf() should not be used");
+    });
+
+    it("converts the value, then the searchString and then the position, like the native function", () => {
+        function _getLog(includesFn: (value: any, search: any, position: any) => boolean) {
+            let log: string[] = [];
+            includesFn({
+                toString: () => {
+                    log.push("value");
+                    return "abc";
+                }
+            }, {
+                toString: () => {
+                    log.push("search");
+                    return "b";
+                }
+            }, {
+                valueOf: () => {
+                    log.push("position");
+                    return 0;
+                }
+            });
+
+            return log;
+        }
+
+        const polyLog = _getLog((value, search, position) => polyStrIncludes(value, search, position));
+        const nativeLog = _getLog((value, search, position) => String.prototype.includes.call(value, search, position));
+
+        assert.deepEqual(polyLog, ["value", "search", "position"]);
+        assert.deepEqual(polyLog, nativeLog);
+    });
+
+    it("throws the value's error before checking for a RegExp searchString, like the native function", () => {
+        const error = new Error("value error");
+        const value = {
+            toString: () => {
+                throw error;
+            }
+        };
+
+        let caught: any;
+        try {
+            polyStrIncludes(value as any, /a/ as any);
+        } catch (e) {
+            caught = e;
+        }
+
+        assert.strictEqual(caught, error);
+    });
+});
+
+describe("polyStrIncludes null and undefined values", () => {
+    it("throws a TypeError for a null or undefined value, like the native function", () => {
+        assert.throws(() => polyStrIncludes(null as any, "u"), TypeError);
+        assert.throws(() => polyStrIncludes(undefined as any, "u"), TypeError);
+        assert.throws(() => String.prototype.includes.call(null, "u"), TypeError);
+    });
+});
+
+describe("polyStrIncludes Symbol values", () => {
+    it("converts a Symbol value or searchString (a documented difference from the native function, which throws a TypeError)", function() {
+        if (typeof Symbol !== "function") {
+            this.skip();
+            return;
+        }
+
+        // This is the documented behaviour of polyStrIncludes (see its docs and the CHANGELOG), rather than the native
+        // behaviour, as the value and searchString are converted with asString()
+        assert.isTrue(polyStrIncludes(Symbol("abc") as any, "b"), "The value is converted to \"Symbol(abc)\"");
+        assert.isTrue(polyStrIncludes("Symbol(abc)", Symbol("abc") as any), "The searchString is converted to \"Symbol(abc)\"");
+    });
+});

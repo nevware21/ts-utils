@@ -58,3 +58,10 @@ describe("arrDifference", () => {
         assert.deepEqual(arrDifference([1, 2, 2, 3, 3, 3], [2]), [1, 3, 3, 3]);
     });
 });
+
+describe("arrDifference with a String object", () => {
+    it("compares the characters of a String object, like a string", () => {
+        assert.deepEqual(arrDifference(["bc", "z"], new String("abc") as any), ["bc", "z"]);
+        assert.deepEqual(arrDifference(["b", "z"], new String("abc") as any), ["z"]);
+    });
+});

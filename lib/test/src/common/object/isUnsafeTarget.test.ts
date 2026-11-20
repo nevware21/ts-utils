@@ -233,3 +233,27 @@ describe("object isUnsafeTarget tests", () => {
         assert.isFalse(isUnsafeTarget(new MyClass()), "A class instance should be safe");
     });
 });
+
+describe("isUnsafeTarget with a target which can't be checked", () => {
+    it("doesn't throw for a revoked Proxy", function() {
+        if (typeof Proxy !== "function" || !(Proxy as any).revocable) {
+            this.skip();
+            return;
+        }
+
+        const revocable = (Proxy as any).revocable({}, {});
+        revocable.revoke();
+        assert.isFalse(isUnsafeTarget(revocable.proxy));
+    });
+
+    it("doesn't throw for an object whose own constructor getter throws", () => {
+        const target: any = {};
+        Object.defineProperty(target, "constructor", {
+            get: () => {
+                throw new Error("constructor error");
+            }
+        });
+
+        assert.isFalse(isUnsafeTarget(target));
+    });
+});

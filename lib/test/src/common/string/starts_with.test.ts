@@ -11,7 +11,7 @@ import { strStartsWith } from "../../../../src/string/starts_with";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 describe("string helpers", () => {
-    describe("strStartsWith null / undefined", () => {
+    it("strStartsWith null / undefined", () => {
         _expectThrow(() => {
             _checkStartsWith(null, null as any);
         });
@@ -57,7 +57,7 @@ describe("string helpers", () => {
         _checkStartsWith("", undefined as any);
     });
 
-    describe("strStartsWith With values", () => {
+    it("strStartsWith With values", () => {
         _checkStartsWith("", "");
         _checkStartsWith("", "", 10);
         _checkStartsWith("", "", -1);

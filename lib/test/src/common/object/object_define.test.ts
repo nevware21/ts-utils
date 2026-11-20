@@ -13,6 +13,8 @@ import { objKeys } from "../../../../src/object/object";
 import { getLazy, getWritableLazy } from "../../../../src/helpers/lazy";
 import { isFunction } from "../../../../src/helpers/base";
 import { safe } from "../../../../src/helpers/safe";
+import { polyObjFromEntries } from "../../../../src/polyfills/object/objFromEntries";
+import { polyArrFrom } from "../../../../src/polyfills/array";
 
 describe("object define tests", () => {
     describe("objDefineGet tests", () => {
@@ -453,5 +455,162 @@ describe("object define tests", () => {
             assert.equal(descriptor.value, 42);
             assert.isTrue(descriptor.writable);
         });
+    });
+});
+
+describe("objDefine with a polluted Object.prototype", () => {
+    // Adds the properties to Object.prototype (like prototype pollution) while calling the function, and always removes them
+    // again before any assert is used
+    function _withPollution(props: { [key: string]: any }, fn: () => void) {
+        const objProto: any = Object.prototype;
+        const keys = objKeys(props);
+        const previous: any = {};
+        for (let lp = 0; lp < keys.length; lp++) {
+            previous[keys[lp]] = Object.getOwnPropertyDescriptor(objProto, keys[lp]);
+        }
+
+        try {
+            for (let lp = 0; lp < keys.length; lp++) {
+                objProto[keys[lp]] = props[keys[lp]];
+            }
+
+            fn();
+        } finally {
+            for (let lp = 0; lp < keys.length; lp++) {
+                if (previous[keys[lp]]) {
+                    Object.defineProperty(objProto, keys[lp], previous[keys[lp]]);
+                } else {
+                    delete objProto[keys[lp]];
+                }
+            }
+        }
+    }
+
+    it("defines the value rather than an inherited value, get, writable or lazy value", () => {
+        const results: any = {};
+        _withPollution({ value: "polluted" }, () => {
+            const target: any = {};
+            objDefine(target, "a", { v: undefined });
+            results.a = Object.getOwnPropertyDescriptor(target, "a");
+        });
+
+        _withPollution({ get: () => "polluted" }, () => {
+            const target: any = {};
+            results.b = safe(() => {
+                objDefine(target, "b", { v: 1 });
+                return Object.getOwnPropertyDescriptor(target, "b");
+            });
+        });
+
+        _withPollution({ writable: true }, () => {
+            const target: any = {};
+            objDefine(target, "c", { v: 1 });
+            results.c = Object.getOwnPropertyDescriptor(target, "c");
+        });
+
+        _withPollution({ l: { v: "polluted" } }, () => {
+            const target: any = {};
+            results.d = safe(() => {
+                objDefine(target, "d", { v: 1 });
+                return Object.getOwnPropertyDescriptor(target, "d");
+            });
+        });
+
+        assert.deepEqual(results.a, { value: undefined, writable: false, enumerable: true, configurable: true }, "An inherited value is not used");
+        assert.isUndefined(results.b.e, "An inherited get should not make the descriptor invalid");
+        assert.deepEqual(results.b.v, { value: 1, writable: false, enumerable: true, configurable: true });
+        assert.deepEqual(results.c, { value: 1, writable: false, enumerable: true, configurable: true }, "An inherited writable is not used");
+        assert.isUndefined(results.d.e, "An inherited lazy value should not make the descriptor invalid");
+        assert.deepEqual(results.d.v, { value: 1, writable: false, enumerable: true, configurable: true });
+        assert.isUndefined(({} as any).value, "Object.prototype is restored");
+    });
+
+    it("only uses the descriptor keys it knows, so an unexpected or polluted key doesn't change the property", () => {
+        const results: any = {};
+
+        // A key which isn't a descriptor key, but which Object.prototype maps to one (eg. by prototype pollution)
+        _withPollution({ x: "get" }, () => {
+            const target: any = {};
+            results.a = safe(() => {
+                objDefine(target, "a", { v: 1, x: () => "polluted" } as any);
+                return Object.getOwnPropertyDescriptor(target, "a");
+            });
+        });
+
+        assert.isUndefined(results.a.e, "A polluted key should not make the descriptor invalid");
+        assert.deepEqual(results.a.v, { value: 1, writable: false, enumerable: true, configurable: true });
+
+        // Own "__proto__" and "constructor" keys (eg. from JSON.parse) are not descriptor keys
+        const target: any = {};
+        objDefine(target, "b", JSON.parse("{ \"v\": 1, \"__proto__\": { \"get\": 1 }, \"constructor\": 2 }"));
+        assert.deepEqual(Object.getOwnPropertyDescriptor(target, "b"), { value: 1, writable: false, enumerable: true, configurable: true });
+    });
+
+    it("a lazy value only has a setter when its \"v\" has an own setter, rather than an inherited set", () => {
+        const results: any = {};
+        const lazyValue = { v: 12 };
+        _withPollution({ set: () => {
+            // A polluted setter
+        } }, () => {
+            const target: any = {};
+            objDefine(target, "a", { l: lazyValue as any });
+            results.desc = Object.getOwnPropertyDescriptor(target, "a");
+        });
+
+        assert.isUndefined(results.desc.set, "The property should not have a setter");
+        assert.equal(lazyValue.v, 12);
+    });
+
+    it("the polyfills which define values don't use an inherited value", () => {
+        const results: any = {};
+        _withPollution({ value: "polluted", 0: "inherited index" }, () => {
+            results.fromEntries = polyObjFromEntries([["a", undefined]]);
+            results.arrFrom = polyArrFrom([undefined]);
+        });
+
+        assert.isUndefined(results.fromEntries.a, "polyObjFromEntries");
+        assert.isTrue(Object.prototype.hasOwnProperty.call(results.arrFrom, 0), "polyArrFrom defines an own value");
+        assert.isUndefined(results.arrFrom[0], "polyArrFrom");
+    });
+});
+
+describe("objDefine descriptor handling", () => {
+    it("throws a TypeError for a null or undefined descriptor, like Object.defineProperty", () => {
+        assert.throws(() => objDefine({} as any, "a", undefined as any), TypeError);
+        assert.throws(() => objDefine({} as any, "a", null as any), TypeError);
+        assert.throws(() => objDefineProps({}, { a: null as any }), TypeError);
+        assert.throws(() => Object.defineProperty({}, "a", undefined as any), TypeError);
+    });
+
+    it("a getter (g) or setter (s) takes precedence over a lazy value (l)", () => {
+        const target: any = {};
+        objDefine(target, "a", { l: getLazy(() => "lazy"), g: () => "getter" } as any);
+        objDefine(target, "b", { g: () => "getter", l: getLazy(() => "lazy") } as any);
+        assert.equal(target.a, "getter");
+        assert.equal(target.b, "getter");
+
+        const sets: any[] = [];
+        objDefine(target, "c", { l: getWritableLazy(() => "lazy"), s: (value: any) => sets.push(value) } as any);
+        target.c = 5;
+        assert.deepEqual(sets, [5], "The setter should be used");
+        assert.equal(target.c, "lazy", "The lazy value is still the getter");
+    });
+
+    it("only uses the descriptor's own properties, an inherited lazy value (l) is ignored", () => {
+        const target: any = {};
+        objDefine(target, "a", Object.create({ l: getLazy(() => 42) }));
+        objDefine(target, "b", { l: getLazy(() => 42) });
+        assert.isUndefined(target.a, "An inherited lazy value should not be used");
+        assert.equal(target.b, 42);
+    });
+
+    it("objDefineProps defines a \"__proto__\" key (eg. from JSON.parse) like Object.defineProperties", () => {
+        const target: any = {};
+        objDefineProps(target, JSON.parse("{ \"__proto__\": { \"v\": 1 } }"));
+        const native: any = {};
+        Object.defineProperties(native, JSON.parse("{ \"__proto__\": { \"value\": 1, \"enumerable\": true, \"configurable\": true } }"));
+
+        assert.deepEqual(Object.getOwnPropertyDescriptor(target, "__proto__"), Object.getOwnPropertyDescriptor(native, "__proto__"));
+        assert.strictEqual(Object.getPrototypeOf(target), Object.prototype, "The prototype should not be changed");
     });
 });

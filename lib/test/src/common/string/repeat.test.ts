@@ -12,7 +12,7 @@ import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isUndefined } from "../../../../src/helpers/base";
 
 describe("string helpers", () => {
-    describe("strRepeat null / undefined", () => {
+    it("strRepeat null / undefined", () => {
         _checkRepeat(null, 0);
         _checkRepeat(null, 2);
         _checkRepeat(null, -2);
@@ -25,7 +25,7 @@ describe("string helpers", () => {
         _checkRepeat(undefined, 100);
     });
 
-    describe("polyStrRepeat null / undefined", () => {
+    it("polyStrRepeat null / undefined", () => {
         _checkPolyRepeat(null, 0);
         _checkPolyRepeat(null, 2);
         _checkPolyRepeat(null, -2);
@@ -38,7 +38,7 @@ describe("string helpers", () => {
         _checkPolyRepeat(undefined, 100);
     });
 
-    describe("strRepeat With values", () => {
+    it("strRepeat With values", () => {
         _checkRepeat("", 0);
         _checkRepeat("null", 0);
         _checkRepeat("abcdefg", 0);
@@ -51,7 +51,7 @@ describe("string helpers", () => {
         _checkRepeat("abc", 1/0);
     });
 
-    describe("polyStrRepeat With values", () => {
+    it("polyStrRepeat With values", () => {
         _checkPolyRepeat("", 0);
         _checkPolyRepeat("null", 0);
         _checkPolyRepeat("abcdefg", 0);
