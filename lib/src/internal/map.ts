@@ -8,6 +8,7 @@
 
 import { objDefineProp } from "../object/define";
 import { objForEachKey } from "../object/for_each_key";
+import { objFreeze } from "../object/object";
 
 /**
  * @internal
@@ -31,14 +32,14 @@ export const enum eMapValues {
  * @returns
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function _createKeyValueMap(values: any, keyType: eMapValues, valueType: eMapValues, completeFn?: <T>(value: T) => T, writable?: boolean) {
+export function _createKeyValueMap(values: any, keyType: eMapValues, valueType: eMapValues) {
     let theMap: any = {};
     objForEachKey(values, (key, value) => {
-        _assignMapValue(theMap, key, keyType ? value : key, writable);
-        _assignMapValue(theMap, value, valueType ? value : key, writable);
+        _assignMapValue(theMap, key, keyType ? value : key);
+        _assignMapValue(theMap, value, valueType ? value : key);
     });
 
-    return completeFn ? completeFn(theMap) : theMap;
+    return objFreeze(theMap);
 }
 
 /**
@@ -50,10 +51,10 @@ export function _createKeyValueMap(values: any, keyType: eMapValues, valueType: 
  * @param value - The value to assign
  * @param writable - Flag to indicate if the map should be writable
  */
-export function _assignMapValue(theMap: any, key: any, value: any, writable?: boolean) {
+export function _assignMapValue(theMap: any, key: any, value: any) {
     objDefineProp(theMap, key, {
         value: value,
         enumerable: true,
-        writable: !!writable
+        writable: false
     });
 }

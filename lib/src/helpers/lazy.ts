@@ -19,8 +19,14 @@ export { ILazyValue };
  */
 export let _globalLazyTestHooks: _GlobalTestHooks;
 
-export function _initTestHooks() {
-    _globalLazyTestHooks = _getGlobalConfig();
+/**
+ * @internal
+ * @ignore
+ * Initializes the global test hooks (when not already initialized) and returns them
+ * @returns The global test hooks
+ */
+export function _initTestHooks(): _GlobalTestHooks {
+    return _globalLazyTestHooks || (_globalLazyTestHooks = _getGlobalConfig());
 }
 
 /**
@@ -60,8 +66,7 @@ export function _initTestHooks() {
 /*#__NO_SIDE_EFFECTS__*/
 export function getLazy<T, F extends (...args: any[]) => T = (...args: any[]) => T>(cb: F | ((...args: Parameters<F>) => T), argArray?: Parameters<F>): ILazyValue<T> {
     let lazyValue = { } as ILazyValue<T>;
-    !_globalLazyTestHooks && _initTestHooks();
-    lazyValue.b = _globalLazyTestHooks.lzy;
+    lazyValue.b = _initTestHooks().lzy;
 
     objDefineProp(lazyValue, "v", {
         configurable: true,
@@ -92,8 +97,7 @@ export function getLazy<T, F extends (...args: any[]) => T = (...args: any[]) =>
  * @param newValue - When `true` will cause all new lazy implementations to bypass the cached lookup.
  */
 export function setBypassLazyCache(newValue: boolean) {
-    !_globalLazyTestHooks && _initTestHooks();
-    _globalLazyTestHooks.lzy = newValue;
+    _initTestHooks().lzy = newValue;
 }
 
 /**
@@ -147,8 +151,7 @@ export function setBypassLazyCache(newValue: boolean) {
  */
 export function getWritableLazy<T, F extends (...args: any[]) => T = () => T>(cb: F | ((...args: Parameters<F>) => T), argArray?: Parameters<F>): ILazyValue<T> {
     let lazyValue = { } as ILazyValue<T>;
-    !_globalLazyTestHooks && _initTestHooks();
-    lazyValue.b = _globalLazyTestHooks.lzy;
+    lazyValue.b = _initTestHooks().lzy;
 
     let _setValue = (newValue: T) => {
         // Just replace the value

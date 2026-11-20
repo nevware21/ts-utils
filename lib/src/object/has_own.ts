@@ -6,13 +6,12 @@
  * Licensed under the MIT license.
  */
 
-import { GET_OWN_PROPERTY_DESCRIPTOR, ObjClass } from "../internal/constants";
-import { _returnNothing } from "../internal/stubs";
+import { _objGetOwnPropertyDescriptor } from "../internal/own_props";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
+import { ObjClass } from "../internal/constants";
 import { objHasOwnProperty } from "./has_own_prop";
 
-const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR)), _returnNothing));
 
 /**
  * The objHasOwn() method returns a boolean indicating whether the object

@@ -76,8 +76,8 @@ function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn |
 
         // Microtask fallback hook for environments without native queueMicrotask support, this allows us to
         // simulate the running of microtasks before standard timeouts.
-        let microTasksFn = _microtaskCallback;
         try {
+            let microTasksFn = _microtaskCallback;
             if (microTasksFn) {
                 // While a setTimeout override runs the callback synchronously the handler still has the previous
                 // (cleared) timer, which isn't the timer being run
@@ -104,7 +104,7 @@ function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn |
 
     // The timer is started after the handler is assigned (rather than by _createTimerHandler()), as a setTimeout
     // override may call the callback synchronously, which uses the handler
-    let handler = _createTimerHandler(false, (timerId?: any) => {
+    let handler = _createTimerHandler((timerId?: any) => {
         if (timerId && timerId.refresh) {
             timerId.refresh();
         } else {
@@ -132,6 +132,8 @@ function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn |
 
     return handler.h;
 }
+
+
 
 /**
  * @internal

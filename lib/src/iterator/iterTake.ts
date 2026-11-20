@@ -6,9 +6,8 @@
  * Licensed under the MIT license.
  */
 
-import { createIterableIterator } from "./create";
 import { _closeIter } from "./forOf";
-import { _IterHelperState, _asIterator, _iterNext, _iterReturn, _iterStep } from "./helpers";
+import { _asIterator, _createIterHelper, _iterNext } from "./helpers";
 import { mathFloor } from "../math/floor";
 
 /**
@@ -25,32 +24,22 @@ import { mathFloor } from "../math/floor";
 export function iterTake<T>(iter: Iterator<T> | Iterable<T>, count: number): IterableIterator<T> {
     let source = _asIterator(iter);
     let remaining = count > 0 ? mathFloor(count) : 0;
-    let state: _IterHelperState = {};
 
-    return createIterableIterator<T>({
-        n: function() {
-            let ctx = this;
-
-            return _iterStep(state, () => {
-                if (remaining <= 0) {
-                    // Like the native take() the source is closed when the count is reached
-                    _closeIter(source);
-                    return true;
-                }
-
-                // Like the native take() the result's done (and value) is only read once
-                let next = _iterNext(source);
-                if (next.done) {
-                    return true;
-                }
-
-                ctx.v = next.value;
-                remaining--;
-                return false;
-            });
-        },
-        r: function(value?: T) {
-            return _iterReturn(state, source, value);
+    return _createIterHelper<T, T>(source, (ctx) => {
+        if (remaining <= 0) {
+            // Like the native take() the source is closed when the count is reached
+            _closeIter(source);
+            return true;
         }
+
+        // Like the native take() the result's done (and value) is only read once
+        let next = _iterNext(source);
+        if (next.done) {
+            return true;
+        }
+
+        ctx.v = next.value;
+        remaining--;
+        return false;
     });
 }

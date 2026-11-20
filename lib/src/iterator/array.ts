@@ -7,7 +7,6 @@
  */
 
 import { LENGTH } from "../internal/constants";
-import { objDefine } from "../object/define";
 import { createIterator, CreateIteratorContext } from "./create";
 
 /**
@@ -38,22 +37,18 @@ export function createArrayIterator<T>(values: T[]): Iterator<T> {
     let theValues = values ? values.slice() : [];
     let len = theValues[LENGTH];
 
-    function _value(): T {
-        if (idx >= 0 && idx < len) {
-            return theValues[idx];
-        }
-    }
-
-    function _getNext() {
-        idx++;
-        return idx >= len;
-    }
-
     let ctx: CreateIteratorContext<T> = {
-        n: _getNext
-    };
+        n: function () {
+            idx++;
+            let isDone = idx >= len;
+            if (!isDone) {
+                // The value is set when it is read by createIterator()
+                ctx.v = theValues[idx];
+            }
 
-    objDefine(ctx, "v", { g: _value });
+            return isDone;
+        }
+    };
 
     return createIterator<T>(ctx);
 }

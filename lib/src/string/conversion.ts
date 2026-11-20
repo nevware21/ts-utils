@@ -7,6 +7,7 @@
  */
 
 import { EMPTY, SUBSTRING, TO_LOWER_CASE, TO_UPPER_CASE } from "../internal/constants";
+import { _charLen } from "../internal/surrogate";
 import { asString } from "./as_string";
 import { strReplace } from "./replace";
 
@@ -52,24 +53,12 @@ function _upperWord(word: string): string {
 /**
  * @internal
  * @ignore
- * Returns the number of code units of the first character of the (non-empty) word, this is 2 for a
- * supplementary plane character (a high surrogate `0xD800 - 0xDBFF` followed by a low surrogate
- * `0xDC00 - 0xDFFF`) so the complete character is case converted, otherwise 1. The low surrogate is
- * only checked after a high surrogate, so this is a single `charCodeAt()` for all other characters.
- */
-/*#__NO_SIDE_EFFECTS__*/
-function _firstLen(word: string): number {
-    return ((word.charCodeAt(0) & 0xFC00) === 0xD800 && (word.charCodeAt(1) & 0xFC00) === 0xDC00) ? 2 : 1;
-}
-
-/**
- * @internal
- * @ignore
  * Uppercase the first character of the word and retain the case of the remaining characters
  */
 /*#__NO_SIDE_EFFECTS__*/
 function _letterWord(word: string): string {
-    let len = _firstLen(word);
+    // The complete first character (a surrogate pair is 2 code units) is converted
+    let len = _charLen(word, 0);
     return word[SUBSTRING](0, len)[TO_UPPER_CASE]() + word[SUBSTRING](len);
 }
 
@@ -224,7 +213,7 @@ export function strCapitalizeWords<T>(value: T): string {
 export function strCamelCase<T>(value: T, upperFirst?: boolean): string {
     return _convertCase(value, EMPTY, upperFirst ? _letterWord : (word: string) => {
         // Lowercase the first character of the word and retain the case of the remaining characters
-        let len = _firstLen(word);
+        let len = _charLen(word, 0);
         return word[SUBSTRING](0, len)[TO_LOWER_CASE]() + word[SUBSTRING](len);
     }, _letterWord);
 }

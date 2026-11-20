@@ -7,8 +7,6 @@
  */
 
 import { isNullOrUndefined } from "../helpers/base";
-import { UNDEF_VALUE } from "../internal/constants";
-import { objDefine } from "../object/define";
 import { createIterator, CreateIteratorContext } from "./create";
 
 /**
@@ -107,7 +105,6 @@ import { createIterator, CreateIteratorContext } from "./create";
 /*#__NO_SIDE_EFFECTS__*/
 export function createRangeIterator(start: number, end: number, step?: number): Iterator<number> {
     let nextValue = start;
-    let theValue: number = UNDEF_VALUE;
 
     if (isNullOrUndefined(end)) {
         end = start;
@@ -118,23 +115,18 @@ export function createRangeIterator(start: number, end: number, step?: number): 
         theStep = (start <= end) ? 1 : -1;
     }
 
-    function _value(): number {
-        return theValue;
-    }
+    let ctx: CreateIteratorContext<number> = {
+        n: function () {
+            let isDone = (theStep > 0) ? (nextValue > end) : (nextValue < end);
+            if (!isDone) {
+                // The value is set when it is read by createIterator()
+                ctx.v = nextValue;
+                nextValue += theStep;
+            }
 
-    function _getNext() {
-        let isDone = (theStep > 0) ? (nextValue > end) : (nextValue < end);
-        if (!isDone) {
-            theValue = nextValue;
-            nextValue += theStep;
+            return isDone;
         }
+    };
 
-        return isDone;
-    }
-
-    return createIterator<number>(
-        objDefine({
-            n: _getNext
-        } as CreateIteratorContext<number>, "v", { g: _value })
-    );
+    return createIterator<number>(ctx);
 }

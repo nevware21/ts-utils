@@ -51,7 +51,7 @@ function _ensureSharedTimer(): void {
  * @since 0.15.0
  */
 export function _addNextTickToQueue(callback: () => void, maxQueuedTasks?: number): boolean {
-    return _addToQueueWithTimer(_eTaskQueueType.nextTick, callback, maxQueuedTasks);
+    return _addToQueue(_eTaskQueueType.nextTick, callback, maxQueuedTasks, _ensureSharedTimer);
 }
 
 /**
@@ -59,16 +59,7 @@ export function _addNextTickToQueue(callback: () => void, maxQueuedTasks?: numbe
  * @since 0.15.0
  */
 export function _addMicrotaskQueue(callback: () => void, maxQueuedTasks?: number): boolean {
-    return _addToQueueWithTimer(_eTaskQueueType.microtask, callback, maxQueuedTasks);
-}
-
-function _addToQueueWithTimer(queueType: _eTaskQueueType, callback: () => void, maxQueuedTasks?: number): boolean {
-    let result = _addToQueue(queueType, callback, maxQueuedTasks);
-    if (result) {
-        _ensureSharedTimer();
-    }
-
-    return result;
+    return _addToQueue(_eTaskQueueType.microtask, callback, maxQueuedTasks, _ensureSharedTimer);
 }
 
 

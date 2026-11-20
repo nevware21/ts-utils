@@ -12,7 +12,6 @@ import { asString } from "../string/as_string";
 import { strCamelCase } from "../string/conversion";
 import { strPadStart } from "../string/pad";
 import { strReplace } from "../string/replace";
-import { strSubstr } from "../string/substring";
 import { strUpper } from "../string/upper_lower";
 import { isNumber, isStrictNullOrUndefined, isString, isUndefined } from "./base";
 import { getInst } from "./environment";
@@ -437,8 +436,9 @@ export function decodeHex(value: string): string {
     if (value || !isStrictNullOrUndefined(value)) {
         let theValue = asString(value);
 
+        // The value is a (primitive) string, so its own substring() is called directly
         for (let idx = 0; idx < theValue[LENGTH]; idx += 2) {
-            result.push(_fromCharCode(parseInt(strSubstr(theValue, idx, 2), 16)));
+            result.push(_fromCharCode(parseInt(theValue.substring(idx, idx + 2), 16)));
         }
     }
 

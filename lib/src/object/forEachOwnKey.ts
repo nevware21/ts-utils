@@ -10,7 +10,7 @@ import { arrForEach } from "../array/forEach";
 import { isStrictNullOrUndefined } from "../helpers/base";
 import { CALL } from "../internal/constants";
 import { _objForEachKey } from "./for_each_key";
-import { objGetOwnPropertySymbols } from "./get_own_property";
+import { _objGetOwnPropertySymbols } from "../internal/own_props";
 import { isUnsafePropKey } from "./isUnsafePropKey";
 import { _objPropertyIsEnumerable } from "./property_is_enumerable";
 
@@ -73,7 +73,7 @@ export function forEachOwnKey<T>(theObject: T, callbackfn: (key: PropertyKey, va
         // Resolve the `this` value once, reusing the thisArg variable to keep the minified output small
         thisArg = isStrictNullOrUndefined(thisArg) ? theObject : thisArg;
         if (_objForEachKey(theObject, callbackfn, thisArg) !== -1) {
-            arrForEach(objGetOwnPropertySymbols(theObject), (key) => {
+            arrForEach(_objGetOwnPropertySymbols(theObject), (key) => {
                 if (_objPropertyIsEnumerable(theObject, key)) {
                     let value: any;
                     try {

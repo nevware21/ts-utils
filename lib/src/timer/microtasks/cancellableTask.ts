@@ -42,7 +42,7 @@ export function _createCancellableTask(callback: () => void, queueFn: ScheduleMi
         }
     }
 
-    handler = _createTimerHandler(false, _scheduleTask, _cancelTask);
+    handler = _createTimerHandler(_scheduleTask, _cancelTask);
     // Start after handler assignment in case queueFn executes synchronously.
     handler.h.refresh();
 

@@ -6,8 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { arrForEach } from "../array/forEach";
-import { arrIncludes } from "../array/includes";
+import { _arrIntersection } from "../array/intersection";
 import { iterToArray } from "./iterToArray";
 import { LENGTH } from "../internal/constants";
 
@@ -27,31 +26,12 @@ export function iterIntersection<T>(...iters: Array<Iterator<T> | Iterable<T>>):
 export function iterIntersection<T>(): T[] {
     // The iterators are only read, so the arguments are used rather than copied into a new array
     let iters: ArrayLike<Iterator<T> | Iterable<T>> = arguments;
-    if (iters[LENGTH] === 0) {
-        return [];
+    let values: T[][] = [];
+
+    // Every value is read (in order) before they are compared
+    for (let lp = 0; lp < iters[LENGTH]; lp++) {
+        values.push(iterToArray(iters[lp]));
     }
 
-    let result: T[] = [];
-    let firstValues = iterToArray(iters[0]);
-    let otherValues: T[][] = [];
-
-    for (let lp = 1; lp < iters[LENGTH]; lp++) {
-        otherValues.push(iterToArray(iters[lp]));
-    }
-
-    arrForEach(firstValues, (value) => {
-        let inAll = true;
-        arrForEach(otherValues, (other) => {
-            if (!arrIncludes(other, value)) {
-                inAll = false;
-                return -1;
-            }
-        });
-
-        if (inAll && !arrIncludes(result, value)) {
-            result.push(value);
-        }
-    });
-
-    return result;
+    return _arrIntersection(values);
 }

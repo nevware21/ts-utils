@@ -6,8 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { createIterableIterator } from "./create";
-import { _IterHelperState, _asIterator, _callIterFn, _iterNext, _iterReturn, _iterStep } from "./helpers";
+import { _asIterator, _callIterFn, _createIterHelper, _iterNext } from "./helpers";
 import { IterMapCallbackFn } from "./types";
 
 /**
@@ -24,25 +23,15 @@ import { IterMapCallbackFn } from "./types";
 export function iterMap<T, R = T>(iter: Iterator<T> | Iterable<T>, callbackfn: IterMapCallbackFn<T, R>, thisArg?: any): IterableIterator<R> {
     let source = _asIterator(iter);
     let index = 0;
-    let state: _IterHelperState = {};
 
-    return createIterableIterator<R>({
-        n: function() {
-            let ctx = this;
-
-            return _iterStep(state, () => {
-                // Like the native helper the result's done (and value) is only read once
-                let next = _iterNext(source);
-                if (next.done) {
-                    return true;
-                }
-
-                ctx.v = _callIterFn(source, callbackfn, thisArg, next.value, index++);
-                return false;
-            });
-        },
-        r: function(value?: R) {
-            return _iterReturn(state, source, value);
+    return _createIterHelper<T, R>(source, (ctx) => {
+        // Like the native helper the result's done (and value) is only read once
+        let next = _iterNext(source);
+        if (next.done) {
+            return true;
         }
+
+        ctx.v = _callIterFn(source, callbackfn, thisArg, next.value, index++);
+        return false;
     });
 }

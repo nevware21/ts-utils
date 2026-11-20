@@ -9,7 +9,7 @@
 import { ICachedValue, createCachedValue } from "./cache";
 import { utcNow } from "./date";
 import { getInst } from "./environment";
-import { _globalLazyTestHooks, _initTestHooks } from "./lazy";
+import { _initTestHooks } from "./lazy";
 import { safe } from "./safe";
 
 let _perf: ICachedValue<Performance>
@@ -38,8 +38,7 @@ export function hasPerformance(): boolean {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function getPerformance(): Performance {
-    !_globalLazyTestHooks && _initTestHooks();
-    if (!_perf || _globalLazyTestHooks.lzy) {
+    if (_initTestHooks().lzy || !_perf) {
         _perf = createCachedValue(safe(getInst<Performance>, ["performance"]).v);
     }
     

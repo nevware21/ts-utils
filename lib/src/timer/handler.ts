@@ -162,9 +162,9 @@ export interface _TimerHandler {
  * @returns The new ITimerHandler instance
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId: T) => T, cancelFn: (timerId: T) => void): _TimerHandler {
+export function _createTimerHandler<T>(refreshFn: (timerId: T) => T, cancelFn: (timerId: T) => void): _TimerHandler {
     let ref = true;
-    let timerId: T = startTimer ? refreshFn(NULL_VALUE) : NULL_VALUE;
+    let timerId: T = NULL_VALUE;
     let theTimerHandler: ITimerHandler;
 
     // Incremented each time the timer's callback runs (dn()), so a refresh whose callback was run synchronously while

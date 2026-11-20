@@ -10,6 +10,7 @@ import { fnCall } from "../funcs/funcs";
 import { isArrayLike, isFunction, isStrictNullOrUndefined } from "../helpers/base";
 import { safe } from "../helpers/safe";
 import { throwTypeError } from "../helpers/throw";
+import { createIterableIterator, CreateIteratorContext } from "./create";
 import { _closeIter, _createIndexIterator, _getMapSetValues, _throwIfNotResult } from "./forOf";
 import { _getIterKey, isIterator } from "./iterator";
 
@@ -46,74 +47,51 @@ export function _getIteratorThisArg<T>(source: Iterator<T>, thisArg?: any): any 
 /**
  * @internal
  * @ignore
- * The state of a lazy iterator helper (eg. iterMap, iterFilter and iterTake)
+ * Creates a lazy iterator helper (eg. iterMap, iterFilter and iterTake) of the source iterator. Like the native iterator
+ * helpers:
+ * - Its next() is done once the step throws (eg. the source's next() or the callbackfn throws).
+ * - Its return() only closes the source (by calling its `return()` with no arguments, which must return an object) when
+ * the helper isn't already done, and returns the value.
+ * - A TypeError is thrown when its next() or return() is called while it is running (eg. from its callbackfn).
+ * @param source - The source iterator, closed by the helper's return()
+ * @param step - Processes the next value, setting the value of the context (`ctx.v`) and returning true when the
+ * helper is done
+ * @returns The new iterable iterator
  */
-export interface _IterHelperState {
-    /**
-     * Identifies that the helper is done
-     */
-    d?: boolean;
+export function _createIterHelper<T, R>(source: Iterator<T>, step: (ctx: CreateIteratorContext<R>) => boolean): IterableIterator<R> {
+    let isDone: boolean;
+    let isRunning: boolean;
 
-    /**
-     * Identifies that the helper is running (processing a value), eg. while its callbackfn is called
-     */
-    r?: boolean;
-}
-
-/**
- * @internal
- * @ignore
- * Like the native iterator helpers, throws a TypeError when the helper's next() or return() is called while it is
- * running (eg. from its callbackfn)
- * @param state - The state of the helper
- */
-function _throwIfRunning(state: _IterHelperState): void {
-    if (state.r) {
-        throwTypeError("Iterator is already running");
-    }
-}
-
-/**
- * @internal
- * @ignore
- * Processes the next() of a lazy iterator helper, like the native iterator helpers it is done once the step throws
- * (eg. the source's next() or the callbackfn throws), and a TypeError is thrown when it is called while it is running
- * @param state - The state of the helper
- * @param step - Processes the next value, returning true when the helper is done
- * @returns true when the helper is done
- */
-export function _iterStep(state: _IterHelperState, step: () => boolean): boolean {
-    _throwIfRunning(state);
-    if (!state.d) {
-        state.d = state.r = true;
-        try {
-            state.d = step();
-        } finally {
-            state.r = false;
+    function _throwIfRunning(): void {
+        if (isRunning) {
+            throwTypeError("Iterator is already running");
         }
     }
 
-    return state.d;
-}
+    return createIterableIterator<R>({
+        n: function() {
+            _throwIfRunning();
+            if (!isDone) {
+                isDone = isRunning = true;
+                try {
+                    isDone = step(this);
+                } finally {
+                    isRunning = false;
+                }
+            }
 
-/**
- * @internal
- * @ignore
- * Processes the return() of a lazy iterator helper, like the native iterator helpers the source is only closed (by
- * calling its `return()` with no arguments, which must return an object) when the helper isn't already done
- * @param state - The state of the helper
- * @param source - The source iterator to close
- * @param value - The value to return
- * @returns The value
- */
-export function _iterReturn<T, R>(state: _IterHelperState, source: Iterator<T>, value?: R): R | undefined {
-    _throwIfRunning(state);
-    if (!state.d) {
-        state.d = true;
-        _closeIter(source);
-    }
+            return isDone;
+        },
+        r: function(value?: R) {
+            _throwIfRunning();
+            if (!isDone) {
+                isDone = true;
+                _closeIter(source);
+            }
 
-    return value;
+            return value;
+        }
+    });
 }
 
 /**

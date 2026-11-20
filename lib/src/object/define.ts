@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { GET_OWN_PROPERTY_DESCRIPTOR, GET_OWN_PROPERTY_SYMBOLS, LENGTH, ObjClass } from "../internal/constants";
+import { LENGTH, ObjClass } from "../internal/constants";
 import { isFunction, isStrictUndefined } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
 import { objHasOwn } from "./has_own";
@@ -15,10 +15,8 @@ import { ILazyValue } from "../helpers/types";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { arrForEach } from "../array/forEach";
 import { _objPropertyIsEnumerable } from "./property_is_enumerable";
-import { _returnEmptyArray, _returnNothing } from "../internal/stubs";
+import { _objGetOwnPropertyDescriptor, _objGetOwnPropertySymbols } from "../internal/own_props";
 
-const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR)), _returnNothing));
-const _objGetOwnPropertySymbols: (obj: any) => symbol[] = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertySymbols>(ObjClass, GET_OWN_PROPERTY_SYMBOLS)), _returnEmptyArray));
 const _objCreate: (proto: null) => any = (/*#__PURE__*/_pureRef<typeof Object.create>(ObjClass, "create"));
 
 /**

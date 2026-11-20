@@ -8,7 +8,8 @@
 
 import { isFunction, isRegExp, isStrictNullOrUndefined } from "../helpers/base";
 import { throwTypeError } from "../helpers/throw";
-import { EMPTY, LENGTH, StrProto } from "../internal/constants";
+import { EMPTY, StrProto } from "../internal/constants";
+import { _charLen } from "../internal/surrogate";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { asString } from "./as_string";
@@ -101,24 +102,6 @@ function _cloneRegExp(theRegex: RegExp): RegExp {
     return result;
 }
 
-/*#__NO_SIDE_EFFECTS__*/
-function _advanceStringIndex(value: string, index: number, unicode: boolean): number {
-    let newIndex = index + 1;
-    if (unicode) {
-        if (index < value[LENGTH]) {
-            let first = value.charCodeAt(index);
-            if (first >= 0xD800  && first <= 0xDBFF) {
-                let second = value.charCodeAt(index + 1);
-                if (second >= 0xDC00 && second <= 0xDFFF) {
-                    newIndex++;
-                }
-            }
-        }
-    }
-
-    return newIndex;
-}
-
 /**
  * Polyfill implementation of `String.prototype.matchAll()` that returns an iterator of all
  * results matching a string against a regular expression, including capturing groups.
@@ -204,7 +187,9 @@ export function polyStrMatchAll(value: string, matcher: string | RegExp): Iterab
                 }
 
                 if (match[0] === EMPTY) {
-                    theRegex.lastIndex = _advanceStringIndex(theValue, theRegex.lastIndex, !!(theRegex as any).unicode);
+                    // Like the native AdvanceStringIndex() a unicode regular expression advances past a surrogate pair
+                    let index = theRegex.lastIndex;
+                    theRegex.lastIndex = index + ((theRegex as any).unicode ? _charLen(theValue, index) : 1);
                 }
 
                 ctx.v = match;

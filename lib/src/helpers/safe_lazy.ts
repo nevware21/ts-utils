@@ -8,7 +8,7 @@
 
 import { getLazy, getWritableLazy, ILazyValue } from "./lazy";
 import { getDeferred, getWritableDeferred, ICachedValue } from "./cache";
-import { safe } from "./safe";
+import { safeGet } from "./safe_get";
 
 /**
  * Create and return an readonly {@link ILazyValue} instance which will cache and return the value returned
@@ -43,10 +43,7 @@ import { safe } from "./safe";
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function safeGetLazy<T = boolean, F extends (...args: any[]) => T = (...args: any[]) => T>(cb: F | ((...args: Parameters<F>) => T), defValue: T, argArray?: Parameters<F>): ILazyValue<T> {
-    return getLazy<T>(() => {
-        let result = safe(cb, argArray);
-        return result.e ? defValue : result.v;
-    });
+    return getLazy<T>(() => safeGet(cb, defValue, argArray));
 }
 
 /**
@@ -87,10 +84,7 @@ export function safeGetLazy<T = boolean, F extends (...args: any[]) => T = (...a
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function safeGetWritableLazy<T = boolean, F extends (...args: any[]) => T = (...args: any[]) => T>(cb: F | ((...args: Parameters<F>) => T), defValue: T, argArray?: Parameters<F>): ILazyValue<T> {
-    return getWritableLazy<T>(() => {
-        let result = safe(cb, argArray);
-        return result.e ? defValue : result.v;
-    });
+    return getWritableLazy<T>(() => safeGet(cb, defValue, argArray));
 }
 
 /**
@@ -131,10 +125,7 @@ export function safeGetWritableLazy<T = boolean, F extends (...args: any[]) => T
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function safeGetDeferred<T, F extends (...args: any[]) => T = (...args: any[]) => T>(cb: F | ((...args: Parameters<F>) => T), defValue: T, argArray?: Parameters<F>): ICachedValue<T> {
-    return getDeferred<T, () => T>(() => {
-        let result = safe(cb, argArray);
-        return result.e ? defValue : result.v;
-    });
+    return getDeferred<T, () => T>(() => safeGet(cb, defValue, argArray));
 }
 
 /**
@@ -179,8 +170,5 @@ export function safeGetDeferred<T, F extends (...args: any[]) => T = (...args: a
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function safeGetWritableDeferred<T, F extends (...args: any[]) => T = (...args: any[]) => T>(cb: F | ((...args: Parameters<F>) => T), defValue: T, argArray?: Parameters<F>): ICachedValue<T> {
-    return getWritableDeferred<T, () => T>(() => {
-        let result = safe(cb, argArray);
-        return result.e ? defValue : result.v;
-    });
+    return getWritableDeferred<T, () => T>(() => safeGet(cb, defValue, argArray));
 }

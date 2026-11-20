@@ -91,7 +91,7 @@ export declare type EnumTypeMap<E, V, T = { readonly [key in keyof E]: V }> = {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function createEnum<E>(values: { [key in keyof E]: E[keyof E] }): EnumCls<E> {
-    return _createKeyValueMap(values, eMapValues.Value, eMapValues.Key, objFreeze);
+    return _createKeyValueMap(values, eMapValues.Value, eMapValues.Key);
 }
 
 /**
@@ -130,7 +130,7 @@ export function createEnum<E>(values: { [key in keyof E]: E[keyof E] }): EnumCls
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function createEnumKeyMap<E>(values: { [key in keyof E]: E[keyof E] }): EnumNameMap<E> {
-    return _createKeyValueMap(values, eMapValues.Key, eMapValues.Key, objFreeze);
+    return _createKeyValueMap(values, eMapValues.Key, eMapValues.Key);
 }
 
 /**
@@ -171,7 +171,7 @@ export function createEnumKeyMap<E>(values: { [key in keyof E]: E[keyof E] }): E
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function createEnumValueMap<E>(values: { [key in keyof E]: E[keyof E] }): EnumValueMap<E> {
-    return _createKeyValueMap(values, eMapValues.Value, eMapValues.Value, objFreeze);
+    return _createKeyValueMap(values, eMapValues.Value, eMapValues.Value);
 }
 
 /**

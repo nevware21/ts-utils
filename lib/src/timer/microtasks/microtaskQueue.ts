@@ -8,46 +8,14 @@
 
 import { getQueueMicrotask } from "../../helpers/environment";
 import { ScheduleMicrotaskFn } from "../../helpers/types";
-import { _addToQueue, _eTaskQueueType, _flushQueues } from "./taskQueue";
+import { UNDEF_VALUE } from "../../internal/constants";
+import { _eTaskQueueType, _getRunnerQueueFn, _IQueueRunner, _resetRunner } from "./taskQueue";
 
-let _microtaskPending = false;
-let _pendingMicrotaskFn: ScheduleMicrotaskFn | undefined;
-let _microtaskQueueFns: { [key in _eTaskQueueType]?: ScheduleMicrotaskFn } | undefined;
-
-function _ensureMicrotask(microtaskFn: ScheduleMicrotaskFn): void {
-    // If the microtask implementation has changed (e.g. lazy bypass tests), clear stale pending state
-    // so a fresh microtask batch can be scheduled with the current implementation.
-    if (_microtaskPending && _pendingMicrotaskFn !== microtaskFn) {
-        _microtaskPending = false;
+const _microtaskRunner: _IQueueRunner<ScheduleMicrotaskFn> = {
+    r: (microtaskFn, flushFn) => {
+        microtaskFn(flushFn);
     }
-
-    if (!_microtaskPending) {
-        _microtaskPending = true;
-        _pendingMicrotaskFn = microtaskFn;
-        try {
-            microtaskFn(() => {
-                _microtaskPending = false;
-                _pendingMicrotaskFn = undefined;
-                _flushQueues();
-            });
-        } catch (e) {
-            _microtaskPending = false;
-            _pendingMicrotaskFn = undefined;
-            _flushQueues();
-        }
-    }
-}
-
-function _microtaskScheduleFn(microtaskFn: ScheduleMicrotaskFn, queueType: _eTaskQueueType): ScheduleMicrotaskFn {
-    return function(callback: () => void, maxQueuedTasks?: number): boolean {
-        let added = _addToQueue(queueType, callback, maxQueuedTasks);
-        if (added) {
-            _ensureMicrotask(microtaskFn);
-        }
-
-        return added;
-    };
-}
+};
 
 /**
  * @internal
@@ -59,19 +27,9 @@ function _microtaskScheduleFn(microtaskFn: ScheduleMicrotaskFn, queueType: _eTas
  * @since 0.15.0
  */
 export function _getMicrotaskQueueFn(queueType: _eTaskQueueType): ScheduleMicrotaskFn | undefined {
-    let result: ScheduleMicrotaskFn | undefined;
     let queueFn = getQueueMicrotask();
 
-    if (queueFn) {
-        !_microtaskQueueFns && (_microtaskQueueFns = {});
-        result = _microtaskQueueFns[queueType];
-        if (!result) {
-            result = _microtaskScheduleFn(queueFn, queueType);
-            _microtaskQueueFns[queueType] = result;
-        }
-    }
-
-    return result;
+    return queueFn ? _getRunnerQueueFn(_microtaskRunner, queueFn, queueType) : UNDEF_VALUE;
 }
 
 /**
@@ -80,8 +38,6 @@ export function _getMicrotaskQueueFn(queueType: _eTaskQueueType): ScheduleMicrot
  * @since 0.15.0
  */
 export function _resetMicrotaskQueueFns(): void {
-    _microtaskQueueFns = undefined;
-    _microtaskPending = false;
-    _pendingMicrotaskFn = undefined;
+    _resetRunner(_microtaskRunner);
 }
 

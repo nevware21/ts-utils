@@ -79,13 +79,12 @@ export function scheduleInterval<A extends any[]>(callback: (...args: A) => void
 export function scheduleInterval<A extends any[]>(callback: (...args: A) => void, timeout: number): ITimerHandler {
     // Copy the arguments as they are kept and reused by refresh() after this call has returned
     let theArguments = ArrSlice[CALL](arguments);
-
-    let handler = _createTimerHandler(true, (intervalId: any) => {
+    let handler = _createTimerHandler((intervalId: any) => {
         intervalId && clearInterval(intervalId);
         return fnApply(setInterval, UNDEF_VALUE, theArguments)
     }, (intervalId: any) => {
         fnApply(clearInterval, UNDEF_VALUE, [ intervalId ]);
     });
 
-    return handler.h;
+    return handler.h.refresh();
 }

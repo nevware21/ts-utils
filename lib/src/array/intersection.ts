@@ -37,10 +37,22 @@ import { LENGTH } from "../internal/constants";
 export function arrIntersection<T>(...arrays: ArrayLike<T>[]): T[];
 /*#__NO_SIDE_EFFECTS__*/
 export function arrIntersection<T>(): T[] {
-    const result: T[] = [];
     // A string's own includes() matches a substring, so its characters are compared instead
-    let theArrays = _strArgsToArr(arguments as ArrayLike<ArrayLike<T>>);
-    
+    return _arrIntersection(_strArgsToArr(arguments as ArrayLike<ArrayLike<T>>));
+}
+
+/**
+ * @internal
+ * @ignore
+ * Returns the unique values of the first array-like which are included in every other array-like (a value which isn't
+ * an array-like includes nothing), used by arrIntersection() and iterIntersection()
+ * @param theArrays - The array-likes
+ * @returns The values which are included in every array-like
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function _arrIntersection<T>(theArrays: ArrayLike<ArrayLike<T>>): T[] {
+    const result: T[] = [];
+
     if (theArrays[LENGTH] > 0) {
         
         const firstArray = theArrays[0];

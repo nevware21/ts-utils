@@ -13,14 +13,12 @@ import { throwTypeError } from "../helpers/throw";
 import { CALL, DUMP_ERR_MAX_LENGTH, LENGTH, NULL_VALUE } from "../internal/constants";
 import { asString } from "../string/as_string";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
-import { _toArrayLength, _toLength } from "../helpers/length";
+import { _toArrayLength, _toLength, _toRelIndex } from "../helpers/length";
 import { fnCall } from "../funcs/funcs";
 import { _getMapSetValues, _iterForOf } from "../iterator/forOf";
 import { _pushOwnValue } from "../object/define";
 import { getKnownSymbol, hasSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
-import { mathMax } from "../math/min_max";
-import { mathToInt } from "../math/to_int";
 
 /**
  * Polyfill support function for Array.isArray
@@ -64,11 +62,9 @@ export function polyArrIncludes<T>(theArray: ArrayLike<T>, searchElement: T, fro
 
     let len = _toLength(theArray);
     if (len) {
-        // Convert the fromIndex like the native function (NaN is 0 and Infinity searches nothing)
-        let idx = mathToInt(fromIndex);
-        if (idx < 0) {
-            idx = mathMax(len + idx, 0);
-        }
+        // Convert the fromIndex like the native function (NaN is 0, a negative index counts back from the end, before the
+        // start is 0 and from the end, including Infinity, searches nothing)
+        let idx = _toRelIndex(fromIndex, len);
 
         // SameValueZero, NaN is the only value which is not equal to itself
         let isNaNValue = searchElement !== searchElement;
@@ -300,17 +296,16 @@ export function polyArrFindLast<T, E extends T>(theArray: ArrayLike<T>, callback
  * no matching element is found.
  */
 export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
-    let result = -1;
     let len = _toLength(theArray);
+
     // Like the native function every index is visited (an empty slot is undefined), so there is no "in" check
     for (let idx = len - 1; idx >= 0; idx--) {
         if (callbackFn[CALL](thisArg, theArray[idx], idx, theArray)) {
-            result = idx;
-            break;
+            return idx;
         }
     }
 
-    return result;
+    return -1;
 }
 
 /**

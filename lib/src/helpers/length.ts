@@ -9,6 +9,7 @@
 import { LENGTH } from "../internal/constants";
 import { _unwrapProp } from "../internal/unwrapFunction";
 import { throwRangeError } from "./throw";
+import { mathTrunc } from "../math/trunc";
 
 /**
  * Interface to identify that an object contains the length property used as a type
@@ -85,4 +86,30 @@ export function _toArrayLength(value: ArrayLike<any>): number {
     }
 
     return len;
+}
+
+/**
+ * @internal
+ * @ignore
+ * Converts a relative start / end index (eg. of Array.prototype.fill() or includes()) into the position within the
+ * array that it identifies, which is always in range. Like the native functions the value is converted to an integer
+ * (NaN is 0), a negative index counts back from the end, and the result is clamped to 0 to len.
+ * @param value - The value to convert (NaN becomes 0)
+ * @param len - The length of the array
+ * @returns The position within the array
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function _toRelIndex(value: number, len: number): number {
+    // Truncated with mathTrunc() (rather than idx - idx % 1) so a small integer index stays an integer (rather than a double)
+    let idx = mathTrunc(+value) || 0;
+
+    if (idx <= -len) {
+        return 0;
+    }
+
+    if (idx >= len) {
+        return len;
+    }
+
+    return idx < 0 ? len + idx : idx;
 }

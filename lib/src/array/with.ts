@@ -11,7 +11,7 @@ import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { isArrayLike } from "../helpers/base";
 import { _toArrayLength } from "../helpers/length";
 import { throwRangeError } from "../helpers/throw";
-import { objDefine } from "../object/define";
+import { _pushOwnValue } from "../object/define";
 
 /**
  * The arrWith() method is the copying version of using the bracket notation to change the value
@@ -85,16 +85,10 @@ export function polyArrWith<T>(theArray: ArrayLike<T>, index: number, value: T):
     
     // Like the native function every other index is read into the new array (so an empty slot is undefined), and (like
     // polyArrFrom) each value is added as an own property, so a setter or read-only property of the same index on
-    // Array.prototype (or Object.prototype) doesn't stop it being added. The new array only "has" the index when it is
-    // inherited (which is rare), as defining every value is much slower than assigning it
+    // Array.prototype (or Object.prototype) doesn't stop it being added
     result = [];
     for (let lp = 0; lp < len; lp++) {
-        let newValue = lp === idx ? value : theArray[lp];
-        if (lp in result) {
-            objDefine(result, lp, { v: newValue, w: true });
-        } else {
-            result[lp] = newValue;
-        }
+        _pushOwnValue(result, lp === idx ? value : theArray[lp]);
     }
 
     return result;
