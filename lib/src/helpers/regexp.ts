@@ -43,6 +43,11 @@ function _createRegExp(value: string, escapeRgx: RegExp, replaceFn: (value: stri
  * while escaping all other characters.
  * The supported matching values are
  * - `'*'` Matches any characters zero or more times (including folder seperators '`'/`' or `'\'`)
+ *
+ * Each `'*'` is a `(.*)` group which can backtrack, so for a string which doesn't match the time grows with the length
+ * of the string to the power of the number of `'*'` (eg. seconds for a few KB with three `'*'`), and an unanchored
+ * expression (without `fullMatch`) also tries each starting position, so limit the length of an untrusted string
+ * before matching it.
  * @since 0.9.0
  * @group RegExp
  * @param value - The value to be converted into a RegExp, if the value is not a string it will coerced
@@ -91,6 +96,8 @@ export function createWildcardRegex(value: string, ignoreCase?: boolean, fullMat
  * - `'/'` Matches either `'/'` or `'\'` character, not captured as a group
  * - `'\'` Matches either `'/'` or `'\'` character, not captured as a group
  *
+ * As for {@link createWildcardRegex}, each `'*'` can backtrack, so limit the length of an untrusted string before
+ * matching it.
  * @since 0.9.0
  * @group RegExp
  * @param value - The string value to converted
@@ -148,6 +155,12 @@ export function createFilenameRegex(value: string, ignoreCase?: boolean, fullMat
  * - `'/'` Matches either `'/'` or `'\'` character, not captured as a group
  * - `'\'` Matches either `'/'` or `'\'` character, not captured as a group
  *
+ * Since v0.20.0 a `'**'` which is followed by a folder separator matches the folders with one group which can only
+ * match a path in one way, so a path which doesn't match no longer takes exponential time (eg. matching all the `.txt`
+ * files against 61 characters of repeated `"a/"` took ~10s). As for {@link createWildcardRegex}, each other wildcard
+ * (`'**'` and `'*'`) can still backtrack, so the time to fail grows with the length of the string to the power of the
+ * number of these wildcards (and an unanchored expression, without `fullMatch`, also tries each starting position), so
+ * limit the length of an untrusted string before matching it.
  * @since 0.9.0
  * @group RegExp
  * @param value - The string value to converted.
@@ -203,7 +216,11 @@ export function makeGlobRegex(value: string, ignoreCase?: boolean, fullMatch?: b
         //"**\/*\.txt"
         return strReplace(value, /(\*\*\\[\\\/]|\\\\|\\\/|\*\*|\*|\?)/g, function (_all, g1) {
             if (g1 == "**\\/" || g1 == "**\\\\") {
-                return "(.*[\\\\\\/])*";
+                // Zero or more folders (each ending with a separator), matched as one group. Each repetition is exactly
+                // one folder (it can't contain a separator), so unlike the previous (.*[\\\/])* there is only one way to
+                // match a path and a path which doesn't match fails in linear time (rather than exponential time when
+                // there are many separators, a ReDoS), while it matches (and captures) the same values
+                return "((?:[^\\\\\\/]*[\\\\\\/])+)?";
             }
 
             if (g1 === "\\/" || g1 == "\\\\") {

@@ -93,9 +93,10 @@ export function getValueByKey<V, T extends object = any>(target: T, path: string
  * @param defValue - If the final value or any intervening object in the heirarchy is not present
  * the default value will be returned
  * @returns The value located based on the path or the defaule value
- * @throws TypeError when the iter's `[Symbol.iterator]()` doesn't return an iterator, the iterator's `next()` returns
- * a value which is not an object, or (like `for...of`) when it stops early (an intervening value is not present) and
- * the iterator's `return()` doesn't return an object
+ * @throws TypeError when the iter's `[Symbol.iterator]` isn't `null`, `undefined` or a function, its
+ * `[Symbol.iterator]()` doesn't return an iterator, the iterator's `next()` returns a value which is not an object, or
+ * (like `for...of`) when it stops early (an intervening value is not present) and the iterator's `return()` doesn't
+ * return an object
  * @example
  * ```ts
  * let theValue = {
@@ -213,9 +214,9 @@ export function setValueByKey<T>(target: any, path: string, value: T) {
  * @param target - The target object
  * @param iter - The iter identifying the path of the final key value
  * @param value - The value to set
- * @throws TypeError when the iter's `[Symbol.iterator]()` doesn't return an iterator, the iterator's `next()` returns
- * a value which is not an object, or (like `for...of`) when it stops early (the path is not valid) and the iterator's
- * `return()` doesn't return an object
+ * @throws TypeError when the iter's `[Symbol.iterator]` isn't `null`, `undefined` or a function, its
+ * `[Symbol.iterator]()` doesn't return an iterator, the iterator's `next()` returns a value which is not an object, or
+ * (like `for...of`) when it stops early (the path is not valid) and the iterator's `return()` doesn't return an object
  * @example
  * ```ts
  * let theValue = { };

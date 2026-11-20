@@ -35,7 +35,8 @@ import { _pushOwnValue } from "../object/define";
  * end to be extracted.
  * - If end is positioned before or at start after normalization, nothing is extracted.
  * @returns A new array with the extracted elements
- * @throws TypeError when an iterable's `[Symbol.iterator]()` doesn't return an iterator, the iterator's `next()`
+ * @throws TypeError when a value without a `length` has a `[Symbol.iterator]` which isn't a function (a falsy value,
+ * eg. `null`, is ignored), an iterable's `[Symbol.iterator]()` doesn't return an iterator, the iterator's `next()`
  * returns a value which is not an object, or (like `for...of`) when it stops early (at the end index) and the
  * iterator's `return()` doesn't return an object
  * @example

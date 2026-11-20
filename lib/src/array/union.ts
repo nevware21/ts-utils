@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { isArrayLike } from "../helpers/base";
+import { isStrictNullOrUndefined } from "../helpers/base";
 import { arrUnique } from "./unique";
 import { arrAppend } from "./append";
 import { _arrSliceToArr } from "./slice";
@@ -48,7 +48,10 @@ export function arrUnion<T>(): T[] {
     let theArgs = arguments;
 
     arrForEach(theArgs, (arr) => {
-        if (isArrayLike(arr)) {
+        // A null or undefined value is skipped, any other value is read like an array-like (as in v0.16.0), so its length
+        // is converted like the native functions (eg. a string length, or a function's length) and a value without a
+        // length adds nothing
+        if (!isStrictNullOrUndefined(arr)) {
             combined = arrAppend(combined, _arrSliceToArr(arr));
         }
     });

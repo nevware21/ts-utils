@@ -30,7 +30,7 @@ export { ICachedValue };
  * let cachedValue = createCachedValue("some value");
  * // cachedValue.v === "some value"
  *
- * JSON.stringify(cachedValue) === '{"v":"some value"}';
+ * JSON.stringify(cachedValue) === '"some value"'; // toJSON() returns the value (v isn't enumerable)
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/

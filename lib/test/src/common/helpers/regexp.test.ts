@@ -263,7 +263,7 @@ describe("makeGlobRegex", () => {
         let regex = makeGlobRegex("**/*.txt");
 
         //'(.*[\\\/])([^\\\/]*)\.txt
-        assert.equal(regex.source, "(.*[\\\\\\/])*([^\\\\\\/]*)\\.txt", dumpObj(regex));
+        assert.equal(regex.source, "((?:[^\\\\\\/]*[\\\\\\/])+)?([^\\\\\\/]*)\\.txt", dumpObj(regex));
         _checkResult(regex, "Hello", false, null);
         _checkResult(regex, "ug.txt", true, ["ug.txt", undefined, "ug"]);
         _checkResult(regex, " ug.txt ", true, [" ug.txt", undefined, " ug"]);
@@ -274,7 +274,7 @@ describe("makeGlobRegex", () => {
         regex = makeGlobRegex("src/**/*.ts");
 
         //'(.*[\\\/])([^\\\/]*)\.txt
-        assert.equal(regex.source, "src[\\\\\\/]{1}(.*[\\\\\\/])*([^\\\\\\/]*)\\.ts", dumpObj(regex));
+        assert.equal(regex.source, "src[\\\\\\/]{1}((?:[^\\\\\\/]*[\\\\\\/])+)?([^\\\\\\/]*)\\.ts", dumpObj(regex));
         _checkResult(regex, "Hello", false, null);
         _checkResult(regex, "Src/index.ts", false, null);
         _checkResult(regex, "Src\\index.ts", false, null);
@@ -308,7 +308,7 @@ describe("makeGlobRegex", () => {
 
         regex = makeGlobRegex("?:**/*.t??");
 
-        assert.equal(regex.source, "([^\\\\\\/]{1}):(.*[\\\\\\/])*([^\\\\\\/]*)\\.t([^\\\\\\/]{1})([^\\\\\\/]{1})", dumpObj(regex));
+        assert.equal(regex.source, "([^\\\\\\/]{1}):((?:[^\\\\\\/]*[\\\\\\/])+)?([^\\\\\\/]*)\\.t([^\\\\\\/]{1})([^\\\\\\/]{1})", dumpObj(regex));
         _checkResult(regex, "Hello", false, null);
         _checkResult(regex, "ug.txt", false, null);
         _checkResult(regex, "C:\\temp\\ug.txt", true, ["C:\\temp\\ug.txt", "C", "\\temp\\", "ug", "x", "t"]);
@@ -321,7 +321,7 @@ describe("makeGlobRegex", () => {
         let regex = makeGlobRegex("**/*.Txt", true);
 
         //'(.*[\\\/])([^\\\/]*)\.txt
-        assert.equal(regex.source, "(.*[\\\\\\/])*([^\\\\\\/]*)\\.Txt", dumpObj(regex));
+        assert.equal(regex.source, "((?:[^\\\\\\/]*[\\\\\\/])+)?([^\\\\\\/]*)\\.Txt", dumpObj(regex));
         _checkResult(regex, "Hello", false, null);
         _checkResult(regex, "ug.txt", true, ["ug.txt", undefined, "ug"]);
         _checkResult(regex, " ug.txt ", true, [" ug.txt", undefined, " ug"]);
@@ -332,7 +332,7 @@ describe("makeGlobRegex", () => {
         regex = makeGlobRegex("src/**/*.Ts", true);
 
         //'(.*[\\\/])([^\\\/]*)\.txt
-        assert.equal(regex.source, "src[\\\\\\/]{1}(.*[\\\\\\/])*([^\\\\\\/]*)\\.Ts", dumpObj(regex));
+        assert.equal(regex.source, "src[\\\\\\/]{1}((?:[^\\\\\\/]*[\\\\\\/])+)?([^\\\\\\/]*)\\.Ts", dumpObj(regex));
         _checkResult(regex, "Hello", false, null);
         _checkResult(regex, "Src/index.ts", true, ["Src/index.ts", undefined, "index"]);
         _checkResult(regex, "Src\\index.ts", true, ["Src\\index.ts", undefined, "index"]);
@@ -364,7 +364,7 @@ describe("makeGlobRegex", () => {
 
         regex = makeGlobRegex("?:**/*.T??", true);
 
-        assert.equal(regex.source, "([^\\\\\\/]{1}):(.*[\\\\\\/])*([^\\\\\\/]*)\\.T([^\\\\\\/]{1})([^\\\\\\/]{1})", dumpObj(regex));
+        assert.equal(regex.source, "([^\\\\\\/]{1}):((?:[^\\\\\\/]*[\\\\\\/])+)?([^\\\\\\/]*)\\.T([^\\\\\\/]{1})([^\\\\\\/]{1})", dumpObj(regex));
         _checkResult(regex, "Hello", false, null);
         _checkResult(regex, "ug.txt", false, null);
         _checkResult(regex, "C:\\temp\\ug.txt", true, ["C:\\temp\\ug.txt", "C", "\\temp\\", "ug", "x", "t"]);
@@ -377,7 +377,7 @@ describe("makeGlobRegex", () => {
         let regex = makeGlobRegex("**/*.Txt", true, true);
 
         //'(.*[\\\/])([^\\\/]*)\.txt
-        assert.equal(regex.source, "^(.*[\\\\\\/])*([^\\\\\\/]*)\\.Txt$", dumpObj(regex));
+        assert.equal(regex.source, "^((?:[^\\\\\\/]*[\\\\\\/])+)?([^\\\\\\/]*)\\.Txt$", dumpObj(regex));
         _checkResult(regex, "Hello", false, null);
         _checkResult(regex, "ug.txt", true, ["ug.txt", undefined, "ug"]);
         _checkResult(regex, " ug.txt ", false, null);
@@ -388,7 +388,7 @@ describe("makeGlobRegex", () => {
         regex = makeGlobRegex("src/**/*.Ts", true, true);
 
         //'(.*[\\\/])([^\\\/]*)\.txt
-        assert.equal(regex.source, "^src[\\\\\\/]{1}(.*[\\\\\\/])*([^\\\\\\/]*)\\.Ts$", dumpObj(regex));
+        assert.equal(regex.source, "^src[\\\\\\/]{1}((?:[^\\\\\\/]*[\\\\\\/])+)?([^\\\\\\/]*)\\.Ts$", dumpObj(regex));
         _checkResult(regex, "Hello", false, null);
         _checkResult(regex, "Src/index.ts", true, ["Src/index.ts", undefined, "index"]);
         _checkResult(regex, "Src\\index.ts", true, ["Src\\index.ts", undefined, "index"]);
@@ -420,7 +420,7 @@ describe("makeGlobRegex", () => {
 
         regex = makeGlobRegex("?:**/*.T??", true, true);
 
-        assert.equal(regex.source, "^([^\\\\\\/]{1}):(.*[\\\\\\/])*([^\\\\\\/]*)\\.T([^\\\\\\/]{1})([^\\\\\\/]{1})$", dumpObj(regex));
+        assert.equal(regex.source, "^([^\\\\\\/]{1}):((?:[^\\\\\\/]*[\\\\\\/])+)?([^\\\\\\/]*)\\.T([^\\\\\\/]{1})([^\\\\\\/]{1})$", dumpObj(regex));
         _checkResult(regex, "Hello", false, null);
         _checkResult(regex, "ug.txt", false, null);
         _checkResult(regex, "C:\\temp\\ug.txt", true, ["C:\\temp\\ug.txt", "C", "\\temp\\", "ug", "x", "t"]);
@@ -431,13 +431,13 @@ describe("makeGlobRegex", () => {
 
     it("Escaping tokens", () => {
         let regex = makeGlobRegex("**[-+|^$#.?{}()]**\\\\/\"\'*");
-        assert.equal(regex.source, "(.*)\\[\\-\\+\\|\\^\\$\\#\\.([^\\\\\\/]{1})\\{\\}\\(\\)\\](.*[\\\\\\/])*[\\\\\\/]{1}[\\\\\\/]{1}\\\"\\'([^\\\\\\/]*)");
+        assert.equal(regex.source, "(.*)\\[\\-\\+\\|\\^\\$\\#\\.([^\\\\\\/]{1})\\{\\}\\(\\)\\]((?:[^\\\\\\/]*[\\\\\\/])+)?[\\\\\\/]{1}[\\\\\\/]{1}\\\"\\'([^\\\\\\/]*)");
     
         regex = makeGlobRegex("**[-+|^$#.?{}()]**\\\\/\"\'*", true);
-        assert.equal(regex.source, "(.*)\\[\\-\\+\\|\\^\\$\\#\\.([^\\\\\\/]{1})\\{\\}\\(\\)\\](.*[\\\\\\/])*[\\\\\\/]{1}[\\\\\\/]{1}\\\"\\'([^\\\\\\/]*)");
+        assert.equal(regex.source, "(.*)\\[\\-\\+\\|\\^\\$\\#\\.([^\\\\\\/]{1})\\{\\}\\(\\)\\]((?:[^\\\\\\/]*[\\\\\\/])+)?[\\\\\\/]{1}[\\\\\\/]{1}\\\"\\'([^\\\\\\/]*)");
     
         regex = makeGlobRegex("**[-+|^$#.?{}()]**\\\\/\"\'*", true, true);
-        assert.equal(regex.source, "^(.*)\\[\\-\\+\\|\\^\\$\\#\\.([^\\\\\\/]{1})\\{\\}\\(\\)\\](.*[\\\\\\/])*[\\\\\\/]{1}[\\\\\\/]{1}\\\"\\'([^\\\\\\/]*)$");
+        assert.equal(regex.source, "^(.*)\\[\\-\\+\\|\\^\\$\\#\\.([^\\\\\\/]{1})\\{\\}\\(\\)\\]((?:[^\\\\\\/]*[\\\\\\/])+)?[\\\\\\/]{1}[\\\\\\/]{1}\\\"\\'([^\\\\\\/]*)$");
     });
 });
 
@@ -542,5 +542,34 @@ describe("createLiteralRegex", () => {
 
     it("no match returns null", () => {
         assert.equal(createLiteralRegex("xyz").exec("hello world"), null);
+    });
+});
+
+describe("makeGlobRegex with a path which has many folders", () => {
+    it("quickly fails to match a long path which doesn't match (the folders of a '**' don't backtrack)", () => {
+        // With the previous (.*[\\\/])* group each extra folder doubled the time to fail (~10s for 30 folders)
+        const subject = new Array(41).join("a/") + "b";
+
+        assert.isFalse(makeGlobRegex("**/*.txt", false, true).test(subject));
+        assert.isFalse(makeGlobRegex("src/**/*.ts", false, true).test("src/" + subject));
+        assert.isFalse(makeGlobRegex("**/*.txt").test(subject));
+    });
+
+    it("matches and captures the folders of a path", () => {
+        let matches = makeGlobRegex("**/*.txt", false, true).exec("a/b/c/file.txt");
+        assert.equal(matches[0], "a/b/c/file.txt");
+        assert.equal(matches[1], "a/b/c/", "All of the folders are one group");
+        assert.equal(matches[2], "file");
+
+        matches = makeGlobRegex("src\\**\\*.ts").exec("src\\helpers/sub\\regexp.ts");
+        assert.equal(matches[1], "helpers/sub\\", "Either folder separator");
+        assert.equal(matches[2], "regexp");
+
+        matches = makeGlobRegex("**/*.txt", false, true).exec("file.txt");
+        assert.isUndefined(matches[1], "No folders");
+        assert.equal(matches[2], "file");
+
+        assert.isTrue(makeGlobRegex("**/x", false, true).test("a//x"), "An empty folder name");
+        assert.isFalse(makeGlobRegex("**/*.txt", false, true).test("a/b.txtx"));
     });
 });

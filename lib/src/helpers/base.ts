@@ -195,7 +195,7 @@ export function isStrictUndefined(arg: any): arg is undefined {
  *
  * let value = null;
  * isNullOrUndefined(value);        // true
- * let value = undefined;
+ * value = undefined;
  * isNullOrUndefined(value);        // true
  *
  * isNullOrUndefined("");           // false
@@ -225,7 +225,7 @@ export function isNullOrUndefined(value:  any): boolean {
  *
  * let value = null;
  * isStrictNullOrUndefined(value);        // true
- * let value = undefined;
+ * value = undefined;
  * isStrictNullOrUndefined(value);        // true
  *
  * isStrictNullOrUndefined("");           // false
@@ -241,23 +241,23 @@ export function isStrictNullOrUndefined(value: any): value is null | undefined {
 }
 
 /**
- * Checks if the passed value is defined, which means it is not strictly `undefined` (and not `null`).
- * A string value of `"undefined"` is considered to be defined. When this returns `true`, TypeScript narrows
- * the type to `Exclude<T, undefined>`, removing `undefined` from the type.
+ * Checks if the passed value is defined, which means it is not strictly `undefined` (so `null` is defined, use
+ * {@link isStrictNullOrUndefined} to also exclude `null`). A string value of `"undefined"` is considered to be defined.
+ * When this returns `true`, TypeScript narrows the type to `Exclude<T, undefined>`, removing `undefined` from the type.
  * @group Type Identity
  * @group Value Check
  * @typeParam T - The expected type of the value when it is defined.
  * @param arg - The value to check
- * @returns `true` if the value is defined (not `null` and not `undefined`), narrowing the type to `Exclude<T, undefined>`.
+ * @returns `true` if the value is defined (not `undefined`), narrowing the type to `Exclude<T, undefined>`.
  * @example
  * ```ts
- * isDefined(null);         // false
+ * isDefined(null);         // true
  * isDefined(undefined);    // false
  * isDefined("undefined");  // true
  *
  * let value = null;
- * isDefined(value);        // false
- * let value = undefined;
+ * isDefined(value);        // true
+ * value = undefined;
  * isDefined(value);        // false
  *
  * isDefined("");           // true

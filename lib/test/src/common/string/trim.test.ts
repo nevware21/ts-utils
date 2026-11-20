@@ -458,3 +458,15 @@ describe("string helpers", () => {
     }
 });
 
+describe("trim polyfills with a long run of whitespace", () => {
+    it("quickly trim a string with a long run of whitespace before its end", () => {
+        // A regular expression for the whitespace at the end (/\s+$/g) took quadratic time for this (~7s for 80k spaces)
+        const spaces = new Array(100001).join(" ");
+
+        assert.equal(polyStrTrimEnd(spaces + "x "), spaces + "x");
+        assert.equal(polyStrTrim(spaces + "x " + spaces), "x");
+        assert.equal(polyStrTrimStart(spaces + "x" + spaces), "x" + spaces);
+        assert.equal(polyStrTrimEnd(spaces), "");
+        assert.equal(polyStrTrim("a" + spaces + "b"), "a" + spaces + "b", "Whitespace inside the string is kept");
+    });
+});

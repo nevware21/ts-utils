@@ -14,6 +14,8 @@ import { LENGTH } from "../internal/constants";
  * Returns unique values from all provided iterators / iterables.
  * @since 0.15.0
  * @group Iterator
+ * @throws TypeError when a value's `[Symbol.iterator]` isn't `null`, `undefined` or a function, its
+ * `[Symbol.iterator]()` doesn't return an iterator, or the iterator's `next()` returns a value which is not an object
  * @example
  * ```ts
  * iterUnion([1, 2, 3], [3, 4], createRangeIterator(4, 5)); // [1, 2, 3, 4, 5]

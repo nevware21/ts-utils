@@ -14,6 +14,8 @@ import { LENGTH } from "../internal/constants";
  * Returns values that are present in every provided iterator / iterable.
  * @since 0.15.0
  * @group Iterator
+ * @throws TypeError when a value's `[Symbol.iterator]` isn't `null`, `undefined` or a function, its
+ * `[Symbol.iterator]()` doesn't return an iterator, or the iterator's `next()` returns a value which is not an object
  * @example
  * ```ts
  * iterIntersection([1, 2, 3, 4], [2, 4, 6], [0, 2, 4]); // [2, 4]
