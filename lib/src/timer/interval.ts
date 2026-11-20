@@ -9,6 +9,7 @@
 import { fnApply } from "../funcs/funcs";
 import { ArrSlice, CALL, UNDEF_VALUE } from "../internal/constants";
 import { ITimerHandler, _createTimerHandler } from "./handler";
+import { _runMicrotasks } from "./timeout";
 
 /**
  * Repeatedly calls a function or executes a code snippet, with a fixed time delay between each call.
@@ -79,6 +80,16 @@ export function scheduleInterval<A extends any[]>(callback: (...args: A) => void
 export function scheduleInterval<A extends any[]>(callback: (...args: A) => void, timeout: number): ITimerHandler {
     // Copy the arguments as they are kept and reused by refresh() after this call has returned
     let theArguments = ArrSlice[CALL](arguments);
+    let intervalFn = theArguments[0];
+    theArguments[0] = function () {
+        let enabled = handler.h.enabled;
+
+        // Like a timeout, any pending fallback microtasks are run first, and (like a native microtask, which runs
+        // before the timer) one which cancels the interval stops this call
+        _runMicrotasks();
+        (!enabled || handler.h.enabled) && fnApply(intervalFn, UNDEF_VALUE, arguments);
+    };
+
     let handler = _createTimerHandler((intervalId: any) => {
         intervalId && clearInterval(intervalId);
         return fnApply(setInterval, UNDEF_VALUE, theArguments)

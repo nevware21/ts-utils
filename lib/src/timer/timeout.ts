@@ -77,16 +77,14 @@ function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn |
         // Microtask fallback hook for environments without native queueMicrotask support, this allows us to
         // simulate the running of microtasks before standard timeouts.
         try {
-            let microTasksFn = _microtaskCallback;
-            if (microTasksFn) {
+            if (_microtaskCallback) {
                 // While a setTimeout override runs the callback synchronously the handler still has the previous
                 // (cleared) timer, which isn't the timer being run
                 let enabled = !starting && handler.h.enabled;
 
                 // Run any pending microtasks before running the timeout callback to allow any microtasks
                 // scheduled within the callback to run before the next timeout.
-                _microtaskCallback = UNDEF_VALUE;
-                microTasksFn();
+                _runMicrotasks();
 
                 // Like a native microtask (which runs before the timer), a microtask which leaves the timer
                 // cancelled stops the callback
@@ -133,7 +131,19 @@ function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn |
     return handler.h;
 }
 
-
+/**
+ * @internal
+ * @ignore
+ * Runs the pending fallback microtasks (when there is no native queueMicrotask), which is done before the callback of a
+ * timeout or an interval so (like native microtasks) they run before a timer which was started before them.
+ */
+export function _runMicrotasks(): void {
+    let microTasksFn = _microtaskCallback;
+    if (microTasksFn) {
+        _microtaskCallback = UNDEF_VALUE;
+        microTasksFn();
+    }
+}
 
 /**
  * @internal
