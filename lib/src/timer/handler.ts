@@ -146,7 +146,8 @@ export interface _TimerHandler {
     /**
      * The callback function that should be called when the timer operation
      * has completed and will not automatically rescheduled
-     * @returns
+     * @param keep - Keep the current timer, as it was started (eg. by a refresh() from a microtask run before the
+     * callback) after the timer which has completed, otherwise there is no pending timer
      */
     dn: (keep?: boolean) => void
 }
@@ -155,8 +156,9 @@ export interface _TimerHandler {
  * @ignore
  * @internal
  * Internal function to create and manage an ITimerHandler implementation, the object returned from this function
- * it directly used / returned by the pulic functions used to create timers (idle, interval and timeout)
- * @param startTimer - Should the timer be started as part of creating the handler
+ * it directly used / returned by the pulic functions used to create timers (idle, interval and timeout). The timer is
+ * not started, call refresh() once the handler has been assigned (as a callback which is run synchronously may use the
+ * handler)
  * @param refreshFn - The function used to create/start or refresh the timer
  * @param cancelFn - The function used to cancel the timer.
  * @returns The new ITimerHandler instance

@@ -26,7 +26,8 @@ import { _pushOwnValue } from "../object/define";
  * @param value - The new value to set at the index
  * @returns A new array with the element at index replaced, every other index is read from `theArray` so an
  * empty slot of a sparse array is `undefined` in the new array
- * @throws RangeError if the index is out of bounds
+ * @throws RangeError if the index is out of bounds, or (when the polyfill is used) the length is longer than an array
+ * can be (2^32 - 1)
  * @example
  * ```ts
  * arrWith([1, 2, 3], 1, 5);       // [1, 5, 3]
@@ -56,7 +57,9 @@ export const arrWith = (/*#__PURE__*/_unwrapFunctionWithPoly("with", ArrProto as
  * @param value - The new value to set at the index
  * @returns A new array with the element at index replaced, every other index is read from `theArray` so an
  * empty slot of a sparse array is `undefined` in the new array
- * @throws RangeError if the index is out of bounds
+ * @throws RangeError if the index is out of bounds (so a value without a length, eg. a number, always throws), or
+ * (when the polyfill is used) the length is longer than an array can be (2^32 - 1)
+ * @throws TypeError if `theArray` is `null` or `undefined`
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyArrWith<T>(theArray: ArrayLike<T>, index: number, value: T): T[] {

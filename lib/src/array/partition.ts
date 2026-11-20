@@ -13,6 +13,10 @@ import { arrForEach } from "./forEach";
 /**
  * The arrPartition() method splits an array into two arrays based on a predicate function.
  * The first array contains elements for which the predicate returns true, the second contains the rest.
+ *
+ * Like {@link https://nevware21.github.io/ts-utils/typedoc/functions/arrForEach.html | arrForEach} an empty slot of a
+ * sparse array (or a missing index of an array-like) is skipped, so the predicate isn't called for it and it isn't in
+ * either array.
  * @since 0.14.0
  * @group Array
  * @group ArrayLike

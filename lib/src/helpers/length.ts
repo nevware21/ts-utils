@@ -74,8 +74,8 @@ export function _toLength(value: ArrayLike<any>): number {
  * @ignore
  * Returns the length of the array or array-like value as the length of a new array, like {@link _toLength} but (like
  * the native functions) it throws a RangeError for a length which is longer than an array can be (2^32 - 1), rather
- * than adding values until the runtime runs out of memory. It is not annotated as having no side effects as it can
- * throw.
+ * than adding values until the runtime runs out of memory. It is not annotated as having no side effects, as the
+ * check is part of what it does (unlike eg. `readArgs()`, where an unused call can be removed).
  * @param value - The array or array-like value to return the length of
  * @returns The length
  */

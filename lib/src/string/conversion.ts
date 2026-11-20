@@ -21,7 +21,7 @@ let _wordRuns: RegExp;
  * @internal
  * @ignore
  * Returns the regular expression matching each run of word characters (anything that is not a separator, see
- * {@link _getCaseWords}) used by {@link strLetterCase} and {@link strCapitalizeWords}
+ * {@link _convertCase}) used by {@link strLetterCase} and {@link strCapitalizeWords}
  */
 function _getWordRuns(): RegExp {
     // eslint-disable-next-line security/detect-non-literal-regexp
@@ -69,6 +69,50 @@ function _letterWord(word: string): string {
  * Each run of separators between words is replaced with a single `newPrefix`, leading and trailing
  * whitespace is removed and any other leading / trailing separators are also replaced with a single
  * `newPrefix`, so the conversions remain reversible (eg. `"_a_b_"` to `"-a-b-"` and back to `"_a_b_"`).
+ *
+ * The words are found with a regular expression (created when it is first used), where every
+ * match is `whitespace* (separators*) (word)` or only the trailing separators (with an empty word). As the
+ * matches are contiguous the replacer can use the match offset to identify the first word (any leading
+ * separators are part of its match), and the leading `(?!$)` stops an empty match at the end of the string.
+ * The greedy `\s*` means the captured separators are only empty when the separators are all whitespace,
+ * which is used to trim leading / trailing whitespace while retaining any other leading / trailing separator.
+ *
+ * Words are either:
+ * - An uppercase run followed by a capitalized word, eg. `"XML"` from `"XMLHttp"` (but not a plural `s` which ends
+ *   the word, eg. `"IDs"` from `"userIDs"` and `"URLs"` from `"getURLsFor"`); or
+ * - An optional uppercase run followed by any other word characters, eg. `"Http"`, `"bar2"`, `"ABC123"`, `"ABC"`
+ *
+ * So words are split at separators, where any other word character (eg. a lowercase letter, a number, `™` or an
+ * emoji) is followed by an uppercase letter (`"fooBar"`, `"bar2Baz"`, `"Hello™World"`) and before the last letter
+ * of an uppercase run followed by one of the lowercase letters listed below.
+ *
+ * The character classes are fixed code unit ranges so the result is the same on every runtime, Unicode
+ * property escapes (`\p{L}`) require ES2018 and a `u` regular expression literal is a SyntaxError on
+ * older runtimes (even within a try / catch), they are:
+ * - Separators: whitespace and the punctuation and symbols (not the letters, numbers or marks) of ASCII,
+ *   Latin-1 (so not `ª²³µ¹º¼½¾`), General Punctuation (except the zero width non-joiner and joiner, so an emoji
+ *   sequence or a word which uses them isn't split), Currency Symbols, Arrows to Miscellaneous Symbols and
+ *   Arrows (not Enclosed Alphanumerics, eg. `①Ⓐⓐ`, or the Dingbat numbers `❶➀➊`) and CJK Symbols and
+ *   Punctuation (not `々〆〇〡〪〱〸〻〼` etc), so the emoji of these blocks (eg. `©`, `‼`, `⌚`, `☕`, `❤`, `⭐` and
+ *   `✅`) are separators. The punctuation and symbols of other blocks (eg. fullwidth or non-Latin punctuation)
+ *   and the supplementary plane characters (eg. emoji such as `😀`) are word characters
+ *   `\s\0-\x2F\x3A-\x40\x5B-\x60\x7B-\xA9\xAB-\xB1\xB4\xB6-\xB8\xBB\xBF\xD7\xF7\u2000-\u200B\u200E-\u206F\u20A0-\u20CF\u2190-\u245F\u2500-\u2775\u2794-\u2BFF\u3000-\u3004\u3008-\u3020\u3030\u3036\u3037\u303D-\u303F`
+ * - Uppercase: Basic Latin, Latin-1, Greek and Cyrillic `A-Z\xC0-\xD6\xD8-\xDE\u0386\u0388-\u038F\u0391-\u03AB\u0400-\u042F`,
+ *   each followed by any combining diacritical marks `\u0300-\u036F` (so decomposed letters are not split)
+ * - Lowercase (only used to detect the end of an uppercase run): `a-z\xDF-\xF6\xF8-\xFF\u0390\u03AC-\u03CE\u0430-\u045F`
+ * - Other word characters: every other character (lowercase and caseless letters, numbers, marks, etc)
+ *
+ * So the precomposed and decomposed (NFC / NFD) forms of the letters within these ranges produce the same
+ * words, the other letters that alternate between upper and lower case (eg. Latin Extended, the rest of the
+ * Greek and Cyrillic blocks such as `Ϗ`, `Ґ` and `Қ`, Cyrillic Supplement and Greek Extended) are not listed as
+ * that would require each letter individually,
+ * so a precomposed letter from those blocks (eg. `Č`) doesn't start a new word while its decomposed form
+ * (`C` followed by a combining caron) does.
+ *
+ * The character classes are strings (rather than regular expression literals) so each class is only included
+ * once in the minified output, and the ASCII ranges are the characters themselves as they are shorter than the
+ * escapes, eg. `\0-/:-@` is `\0-\x2F\x3A-\x40`. The regular expressions are created when first used, as
+ * creating them when the module is loaded (from the strings) would stop them from being tree-shaken.
  * @param value - The value to be converted
  * @param newPrefix - The separator to add between words
  * @param firstFn - The function used to convert the case of the first word
@@ -99,7 +143,12 @@ function _convertCase<T>(value: T, newPrefix: string, firstFn: (word: string) =>
  * capitalized, all non-word character and spaces are retained.
  *
  * A word is a run of any characters other than whitespace, punctuation and symbols (`_` and `-` are
- * separators), so non-ASCII letters are part of words.
+ * separators), so non-ASCII letters are part of words. The separators are the punctuation and symbols of
+ * ASCII and Latin-1 (except `ª²³µ¹º¼½¾`) and of the General Punctuation (except the zero width non-joiner and
+ * joiner), Currency Symbols, Arrows to Miscellaneous Symbols and Arrows (except Enclosed Alphanumerics, eg. `Ⓐ`
+ * and `①`, and the Dingbat numbers, eg. `❶`) and CJK Symbols and Punctuation blocks, so the emoji of these
+ * blocks (eg. `©`, `❤`, `⭐` and `✅`) are separators. All other characters (eg. supplementary plane emoji such
+ * as `😀`, Letterlike Symbols such as `™`, and fullwidth or non-Latin punctuation) are part of a word.
  * If the value is not a string it will be converted.
  * @since 0.9.0
  * @group String
@@ -127,7 +176,13 @@ export function strLetterCase<T>(value: T): string {
  * uppercase character and the remaining characters of that word are lowercased.
  *
  * A word is a run of any characters other than whitespace, punctuation and symbols (including non-ASCII
- * letters), so existing separators (spaces, punctuation, `_`, and `-`) are retained. Words are only split at separators,
+ * letters), so existing separators (spaces, punctuation, `_`, and `-`) are retained. The separators are the
+ * punctuation and symbols of ASCII and Latin-1 (except `ª²³µ¹º¼½¾`) and of the General Punctuation (except the
+ * zero width non-joiner and joiner), Currency Symbols, Arrows to Miscellaneous Symbols and Arrows (except Enclosed
+ * Alphanumerics, eg. `Ⓐ` and `①`, and the Dingbat numbers, eg. `❶`) and CJK Symbols and Punctuation blocks, so
+ * the emoji of these blocks (eg. `©`, `❤`, `⭐` and `✅`) are separators. All other characters (eg. supplementary
+ * plane emoji such as `😀`, Letterlike Symbols such as `™`, and fullwidth or non-Latin punctuation) are part of a
+ * word. Words are only split at separators,
  * so camelCase boundaries are not retained (`"fooBarBaz"` becomes `"Foobarbaz"`), use
  * {@link strCamelCase} or {@link strKebabCase} with {@link strLetterCase} to retain them.
  * If the value is not a string it will be converted.
@@ -163,7 +218,11 @@ export function strCapitalizeWords<T>(value: T): string {
  * first character is upper cased (lowercase by default).
  *
  * All separators (whitespace, punctuation and symbols, eg. spaces, `_` and `-`) are removed and the first
- * letter of each following word is uppercased, the first letter of the result is lowercased (or uppercased
+ * letter of each following word is uppercased (the separators are the punctuation and symbols of ASCII and
+ * Latin-1, except `ª²³µ¹º¼½¾`, and of the General Punctuation, Currency Symbols, Arrows to Miscellaneous Symbols
+ * and Arrows, and CJK Symbols and Punctuation blocks, with the same exceptions as {@link strLetterCase}, so the
+ * emoji of these blocks are removed, eg. `"I ⭐ JS"` is `"iJS"`, all other characters such as `😀` and `™` are
+ * part of a word), the first letter of the result is lowercased (or uppercased
  * when `upperFirst` is `true`). The case of all other letters is retained, so the conversion is reversible
  * with {@link strKebabCase} / {@link strSnakeCase} (eg. `"helloDarkness"` to `"hello-darkness"` and back to `"helloDarkness"`)
  * and an existing camelCase (or PascalCase with `upperFirst`) value is returned unchanged.
@@ -223,14 +282,23 @@ export function strCamelCase<T>(value: T, upperFirst?: boolean): string {
  * is all uppercased by passing `true` as the optional `scream` argument, otherwise the entire result
  * will be lowercased.
  *
- * Words are split at any separator (whitespace, punctuation and symbols, eg. spaces, `_` and `-`), where a
- * lowercase letter or number is followed by an uppercase letter (`"fooBar"`, `"bar2Baz"`) and before the last
- * letter of an uppercase run that is followed by a lowercase letter (`"XMLHttp"`), then joined with a single
+ * Words are split at any separator (whitespace, punctuation and symbols, eg. spaces, `_` and `-`, of ASCII and
+ * Latin-1, except `ª²³µ¹º¼½¾`, and of the General Punctuation, Currency Symbols, Arrows to Miscellaneous Symbols
+ * and Arrows, and CJK Symbols and Punctuation blocks, with the same exceptions as {@link strLetterCase}, so the
+ * emoji of these blocks are separators, eg. `"I ⭐ JS"` is `"i-js"`, all other characters such as `😀` and `™`
+ * are part of a word, eg. `"I 😀 JS"` is `"i-😀-js"` and `"50µs"` is `"50µs"`), where any other word character
+ * (eg. a lowercase letter, a number, `™` or an emoji) is followed by an uppercase letter (`"fooBar"`, `"bar2Baz"`,
+ * `"Hello™World"` is `"hello™-world"`, also after a separator, eg. `"the iPhone"` is `"the-i-phone"`) and
+ * before the last letter of an uppercase run that is followed by a lowercase letter (`"XMLHttp"`, but not a
+ * plural `s` which ends the word, eg. `"userIDs"` is `"user-ids"`), then joined with a single
  * `-`. Leading and trailing whitespace is removed, any other leading or trailing separators are replaced with
  * a single `-` so the conversion is reversible with {@link strSnakeCase} (eg. `"_a_b_"` to `"-a-b-"` and back to `"_a_b_"`).
- * Non-ASCII letters are retained, uppercase letters (word boundaries) are detected for the Latin, Latin-1,
- * Greek and Cyrillic ranges (in both precomposed and decomposed forms, eg. `"Έ"` and `"Ε"` followed by a combining
- * acute accent), other cased letters (eg. `"Ł"` and `"Č"`) are case converted but don't start a new word, while
+ * Non-ASCII letters are retained, uppercase letters (word boundaries) are detected for `A-Z`, the Latin-1
+ * letters `À-Þ` (except `×`), the basic Greek capitals `Ά`, `Έ-Ώ` and `Α-Ϋ` (U+0386, U+0388 to U+038F and U+0391 to
+ * U+03AB) and the basic Cyrillic capitals `Ѐ-Я` (U+0400 to U+042F), in both precomposed and decomposed forms (eg.
+ * `"Έ"` and `"Ε"` followed by a combining acute accent), other cased letters (eg. `"Ł"`, `"Č"`, `"Ϗ"` and `"Ґ"`) are
+ * case converted but don't start a new word (and only `a-z`, `ß-ÿ` except `÷` and the basic Greek and Cyrillic
+ * lowercase letters end an uppercase run, eg. `"ABCłdef"` is `"abcłdef"`), while
  * a decomposed letter whose base letter is within those ranges (eg. `"C"` followed by a combining caron) does, so
  * normalize the value first (eg. with `String.prototype.normalize()` where supported) when it may contain both forms.
  * The same fixed character ranges are used on every runtime.

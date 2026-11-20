@@ -19,6 +19,11 @@ let _symbol: ICachedValue<Symbol>;
 let _symbolFor: ICachedValue<(key: string) => symbol>;
 let _symbolKeyFor: ICachedValue<(sym: symbol) => string | undefined>;
 
+/**
+ * @internal
+ * @ignore
+ * Returns the current (cached) global Symbol, or causes it to get initialized
+ */
 /*#__NO_SIDE_EFFECTS__*/
 function _getSymbolValue(): ICachedValue<Symbol> {
     return (!_initTestHooks().lzy ? _symbol : 0) || (_symbol = (/*#__PURE__*/createCachedValue(safe(getInst<Symbol>, [SYMBOL]).v)));

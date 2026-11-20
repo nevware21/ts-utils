@@ -22,6 +22,13 @@ const ERROR_TYPE = "[object Error]";
  * - `true` - Format with 4 spaces
  * - 'number' - The number of spaces to format with
  * - `false` (or not Truthy) - Do not format
+ * @param maxLength - (Since 0.20.0) The maximum length of the returned string, when it is longer it is truncated and
+ * ends with `"..."`, which is included in the length (like {@link strTruncate}), and a surrogate pair (eg. an emoji) is
+ * not split (so the result can be one shorter). It must be at least 3 (the length of the `"..."`), a smaller positive value is rounded up to 3 so the
+ * result is `"..."`, and a fraction is rounded down. When it is zero, negative or not a number the length is not
+ * limited. So `dumpObj` should not be passed directly as a callback, eg. `arr.map(dumpObj)` passes the index as the
+ * `format` and the array as the `maxLength` (which TypeScript rejects, as it isn't a number), use a function instead,
+ * eg. `arr.map((value) => dumpObj(value))`.
  * @returns A string representation of the object suitable for diagnostics logging
  * @example
  * ```ts
@@ -64,8 +71,12 @@ const ERROR_TYPE = "[object Error]";
  * let errStrFmt3 = dumpObj(err, 0);
  * // errStrFmt3 === "[object Error]: { stack: "Error: Hello Darkness\n    at <anonymous>:1:13", message: "Hello Darkness", name: "Error" }"
  *
+ * let objStrMax = dumpObj(obj, false, 20);
+ * // objStrMax === "[object Object]: ..."
+ *
+ * let objStrFmtMax = dumpObj(obj, true, 30);
+ * // objStrFmtMax === "[object Object]: {\n    a: 1..."
  * ```
- * @see {@link dumpObj}
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function dumpObj(object: any, format?: boolean | number, maxLength?: number): string {

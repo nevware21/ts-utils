@@ -23,9 +23,9 @@ import { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "./callbacks";
  * @typeParam E - Identifies a more specific instance of the base array type
  * @param theArray - The array or array like object of elements to be searched.
  * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
- * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
+ * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in theArray until
  * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
- * @param thisArg - A value to use as this when executing callbackFn. Defaults to the array if not provided.
+ * @param thisArg - A value to use as this when executing callbackFn, like the native function it is `undefined` when not provided.
  * @return `true` if the callbackFn returns a `truthy` value for every array elements. Otherwise `false`.
  * @example
  * ```ts
@@ -85,9 +85,10 @@ export const arrEvery: <T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrP
  * @typeParam E - Identifies a more specific instance of the base array type.
  * @param theArray - The array or array like object of elements to be searched.
  * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
- * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
- * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
- * @param thisArg - A value to use as this when executing callbackFn. Defaults to the array if not provided.
+ * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in theArray (like the native
+ * function an empty slot is skipped), and each element for which it returns a value which is coercible to the
+ * Boolean value true is included in the result.
+ * @param thisArg - A value to use as this when executing callbackFn, like the native function it is `undefined` when not provided.
  * @return A shallow copy of a portion of the given array, filtered down to just the elements from the given
  * array that pass the test implemented by the provided function. If no elements pass the test, an empty array
  * will be returned.

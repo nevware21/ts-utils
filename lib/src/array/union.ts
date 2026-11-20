@@ -14,7 +14,14 @@ import { arrForEach } from "./forEach";
 
 /**
  * The arrUnion() method returns a new array containing all unique elements from all provided arrays.
- * Uses strict equality (===) for comparison and maintains insertion order.
+ * Uses the SameValueZero comparison (like strict equality `===`, except that `NaN` is equal to `NaN`) and maintains
+ * insertion order.
+ *
+ * Like the other array helpers (eg.
+ * {@link https://nevware21.github.io/ts-utils/typedoc/functions/arrForEach.html | arrForEach}) a string (or `String`
+ * object) is read by index, so it is split into its UTF-16 code units (a surrogate pair, eg. an emoji, is two values),
+ * unlike {@link arrFrom}, which splits it into its code points (as do the iterator helpers, eg. {@link iterUnion}, on a
+ * runtime with `Symbol.iterator`).
  * @since 0.14.0
  * @group Array
  * @group ArrayLike

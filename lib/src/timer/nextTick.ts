@@ -45,7 +45,9 @@ export interface NextTickOptions {
 
     /**
      * The maximum number of queued nextTick callbacks that may be pending at once when using the fallback queues.
-     * When the limit is reached, scheduling throws a RangeError.
+     * When the limit is reached, scheduling throws a RangeError. A callback which has already run is not pending (so
+     * a callback which schedules another isn't limited by the callbacks run before it), while a cancelled callback
+     * is still counted until the queue is next run.
      */
     maxQueuedTasks?: number;
 }

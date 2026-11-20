@@ -12,6 +12,10 @@ import { arrForEach } from "./forEach";
 /**
  * The arrChunk() method returns a new array with elements divided into groups of a specified size.
  * The last group may have fewer elements if the array length is not divisible by the chunk size.
+ *
+ * Like {@link https://nevware21.github.io/ts-utils/typedoc/functions/arrForEach.html | arrForEach} an empty slot of a
+ * sparse array (or a missing index of an array-like) is skipped, so it isn't included in a chunk, eg.
+ * `arrChunk([1, , 3, 4], 2)` is `[[1, 3], [4]]`.
  * @function
  * @since 0.14.0
  * @group Array

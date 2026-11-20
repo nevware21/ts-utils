@@ -25,9 +25,10 @@ import { _objPropertyIsEnumerable } from "./property_is_enumerable";
  * `Object.getOwnPropertySymbols`. Use {@link forEachOwnKeySafe} when iterating untrusted input
  * to filter out unsafe keys like `__proto__`, `constructor`, and `prototype`.
  *
- * If reading a property value throws (for example a getter that throws an exception), the exception
- * is caught and the `callbackFn` is still called for that key with an `undefined` value, so a single
- * throwing getter does not stop the iteration of the remaining keys.
+ * If reading a property value throws (for example a getter that throws an exception), the exception is caught and
+ * the key is skipped (the `callbackFn` is not called for it), so a single throwing getter does not stop the iteration of
+ * the remaining keys, and a helper which copies the values (eg. {@link objExtend} or {@link objDeepCopy}) doesn't copy
+ * `undefined` for it (replacing an existing value). Since 0.20.0, previously the exception stopped the iteration.
  * @since 0.14.0
  * @group Object
  * @typeParam T - The source type.
@@ -101,7 +102,7 @@ export function forEachOwnKey<T>(theObject: T, callbackfn: (key: PropertyKey, va
  * user-supplied objects, parsed JSON).
  *
  * As with {@link forEachOwnKey}, if reading a property value throws (for example a throwing getter)
- * the `callbackFn` is called for that key with an `undefined` value and the iteration continues.
+ * the key is skipped and the iteration continues.
  * @since 0.14.0
  * @group Object
  * @typeParam T - The source type.

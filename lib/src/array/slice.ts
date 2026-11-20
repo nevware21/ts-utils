@@ -94,9 +94,9 @@ export function _arrSliceToArr<T>(theArray: ArrayLike<T> | null | undefined, sta
 /**
  * @internal
  * @ignore
- * Returns the values with any string converted into an array of its characters (as a string has its own functions,
- * such as includes(), which work with substrings), the values are returned as-is (without a copy) when none of them
- * are a string.
+ * Returns the values with any string (or String object) converted into an array of its characters (as a string has its
+ * own functions, such as includes(), which work with substrings), the values are returned as-is (without a copy) when
+ * none of them are a string.
  * @param values - The values to check
  * @returns The values, or a new array of the converted values
  */

@@ -17,6 +17,9 @@ import { arrForEach } from "./forEach";
  *
  * Keys are generated in stable source order via `keySelector`; later duplicate keys overwrite earlier values.
  * Unsafe keys (`__proto__`, `constructor`, `prototype`) are ignored.
+ *
+ * Like {@link https://nevware21.github.io/ts-utils/typedoc/functions/arrForEach.html | arrForEach} an empty slot of an
+ * array (or a missing index of an array-like) is skipped, so the keySelector isn't called for it.
  * @since 0.15.0
  * @group Array
  * @example

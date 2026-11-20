@@ -23,10 +23,10 @@ const _objCreate: (proto: null) => any = (/*#__PURE__*/_pureRef<typeof Object.cr
  * Definition of the Property Descriptor mappings for the objDefine functions.
  * If a descriptor has neither of value, writable, get and set keys, it is treated as a data descriptor.
  * If a descriptor has both [value or writable] and [get or set] keys, an exception is thrown.
- * Bear in mind that these attributes are not necessarily the descriptor's own properties. Inherited
- * properties will be considered as well. In order to ensure these defaults are preserved, you might
- * freeze existing objects in the descriptor object's prototype chain upfront, specify all options
- * explicitly, or point to null with {@link objCreate}(null).
+ * Only the descriptor's own (enumerable) properties are used, so inherited properties (eg. from
+ * `Object.prototype`, or from a prototype of the descriptor) are ignored (since 0.20.0, previously an
+ * inherited `l` was used), and like `Object.defineProperty` a `null` or `undefined` descriptor throws a
+ * `TypeError`.
  * @since 0.6.0
  * @group Object
  */

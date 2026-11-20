@@ -27,9 +27,7 @@ export const enum eMapValues {
  * @param values - The source values
  * @param keyType - Identifies the value to populate against the key
  * @param valueType - Identifies the value to populate against the value
- * @param completeFn - The function to call to complete the map (used to freeze the instance)
- * @param writable - Flag to indicate if the map should be writable
- * @returns
+ * @returns The (frozen) map
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function _createKeyValueMap(values: any, keyType: eMapValues, valueType: eMapValues) {
@@ -49,7 +47,6 @@ export function _createKeyValueMap(values: any, keyType: eMapValues, valueType: 
  * @param theMap - The map to assign the key and value to
  * @param key - The key to assign
  * @param value - The value to assign
- * @param writable - Flag to indicate if the map should be writable
  */
 export function _assignMapValue(theMap: any, key: any, value: any) {
     objDefineProp(theMap, key, {

@@ -15,6 +15,10 @@ import { LENGTH } from "../internal/constants";
 /**
  * The arrDifference() method returns a new array containing elements from the first array
  * that do not exist in any of the other provided arrays. Uses strict equality (===) for comparison.
+ *
+ * Like {@link https://nevware21.github.io/ts-utils/typedoc/functions/arrForEach.html | arrForEach} an empty slot (or a
+ * missing index) of the first array is skipped, so it isn't included as `undefined`, while one in another array
+ * excludes an `undefined` value of the first array.
  * @since 0.14.0
  * @group Array
  * @group ArrayLike

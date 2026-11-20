@@ -23,12 +23,14 @@ import { strSubstring } from "./substring";
  * @param position - [Optional] The position in this string at which to begin searching for `searchString`.
  * Defaults to 0
  * @returns `true` if the given characters are found at the beginning of the string; otherwise, `false`.
- * @throws TypeError If searchString is a regex.
+ * @throws TypeError If searchString is a regex, or the value is `null` or `undefined`.
  */
 export const strStartsWith: (value: string, searchString: string, position?: number) => boolean = (/*#__PURE__*/_unwrapFunctionWithPoly("startsWith", StrProto, polyStrStartsWith));
 
 /**
  * This method lets you determine whether or not a string begins with another string. This method is case-sensitive.
+ * Like the native function the value (eg. a `String` object or a number) is converted to a string, but unlike it a
+ * `Symbol` value or searchString is also converted (eg. to `"Symbol(abc)"`) rather than throwing a TypeError.
  * @group Polyfill
  * @group String
  * @param value - The value to be checked
@@ -36,7 +38,7 @@ export const strStartsWith: (value: string, searchString: string, position?: num
  * @param position - [Optional] The position in this string at which to begin searching for `searchString`.
  * Defaults to 0
  * @returns `true` if the given characters are found at the beginning of the string; otherwise, `false`.
- * @throws TypeError If searchString is a regex.
+ * @throws TypeError If searchString is a regex, or the value is `null` or `undefined`.
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyStrStartsWith(value: string, searchString: string, position?: number): boolean {

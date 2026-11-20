@@ -382,12 +382,13 @@ export function isPrimitiveType(theType: string): boolean {
 }
 
 /**
- * Checks to see if the past value is a string value
+ * Checks to see if the past value is a string value, which is only a primitive string (`typeof value === "string"`), a
+ * String object (eg. `new String("")`) is not a string value, use {@link isStringObject} to check for one.
  * @function
  * @group Type Identity
  * @group String
  * @param value - The value to check
- * @returns
+ * @returns True if the value is a primitive string, otherwise false
  * @example
  * ```ts
  * isString("");            // true
@@ -398,6 +399,8 @@ export function isPrimitiveType(theType: string): boolean {
  * isString(null);          // false
  * isString(undefined);     // false
  * isString(0);             // false
+ * isString(new String("")); // false (a String object, see isStringObject)
+ * isString(Object(""));    // false (a String object, see isStringObject)
  * ```
  */
 export const isString: (value: any) => value is string = (/*#__PURE__*/_createIs<string>("string"));

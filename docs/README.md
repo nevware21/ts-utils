@@ -47,11 +47,13 @@ If you find this library useful, please consider [sponsoring @nevware21](https:/
 
 ## Polyfill Information
 
-Some polyfills are provided for simple backward compatibility to enable the utility functions in older environments. These polyfills are **not exported** as part of the main module. If you need them, you will need to:
+Some polyfills are provided for simple backward compatibility to enable the utility functions in older environments. None of them are **installed** by the main module and most are **not exported**, it only uses them internally where the native function is missing. If you need them, you can:
 
-1. Import the "polyfill" file directly
-2. Host and load the provided `bundle/ts-polyfills-utils.min.js` 
+1. Host the pre-packaged "polyfill" bundle (`bundle/es5/ts-polyfills-utils.min.js`, or the non-minified `bundle/es5/ts-polyfills-utils.js`) and load it with a script tag (it installs the polyfills even when the page has an AMD loader)
+2. Import it for its side effects from your own bundle, eg. `import "@nevware21/ts-utils/bundle/es5/ts-polyfills-utils.js";` (the package marks the polyfills bundles as having side effects, so a bundler keeps the import)
 3. Or provide your own alternative implementations
+
+The polyfills bundle only installs the functions which are missing (it doesn't replace an existing native function), see the [polyfill initializer](https://github.com/nevware21/ts-utils/blob/main/lib/src/internal/poly_install.ts) for the full list.
 
 ## Frequently Asked Questions
 

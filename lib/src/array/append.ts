@@ -15,6 +15,12 @@ import { OBJECT } from "../internal/constants";
 /**
  * Appends the `elms` to the `target` where the elms may be an array, a single object
  * or an iterator object
+ *
+ * An array, an iterator or an iterable (eg. a `Set`) adds each of its values, any other value is added as a single
+ * element. On a runtime without `Symbol.iterator` (eg. IE) a `Map` (its `[key, value]` entries) or `Set` (its
+ * values) is still added using a copy of its entries / values, but a value which is only iterable where there is
+ * `Symbol.iterator` (eg. an `arguments` object or a typed array) is added as a single element, use {@link arrFrom}
+ * (eg. `arrAppend(target, arrFrom(arguments))`) to add its values on every runtime.
  * @group Array
  * @group Iterator
  * @example

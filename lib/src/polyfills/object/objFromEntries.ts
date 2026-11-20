@@ -27,8 +27,9 @@ import { isSymbol } from "../../symbol/symbol";
  * - Each key is defined as an own property (rather than assigned), so a `__proto__` key does not change the
  * prototype of the new object, and a setter or read-only property of the same name on `Object.prototype` doesn't
  * stop the key being added.
- * - A `null` or `undefined` value, a value which is not iterable (an array is always supported) or an entry
- * which is not an object (including an empty slot of a sparse array) throws a `TypeError`.
+ * - A `null` or `undefined` value, a value which is not iterable (an array is always supported, as is (since 0.20.0) a
+ * `Map` or `Set` which has no iterator function, eg. on IE 11) or an entry which is not an object (including an empty
+ * slot of a sparse array) throws a `TypeError`.
  *
  * @since 0.12.0
  * @group Polyfill

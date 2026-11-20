@@ -47,6 +47,7 @@ export const arrAt = (/*#__PURE__*/_unwrapFunctionWithPoly("at", ArrProto as any
  * @param theArray - The array or array-like object to get element from
  * @param index - The index of the element to return
  * @returns The element at the specified index, or undefined if out of range
+ * @throws TypeError if `theArray` is `null` or `undefined`
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyArrAt<T>(theArray: ArrayLike<T>, index: number): T | undefined {

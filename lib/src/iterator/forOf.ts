@@ -30,7 +30,8 @@ export function _throwIfNotResult(result: any): void {
 /**
  * @internal
  * @ignore
- * Closes the iterator, by calling its `return()` function (if it has one) with no arguments like for...of.
+ * Closes the iterator, by calling its `return()` function (if it has one) with no arguments like for...of, which
+ * must return an object
  * @param iter - The iterator to close
  */
 export function _closeIter(iter: any): void {
@@ -50,12 +51,18 @@ export function _closeIter(iter: any): void {
  * - An iterable is processed using the iterator returned by its `[Symbol.iterator]()`, even when it is also an
  * iterator (has a `next()` function), and only an iterator which is not iterable is used as-is. The built-in
  * iterators and generators return themselves, while an object such as a jQuery collection (which has a `next()`
- * function that is not an iterator function) is processed using its iterator.
+ * function that is not an iterator function) is processed using its iterator. On a runtime without `Symbol.iterator`
+ * (eg. IE), where an array isn't iterable, an array (which isn't also an iterator) is processed by its indexes
+ * (since 0.20.0), like the native array iterator its values are read as they are iterated (so a value added by the
+ * `callbackFn` is also processed). Likewise a `Map` (its `[key, value]` entries) or `Set` (its values) which isn't
+ * iterable (eg. on IE 11, which has no iterator functions) is processed (since 0.20.0) using its `forEach()`, as a
+ * copy of its entries / values when processing starts (so a value added by the `callbackFn` is not processed).
  * - When the iteration stops before the iterator is done, because the `callbackFn` returns -1 or throws, the
  * iterator is closed by calling its `return()` function (if any), so a generator's `finally` block is run. The
  * error thrown by the `callbackFn` is then re-thrown (rather than any error thrown by `return()`). The iterator is
  * not closed when the iterator itself throws.
- * - A `TypeError` is thrown when `next()` returns a value which is not an object.
+ * - A `TypeError` is thrown when `[Symbol.iterator]()` doesn't return an iterator, when `next()` returns a value
+ * which is not an object, or when `return()` returns a value which is not an object after the `callbackFn` returns -1.
  * @remarks
  * If Symbols are NOT supported then the iterable MUST be using the same polyFill for the well know symbols,
  * if you are targetting a mixed environment you SHOULD either
@@ -73,20 +80,19 @@ export function _closeIter(iter: any): void {
  * @param thisArg - An object to which the this keyword can refer in the callbackfn function. If thisArg is
  * omitted, null or undefined the iterator will be used as the this value.
  * @throws Any exception thrown while processing the iterator
- * @throws TypeError when the iterator's `next()` returns a value which is not an object
+ * @throws TypeError when `[Symbol.iterator]` is not a function (other than `null` or `undefined`) or doesn't return an
+ * iterator, or the iterator's `next()` (or `return()` when the `callbackFn` returns -1) returns a value which is not
+ * an object
  * @example
  * ```ts
- * const items = {
- *     'item1': 'value1',
- *     'item2': 'value2',
- *     'item3': 'value3
- * };
+ * const items = new Set(["value1", "value2", "value3"]);
  * const copyItems = [];
  *
  * iterForOf(items, (item) => {
  *   copyItems.push(item);
  *   // May return -1 to abort the iteration
  * });
+ * // copyItems === ["value1", "value2", "value3"]
  * ```
  */
 export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value: T, count?: number, iter?: Iterator<T>) => void | number, thisArg?: any): void {

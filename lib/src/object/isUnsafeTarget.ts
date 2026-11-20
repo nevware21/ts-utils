@@ -84,7 +84,19 @@ function _addUnsafeClasses(names: string[]): string[] {
  *
  * The built-in prototypes include those of the global classes which are defined by the runtime, and the built-in
  * prototypes they inherit from (eg. `%TypedArray%.prototype`). A class which is added after the first check (eg. by
- * a `Promise` or `Map` polyfill) is also identified, when its prototype is checked.
+ * a `Promise` or `Map` polyfill) is also identified, when its prototype (whose own `constructor` is the class) is
+ * checked, so a polyfill whose prototype doesn't have its own `constructor` (eg. one replaced by an object literal) is
+ * only identified once the prototype of another class is checked. The missing classes are only looked up again when
+ * the class differs from the last class whose prototype caused them to be looked up, so a class prototype which was
+ * checked before the polyfill was added is only identified once the prototype of a different class has been checked
+ * in between. A target whose own `constructor` can't be read (eg. a revoked Proxy) is not identified (rather than
+ * throwing), and a class whose prototype can't be read is treated as not defined.
+ *
+ * As the prototype of a polyfill's class is identified once the class is the global, the guards which use this (eg.
+ * {@link objExtend}, {@link objDefaults} and {@link setValueByKey}) don't change it after that, so a polyfill should use
+ * {@link objDefine} / {@link objDefineProps} to add to its prototype. Adding to it with one of the guards before the
+ * global class is assigned makes it the last class looked up, so the global's prototype is then not identified until
+ * the prototype of a different class has been checked.
  * @since 0.14.0
  * @group Object
  * @param target - The target object to validate.

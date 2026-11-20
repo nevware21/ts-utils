@@ -47,7 +47,9 @@ export const arrFill = (/*#__PURE__*/_unwrapFunctionWithPoly("fill", ArrProto, p
  * @param value - Value to fill the array with
  * @param start - Start index (inclusive), defaults to 0
  * @param end - End index (exclusive), defaults to array.length
- * @returns The modified array
+ * @returns The modified array, like the native function a primitive value is converted to an object (eg. a number
+ * returns its `Number` object, and filling a string throws a TypeError as its characters are read-only)
+ * @throws TypeError if `theArray` is `null` or `undefined`
  */
 export function polyArrFill<T>(theArray: WritableArrayLike<T>, value: T, start?: number, end?: number): WritableArrayLike<T> {
     // Like the native function the length of the value is converted (eg. a string length), reading it throws a

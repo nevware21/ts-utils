@@ -15,6 +15,11 @@ import { _toLength } from "../helpers/length";
  * The arrRotate() method returns a new array with elements rotated by the specified number of positions.
  * Positive values rotate left (elements shift forward), negative values rotate right
  * (elements shift backward). The original array is not modified.
+ *
+ * Like the other array helpers (eg.
+ * {@link https://nevware21.github.io/ts-utils/typedoc/functions/arrForEach.html | arrForEach}) a string (or `String`
+ * object) is read by index, so it is split into its UTF-16 code units (a surrogate pair, eg. an emoji, is two values),
+ * unlike {@link arrFrom} which splits it into its code points.
  * @since 0.14.0
  * @group Array
  * @group ArrayLike

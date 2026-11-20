@@ -31,7 +31,7 @@ import { strIndexOf } from "./index_of";
  * @param position - The position within the string at which to begin searching for searchString. (Defaults to 0.)
  * @returns `true` if the search string is found anywhere within the given string value, including
  * when searchString is an empty string; otherwise, `false`.
- * @throws TypeError If searchString is a regex.
+ * @throws TypeError If searchString is a regex, or the value is `null` or `undefined`.
  */
 export const strIncludes: (value: string, searchString: string, position?: number) => boolean = (/*#__PURE__*/_unwrapFunctionWithPoly("includes", StrProto, polyStrIncludes));
 
@@ -50,13 +50,16 @@ export const strIncludes: (value: string, searchString: string, position?: numbe
  * @param position - The position within the string at which to begin searching for searchString. (Defaults to 0.)
  * @returns `true` if the search string is found anywhere within the given string value, including
  * when searchString is an empty string; otherwise, `false`.
- * @throws TypeError If searchString is a regex.
+ * @throws TypeError If searchString is a regex, or the value is `null` or `undefined`.
  */
 export const strContains: (value: string, searchString: string, position?: number) => boolean = (/*#__PURE__*/_pureAssign(strIncludes));
 
 /**
  * The polyStrIncludes() method performs a case-sensitive search to determine whether one string
  * may be found within another string, returning `true` or `false` as appropriate.
+ * Like the native function the value (eg. a `String` object, a number or an array) is converted to a string, but
+ * unlike it a `Symbol` value or searchString is also converted (eg. to `"Symbol(abc)"`) rather than throwing a
+ * TypeError.
  * @since 0.9.0
  * @group String
  * @group Polyfill
@@ -67,7 +70,7 @@ export const strContains: (value: string, searchString: string, position?: numbe
  * @param position - The position within the string at which to begin searching for searchString. (Defaults to 0.)
  * @returns `true` if the search string is found anywhere within the given string value, including
  * when searchString is an empty string; otherwise, `false`.
- * @throws TypeError If searchString is a regex.
+ * @throws TypeError If searchString is a regex, or the value is `null` or `undefined`.
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyStrIncludes(value: string, searchString: string, position?: number): boolean {

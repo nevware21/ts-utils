@@ -18,7 +18,9 @@ import { _pushOwnValue } from "../object/define";
  * Read the arguments from the provided array, iterator /  or generator function
  * When processing an Iterable and a negative start or end is provided the entire
  * iterator will be processed into an array before applying the start / end restrictions
- * and when undefined or \>= 0 any iterator will not be fully processed.
+ * and when undefined or \>= 0 any iterator will not be fully processed. A `Map` (its `[key, value]` entries) or `Set`
+ * (its values) which isn't iterable (eg. on IE 11, which has no iterator functions) is read (since 0.20.0) from a copy
+ * of its entries / values.
  * @param theArgs - The arguments to process, may be ArrayLike or an Iterable
  * @param start - Zero-based index at which to start extraction, converted to an integer.
  * - Negative index counts back from the end of the array or iteration
@@ -33,6 +35,9 @@ import { _pushOwnValue } from "../object/define";
  * end to be extracted.
  * - If end is positioned before or at start after normalization, nothing is extracted.
  * @returns A new array with the extracted elements
+ * @throws TypeError when an iterable's `[Symbol.iterator]()` doesn't return an iterator, the iterator's `next()`
+ * returns a value which is not an object, or (like `for...of`) when it stops early (at the end index) and the
+ * iterator's `return()` doesn't return an object
  * @example
  * ```ts
  * function myFunc<T>(firstArg: T, ...otherArgs) {

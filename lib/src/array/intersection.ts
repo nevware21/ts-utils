@@ -15,6 +15,10 @@ import { LENGTH } from "../internal/constants";
 /**
  * The arrIntersection() method returns a new array containing elements that exist in all provided arrays.
  * Uses strict equality (===) for comparison and maintains order from the first array.
+ *
+ * Like {@link https://nevware21.github.io/ts-utils/typedoc/functions/arrForEach.html | arrForEach} an empty slot (or a
+ * missing index) of the first array is skipped, so it isn't included as `undefined`, while one in another array matches
+ * an `undefined` value of the first array.
  * @since 0.14.0
  * @group Array
  * @group ArrayLike

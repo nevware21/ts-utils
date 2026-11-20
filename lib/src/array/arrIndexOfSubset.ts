@@ -66,7 +66,10 @@ function _findSubset<T>(theArray: ArrayLike<T>, subset: ArrayLike<T>, fromIndex:
  * If `theArray` has fewer remaining elements than `subset` from a candidate position, the
  * comparison is limited to just those available elements -- so a `subset` that "runs off the end"
  * of `theArray` is still considered a match against its available prefix. This makes it possible
- * to match a shorter (eg. truncated) array against a longer one, or vice-versa.
+ * to match a shorter (eg. truncated) array against a longer one, or vice-versa. A full match is always
+ * found before a partial match at the end (which is only checked after every full position), unless the
+ * `fromIndex` is after the last full match, eg. `arrIndexOfSubset([1, 2, 3, 1], [1, 2], 1)` is `3` (the
+ * trailing `1` is a partial match).
  *
  * The elements are read by index, so for a string its characters (UTF-16 code units) are compared
  * (a string element of `subset` never matches a substring) and an empty slot of a sparse array is
@@ -112,7 +115,11 @@ export function arrIndexOfSubset<T>(theArray: ArrayLike<T>, subset: ArrayLike<T>
  * As with {@link arrIndexOfSubset}, if `theArray` has fewer remaining elements than
  * `subset` from a candidate position, the comparison is limited to just those available
  * elements -- so a `subset` that "runs off the end" of `theArray` is still considered a
- * match against its available prefix. The elements are also read by index, so for a string
+ * match against its available prefix. As the search starts from the end, a partial match at the end is
+ * found before an earlier full match, so a trailing element which matches the first element of `subset`
+ * is returned, eg. `arrLastIndexOfSubset([1, 2, 3, 1], [1, 2])` is `3` rather than `0`. To only find a
+ * full match pass a `fromIndex` of `theArray.length - subset.length`, eg.
+ * `arrLastIndexOfSubset([1, 2, 3, 1], [1, 2], 2)` is `0`. The elements are also read by index, so for a string
  * its characters are compared and an empty slot of a sparse array is compared as `undefined`.
  * @function
  * @since 0.20.0
@@ -134,6 +141,8 @@ export function arrIndexOfSubset<T>(theArray: ArrayLike<T>, subset: ArrayLike<T>
  * arrLastIndexOfSubset(["a", "b", "a", "b", "c"], ["a", "b"]); // 2 (the later occurrence)
  * arrLastIndexOfSubset([1, 2, 3], [3, 4, 5]);       // 2 (matches the available "3")
  * arrLastIndexOfSubset([1, 2, 3], []);              // 3
+ * arrLastIndexOfSubset([1, 2, 3, 1], [1, 2]);       // 3 (the trailing "1" is a partial match)
+ * arrLastIndexOfSubset([1, 2, 3, 1], [1, 2], 2);    // 0 (only full matches, as 2 is length - subset length)
  *
  * // Repeated values -- returns the later occurrence, unlike arrIndexOfSubset()
  * let haystack = ["at foo", "at bar", "at foo", "at bar", "at baz"];

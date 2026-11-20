@@ -112,10 +112,12 @@ export function polyArrIncludes<T>(theArray: ArrayLike<T>, searchElement: T, fro
  * @typeParam E - Identifies a more specific instance of the base array type
  * @param theArray - The array or array like object of elements to be searched.
  * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
- * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
- * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
+ * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in theArray until
+ * the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+ * @param thisArg - A value to use as this when executing callbackFn, like the native function it is `undefined` when not provided.
  * @return The first element in the array that satisfies the provided testing function. Otherwise, undefined
  * is returned.
+ * @throws TypeError if `theArray` is `null` or `undefined`, or `callbackFn` is not a function (even when the array is empty)
  * @example
  * ```ts
  * const inventory = [
@@ -176,10 +178,11 @@ export function polyArrFind<T, E extends T>(theArray: ArrayLike<T>, callbackFn: 
  * @typeParam E - Identifies a more specific instance of the base array type
  * @param theArray - The array or array like object of elements to be searched.
  * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
- * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
- * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
- * @param thisArg - A value to use as this when executing callbackFn. Defaults to the array if not provided.
+ * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in theArray until
+ * the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+ * @param thisArg - A value to use as this when executing callbackFn, like the native function it is `undefined` when not provided.
  * @return The index of the first element in the array that passes the test. Otherwise, -1.
+ * @throws TypeError if `theArray` is `null` or `undefined`, or `callbackFn` is not a function (even when the array is empty)
  */
 export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
     // Like the native function the length is read before the callbackFn is checked (reading it throws a TypeError for
@@ -230,11 +233,12 @@ export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbac
  * @typeParam E - Identifies a more specific instance of the base array type
  * @param theArray - The array or array like object of elements to be searched.
  * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
- * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
- * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
- * @param thisArg - A value to use as this when executing callbackFn. Defaults to the array if not provided.
+ * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in theArray until
+ * the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+ * @param thisArg - A value to use as this when executing callbackFn, like the native function it is `undefined` when not provided.
  * @return The last element in the array that satisfies the provided testing function. Otherwise, undefined
  * is returned.
+ * @throws TypeError if `theArray` is `null` or `undefined`, or `callbackFn` is not a function (even when the array is empty)
  * @example
  * ```ts
  * const inventory = [
@@ -294,11 +298,12 @@ export function polyArrFindLast<T, E extends T>(theArray: ArrayLike<T>, callback
  * @typeParam E - Identifies a more specific instance of the base array type
  * @param theArray - The array or array like object of elements to be searched.
  * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
- * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
- * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
- * @param thisArg - A value to use as this when executing callbackFn. Defaults to the array if not provided.
+ * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in theArray until
+ * the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+ * @param thisArg - A value to use as this when executing callbackFn, like the native function it is `undefined` when not provided.
  * @return The index of the last (highest-index) element in the array that passes the test. Otherwise -1 if
  * no matching element is found.
+ * @throws TypeError if `theArray` is `null` or `undefined`, or `callbackFn` is not a function (even when the array is empty)
  */
 export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
     // See polyArrFindIndex(), the length is read before the callbackFn is checked and the array is converted to an object
@@ -320,13 +325,25 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
  * The polyArrFrom creates an new shallow-copied array from an array-like object or an iterable.
  *
  * Like the native `Array.from()`:
- * - An iterable value is iterated, otherwise it is used as an array-like value (eg. `arguments` or a `NodeList`), so
- * every index up to its length is read (an empty slot or missing index is `undefined`) and any other value (eg. a number)
- * returns an empty array.
- * - A string is split into its code points (so a surrogate pair is a single value), this is also done for runtimes
- * which don't support `Symbol.iterator`.
- * - The `mapFn` is called with the value and its index.
- * - A `null` or `undefined` value, or a `mapFn` which is not a function, throws a `TypeError`.
+ * - A value with an iterator function (`[Symbol.iterator]`, which is only read once) is iterated using the iterator it
+ * returns, so an iterator which is not iterable (eg. one created by {@link createIterator} or {@link createRangeIterator})
+ * returns an empty array (use {@link iterToArray} to read its values). Otherwise (when the iterator function is `null`
+ * or `undefined`) the value is used as an array-like value (eg. `arguments` or
+ * a `NodeList`), so every index up to its length is read (an empty slot or missing index is `undefined`) and any other
+ * value (eg. a number) returns an empty array. An array is always read using its indexes, like the native array
+ * iterator its length is read for each index, so a value added to it while it is read (eg. by the `mapFn`) is also
+ * read and the reading stops at its new length when values are removed, while (like the native function) any other
+ * array-like is read up to the length it had when it was called.
+ * - A string (or a `String` object) is split into its code points (so a surrogate pair is a single value), this is also
+ * done for runtimes which don't support `Symbol.iterator`.
+ * - A `Map` returns its `[key, value]` entries and a `Set` its values, this is also done (since 0.20.0) for a `Map` or
+ * `Set` which has no iterator function (eg. on IE 11) using its `forEach()`.
+ * - The `mapFn` is called with the value and its index (without using its own `call` property), and each value is
+ * added as an own property of the new array (even when `Array.prototype` has a setter or read-only property for the
+ * index).
+ * - A `null` or `undefined` value, a `mapFn` which is not a function, an iterator function which is not a function or
+ * one which doesn't return an iterator, or an iterator result which is not an object throws a `TypeError`, and a
+ * length which is longer than an array can be (2^32 - 1) throws a `RangeError`.
  * @since 0.9.7
  * @group Polyfill
  * @group ArrayLike
@@ -337,7 +354,8 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
  * @param theValue - An array-like object or iterable to convert to an array.
  * @param mapFn - A {@link ArrFromMapFn | mapping function} to call on every element of the array. If provided, every
  * value to be added to the array is first passed through this map function, and the return
- * value is added to the array instead. The function is called with the following arguments:
+ * value is added to the array instead. The function is called with the value and its index (`mapFn(value, index)`)
+ * and the `thisArg` as `this`.
  * @param thisArg - Value of 'this' used to invoke the mapfn.
  * @example
  * ```ts

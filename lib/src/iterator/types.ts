@@ -96,6 +96,8 @@ export interface IAsyncIterator<T = any> {
  * and it can be used with `for await`.
  * - Earlier versions of TypeScript with the ES2018 or later lib define the symbol as a plain `symbol` which can't be
  * used as a key, so this is `any` which can still be assigned to a native `AsyncIterable` and be used with `for await`.
+ * As a type guard ({@link isAsyncIterable}) for `any` doesn't narrow, a value declared as a union with `AsyncIterable`
+ * is not narrowed when the guard is `true`, and is `never` when it is `false` (so check the other types first).
  * - Without the ES2018 or later lib `Symbol.asyncIterator` is not defined, so this is `object`.
  * @since 0.20.0
  * @group Iterator

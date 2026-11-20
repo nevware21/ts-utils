@@ -25,6 +25,8 @@ export const objPreventExtensions: <T>(obj: T) => T = (/*#__PURE__*/_pureAssign(
 /**
  * The Object.isExtensible() method determines if an object is extensible (whether it can have new
  * properties added to it).
+ * Where there is no native `Object.isExtensible` (a runtime which can't prevent extensions) an object or function
+ * is extensible and a primitive value, including `null` and `undefined`, is not.
  * @function
  * @group Object
  * @param obj - The object which should be checked.

@@ -43,7 +43,7 @@ import { isSymbol } from "../symbol/symbol";
  * };
  *
  * let value = getValueByKey(theValue, "Hello.Darkness.my", "friend");
- * // value === "my"
+ * // value === "old"
  *
  * let value = getValueByKey(theValue, "My.Old", "friend");
  * // value === "friend"
@@ -79,7 +79,13 @@ export function getValueByKey<V, T extends object = any>(target: T, path: string
  * The order of processing of the iterator is not reset if you add or remove elements to the iterator,
  * the actual behavior will depend on the iterator imeplementation.
  *
- * If the passed `iter` is both an Iterable<T> and Iterator<T> the Iterator<T> interface takes preceedence.
+ * If the passed `iter` is both an Iterable<T> and Iterator<T>, like `for...of` (and {@link iterForOf}) the iterator
+ * returned by its `[Symbol.iterator]()` is used.
+ *
+ * The path is read like {@link iterForOf}, so on a runtime without `Symbol.iterator` (eg. IE) an array, an iterator
+ * (or an iterable created by this library) and a `Map` or `Set` are read, but a value which is only iterable where
+ * there is `Symbol.iterator` (eg. an `arguments` object) has no keys, so (like an empty path) the target itself is
+ * returned. Pass an array (eg. using {@link arrFrom}) to use the same path on every runtime.
  * @since 0.9.1
  * @group Value
  * @param target - The source object that contains the value
@@ -87,6 +93,9 @@ export function getValueByKey<V, T extends object = any>(target: T, path: string
  * @param defValue - If the final value or any intervening object in the heirarchy is not present
  * the default value will be returned
  * @returns The value located based on the path or the defaule value
+ * @throws TypeError when the iter's `[Symbol.iterator]()` doesn't return an iterator, the iterator's `next()` returns
+ * a value which is not an object, or (like `for...of`) when it stops early (an intervening value is not present) and
+ * the iterator's `return()` doesn't return an object
  * @example
  * ```ts
  * let theValue = {
@@ -103,16 +112,16 @@ export function getValueByKey<V, T extends object = any>(target: T, path: string
  *   }
  * };
  *
- * let value = getValueByKey(theValue, ["Hello", "Darkness", "my"], "friend");
- * // value === "my"
+ * let value = getValueByIter(theValue, ["Hello", "Darkness", "my"], "friend");
+ * // value === "old"
  *
- * let value = getValueByKey(theValue, ["My", "Old"], "friend");
+ * let value = getValueByIter(theValue, ["My", "Old"], "friend");
  * // value === "friend"
  *
- * let value = getValueByKey(theValue, ["come", "to"], "friend");
+ * let value = getValueByIter(theValue, ["come", "to"], "friend");
  * // value === { see: "you" }
  *
- * let value = getValueByKey(theValue, ["friend"], "friend");
+ * let value = getValueByIter(theValue, ["friend"], "friend");
  * // value === "I've"
  * ```
  */
@@ -139,7 +148,15 @@ export function getValueByIter<V, T extends object = any>(target: T, iter: Itera
  *
  * For safety, this helper blocks setting any path that includes unsafe keys (`__proto__`,
  * `constructor`, or `prototype`) and will also stop if the traversal reaches an unsafe target
- * such as a built-in prototype object, without writing the final value.
+ * such as a built-in prototype object, without writing the final value. A missing (`null` or
+ * `undefined`) value of the path is replaced by a new object, as is (since 0.20.0) an inherited
+ * function (eg. the `hasOwnProperty` of an object or a method of a class), which is added as an own
+ * property of the target, so the path sets the target's own properties rather than changing an
+ * inherited (eg. built-in) function, eg. `"hasOwnProperty.call"` sets the target's own
+ * `hasOwnProperty` to `{ call: value }`. Any objects which were added for the path are removed
+ * again when the value is not set (unless one was passed to an inherited setter). Since 0.20.0 the parts of the
+ * path are set with {@link setValueByIter}, so they have the same checks and the added objects are
+ * removed in the same way (an empty part, eg. the second part of `"a..b"`, is still used as a key).
  * @since 0.9.1
  * @group Value
  * @param target - The target object
@@ -169,17 +186,36 @@ export function setValueByKey<T>(target: any, path: string, value: T) {
  *
  * For safety, this helper blocks setting any path that includes unsafe keys (`__proto__`,
  * `constructor`, or `prototype`) and will also stop if the traversal reaches an unsafe target
- * such as a built-in prototype object, without writing the final value.
+ * such as a built-in prototype object, without writing the final value. A missing (`null` or
+ * `undefined`) value of the path is replaced by a new object, as is (since 0.20.0) an inherited
+ * function (eg. the `hasOwnProperty` of an object or a method of a class), which is added as an own
+ * property of the target, so the path sets the target's own properties rather than changing an
+ * inherited (eg. built-in) function, eg. `["hasOwnProperty", "call"]` sets the target's own
+ * `hasOwnProperty` to `{ call: value }`. Each key is converted to a property key (a string, unless it's a symbol)
+ * once, like a property access, before it is checked and used (except that a key which isn't a symbol but converts to
+ * one, eg. a boxed `Symbol`, throws a TypeError). Any objects which were added for the
+ * path are removed again (or the own `null` or `undefined` value they replaced is restored) when the
+ * value is not set (unless one was passed to an inherited setter), including when the iterator (or
+ * its `return()`, which like `for...of` must return an object) throws.
  *
  * The order of processing of the iterator is not reset if you add or remove elements to the iterator,
  * the actual behavior will depend on the iterator imeplementation.
  *
- * If the passed `iter` is both an Iterable<T> and Iterator<T> the Iterator<T> interface takes preceedence.
+ * If the passed `iter` is both an Iterable<T> and Iterator<T>, like `for...of` (and {@link iterForOf}) the iterator
+ * returned by its `[Symbol.iterator]()` is used.
+ *
+ * The path is read like {@link iterForOf}, so on a runtime without `Symbol.iterator` (eg. IE) an array, an iterator
+ * (or an iterable created by this library) and a `Map` or `Set` are read, but a value which is only iterable where
+ * there is `Symbol.iterator` (eg. an `arguments` object) has no keys, so nothing is set. Pass an array (eg. using
+ * {@link arrFrom}) to use the same path on every runtime.
  * @since 0.9.1
  * @group Value
  * @param target - The target object
  * @param iter - The iter identifying the path of the final key value
  * @param value - The value to set
+ * @throws TypeError when the iter's `[Symbol.iterator]()` doesn't return an iterator, the iterator's `next()` returns
+ * a value which is not an object, or (like `for...of`) when it stops early (the path is not valid) and the iterator's
+ * `return()` doesn't return an object
  * @example
  * ```ts
  * let theValue = { };
