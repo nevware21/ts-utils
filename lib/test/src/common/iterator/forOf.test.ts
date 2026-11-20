@@ -641,3 +641,76 @@ describe("a value which is identified as a Map or Set (by its Symbol.toStringTag
         assert.equal(forEachCalls, 0, "Its forEach() was not called");
     });
 });
+
+// Like on a runtime without Symbol.iterator (eg. IE, where an array isn't iterable and IE 11's Map / Set have no
+// iterator functions), an own [Symbol.iterator] of undefined makes the value not iterable, so iterForOf uses its
+// fallback. The node-only iterator_no_symbol tests also check the fallback with the modules loaded again without
+// Symbol, but the code of a module which is loaded again isn't included in the coverage
+describe("iterForOf with an array, Map or Set which isn't iterable", () => {
+    function _notIterable<T>(value: T): T {
+        (value as any)[Symbol.iterator] = undefined;
+        return value;
+    }
+
+    it("processes an array by its indexes, including a value added by the callbackFn", function() {
+        if (typeof Symbol !== "function" || !Symbol.iterator) {
+            this.skip();
+            return;
+        }
+
+        const values: number[] = [];
+        const arr = _notIterable([1, 2, 3]);
+
+        iterForOf(arr, (value) => {
+            values.push(value);
+            if (value === 1) {
+                arr.push(4);
+            }
+        });
+
+        assert.deepEqual(values, [1, 2, 3, 4], "Like the native array iterator, the values are read as they are iterated");
+    });
+
+    it("stops processing an array when the callbackFn returns -1", function() {
+        if (typeof Symbol !== "function" || !Symbol.iterator) {
+            this.skip();
+            return;
+        }
+
+        const values: number[] = [];
+
+        iterForOf(_notIterable([1, 2, 3]), (value) => {
+            values.push(value);
+            if (value === 2) {
+                return -1;
+            }
+        });
+
+        assert.deepEqual(values, [1, 2]);
+    });
+
+    it("processes the entries of a Map and the values of a Set using their forEach()", function() {
+        if (typeof Symbol !== "function" || !Symbol.iterator) {
+            this.skip();
+            return;
+        }
+
+        const mapValues: any[] = [];
+        const setValues: string[] = [];
+        const set = _notIterable(new Set(["x", "y"]));
+
+        iterForOf(_notIterable(new Map<string, number>([["a", 1], ["b", 2]])), (value) => {
+            mapValues.push(value);
+        });
+
+        iterForOf(set, (value) => {
+            setValues.push(value);
+            if (value === "x") {
+                set.add("z");
+            }
+        });
+
+        assert.deepEqual(mapValues, [["a", 1], ["b", 2]], "The [key, value] entries of the Map");
+        assert.deepEqual(setValues, ["x", "y"], "The values of the Set, a value added while it is processed isn't processed (a copy of the values is used)");
+    });
+});
