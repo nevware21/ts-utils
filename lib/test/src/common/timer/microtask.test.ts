@@ -14,8 +14,9 @@ import { scheduleMicrotask, setMicroTaskFallbackOptions } from "../../../../src/
 import { _getMicrotaskQueueFn } from "../../../../src/timer/microtasks/microtaskQueue";
 import { _addMicrotaskQueue, _resetSharedTimer } from "../../../../src/timer/microtasks/timerQueue";
 import { _runMicroTask } from "../../../../src/timer/microtasks/runMicrotask";
-import { scheduleTimeout, setTimeoutOverrides } from "../../../../src/timer/timeout";
+import { createTimeout, scheduleTimeout, setTimeoutOverrides } from "../../../../src/timer/timeout";
 import { _clearTaskQueues, _eTaskQueueType } from "../../../../src/timer/microtasks/taskQueue";
+import { scheduleInterval } from "../../../../src/timer/interval";
 
 describe("microtask tests", () => {
     let orgPromise: any;
@@ -424,6 +425,55 @@ describe("microtask tests", () => {
             }
         });
 
+        it("executes microtasks before a previously scheduled interval", (done) => {
+            let events: string[] = [];
+            let theInterval = scheduleInterval(() => {
+                events.push("interval");
+                theInterval.cancel();
+            }, 0);
+
+            // Scheduled after the interval, which is due at the same time as the fallback queue's timer
+            scheduleMicrotask(() => {
+                events.push("microtask");
+            }, {
+                useTimeout: true
+            });
+
+            setTimeout(() => {
+                try {
+                    assert.deepEqual(events, ["microtask", "interval"], "Expected the microtask to run before the interval");
+                    done();
+                } catch (e) {
+                    done(e);
+                }
+            }, 20);
+        });
+
+        it("a microtask run before an interval's callback which cancels the interval stops the callback", (done) => {
+            let calls = 0;
+            let theInterval = scheduleInterval(() => {
+                calls++;
+            }, 0);
+
+            // Run (by the fallback queue) when the interval's callback is about to be called
+            scheduleMicrotask(() => {
+                theInterval.cancel();
+            }, {
+                useTimeout: true
+            });
+
+            setTimeout(() => {
+                try {
+                    assert.equal(calls, 0, "The callback of the cancelled interval was not called");
+                    assert.equal(theInterval.enabled, false, "The interval is not enabled");
+                    done();
+                } catch (e) {
+                    theInterval.cancel();
+                    done(e);
+                }
+            }, 20);
+        });
+
         it("executes nested microtasks before previously scheduled timers", () => {
             let clock = sinon.useFakeTimers();
             try {
@@ -450,6 +500,461 @@ describe("microtask tests", () => {
             } finally {
                 clock.restore();
             }
+        });
+
+        it("a microtask run before a timer's callback which refreshes that timer keeps the new timer", () => {
+            let clock = sinon.useFakeTimers();
+            try {
+                let calls = 0;
+                let enabledInCallback: boolean[] = [];
+                let theTimer = scheduleTimeout(() => {
+                    calls++;
+                    enabledInCallback.push(theTimer.enabled);
+
+                    // Stops the timer started by the microtask's refresh()
+                    theTimer.cancel();
+                }, 0);
+
+                // Run (by the fallback queue) when the timer's callback is about to be called
+                scheduleMicrotask(() => {
+                    theTimer.refresh();
+                }, {
+                    useTimeout: true
+                });
+
+                clock.tick(0);
+                clock.tick(10);
+
+                assert.deepEqual(enabledInCallback, [true], "The timer started by the microtask's refresh() is pending while the callback runs");
+                assert.equal(calls, 1, "cancel() stopped the timer started by the microtask's refresh()");
+            } finally {
+                clock.restore();
+            }
+        });
+
+        it("a microtask run before a timer's callback sees the timer as enabled, so enabling it doesn't run it again", () => {
+            let clock = sinon.useFakeTimers();
+            try {
+                let calls = 0;
+                let enabledInMicrotask: boolean[] = [];
+                let theTimer = scheduleTimeout(() => {
+                    calls++;
+                }, 0);
+
+                // Run (by the fallback queue) when the timer's callback is about to be called
+                scheduleMicrotask(() => {
+                    enabledInMicrotask.push(theTimer.enabled);
+
+                    // Does nothing, as the timer is still pending
+                    theTimer.enabled = true;
+                }, {
+                    useTimeout: true
+                });
+
+                clock.tick(0);
+                clock.tick(10);
+
+                assert.deepEqual(enabledInMicrotask, [true], "The timer is still enabled while the microtask runs");
+                assert.equal(calls, 1, "The callback was only called once");
+                assert.equal(theTimer.enabled, false, "The timer is not enabled once its callback has run");
+            } finally {
+                clock.restore();
+            }
+        });
+
+        it("a microtask run before a timer's callback which cancels that timer stops the callback, like a native microtask", () => {
+            let clock = sinon.useFakeTimers();
+            try {
+                let calls = 0;
+                let theTimer = scheduleTimeout(() => {
+                    calls++;
+                }, 0);
+
+                // Run (by the fallback queue) when the timer's callback is about to be called
+                scheduleMicrotask(() => {
+                    theTimer.cancel();
+                }, {
+                    useTimeout: true
+                });
+
+                clock.tick(0);
+                clock.tick(10);
+
+                assert.equal(calls, 0, "The callback of the cancelled timer was not called");
+                assert.equal(theTimer.enabled, false, "The timer is not enabled");
+            } finally {
+                clock.restore();
+            }
+        });
+
+        it("a microtask run before a timer's callback which disables that timer stops the callback", () => {
+            let clock = sinon.useFakeTimers();
+            try {
+                let calls = 0;
+                let theTimer = scheduleTimeout(() => {
+                    calls++;
+                }, 0);
+
+                // Run (by the fallback queue) when the timer's callback is about to be called
+                scheduleMicrotask(() => {
+                    if (theTimer.enabled) {
+                        theTimer.enabled = false;
+                    }
+                }, {
+                    useTimeout: true
+                });
+
+                clock.tick(0);
+                clock.tick(10);
+
+                assert.equal(calls, 0, "The callback of the disabled timer was not called");
+                assert.equal(theTimer.enabled, false, "The timer is not enabled");
+            } finally {
+                clock.restore();
+            }
+        });
+
+        it("a microtask run before a timer's callback which cancels and then restarts that timer doesn't stop the callback", () => {
+            let clock = sinon.useFakeTimers();
+            try {
+                let calls = 0;
+                let theTimer = scheduleTimeout(() => {
+                    calls++;
+                }, 0);
+
+                // Run (by the fallback queue) when the timer's callback is about to be called
+                scheduleMicrotask(() => {
+                    theTimer.cancel();
+                    theTimer.refresh();
+                }, {
+                    useTimeout: true
+                });
+
+                clock.tick(0);
+                assert.equal(calls, 1, "The callback was called");
+
+                clock.tick(10);
+                assert.equal(calls, 2, "The timer restarted by the microtask also called the callback");
+                assert.equal(theTimer.enabled, false, "The timer is not enabled once the restarted timer has run");
+            } finally {
+                clock.restore();
+            }
+        });
+
+        it("cancel() stops the timer which a pending microtask refreshed while a synchronous setTimeout override ran the callback", () => {
+            let pending: number[] = [];
+            let timers: { [id: number]: { cb: () => void, live: boolean } } = {};
+            let nextId = 1;
+            let runNow = false;
+            let calls = 0;
+
+            setTimeoutOverrides([
+                (function (callback: () => void) {
+                    let id = nextId++;
+                    if (runNow) {
+                        // Runs the callback synchronously (before the id is returned)
+                        runNow = false;
+                        callback();
+                    } else {
+                        timers[id] = { cb: callback, live: true };
+                        pending.push(id);
+                    }
+
+                    return id;
+                }) as any,
+                function (id: any) {
+                    timers[id] && (timers[id].live = false);
+                }
+            ]);
+
+            let theTimer = createTimeout(() => {
+                calls++;
+            }, 10);
+
+            // Queued, so the fallback queue is run before the next timer's callback
+            scheduleMicrotask(() => {
+                theTimer.refresh();
+            }, {
+                useTimeout: true
+            });
+
+            // The override runs the callback synchronously, which first runs the pending microtask (refreshing the timer)
+            runNow = true;
+            theTimer.refresh();
+            assert.equal(calls, 1, "The callback was run synchronously");
+            assert.equal(theTimer.enabled, true, "The timer started by the microtask's refresh() is kept");
+
+            theTimer.cancel();
+
+            // Run all of the pending timers
+            let due = pending;
+            pending = [];
+            for (let idx = 0; idx < due.length; idx++) {
+                let timer = timers[due[idx]];
+                if (timer.live) {
+                    timer.live = false;
+                    timer.cb();
+                }
+            }
+
+            assert.equal(calls, 1, "cancel() stopped the timer started by the microtask's refresh()");
+        });
+
+        it("later microtasks still run after a flush of the fallback queue throws (when reporting a microtask's error throws)", () => {
+            let pending: Array<() => void> = [];
+            let failNext = false;
+            let failed = false;
+            let mt2Calls = 0;
+            let mt3Calls = 0;
+
+            setTimeoutOverrides([
+                (function (callback: () => void) {
+                    if (failNext) {
+                        failNext = false;
+                        throw new Error("setTimeout failed");
+                    }
+
+                    pending.push(callback);
+                    return pending.length;
+                }) as any,
+                function () {
+                    // The callbacks which have run are removed from pending
+                }
+            ]);
+
+            function _runPending() {
+                let due = pending;
+                pending = [];
+                for (let idx = 0; idx < due.length; idx++) {
+                    try {
+                        due[idx]();
+                    } catch (e) {
+                        // The error of the flush which failed
+                    }
+                }
+            }
+
+            scheduleMicrotask(() => {
+                if (!failed) {
+                    // Its error is reported (re-thrown) using a timeout, which fails
+                    failed = true;
+                    failNext = true;
+                    throw new Error("microtask failed");
+                }
+            }, {
+                useTimeout: true
+            });
+
+            scheduleMicrotask(() => {
+                mt2Calls++;
+            }, {
+                useTimeout: true
+            });
+
+            _runPending();
+            _runPending();
+
+            scheduleMicrotask(() => {
+                mt3Calls++;
+            }, {
+                useTimeout: true
+            });
+
+            _runPending();
+            _runPending();
+
+            assert.equal(failed, true, "The first microtask failed");
+            assert.equal(mt2Calls, 1, "The microtask queued after the one which failed was run");
+            assert.equal(mt3Calls, 1, "A microtask scheduled after the failed flush was run");
+        });
+
+        it("a microtask run before a timer's callback which restarts and then cancels that timer stops the callback", () => {
+            let clock = sinon.useFakeTimers();
+            try {
+                let refreshCalls = 0;
+                let refreshTimer = scheduleTimeout(() => {
+                    refreshCalls++;
+                }, 0);
+
+                let enabledCalls = 0;
+                let enabledTimer = scheduleTimeout(() => {
+                    enabledCalls++;
+                }, 0);
+
+                // Run (by the fallback queue) when the timers' callbacks are about to be called
+                scheduleMicrotask(() => {
+                    refreshTimer.refresh();
+                    refreshTimer.cancel();
+
+                    enabledTimer.enabled = false;
+                    enabledTimer.enabled = true;
+                    enabledTimer.enabled = false;
+                }, {
+                    useTimeout: true
+                });
+
+                clock.tick(0);
+                clock.tick(10);
+
+                assert.equal(refreshCalls, 0, "The callback of the timer which was refreshed and then cancelled was not called");
+                assert.equal(refreshTimer.enabled, false, "The refreshed and then cancelled timer is not enabled");
+                assert.equal(enabledCalls, 0, "The callback of the timer which was enabled again and then disabled was not called");
+                assert.equal(enabledTimer.enabled, false, "The enabled and then disabled timer is not enabled");
+            } finally {
+                clock.restore();
+            }
+        });
+
+        describe("with a setTimeout override which can run the callback synchronously", () => {
+            let runNow: boolean;
+            let runPendingFirst: boolean;
+
+            /**
+             * Sets a setTimeout override which runs the callback synchronously (before the id is returned) when runNow is
+             * set (after running the pending timers when runPendingFirst is also set), and returns a function which runs
+             * the pending timers
+             */
+            function _setSyncOverride() {
+                let timers: { [id: number]: () => void } = {};
+                let nextId = 1;
+
+                function _runPending() {
+                    let due = timers;
+                    timers = {};
+                    Object.keys(due).forEach((id) => {
+                        due[id as any]();
+                    });
+                }
+
+                runNow = false;
+                runPendingFirst = false;
+                setTimeoutOverrides([
+                    (function (callback: () => void) {
+                        let id = nextId++;
+                        if (runNow) {
+                            runNow = false;
+                            if (runPendingFirst) {
+                                runPendingFirst = false;
+                                _runPending();
+                            }
+
+                            callback();
+                        } else {
+                            timers[id] = callback;
+                        }
+
+                        return id;
+                    }) as any,
+                    function (id: any) {
+                        delete timers[id];
+                    }
+                ]);
+
+                return _runPending;
+            }
+
+            it("a microtask which cancels a running timer doesn't stop the callback which its refresh() runs synchronously", () => {
+                let runPending = _setSyncOverride();
+                let calls = 0;
+                let theTimer = scheduleTimeout(() => {
+                    calls++;
+                }, 10);
+
+                // Queued, so the fallback queue is run before the next timer's callback
+                scheduleMicrotask(() => {
+                    theTimer.cancel();
+                }, {
+                    useTimeout: true
+                });
+
+                // The override runs the callback of the new timer synchronously, which first runs the pending microtask
+                runNow = true;
+                theTimer.refresh();
+                assert.equal(calls, 1, "The callback of the timer started by refresh() was called");
+                assert.equal(theTimer.enabled, false, "The timer is not enabled once its callback has run");
+
+                runPending();
+                runPending();
+                assert.equal(calls, 1, "The callback was only called once");
+            });
+
+            it("a microtask which cancels the timer doesn't stop the callback which its first start runs synchronously", () => {
+                let runPending = _setSyncOverride();
+                let calls = 0;
+                let theTimer = createTimeout(() => {
+                    calls++;
+                }, 10);
+
+                // Queued, so the fallback queue is run before the next timer's callback
+                scheduleMicrotask(() => {
+                    theTimer.cancel();
+                }, {
+                    useTimeout: true
+                });
+
+                // The override runs the callback synchronously, which first runs the pending microtask
+                runNow = true;
+                theTimer.refresh();
+                assert.equal(calls, 1, "The callback of the timer being started was called");
+                assert.equal(theTimer.enabled, false, "The timer is not enabled once its callback has run");
+
+                runPending();
+                runPending();
+                assert.equal(calls, 1, "The callback was only called once");
+            });
+
+            it("a microtask which cancels the timer doesn't stop the callback which its refresh() runs synchronously after a nested start", () => {
+                let runPending = _setSyncOverride();
+                let calls = 0;
+                let theTimer = createTimeout(() => {
+                    calls++;
+                }, 10);
+
+                // Run by the override (before the timer's callback) while the timer is being started, it starts the timer
+                // again (a nested start) and queues a microtask which cancels it
+                scheduleTimeout(() => {
+                    theTimer.refresh();
+                    scheduleMicrotask(() => {
+                        theTimer.cancel();
+                    }, {
+                        useTimeout: true
+                    });
+                }, 10);
+
+                // The override runs the pending timer and then the callback synchronously, which first runs the microtask
+                runNow = true;
+                runPendingFirst = true;
+                theTimer.refresh();
+                assert.equal(calls, 1, "The callback of the timer being started was called");
+                assert.equal(theTimer.enabled, false, "The microtask cancelled the timer started by the nested start");
+
+                runPending();
+                runPending();
+                assert.equal(calls, 1, "The callback was only called once");
+            });
+
+            it("a microtask which refreshes the timer about to run (whose callback the override runs synchronously) runs the callback once", () => {
+                let runPending = _setSyncOverride();
+                let calls = 0;
+                let theTimer = scheduleTimeout(() => {
+                    calls++;
+                }, 10);
+
+                // Run (by the fallback queue) when the timer's callback is about to be called, the refresh() runs the
+                // callback synchronously, so the fallback queue must not be run again (by that callback)
+                scheduleMicrotask(() => {
+                    runNow = true;
+                    theTimer.refresh();
+                }, {
+                    useTimeout: true
+                });
+
+                runPending();
+                runPending();
+
+                assert.equal(calls, 1, "The callback was only called once");
+                assert.equal(theTimer.enabled, false, "The timer is not enabled once its callback has run");
+            });
         });
     });
 
@@ -620,6 +1125,39 @@ describe("microtask handler enabled state", () => {
     afterEach(() => {
         (<any>getGlobal()).queueMicrotask = orgQueueMicrotask;
         setBypassLazyCache(false);
+    });
+
+    it("keeps the task started by a refresh() from the scheduleFn, which then rejects the task it was asked to schedule", () => {
+        let queue: Array<() => void> = [];
+        let calls = 0;
+        let scheduleCalls = 0;
+        let handler: any;
+
+        handler = scheduleMicrotask(() => {
+            calls++;
+        }, {
+            scheduleFn: (callback: () => void) => {
+                scheduleCalls++;
+                if (scheduleCalls === 2) {
+                    // Re-entrantly refresh the handler (which schedules a new task), then reject this task
+                    handler.refresh();
+                    return false;
+                }
+
+                queue.push(callback);
+                return true;
+            }
+        });
+
+        handler.refresh();
+        assert.equal(handler.enabled, true, "The task started by the nested refresh() is enabled");
+
+        handler.cancel();
+        for (let idx = 0; idx < queue.length; idx++) {
+            queue[idx]();
+        }
+
+        assert.equal(calls, 0, "cancel() stopped the task started by the nested refresh()");
     });
 
     it("is not enabled when the scheduleFn rejects the task", () => {

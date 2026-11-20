@@ -8,11 +8,14 @@
 
 import { arrIncludes } from "../array/includes";
 import { iterForOf } from "./forOf";
+import { LENGTH } from "../internal/constants";
 
 /**
  * Returns unique values from all provided iterators / iterables.
  * @since 0.15.0
  * @group Iterator
+ * @throws TypeError when a value's `[Symbol.iterator]` isn't `null`, `undefined` or a function, its
+ * `[Symbol.iterator]()` doesn't return an iterator, or the iterator's `next()` returns a value which is not an object
  * @example
  * ```ts
  * iterUnion([1, 2, 3], [3, 4], createRangeIterator(4, 5)); // [1, 2, 3, 4, 5]
@@ -27,7 +30,7 @@ export function iterUnion<T>(): T[] {
     let iters: ArrayLike<Iterator<T> | Iterable<T>> = arguments;
     let result: T[] = [];
 
-    for (let lp = 0; lp < iters.length; lp++) {
+    for (let lp = 0; lp < iters[LENGTH]; lp++) {
         iterForOf(iters[lp], (value) => {
             if (!arrIncludes(result, value)) {
                 result.push(value);

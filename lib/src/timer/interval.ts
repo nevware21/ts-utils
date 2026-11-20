@@ -9,6 +9,7 @@
 import { fnApply } from "../funcs/funcs";
 import { ArrSlice, CALL, UNDEF_VALUE } from "../internal/constants";
 import { ITimerHandler, _createTimerHandler } from "./handler";
+import { _runMicrotasks } from "./timeout";
 
 /**
  * Repeatedly calls a function or executes a code snippet, with a fixed time delay between each call.
@@ -79,13 +80,24 @@ export function scheduleInterval<A extends any[]>(callback: (...args: A) => void
 export function scheduleInterval<A extends any[]>(callback: (...args: A) => void, timeout: number): ITimerHandler {
     // Copy the arguments as they are kept and reused by refresh() after this call has returned
     let theArguments = ArrSlice[CALL](arguments);
+    let intervalFn = theArguments[0];
+    theArguments[0] = function (this: any) {
+        let enabled = handler.h.enabled;
 
-    let handler = _createTimerHandler(true, (intervalId: any) => {
+        // Like a timeout, any pending fallback microtasks are run first, and (like a native microtask, which runs
+        // before the timer) one which cancels the interval stops this call. The callback is called with the `this` which
+        // setInterval passes (eg. Node's Timeout, so `clearInterval(this)` or `this.unref()` work as they did when the
+        // callback was passed to setInterval directly)
+        _runMicrotasks();
+        (!enabled || handler.h.enabled) && fnApply(intervalFn, this, arguments);
+    };
+
+    let handler = _createTimerHandler((intervalId: any) => {
         intervalId && clearInterval(intervalId);
         return fnApply(setInterval, UNDEF_VALUE, theArguments)
     }, (intervalId: any) => {
         fnApply(clearInterval, UNDEF_VALUE, [ intervalId ]);
     });
 
-    return handler.h;
+    return handler.h.refresh();
 }

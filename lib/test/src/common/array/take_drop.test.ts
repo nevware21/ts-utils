@@ -187,11 +187,14 @@ describe("array helpers return a new array for a typed array or a Buffer", () =>
     _check("arrUnion", (value) => arrUnion(value), [1, 2, 3, 4]);
     _check("polyArrWith", (value) => polyArrWith(value, 0, 300), [300, 2, 3, 4]);
 
-    it("polyArrWith matches the native Array with() for a typed array", () => {
+    it("polyArrWith matches the native Array with() for a typed array", function() {
         const nativeWith = (Array.prototype as any)["with"];
-        if (nativeWith) {
-            const source = new Uint8Array([1, 2]);
-            assert.deepEqual(polyArrWith(source as any, 0, 300), nativeWith.call(source, 0, 300));
+        if (!nativeWith) {
+            this.skip();
+            return;
         }
+
+        const source = new Uint8Array([1, 2]);
+        assert.deepEqual(polyArrWith(source as any, 0, 300), nativeWith.call(source, 0, 300));
     });
 });

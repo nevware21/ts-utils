@@ -69,8 +69,8 @@ describe("object forEachOwnKeySafe tests", () => {
                 });
             }, "Should not throw when a getter throws");
 
-            assert.deepEqual(Object.keys(visited).sort(), ["a", "b", "c"], "Should visit all keys including the throwing getter");
-            assert.isUndefined(visited["b"], "Should pass undefined for the throwing getter");
+            assert.deepEqual(Object.keys(visited).sort(), ["a", "c"], "Should visit the other keys and skip the throwing getter");
+            assert.isFalse("b" in visited, "Should skip the key of the throwing getter");
             assert.equal(visited["c"], 3, "Should pass the value for c");
         });
 
@@ -100,8 +100,8 @@ describe("object forEachOwnKeySafe tests", () => {
                 });
             }, "Should not throw when a symbol getter throws");
 
-            assert.deepEqual(keys, ["a", badSym, goodSym], "Should visit all keys including the throwing symbol getter");
-            assert.deepEqual(values, [1, undefined, 2], "Should pass undefined for the throwing symbol getter");
+            assert.deepEqual(keys, ["a", goodSym], "Should visit the other keys and skip the throwing symbol getter");
+            assert.deepEqual(values, [1, 2], "Should skip the value of the throwing symbol getter");
         });
 
         it("should use the provided thisArg for both string and symbol keys", () => {
@@ -290,8 +290,8 @@ describe("object forEachOwnKeySafe tests", () => {
                 });
             }, "Should not throw when a getter throws");
 
-            assert.deepEqual(Object.keys(visited).sort(), ["a", "b", "c"], "Should visit all keys including the throwing getter");
-            assert.isUndefined(visited["b"], "Should pass undefined for the throwing getter");
+            assert.deepEqual(Object.keys(visited).sort(), ["a", "c"], "Should visit the other keys and skip the throwing getter");
+            assert.isFalse("b" in visited, "Should skip the key of the throwing getter");
         });
     });
 });

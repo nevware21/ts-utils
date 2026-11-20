@@ -6,11 +6,12 @@
  * Licensed under the MIT license.
  */
 
-import { isString } from "../helpers/base";
 import { LENGTH, StrProto } from "../internal/constants";
-import { _throwIfNotString } from "../internal/throwIf";
+import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
+import { mathFloor } from "../math/floor";
 import { asString } from "./as_string";
+import { _toSearchString } from "./includes";
 import { strSubstring } from "./substring";
 
 /**
@@ -22,11 +23,14 @@ import { strSubstring } from "./substring";
  * @param position - [Optional] The position in this string at which to begin searching for `searchString`.
  * Defaults to 0
  * @returns `true` if the given characters are found at the beginning of the string; otherwise, `false`.
+ * @throws TypeError If searchString is a regex, or the value is `null` or `undefined`.
  */
 export const strStartsWith: (value: string, searchString: string, position?: number) => boolean = (/*#__PURE__*/_unwrapFunctionWithPoly("startsWith", StrProto, polyStrStartsWith));
 
 /**
  * This method lets you determine whether or not a string begins with another string. This method is case-sensitive.
+ * Like the native function the value (eg. a `String` object or a number) is converted to a string, but unlike it a
+ * `Symbol` value or searchString is also converted (eg. to `"Symbol(abc)"`) rather than throwing a TypeError.
  * @group Polyfill
  * @group String
  * @param value - The value to be checked
@@ -34,13 +38,21 @@ export const strStartsWith: (value: string, searchString: string, position?: num
  * @param position - [Optional] The position in this string at which to begin searching for `searchString`.
  * Defaults to 0
  * @returns `true` if the given characters are found at the beginning of the string; otherwise, `false`.
+ * @throws TypeError If searchString is a regex, or the value is `null` or `undefined`.
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyStrStartsWith(value: string, searchString: string, position?: number): boolean {
-    _throwIfNotString(value);
+    _throwIfNullOrUndefined(value);
 
-    let searchValue = isString(searchString) ? searchString : asString(searchString);
-    let pos = position > 0 ? position : 0;
+    // Like the native function the value (eg. a String object or a number) and then the searchString are converted to
+    // strings (the searchString only once, and like polyStrIncludes() a RegExp throws a TypeError), and then the position
+    // to a number (so NaN and a value which isn't a number are 0)
+    let theValue = asString(value);
+    let searchValue = _toSearchString(searchString);
+    let pos = +position;
 
-    return strSubstring(value, pos, pos + searchValue[LENGTH]) === searchValue;
+    // A fractional position is truncated before the length is added, as the sum could otherwise round up
+    pos = pos > 0 ? mathFloor(pos) : 0;
+
+    return strSubstring(theValue, pos, pos + searchValue[LENGTH]) === searchValue;
 }

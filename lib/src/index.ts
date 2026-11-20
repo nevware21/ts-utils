@@ -58,7 +58,7 @@ export {
     isTypeof, isUndefined, isNullOrUndefined, isDefined, isString, isFunction, isObject, isArray, isArrayLike, isDate, isNumber, isBoolean,
     isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isPromiseLike, isPromise, isThenable, isNotTruthy, isTruthy, objToString,
     isStrictNullOrUndefined, isStrictUndefined, isError, isPrimitive, isPrimitiveType, isMap, isMapLike, isSet, isSetLike,
-    isWeakMap, isWeakSet, isBigInt, isAsyncFunction, isGenerator, isAsyncGenerator
+    isWeakMap, isWeakSet, isBigInt, isAsyncFunction, isGenerator, isAsyncGenerator, isStringObject, isStringLike
 } from "./helpers/base";
 export { ICachedValue, createCachedValue, createDeferredCachedValue, getDeferred, getWritableDeferred } from "./helpers/cache";
 export { CustomErrorConstructor, createCustomError, throwUnsupported } from "./helpers/customError";

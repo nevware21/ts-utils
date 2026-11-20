@@ -10,6 +10,8 @@ import { assert } from "@nevware21/tripwire-chai";
 import { objForEachKey, objForEachKeySafe } from "../../../../src/object/for_each_key";
 import { arrForEach } from "../../../../src/array/forEach";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
+import { objExtend } from "../../../../src/helpers/extend";
+import { objDeepCopy } from "../../../../src/object/copy";
 
 describe("object for_each_key tests", () => {
     describe("objForEachKey", () => {
@@ -214,9 +216,9 @@ describe("object for_each_key tests", () => {
                 });
             }, "Should not throw when a getter throws");
 
-            assert.deepEqual(Object.keys(visited).sort(), ["a", "b", "c"], "Should visit all keys including the throwing getter");
+            assert.deepEqual(Object.keys(visited).sort(), ["a", "c"], "Should visit the other keys and skip the throwing getter");
             assert.equal(visited["a"], 1, "Should pass the value for a");
-            assert.isUndefined(visited["b"], "Should pass undefined for the throwing getter");
+            assert.isFalse("b" in visited, "Should skip the key of the throwing getter");
             assert.equal(visited["c"], 3, "Should pass the value for c");
         });
 
@@ -230,16 +232,17 @@ describe("object for_each_key tests", () => {
                 configurable: true
             });
             obj.c = 3;
+            obj.d = 4;
 
             const visited: string[] = [];
             objForEachKey(obj, (key) => {
                 visited.push(key);
-                if (key === "b") {
+                if (key === "c") {
                     return -1;
                 }
             });
 
-            assert.deepEqual(visited, ["a", "b"], "Should stop after the throwing getter key");
+            assert.deepEqual(visited, ["a", "c"], "Should skip the throwing getter key and stop after the c key");
         });
 
         it("should not swallow exceptions thrown by the callback", () => {
@@ -480,9 +483,34 @@ describe("object for_each_key tests", () => {
                 });
             }, "Should not throw when a getter throws");
 
-            assert.deepEqual(Object.keys(visited).sort(), ["a", "b", "c"], "Should visit all keys including the throwing getter");
-            assert.isUndefined(visited["b"], "Should pass undefined for the throwing getter");
+            assert.deepEqual(Object.keys(visited).sort(), ["a", "c"], "Should visit the other keys and skip the throwing getter");
+            assert.isFalse("b" in visited, "Should skip the key of the throwing getter");
             assert.equal(visited["c"], 3, "Should pass the value for c");
         });
+    });
+});
+
+describe("the helpers which copy values skip the key of a throwing getter", () => {
+    function _createSource(): any {
+        const source: any = { b: 2 };
+        Object.defineProperty(source, "a", {
+            get: () => {
+                throw new Error("getter failed");
+            },
+            enumerable: true,
+            configurable: true
+        });
+
+        return source;
+    }
+
+    it("objExtend keeps the existing value rather than copying undefined", () => {
+        assert.deepEqual(objExtend({ a: "keep" }, _createSource()), { a: "keep", b: 2 });
+    });
+
+    it("objDeepCopy doesn't copy the key", () => {
+        const copy = objDeepCopy(_createSource());
+        assert.deepEqual(copy, { b: 2 });
+        assert.isFalse("a" in copy, "The key should not be added");
     });
 });

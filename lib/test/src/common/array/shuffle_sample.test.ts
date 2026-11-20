@@ -110,4 +110,16 @@ describe("arrSample", () => {
         
         assert.ok(samples.size > 1, "Should sample different values");
     });
+
+    it("should truncate a fractional length, like the native functions", () => {
+        const arrayLike: any = { length: 2.5, 0: "x", 1: "y", 2: "z" };
+
+        // Previously the index could be 2, which is after the length
+        for (let i = 0; i < 50; i++) {
+            const value = arrSample(arrayLike);
+            assert.ok(value === "x" || value === "y", "Only the values within the length should be sampled, not " + value);
+        }
+
+        assert.isUndefined(arrSample({ length: 0.5, 0: "x" } as any), "A length of 0.5 is 0");
+    });
 });

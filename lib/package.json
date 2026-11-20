@@ -179,7 +179,10 @@
     "esnext:main": "./dist/es6/main/ts-utils.js",
     "esnext": "./dist/es6/mod/ts-utils.js",
     "esnext:module": "./dist/es6/mod/ts-utils.js",
-    "sideEffects": false,
+    "sideEffects": [
+        "./bundle/es5/ts-polyfills-utils.js",
+        "./bundle/es5/ts-polyfills-utils.min.js"
+    ],
     "repository": {
         "type": "git",
         "url": "https://github.com/nevware21/ts-utils.git"

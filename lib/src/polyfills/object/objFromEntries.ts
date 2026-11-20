@@ -6,15 +6,16 @@
  * Licensed under the MIT license.
  */
 
-import { isArray, isFunction, isObject } from "../../helpers/base";
+import { isArray, isPrimitive, isString } from "../../helpers/base";
 import { dumpObj } from "../../helpers/diagnostics";
 import { throwTypeError } from "../../helpers/throw";
-import { LENGTH, __PROTO__ } from "../../internal/constants";
+import { DUMP_ERR_MAX_LENGTH, LENGTH, NULL_VALUE } from "../../internal/constants";
 import { _throwIfNullOrUndefined } from "../../internal/throwIf";
-import { iterForOf } from "../../iterator/forOf";
+import { _getMapSetValues, iterForOf } from "../../iterator/forOf";
 import { isIterable } from "../../iterator/iterator";
 import { objDefine } from "../../object/define";
 import { asString } from "../../string/as_string";
+import { isSymbol } from "../../symbol/symbol";
 
 /**
  * Creates a new object from an array of [key, value] pairs.
@@ -23,9 +24,12 @@ import { asString } from "../../string/as_string";
  * Like the native `Object.fromEntries()`:
  * - Each entry must be an object, its `0` property is the key and its `1` property is the value (so an entry
  * with only a key has an `undefined` value).
- * - A `__proto__` key is added as an own property, it does not change the prototype of the new object.
- * - A `null` or `undefined` value, a value which is not iterable (an array is always supported) or an entry
- * which is not an object (including an empty slot of a sparse array) throws a `TypeError`.
+ * - Each key is defined as an own property (rather than assigned), so a `__proto__` key does not change the
+ * prototype of the new object, and a setter or read-only property of the same name on `Object.prototype` doesn't
+ * stop the key being added.
+ * - A `null` or `undefined` value, a value which is not iterable (an array is always supported, as is (since 0.20.0) a
+ * `Map` or `Set` which has no iterator function, eg. on IE 11) or an entry which is not an object (including an empty
+ * slot of a sparse array) throws a `TypeError`.
  *
  * @since 0.12.0
  * @group Polyfill
@@ -39,17 +43,21 @@ export function polyObjFromEntries<T = any>(entries: any): T {
     const result = {} as any;
 
     function addEntry(entry: any) {
-        if (!isObject(entry) && !isFunction(entry)) {
-            throwTypeError(dumpObj(entry) + " is not an entry object");
+        if (isPrimitive(entry)) {
+            throwTypeError(dumpObj(entry, 0, DUMP_ERR_MAX_LENGTH) + " is not an entry object");
         }
 
-        // Convert the key once (like the native function) before checking for __proto__, so an object key which converts
-        // to "__proto__" can't change the prototype of the result
+        // Convert the key once (like the native function), then add it as an own (enumerable, configurable and
+        // writable) property. When the result already "has" the key (it is inherited, eg. "__proto__" including an
+        // object key which converts to it, or a setter or a read-only property of the same name on Object.prototype,
+        // or it is a duplicate key) it is defined rather than assigned, so the prototype of the result can't be changed
+        // and the key is still added. Otherwise it is assigned, as defining every key is ~25x slower. Object.defineProperty
+        // is defined by every runtime which needs this polyfill (ES5).
         let key = entry[0];
         let value = entry[1];
-        key = typeof key === "symbol" ? key : asString(key);
-        if (key === __PROTO__) {
-            // Added as an own (enumerable, configurable and writable) property, rather than changing the prototype
+        // A string key (the usual case) is used as-is, without the symbol check and conversion
+        key = isString(key) || isSymbol(key) ? key : asString(key);
+        if (key in result) {
             objDefine(result, key, { v: value, w: true });
         } else {
             result[key] = value;
@@ -57,15 +65,18 @@ export function polyObjFromEntries<T = any>(entries: any): T {
     }
 
     _throwIfNullOrUndefined(entries);
-    if (isArray(entries)) {
+
+    // A Map or Set which isn't iterable (eg. IE 11, which has no iterator functions) uses a copy of its entries / values
+    let values: ArrayLike<any> = isArray(entries) ? entries : (isIterable(entries) ? NULL_VALUE : _getMapSetValues(entries));
+    if (values) {
         // Like the array iterator every index is visited (an empty slot is undefined, which throws)
-        for (let idx = 0; idx < entries[LENGTH]; idx++) {
-            addEntry(entries[idx]);
+        for (let idx = 0; idx < values[LENGTH]; idx++) {
+            addEntry(values[idx]);
         }
     } else if (isIterable(entries)) {
         iterForOf(entries, addEntry);
     } else {
-        throwTypeError(dumpObj(entries) + " is not iterable");
+        throwTypeError(dumpObj(entries, 0, DUMP_ERR_MAX_LENGTH) + " is not iterable");
     }
 
     return result as T;

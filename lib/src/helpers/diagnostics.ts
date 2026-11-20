@@ -6,8 +6,10 @@
  * Licensed under the MIT license.
  */
 
-import { CALL, EMPTY, NULL_VALUE, ObjProto, TO_STRING, UNDEF_VALUE } from "../internal/constants";
+import { CALL, EMPTY, LENGTH, NULL_VALUE, ObjProto, SUBSTRING, TO_STRING, UNDEF_VALUE } from "../internal/constants";
 import { asString } from "../string/as_string";
+import { isNumber } from "./base";
+import { _cutLength } from "../internal/surrogate";
 
 const ERROR_TYPE = "[object Error]";
 
@@ -20,6 +22,13 @@ const ERROR_TYPE = "[object Error]";
  * - `true` - Format with 4 spaces
  * - 'number' - The number of spaces to format with
  * - `false` (or not Truthy) - Do not format
+ * @param maxLength - (Since 0.20.0) The maximum length of the returned string, when it is longer it is truncated and
+ * ends with `"..."`, which is included in the length (like {@link strTruncate}), and a surrogate pair (eg. an emoji) is
+ * not split (so the result can be one shorter). It must be at least 3 (the length of the `"..."`), a smaller positive value is rounded up to 3 so the
+ * result is `"..."`, and a fraction is rounded down. When it is zero, negative or not a number the length is not
+ * limited. So `dumpObj` should not be passed directly as a callback, eg. `arr.map(dumpObj)` passes the index as the
+ * `format` and the array as the `maxLength` (which TypeScript rejects, as it isn't a number), use a function instead,
+ * eg. `arr.map((value) => dumpObj(value))`.
  * @returns A string representation of the object suitable for diagnostics logging
  * @example
  * ```ts
@@ -62,24 +71,43 @@ const ERROR_TYPE = "[object Error]";
  * let errStrFmt3 = dumpObj(err, 0);
  * // errStrFmt3 === "[object Error]: { stack: "Error: Hello Darkness\n    at <anonymous>:1:13", message: "Hello Darkness", name: "Error" }"
  *
+ * let objStrMax = dumpObj(obj, false, 20);
+ * // objStrMax === "[object Object]: ..."
+ *
+ * let objStrFmtMax = dumpObj(obj, true, 30);
+ * // objStrFmtMax === "[object Object]: {\n    a: 1..."
  * ```
- * @see {@link dumpObj}
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function dumpObj(object: any, format?: boolean | number): string {
-    let propertyValueDump = EMPTY;
-    const objType = ObjProto[TO_STRING][CALL](object);
-    if (objType === ERROR_TYPE) {
-        object = { stack: asString(object.stack), message: asString(object.message), name: asString(object.name) };
+export function dumpObj(object: any, format?: boolean | number, maxLength?: number): string {
+    let result = EMPTY;
+
+    // When the object can't be converted (eg. it is circular, or a getter, toJSON or toString throws) the error is dumped
+    // instead, but only once, so an object which throws itself (eg. from its toJSON) can't recurse forever
+    for (let lp = 0; lp < 2; lp++) {
+        let objType = EMPTY;
+        try {
+            objType = ObjProto[TO_STRING][CALL](object);
+            if (objType === ERROR_TYPE) {
+                object = { stack: asString(object.stack), message: asString(object.message), name: asString(object.name) };
+            }
+
+            let propertyValueDump = JSON.stringify(object, NULL_VALUE, format ? (((typeof format as unknown) === "number") ? format as number : 4) : UNDEF_VALUE);
+            result += objType + ": " + ((propertyValueDump ? propertyValueDump.replace(/"(\w+)"\s*:\s{0,1}/g, "$1: ") : NULL_VALUE) || asString(object));
+            break;
+        } catch(e) {
+            // Unable to convert object (probably circular), so dump the error
+            result += objType + ": " + " - ";
+            object = e;
+        }
     }
 
-    try {
-        propertyValueDump = JSON.stringify(object, NULL_VALUE, format ? (((typeof format as unknown) === "number") ? format as number : 4) : UNDEF_VALUE);
-        propertyValueDump = (propertyValueDump ? propertyValueDump.replace(/"(\w+)"\s*:\s{0,1}/g, "$1: ") : NULL_VALUE) || asString(object);
-    } catch(e) {
-        // Unable to convert object (probably circular)
-        propertyValueDump = " - " + dumpObj(e, format);
+    if (isNumber(maxLength) && maxLength > 0 && result[LENGTH] > maxLength) {
+        // The "..." is included in the length, a length less than 3 is rounded up to 3 (substring() treats the negative
+        // end as 0, so the result is "..."), a fraction is rounded down (by substring()), and a surrogate pair is not
+        // split. Only a number is used, so the array passed to a callback (eg. arr.map(dumpObj)) doesn't limit it
+        result = result[SUBSTRING](0, _cutLength(result, maxLength - 3)) + "...";
     }
 
-    return objType + ": " + propertyValueDump;
+    return result;
 }

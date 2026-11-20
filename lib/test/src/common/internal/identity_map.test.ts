@@ -92,4 +92,28 @@ describe("_createIdentityMap", () => {
             theGlobal.Map = orgMap;
         };
     });
+
+    it("without a native Map a value added to Object.prototype or Array.prototype doesn't make a key look found", () => {
+        const theGlobal: any = getGlobal();
+        const orgMap = theGlobal.Map;
+        let results: any[];
+
+        try {
+            theGlobal.Map = undefined;
+
+            // The key used for the primitive 1 and the index used for an object which is not found
+            (Object.prototype as any)["number_1"] = 99;
+            (Array.prototype as any)["-1"] = 98;
+
+            const theMap = _createIdentityMap<number>();
+            const key = { a: 1 };
+            results = [theMap(1, 1), theMap(key, 2), theMap(1, 9), theMap(key, 9)];
+        } finally {
+            theGlobal.Map = orgMap;
+            delete (Object.prototype as any)["number_1"];
+            delete (Array.prototype as any)["-1"];
+        }
+
+        assert.deepEqual(results, [undefined, undefined, 1, 2]);
+    });
 });

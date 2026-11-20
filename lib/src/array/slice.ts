@@ -6,8 +6,8 @@
  * Licensed under the MIT license.
  */
 
-import { isString } from "../helpers/base";
-import { ArrProto, ArrSlice, CALL, FuncCall } from "../internal/constants";
+import { isStringLike } from "../helpers/base";
+import { ArrProto, ArrSlice, CALL, FuncCall, LENGTH } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
 import { arrMap } from "./map";
 
@@ -94,17 +94,17 @@ export function _arrSliceToArr<T>(theArray: ArrayLike<T> | null | undefined, sta
 /**
  * @internal
  * @ignore
- * Returns the values with any string converted into an array of its characters (as a string has its own functions,
- * such as includes(), which work with substrings), the values are returned as-is (without a copy) when none of them
- * are a string.
+ * Returns the values with any string (or String object) converted into an array of its characters (as a string has its
+ * own functions, such as includes(), which work with substrings), the values are returned as-is (without a copy) when
+ * none of them are a string.
  * @param values - The values to check
  * @returns The values, or a new array of the converted values
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function _strArgsToArr<T>(values: ArrayLike<ArrayLike<T>>): ArrayLike<ArrayLike<T>> {
-    for (let lp = 0; lp < values.length; lp++) {
-        if (isString(values[lp])) {
-            return arrMap(values, (value) => isString(value) ? ArrSlice[CALL](value) : value);
+    for (let lp = 0; lp < values[LENGTH]; lp++) {
+        if (isStringLike(values[lp])) {
+            return arrMap(values, (value) => isStringLike(value) ? ArrSlice[CALL](value) : value);
         }
     }
 

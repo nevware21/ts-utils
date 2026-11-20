@@ -9,7 +9,7 @@
 import { fnApply } from "../funcs/funcs";
 import { isArray, isFunction } from "../helpers/base";
 import { ClearTimeoutOverrideFn, TimeoutOverrideFn, TimeoutOverrideFuncs } from "../helpers/types";
-import { ArrSlice, CALL, UNDEF_VALUE } from "../internal/constants";
+import { ArrSlice, CALL, LENGTH, UNDEF_VALUE } from "../internal/constants";
 import { _getGlobalConfig } from "../internal/global";
 import { ITimerHandler, _createTimerHandler } from "./handler";
 
@@ -26,7 +26,7 @@ let _microtaskCallback: (() => void) | undefined;
  */
 function _getOverrides(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs | undefined, defValue: null | undefined): [any, any] {
     let isArr = isArray(overrideFn);
-    let len = isArr ? (overrideFn as TimeoutOverrideFuncs).length : 0;
+    let len = isArr ? (overrideFn as TimeoutOverrideFuncs)[LENGTH] : 0;
 
     return [
         len > 0 ? (overrideFn as TimeoutOverrideFuncs)[0] : (!isArr ? overrideFn : defValue),
@@ -35,10 +35,11 @@ function _getOverrides(overrideFn: TimeoutOverrideFn | TimeoutOverrideFuncs | un
 }
 
 /**
- * Returns the function to use: the given one, else the package instance override, else the global override (at idx of
- * the global [setTimeout, clearTimeout] pair), else the native function
+ * Returns the override function to use: the given one, else the package instance override, else the global override
+ * (at idx of the global [setTimeout, clearTimeout] pair). The caller falls back to the native function, which is only
+ * read when there is no override, as a runtime may not define it (and only supply the overrides).
  */
-function _resolveFn<F>(theFn: F, packageFn: F | undefined, idx: number, nativeFn: F): F {
+function _resolveFn<F>(theFn: F, packageFn: F | undefined, idx: number): F | undefined {
     let result = isFunction(theFn) ? theFn : packageFn;
     if (!result) {
         // Get global timeout overrides if available
@@ -48,7 +49,7 @@ function _resolveFn<F>(theFn: F, packageFn: F | undefined, idx: number, nativeFn
         }
     }
 
-    return result || nativeFn;
+    return result;
 }
 
 /**
@@ -63,43 +64,85 @@ function _createTimeoutWith(startTimer: boolean, overrideFn: TimeoutOverrideFn |
 
     // Use package instance override functions if provided and no specific override was given
     // If no package overrides, try global overrides before falling back to native functions
-    let setFn = _resolveFn(overrides[0], _setTimeoutFn, 0, setTimeout as TimeoutOverrideFn);
-    let clearFn = _resolveFn(overrides[1], _clearTimeoutFn, 1, clearTimeout as ClearTimeoutOverrideFn);
+    let setFn = _resolveFn(overrides[0], _setTimeoutFn, 0) || setTimeout;
+    let clearFn = _resolveFn(overrides[1], _clearTimeoutFn, 1) || clearTimeout;
 
     let timerFn = theArgs[0];
+    let starts = 0;
+    let starting = 0;
     theArgs[0] = function () {
+        let started = starts;
+        let cancelled: boolean | undefined;
+
         // Microtask fallback hook for environments without native queueMicrotask support, this allows us to
         // simulate the running of microtasks before standard timeouts.
-        let microTasksFn = _microtaskCallback;
-        if (microTasksFn) {
-            // Run any pending microtasks before running the timeout callback to allow any microtasks
-            // scheduled within the callback to run before the next timeout.
-            _microtaskCallback = UNDEF_VALUE;
-            microTasksFn();
+        try {
+            if (_microtaskCallback) {
+                // While a setTimeout override runs the callback synchronously the handler still has the previous
+                // (cleared) timer, which isn't the timer being run
+                let enabled = !starting && handler.h.enabled;
+
+                // Run any pending microtasks before running the timeout callback to allow any microtasks
+                // scheduled within the callback to run before the next timeout.
+                _runMicrotasks();
+
+                // Like a native microtask (which runs before the timer), a microtask which leaves the timer
+                // cancelled stops the callback
+                cancelled = enabled && !handler.h.enabled;
+            }
+        } finally {
+            // The timer has run, a timer started by a microtask (run above) is kept
+            handler.dn(started !== starts);
         }
 
-        handler.dn();
         // Pass this callbacks arguments directly (apply accepts any array-like), this function has no named
         // parameters and the arguments are not modified, so there is no need to slice them into a new array
-        fnApply(timerFn, UNDEF_VALUE, arguments);
+        !cancelled && fnApply(timerFn, UNDEF_VALUE, arguments);
     };
-    
-    let handler = _createTimerHandler(startTimer, (timerId?: any) => {
-        if (timerId) {
-            if (timerId.refresh) {
-                timerId.refresh();
-                return timerId;
-            }
 
-            fnApply(clearFn, UNDEF_VALUE, [ timerId ]);
+    // The timer is started after the handler is assigned (rather than by _createTimerHandler()), as a setTimeout
+    // override may call the callback synchronously, which uses the handler
+    let handler = _createTimerHandler((timerId?: any) => {
+        if (timerId && timerId.refresh) {
+            timerId.refresh();
+        } else {
+            timerId && fnApply(clearFn, UNDEF_VALUE, [ timerId ]);
+
+            // When the callback is run synchronously (handler.dn()) the handler ignores the returned id, so it isn't enabled.
+            // The starts in progress are counted (rather than a flag), as the override may first run another callback which
+            // starts this timer again (a nested start), and the count is restored when the setTimeout throws
+            starting++;
+            try {
+                timerId = fnApply(setFn, UNDEF_VALUE, theArgs);
+            } finally {
+                starting--;
+            }
         }
 
-        return fnApply(setFn, UNDEF_VALUE, theArgs);
+        // Counted once the timer has been started (so not when the setTimeout throws)
+        starts++;
+        return timerId;
     }, function (timerId: any) {
         fnApply(clearFn, UNDEF_VALUE, [ timerId ]);
     });
 
+    startTimer && handler.h.refresh();
+
     return handler.h;
+}
+
+/**
+ * @internal
+ * @ignore
+ * Runs the pending fallback microtasks (when there is no native queueMicrotask), which is done before the callback of a
+ * timeout or an interval so (like native microtasks) they run before a timer which was started before them.
+ */
+export function _runMicrotasks(): void {
+    let microTasksFn = _microtaskCallback;
+    if (microTasksFn) {
+        _microtaskCallback = UNDEF_VALUE;
+        microTasksFn();
+    }
 }
 
 /**

@@ -13,6 +13,11 @@ import { ArrFromMapFn } from "./callbacks";
 
 /**
  * Creates an new shallow-copied array from an array-like object or an iterable.
+ *
+ * It uses the native `Array.from()` when it is available, otherwise {@link polyArrFrom} (see it for the differences). Like
+ * `Array.from()` an iterator which is not iterable (eg. one created by {@link createIterator} or
+ * {@link createRangeIterator}, which has a `next()` function but no `[Symbol.iterator]`) returns an empty array, use
+ * {@link iterToArray} to read the values of an iterator.
  * @function
  * @since 0.9.7
  * @group ArrayLike
@@ -23,7 +28,8 @@ import { ArrFromMapFn } from "./callbacks";
  * @param theValue - An array-like object or iterable to convert to an array.
  * @param mapFn - A {@link ArrFromMapFn | mapping function} to call on every element of the array. If provided, every
  * value to be added to the array is first passed through this map function, and the return
- * value is added to the array instead. The function is called with the following arguments:
+ * value is added to the array instead. The function is called with the value and its index (`mapFn(value, index)`)
+ * and the `thisArg` as `this`.
  * @param thisArg - Value of 'this' used to invoke the mapfn.
  * @example
  * ```ts

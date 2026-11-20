@@ -8,15 +8,16 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { _unwrapFunction, _unwrapFunctionNoInstWithPoly, _unwrapFunctionWithPoly, _unwrapInstFunction } from "../../../../src/internal/unwrapFunction";
-import { strIncludes } from "../../../../src/string/includes";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 
-function _expectThrow(cb: () => void, includes: string): Error {
+// When there is neither a function nor a polyfill the runtime throws its own TypeError (for calling apply on
+// undefined / null), so only the type of the error is checked as its message depends on the runtime
+function _expectThrow(cb: () => void): Error {
     try {
         cb();
-        assert.ok(false, "Expected an exception to be thrown with " + includes);
+        assert.ok(false, "Expected a TypeError to be thrown");
     } catch (e) {
-        assert.ok(strIncludes(e.message, includes), "Expected an exception to be thrown - " + dumpObj(e));
+        assert.ok(e instanceof TypeError, "Expected a TypeError to be thrown - " + dumpObj(e));
         return e;
     }
 }
@@ -45,7 +46,7 @@ describe("unwrapFunction", () => {
         assert.equal(testObj1Called, false, "The testObj1 test function has not been called");
         assert.ok(_expectThrow(() => {
             wrappedFn(null);
-        }, "not defined for"));
+        }));
 
         assert.equal(testObj1Called, false, "The testObj1 test function was not called");
     });
@@ -55,7 +56,7 @@ describe("unwrapFunction", () => {
 
         assert.ok(_expectThrow(() => {
             wrappedFn(null);
-        }, "not defined for"));
+        }));
     });
 
     it("wrapped function with mis-matching target", () => {
@@ -91,7 +92,7 @@ describe("unwrapFunction", () => {
         assert.equal(targetFnCalled, 0, "The target testFn has not been called");
         assert.ok(_expectThrow(() => {
             wrappedFn(testObj1);
-        }, "not defined for"));
+        }));
         assert.equal(testObj1Called, false, "The testObj1 test function was not called");
         assert.equal(targetFnCalled, 0, "The target testFn has not been called");
     });
@@ -150,21 +151,21 @@ describe("unwrapFunction", () => {
 
         assert.ok(_expectThrow(() => {
             wrappedFn(null);
-        }, "not defined for"));
+        }));
 
         assert.ok(_expectThrow(() => {
             wrappedFn({});
-        }, "not defined for"));
+        }));
 
         wrappedFn = _unwrapFunction("test", {} as any);
 
         assert.ok(_expectThrow(() => {
             wrappedFn(null);
-        }, "not defined for"));
+        }));
 
         assert.ok(_expectThrow(() => {
             wrappedFn({});
-        }, "not defined for"));
+        }));
     });
 });
 
@@ -356,33 +357,74 @@ describe("_unwrapFunctionWithPoly", () => {
 
         assert.ok(_expectThrow(() => {
             wrappedFn(null);
-        }, "not defined for"));
+        }));
 
         assert.ok(_expectThrow(() => {
             wrappedFn({});
-        }, "not defined for"));
+        }));
 
         wrappedFn = _unwrapFunctionWithPoly("test", {} as any, null as any);
 
         assert.ok(_expectThrow(() => {
             wrappedFn(null);
-        }, "not defined for"));
+        }));
 
         assert.ok(_expectThrow(() => {
             wrappedFn({});
-        }, "not defined for"));
+        }));
     });
 
-    it("error message includes the number of arguments passed", () => {
+    it("test no class / prototype function and no polyfill for the no instance version", () => {
+        let wrappedFn = _unwrapFunctionNoInstWithPoly("test" as any, {} as any, null as any);
+        let instanceCalled = false;
+
+        assert.ok(_expectThrow(() => {
+            (wrappedFn as any)(null);
+        }));
+
+        // The instance function is never used, so this still throws
+        let instance = {
+            test: () => {
+                instanceCalled = true;
+            }
+        };
+
+        assert.ok(_expectThrow(() => {
+            (wrappedFn as any)(instance);
+        }));
+
+        assert.equal(instanceCalled, false, "The instance function was not called");
+    });
+
+    it("the wrapped functions have no named parameters", () => {
+        // In non-strict code (eg. a bundle without "use strict") a named parameter maps the arguments object to it,
+        // which makes passing the arguments to apply() several times slower, so the value is read from the arguments
+        assert.equal(_unwrapFunction("test", {} as any).length, 0, "_unwrapFunction");
+        assert.equal(_unwrapFunctionWithPoly("test" as any, {} as any, null as any).length, 0, "_unwrapFunctionWithPoly");
+        assert.equal(_unwrapFunctionNoInstWithPoly("test" as any, {} as any, null as any).length, 0, "_unwrapFunctionNoInstWithPoly");
+        assert.equal(_unwrapInstFunction("test").length, 0, "_unwrapInstFunction");
+
+        // The value is still the first argument and the remaining arguments are passed to the function
+        let wrappedFn = _unwrapFunctionWithPoly("test" as any, null as any, null as any);
+        let value = {
+            x: 1,
+            test: function(this: any, a: number, b: number) {
+                return this.x + a + b + arguments.length;
+            }
+        };
+        assert.equal((wrappedFn as any)(value, 2, 3), 8);
+    });
+
+    it("throws a TypeError whatever the number of arguments passed", () => {
         let wrappedFn = _unwrapFunctionWithPoly("test", null as any, null as any);
 
         assert.ok(_expectThrow(() => {
             wrappedFn(null);
-        }, "\"test\" not defined for [object Null]: null with 1 args"));
+        }));
 
         assert.ok(_expectThrow(() => {
             (wrappedFn as any)({}, 1, "two");
-        }, " with 3 args"));
+        }));
     });
 
     it("does not depend on the function's own call or apply properties", () => {
@@ -432,7 +474,7 @@ describe("unwrapInstFunction", () => {
         assert.equal(testObj1Called, false, "The testObj1 test function has not been called");
         assert.ok(_expectThrow(() => {
             wrappedFn(testObj1);
-        }, "\"test\" not defined for"));
+        }));
     });
 
     it("test no matching function name for the object", () => {
@@ -440,20 +482,20 @@ describe("unwrapInstFunction", () => {
 
         assert.ok(_expectThrow(() => {
             wrappedFn(null);
-        }, "\"test\" not defined for [object Null]"));
+        }));
 
         assert.ok(_expectThrow(() => {
             wrappedFn({});
-        }, "\"test\" not defined for [object Object]: {}"));
+        }));
 
         wrappedFn = _unwrapInstFunction("test");
 
         assert.ok(_expectThrow(() => {
             wrappedFn(null);
-        }, "\"test\" not defined for [object Null]"));
+        }));
 
         assert.ok(_expectThrow(() => {
             wrappedFn({});
-        }, "\"test\" not defined for [object Object]: {}"));
+        }));
     });
 });

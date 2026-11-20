@@ -11,6 +11,15 @@ import { createArrayIterator } from "../../../../src/iterator/array";
 import { iterForOf } from "../../../../src/iterator/forOf";
 import { createRangeIterator } from "../../../../src/iterator/range";
 import { objKeys } from "../../../../src/object/object";
+import { arrForEach } from "../../../../src/array/forEach";
+import { getKnownSymbol } from "../../../../src/symbol/symbol";
+import { WellKnownSymbols } from "../../../../src/symbol/well_known";
+import { dumpObj } from "../../../../src/helpers/diagnostics";
+import { iterToArray } from "../../../../src/iterator/iterToArray";
+import { polyArrFrom } from "../../../../src/polyfills/array";
+import { polyObjFromEntries } from "../../../../src/polyfills/object/objFromEntries";
+import { arrAppend } from "../../../../src/array/append";
+import { readArgs } from "../../../../src/funcs/readArgs";
 
 
 describe("create iterator helpers", () => {
@@ -220,5 +229,488 @@ describe("create iterator helpers", () => {
             }, false);
             assert.strictEqual(capturedThis, false, "thisArg of false should be used as-is");
         });
+
+        it("an iterable which also has a next() function is processed using its [Symbol.iterator]()", () => {
+            // Like a jQuery collection, whose next() function returns the next sibling elements (another collection)
+            // rather than an iterator result, so using it as the iterator never finishes
+            let nextCalls = 0;
+            let collection: any = {
+                0: "a",
+                1: "b",
+                length: 2,
+                next: function() {
+                    nextCalls++;
+                    return collection;
+                }
+            };
+
+            collection[getKnownSymbol(WellKnownSymbols.iterator)] = function() {
+                return createArrayIterator(["a", "b"]);
+            };
+
+            let values: string[] = [];
+            iterForOf(collection, (value: string) => {
+                values.push(value);
+            });
+
+            assert.deepEqual(values, ["a", "b"], "The values from the [Symbol.iterator]() iterator should be processed");
+            assert.equal(nextCalls, 0, "The next() function of the iterable should not be called");
+        });
+
+        it("an iterator whose [Symbol.iterator]() returns itself is processed once", () => {
+            let idx = 0;
+            let iter: any = {
+                next: function() {
+                    idx++;
+                    return idx > 3 ? { done: true, value: undefined } : { done: false, value: idx };
+                }
+            };
+
+            iter[getKnownSymbol(WellKnownSymbols.iterator)] = function() {
+                return iter;
+            };
+
+            let values: number[] = [];
+            iterForOf(iter, (value: number) => {
+                values.push(value);
+            });
+
+            assert.deepEqual(values, [1, 2, 3]);
+        });
+
+        it("throws a TypeError when next() returns a value which is not an object", () => {
+            arrForEach([undefined, null, 1, true, "result"], (result) => {
+                let returnCalls = 0;
+                let callbackCalls = 0;
+                let iter = {
+                    next: () => result,
+                    return: (): IteratorResult<number> => {
+                        returnCalls++;
+                        return { done: true, value: undefined };
+                    }
+                };
+
+                assert.throws(() => {
+                    iterForOf(iter as any, () => {
+                        callbackCalls++;
+                    });
+                }, TypeError);
+
+                assert.equal(callbackCalls, 0, "The callbackfn should not be called for a next() result of " + result);
+                assert.equal(returnCalls, 0, "The iterator should not be closed for a next() result of " + result);
+            });
+        });
+
+        it("closes the iterator by calling return() with no arguments when the callbackfn returns -1", () => {
+            let idx = 0;
+            let returnArgs: any[] = [];
+            let iter: Iterator<number> = {
+                next: () => {
+                    return { done: false, value: idx++ };
+                },
+                return: function() {
+                    returnArgs.push(arguments.length);
+                    return { done: true, value: undefined };
+                }
+            };
+
+            let values: number[] = [];
+            iterForOf(iter, (value) => {
+                values.push(value);
+                if (values.length === 2) {
+                    return -1;
+                }
+            });
+
+            assert.deepEqual(values, [0, 1]);
+            assert.equal(returnArgs.length, 1, "return() should be called once");
+            assert.equal(returnArgs[0], 0, "return() should be called with no arguments");
+        });
+
+        it("closes the iterator by calling return() rather than throw() when the callbackfn throws", () => {
+            let returnCalls = 0;
+            let throwCalls = 0;
+            let iter = {
+                next: (): IteratorResult<number> => {
+                    return { done: false, value: 1 };
+                },
+                return: (): IteratorResult<number> => {
+                    returnCalls++;
+                    return { done: true, value: undefined };
+                },
+                throw: (): IteratorResult<number> => {
+                    throwCalls++;
+                    return { done: true, value: undefined };
+                }
+            };
+
+            let error = new Error("callbackfn failed");
+            let caught: any;
+            try {
+                iterForOf(iter, () => {
+                    throw error;
+                });
+            } catch (e) {
+                caught = e;
+            }
+
+            assert.strictEqual(caught, error, "The error thrown by the callbackfn should be thrown");
+            assert.equal(returnCalls, 1, "return() should be called once");
+            assert.equal(throwCalls, 0, "throw() should not be called");
+        });
+
+        it("throws the error from the callbackfn rather than the error thrown by return()", () => {
+            let iter = {
+                next: () => {
+                    return { done: false, value: 1 };
+                },
+                return: (): IteratorResult<number> => {
+                    throw new Error("return failed");
+                }
+            };
+
+            let error = new Error("callbackfn failed");
+            let caught: any;
+            try {
+                iterForOf(iter, () => {
+                    throw error;
+                });
+            } catch (e) {
+                caught = e;
+            }
+
+            assert.strictEqual(caught, error, "The error thrown by the callbackfn should be thrown");
+        });
+
+        it("throws the error thrown by return() when the callbackfn returns -1", () => {
+            let returnError = new Error("return failed");
+            let iter = {
+                next: () => {
+                    return { done: false, value: 1 };
+                },
+                return: (): IteratorResult<number> => {
+                    throw returnError;
+                }
+            };
+
+            let caught: any;
+            try {
+                iterForOf(iter, () => {
+                    return -1;
+                });
+            } catch (e) {
+                caught = e;
+            }
+
+            assert.strictEqual(caught, returnError, "The error thrown by return() should be thrown");
+        });
+
+        it("does not close the iterator when next() throws", () => {
+            let returnCalls = 0;
+            let error = new Error("next failed");
+            let iter = {
+                next: (): IteratorResult<number> => {
+                    throw error;
+                },
+                return: (): IteratorResult<number> => {
+                    returnCalls++;
+                    return { done: true, value: undefined };
+                }
+            };
+
+            let caught: any;
+            try {
+                iterForOf(iter, () => {
+                    assert.ok(false, "The callbackfn should not be called");
+                });
+            } catch (e) {
+                caught = e;
+            }
+
+            assert.strictEqual(caught, error, "The error thrown by next() should be thrown");
+            assert.equal(returnCalls, 0, "return() should not be called");
+        });
+
+        it("does not close the iterator when it is done", () => {
+            let returnCalls = 0;
+            let idx = 0;
+            let iter: Iterator<number> = {
+                next: (): IteratorResult<number> => {
+                    idx++;
+                    return idx > 2 ? { done: true, value: undefined } : { done: false, value: idx };
+                },
+                return: (): IteratorResult<number> => {
+                    returnCalls++;
+                    return { done: true, value: undefined };
+                }
+            };
+
+            let values: number[] = [];
+            iterForOf(iter, (value: number) => {
+                values.push(value);
+            });
+
+            assert.deepEqual(values, [1, 2]);
+            assert.equal(returnCalls, 0, "return() should not be called");
+        });
+
+        it("throws a TypeError when return() doesn't return an object after the callbackfn returns -1", () => {
+            arrForEach([undefined, null, 1, "done", true], (returnValue: any) => {
+                let returnCalls = 0;
+                let iter: any = {
+                    next: () => ({ done: false, value: 1 }),
+                    return: () => {
+                        returnCalls++;
+                        return returnValue;
+                    }
+                };
+
+                assert.throws(() => {
+                    iterForOf(iter, () => -1);
+                }, TypeError, undefined, "A return() result of " + dumpObj(returnValue));
+                assert.equal(returnCalls, 1, "return() should be called once");
+            });
+
+            // An object (including an empty object) is a valid return() result
+            let iter: any = {
+                next: () => ({ done: false, value: 1 }),
+                return: () => ({})
+            };
+
+            iterForOf(iter, () => -1);
+        });
+
+        it("throws the callbackfn's error rather than a TypeError when return() doesn't return an object", () => {
+            const error = new Error("callbackfn error");
+            let returnCalls = 0;
+            let iter: any = {
+                next: () => ({ done: false, value: 1 }),
+                return: (): any => {
+                    returnCalls++;
+                    return undefined;
+                }
+            };
+
+            let caught: any;
+            try {
+                iterForOf(iter, () => {
+                    throw error;
+                });
+            } catch (e) {
+                caught = e;
+            }
+
+            assert.strictEqual(caught, error, "The callbackfn's error should be thrown");
+            assert.equal(returnCalls, 1, "return() should be called once");
+        });
+
+        it("throws a TypeError when [Symbol.iterator]() doesn't return an iterator", () => {
+            const iteratorSymbol = getKnownSymbol(WellKnownSymbols.iterator);
+            arrForEach([undefined, null, 1, "iterator", {}, { next: 1 }], (iterator: any) => {
+                let calls = 0;
+                const iterable: any = {};
+                iterable[iteratorSymbol] = () => iterator;
+
+                assert.throws(() => {
+                    iterForOf(iterable, () => {
+                        calls++;
+                    });
+                }, TypeError, undefined, "A [Symbol.iterator]() result of " + dumpObj(iterator));
+                assert.equal(calls, 0, "The callbackfn should not be called");
+            });
+        });
+
+        it("only reads [Symbol.iterator] once", () => {
+            const iteratorSymbol = getKnownSymbol(WellKnownSymbols.iterator);
+            let reads = 0;
+            const iterable: any = {};
+            Object.defineProperty(iterable, iteratorSymbol, {
+                get: () => {
+                    reads++;
+                    return () => createArrayIterator([1, 2]);
+                }
+            });
+
+            let values: number[] = [];
+            iterForOf(iterable, (value: number) => {
+                values.push(value);
+            });
+
+            assert.deepEqual(values, [1, 2]);
+            assert.equal(reads, 1, "[Symbol.iterator] should only be read once");
+        });
+
+        it("reads return once and calls it with the iterator as this when it closes the iterator", () => {
+            let reads = 0;
+            let returnThis: any;
+            const iter: any = {
+                next: () => ({ done: false, value: 1 })
+            };
+
+            Object.defineProperty(iter, "return", {
+                get: () => {
+                    reads++;
+                    return function(this: any) {
+                        returnThis = this;
+                        return { done: true };
+                    };
+                }
+            });
+
+            iterForOf(iter, () => -1);
+            assert.equal(reads, 1, "return should only be read once");
+            assert.strictEqual(returnThis, iter, "return() should be called with the iterator as this");
+        });
+    });
+});
+
+describe("a value which is identified as a Map or Set (by its Symbol.toStringTag) but isn't iterable", () => {
+    // Without a forEach() function it isn't processed as a Map or Set (which is only done for one that isn't iterable,
+    // eg. on IE 11), so it's handled like any other value which isn't iterable, as the native functions do
+    function _createTagged(tag: string, forEachFn?: any) {
+        let value: any = {};
+        value[Symbol.toStringTag] = tag;
+        if (forEachFn !== undefined) {
+            value.forEach = forEachFn;
+        }
+
+        return value;
+    }
+
+    it("iterForOf doesn't process it", function() {
+        if (typeof Symbol !== "function" || !Symbol.toStringTag) {
+            this.skip();
+            return;
+        }
+
+        let values: any[] = [];
+        iterForOf(_createTagged("Map"), (value) => {
+            values.push(value);
+        });
+        iterForOf(_createTagged("Set", 1), (value) => {
+            values.push(value);
+        });
+
+        assert.deepEqual(values, []);
+    });
+
+    it("iterToArray, polyArrFrom, readArgs and arrAppend handle it like a value which isn't iterable", function() {
+        if (typeof Symbol !== "function" || !Symbol.toStringTag) {
+            this.skip();
+            return;
+        }
+
+        let tagged = _createTagged("Set");
+
+        assert.deepEqual(iterToArray(_createTagged("Map")), []);
+        assert.deepEqual(iterToArray(_createTagged("Set", "forEach")), []);
+        assert.deepEqual(polyArrFrom(_createTagged("Map")), Array.from(_createTagged("Map")), "Like Array.from");
+        assert.deepEqual(polyArrFrom(_createTagged("Map")), []);
+        assert.deepEqual(readArgs(_createTagged("Map") as any), []);
+        assert.deepEqual(arrAppend([1], tagged), [1, tagged], "The value itself is appended");
+    });
+
+    it("polyObjFromEntries throws a TypeError, like Object.fromEntries", function() {
+        if (typeof Symbol !== "function" || !Symbol.toStringTag) {
+            this.skip();
+            return;
+        }
+
+        assert.throws(() => {
+            polyObjFromEntries(_createTagged("Map"));
+        }, TypeError);
+    });
+
+    it("arrAppend appends a function which is identified as a Map or Set (and has a forEach()) as-is", function() {
+        if (typeof Symbol !== "function" || !Symbol.toStringTag) {
+            this.skip();
+            return;
+        }
+
+        let forEachCalls = 0;
+        let taggedFn: any = function () {
+            // Not called
+        };
+        taggedFn[Symbol.toStringTag] = "Map";
+        taggedFn.forEach = (callback: (value: any, key: any) => void) => {
+            forEachCalls++;
+            callback(1, "a");
+        };
+
+        assert.deepEqual(arrAppend([1], taggedFn), [1, taggedFn], "The function itself is appended");
+        assert.equal(forEachCalls, 0, "Its forEach() was not called");
+    });
+});
+
+// Like on a runtime without Symbol.iterator (eg. IE, where an array isn't iterable and IE 11's Map / Set have no
+// iterator functions), an own [Symbol.iterator] of undefined makes the value not iterable, so iterForOf uses its
+// fallback. The node-only iterator_no_symbol tests also check the fallback with the modules loaded again without
+// Symbol, but the code of a module which is loaded again isn't included in the coverage
+describe("iterForOf with an array, Map or Set which isn't iterable", () => {
+    function _notIterable<T>(value: T): T {
+        (value as any)[Symbol.iterator] = undefined;
+        return value;
+    }
+
+    it("processes an array by its indexes, including a value added by the callbackFn", function() {
+        if (typeof Symbol !== "function" || !Symbol.iterator) {
+            this.skip();
+            return;
+        }
+
+        const values: number[] = [];
+        const arr = _notIterable([1, 2, 3]);
+
+        iterForOf(arr, (value) => {
+            values.push(value);
+            if (value === 1) {
+                arr.push(4);
+            }
+        });
+
+        assert.deepEqual(values, [1, 2, 3, 4], "Like the native array iterator, the values are read as they are iterated");
+    });
+
+    it("stops processing an array when the callbackFn returns -1", function() {
+        if (typeof Symbol !== "function" || !Symbol.iterator) {
+            this.skip();
+            return;
+        }
+
+        const values: number[] = [];
+
+        iterForOf(_notIterable([1, 2, 3]), (value) => {
+            values.push(value);
+            if (value === 2) {
+                return -1;
+            }
+        });
+
+        assert.deepEqual(values, [1, 2]);
+    });
+
+    it("processes the entries of a Map and the values of a Set using their forEach()", function() {
+        if (typeof Symbol !== "function" || !Symbol.iterator) {
+            this.skip();
+            return;
+        }
+
+        const mapValues: any[] = [];
+        const setValues: string[] = [];
+        const set = _notIterable(new Set(["x", "y"]));
+
+        iterForOf(_notIterable(new Map<string, number>([["a", 1], ["b", 2]])), (value) => {
+            mapValues.push(value);
+        });
+
+        iterForOf(set, (value) => {
+            setValues.push(value);
+            if (value === "x") {
+                set.add("z");
+            }
+        });
+
+        assert.deepEqual(mapValues, [["a", 1], ["b", 2]], "The [key, value] entries of the Map");
+        assert.deepEqual(setValues, ["x", "y"], "The values of the Set, a value added while it is processed isn't processed (a copy of the values is used)");
     });
 });

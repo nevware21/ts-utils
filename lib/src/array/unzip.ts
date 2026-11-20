@@ -7,7 +7,7 @@
  */
 
 import { isArrayLike } from "../helpers/base";
-import { getLength } from "../helpers/length";
+import { _toLength } from "../helpers/length";
 import { UNDEF_VALUE } from "../internal/constants";
 import { arrForEach } from "./forEach";
 
@@ -36,7 +36,7 @@ export function arrUnzip(theArray: ArrayLike<ArrayLike<any>> | null | undefined)
     let result: any[][];
 
     if (isArrayLike(theArray)) {
-        const len = getLength(theArray);
+        const len = _toLength(theArray);
 
         if (len !== 0) {
             // Find the maximum length among all sub-arrays
@@ -44,7 +44,7 @@ export function arrUnzip(theArray: ArrayLike<ArrayLike<any>> | null | undefined)
 
             arrForEach(theArray, (subArray) => {
                 if (isArrayLike(subArray)) {
-                    const subLen = getLength(subArray);
+                    const subLen = _toLength(subArray);
 
                     if (subLen > maxLen) {
                         maxLen = subLen;
@@ -63,8 +63,10 @@ export function arrUnzip(theArray: ArrayLike<ArrayLike<any>> | null | undefined)
                 // Fill result arrays
                 arrForEach(theArray, (subArray) => {
                     if (isArrayLike(subArray)) {
+                        // The length is read once for each sub-array, rather than for each of its values
+                        const subLen = _toLength(subArray);
                         for (let lp = 0; lp < maxLen; lp++) {
-                            result[lp].push(lp < getLength(subArray) ? subArray[lp] : UNDEF_VALUE);
+                            result[lp].push(lp < subLen ? subArray[lp] : UNDEF_VALUE);
                         }
                     }
                 });

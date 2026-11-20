@@ -8,6 +8,7 @@
 
 import { isNullOrUndefined } from "../helpers/base";
 import { EMPTY, LENGTH } from "../internal/constants";
+import { _cutLength } from "../internal/surrogate";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { mathToInt } from "../math/to_int";
 import { asString } from "./as_string";
@@ -19,6 +20,9 @@ import { strLeft } from "./substring";
  * When the value is already within `maxLength`, the original string is returned unchanged. When a
  * suffix is supplied, the result length remains capped at `maxLength`, so the original value is
  * shortened further as needed to make room for the suffix.
+ *
+ * A surrogate pair (eg. an emoji) is not split (since 0.20.0), so the result can be one shorter than `maxLength` when
+ * the value (or suffix) would otherwise end with a high surrogate (the first half of a pair).
  *
  * Both `value` and `suffix` are coerced to strings via {@link asString} before processing.
  * Passing `null` or `undefined` for `value` will cause this function to throw, while a
@@ -55,9 +59,9 @@ export function strTruncate(value: string, maxLength: number, suffix?: string): 
             let theSuffix = (!suffix && isNullOrUndefined(suffix)) ? EMPTY : asString(suffix);
 
             if (theSuffix[LENGTH] >= length) {
-                result = strLeft(theSuffix, length);
+                result = strLeft(theSuffix, _cutLength(theSuffix, length));
             } else {
-                result = strLeft(result, length - theSuffix[LENGTH]) + theSuffix;
+                result = strLeft(result, _cutLength(result, length - theSuffix[LENGTH])) + theSuffix;
             }
         }
     }

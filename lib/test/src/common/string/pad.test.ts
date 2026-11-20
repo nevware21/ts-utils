@@ -13,7 +13,7 @@ import { isUndefined } from "../../../../src/helpers/base";
 
 describe("string helpers", () => {
 
-    describe("strPadStart null / undefined", () => {
+    it("strPadStart null / undefined", () => {
         _checkPadStart(null, 0);
         _checkPadStart(null, 2);
         _checkPadStart(null, -2);
@@ -26,7 +26,7 @@ describe("string helpers", () => {
         _checkPadStart(undefined, 100);
     });
 
-    describe("polyStrPadStart null / undefined", () => {
+    it("polyStrPadStart null / undefined", () => {
         _checkPolyPadStart(null, 0);
         _checkPolyPadStart(null, 2);
         _checkPolyPadStart(null, -2);
@@ -39,7 +39,7 @@ describe("string helpers", () => {
         _checkPolyPadStart(undefined, 100);
     });
 
-    describe("implStrPadStart null / undefined", () => {
+    it("implStrPadStart null / undefined", () => {
         _checkImplPadStart(null, 0);
         _checkImplPadStart(null, 2);
         _checkImplPadStart(null, -2);
@@ -52,7 +52,7 @@ describe("string helpers", () => {
         _checkImplPadStart(undefined, 100);
     });
 
-    describe("strPadStart With values", () => {
+    it("strPadStart With values", () => {
         _checkPadStart("", 0);
         _checkPadStart("null", 0);
         _checkPadStart("abcdefg", 0);
@@ -70,7 +70,7 @@ describe("string helpers", () => {
         assert.equal("abc", strPadStart("abc", 1));
     });
 
-    describe("polyStrPadStart With values", () => {
+    it("polyStrPadStart With values", () => {
         _checkPolyPadStart("", 0);
         _checkPolyPadStart("null", 0);
         _checkPolyPadStart("abcdefg", 0);
@@ -88,7 +88,7 @@ describe("string helpers", () => {
         assert.equal("abc", polyStrPadStart("abc", 1));
     });
 
-    describe("implStrPadStart With values", () => {
+    it("implStrPadStart With values", () => {
         _checkImplPadStart("", 0);
         _checkImplPadStart("null", 0);
         _checkImplPadStart("abcdefg", 0);
@@ -101,7 +101,7 @@ describe("string helpers", () => {
         _checkImplPadStart("abc", 1/0);
     });
 
-    describe("strPadStart With padding", () => {
+    it("strPadStart With padding", () => {
         _checkPadStart("", 0, "foo");
         _checkPadStart("null", 0, "foo");
         _checkPadStart("abcdefg", 0, "foo");
@@ -119,7 +119,7 @@ describe("string helpers", () => {
         assert.equal("abc", strPadStart("abc", 1, "foo"));
     });
 
-    describe("polyStrPadStart With padding", () => {
+    it("polyStrPadStart With padding", () => {
         _checkPolyPadStart("", 0, "foo");
         _checkPolyPadStart("null", 0, "foo");
         _checkPolyPadStart("abcdefg", 0, "foo");
@@ -137,7 +137,7 @@ describe("string helpers", () => {
         assert.equal("abc", polyStrPadStart("abc", 1, "foo"));
     });
 
-    describe("implStrPadStart With padding", () => {
+    it("implStrPadStart With padding", () => {
         _checkImplPadStart("", 0, "foo");
         _checkImplPadStart("null", 0, "foo");
         _checkImplPadStart("abcdefg", 0, "foo");
@@ -150,7 +150,7 @@ describe("string helpers", () => {
         _checkImplPadStart("abc", 1/0, "foo");
     });
 
-    describe("strPadEnd null / undefined", () => {
+    it("strPadEnd null / undefined", () => {
         _checkPadEnd(null, 0);
         _checkPadEnd(null, 2);
         _checkPadEnd(null, -2);
@@ -163,7 +163,7 @@ describe("string helpers", () => {
         _checkPadEnd(undefined, 100);
     });
 
-    describe("polyStrPadEnd null / undefined", () => {
+    it("polyStrPadEnd null / undefined", () => {
         _checkPolyPadEnd(null, 0);
         _checkPolyPadEnd(null, 2);
         _checkPolyPadEnd(null, -2);
@@ -176,7 +176,7 @@ describe("string helpers", () => {
         _checkPolyPadEnd(undefined, 100);
     });
 
-    describe("implStrPadEnd null / undefined", () => {
+    it("implStrPadEnd null / undefined", () => {
         _checkImplPadEnd(null, 0);
         _checkImplPadEnd(null, 2);
         _checkImplPadEnd(null, -2);
@@ -189,7 +189,7 @@ describe("string helpers", () => {
         _checkImplPadEnd(undefined, 100);
     });
 
-    describe("strPadEnd With values", () => {
+    it("strPadEnd With values", () => {
         _checkPadEnd("", 0);
         _checkPadEnd("null", 0);
         _checkPadEnd("abcdefg", 0);
@@ -207,7 +207,7 @@ describe("string helpers", () => {
         assert.equal("abc", strPadEnd("abc", 1));
     });
 
-    describe("polyStrPadEnd With values", () => {
+    it("polyStrPadEnd With values", () => {
         _checkPolyPadEnd("", 0);
         _checkPolyPadEnd("null", 0);
         _checkPolyPadEnd("abcdefg", 0);
@@ -225,7 +225,7 @@ describe("string helpers", () => {
         assert.equal("abc", polyStrPadEnd("abc", 1));
     });
 
-    describe("implStrPadEnd With values", () => {
+    it("implStrPadEnd With values", () => {
         _checkImplPadEnd("", 0);
         _checkImplPadEnd("null", 0);
         _checkImplPadEnd("abcdefg", 0);
@@ -238,7 +238,7 @@ describe("string helpers", () => {
         _checkImplPadEnd("abc", 1/0);
     });
 
-    describe("strPadEnd With padding", () => {
+    it("strPadEnd With padding", () => {
         _checkPadEnd("", 0, "foo");
         _checkPadEnd("null", 0, "foo");
         _checkPadEnd("abcdefg", 0, "foo");
@@ -256,7 +256,7 @@ describe("string helpers", () => {
         assert.equal("abc", strPadEnd("abc", 1, "foo"));
     });
 
-    describe("polyStrPadEnd With padding", () => {
+    it("polyStrPadEnd With padding", () => {
         _checkPolyPadEnd("", 0, "foo");
         _checkPolyPadEnd("null", 0, "foo");
         _checkPolyPadEnd("abcdefg", 0, "foo");
@@ -274,7 +274,7 @@ describe("string helpers", () => {
         assert.equal("abc", polyStrPadEnd("abc", 1, "foo"));
     });
 
-    describe("implStrPadEnd With padding", () => {
+    it("implStrPadEnd With padding", () => {
         _checkImplPadEnd("", 0, "foo");
         _checkImplPadEnd("null", 0, "foo");
         _checkImplPadEnd("abcdefg", 0, "foo");
@@ -310,6 +310,14 @@ describe("string helpers", () => {
             _checkPolyPadStart("abc", 5, 0 as any);
             _checkPolyPadEnd("abc", 6, null as any);
             _checkPolyPadEnd("abc", 5, false as any);
+        });
+
+        it("the string \"undefined\" is a padString, it doesn't use the default", () => {
+            assert.equal(polyStrPadStart("abc", 6, "undefined"), "undabc");
+            assert.equal(polyStrPadEnd("abc", 6, "undefined"), "abcund");
+
+            _checkPolyPadStart("abc", 6, "undefined");
+            _checkPolyPadEnd("abc", 6, "undefined");
         });
     });
 

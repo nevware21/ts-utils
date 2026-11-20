@@ -9,7 +9,8 @@
 import { assert } from "@nevware21/tripwire-chai";
 import {
     DeepPartial, DeepReadonly, DeepRequired, IdleCallbackFn, IIdleDeadline, IIdleRequestOptions, Mutable,
-    NonEmptyArray, ObjDefinePropDescriptorMap, objDefineProps, ReadonlyRecord, RequestIdleCallback, ValueOf
+    NonEmptyArray, ObjDefinePropDescriptorMap, objDefineProps, ReadonlyRecord, RequestIdleCallback, ValueOf,
+    isStringObject, isStringLike
 } from "../../../../src/index";
 
 type IsEqual<T, U> =
@@ -131,5 +132,35 @@ describe("typing helper aliases", () => {
         assert.equal(deadlines, 1, "The callback was called with the deadline");
         assert.equal(optionsToNative.timeout, 10, "The options are retained");
         assert.equal(requestToNative(callback), 42, "The native function was called");
+    });
+
+    it("should narrow isStringObject to a String object only, and isStringLike to either", () => {
+        function checkObject(value: string | number | String): string {
+            if (isStringObject(value)) {
+                type _trueCheck = AssertTrue<IsEqual<typeof value, String>>;
+                return "object";
+            }
+
+            // A primitive string is never a String object, so it must not be removed when the check is false
+            type _falseCheck = AssertTrue<IsEqual<typeof value, string | number>>;
+            return typeof value;
+        }
+
+        function checkLike(value: string | number | String): string {
+            if (isStringLike(value)) {
+                type _trueCheck = AssertTrue<IsEqual<typeof value, string | String>>;
+                return "like";
+            }
+
+            type _falseCheck = AssertTrue<IsEqual<typeof value, number>>;
+            return typeof value;
+        }
+
+        assert.equal(checkObject(new String("abc")), "object");
+        assert.equal(checkObject("abc"), "string", "A primitive string reaches the false branch");
+        assert.equal(checkObject(1), "number");
+        assert.equal(checkLike(new String("abc")), "like");
+        assert.equal(checkLike("abc"), "like");
+        assert.equal(checkLike(1), "number");
     });
 });

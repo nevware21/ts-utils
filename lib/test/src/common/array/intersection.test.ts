@@ -57,3 +57,20 @@ describe("arrIntersection", () => {
         assert.deepEqual(arrIntersection(null, [1, 2]), []);
     });
 });
+
+describe("arrIntersection with a String object", () => {
+    it("compares the characters of a String object, like a string", () => {
+        assert.deepEqual(arrIntersection(["bc"], new String("abc") as any), []);
+        assert.deepEqual(arrIntersection(["b", "z"], new String("abc") as any), ["b"]);
+        assert.deepEqual(arrIntersection(["b", "z"], "abc" as any), ["b"]);
+    });
+});
+
+describe("arrIntersection with later array-likes", () => {
+    it("searches any later value except null and undefined like an array-like, converting its length like the native functions", () => {
+        assert.deepEqual(arrIntersection(["x", "z"], { length: "2", 0: "x", 1: "y" } as any), ["x"], "A string length");
+        assert.deepEqual(arrIntersection(["x", "y"], { length: 1.5, 0: "x", 1: "y" } as any), ["x"], "A fractional length");
+        assert.deepEqual(arrIntersection(["x"], null as any), [], "null includes nothing");
+        assert.deepEqual(arrIntersection(["x"], 5 as any), [], "A value without a length includes nothing");
+    });
+});

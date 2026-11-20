@@ -41,9 +41,9 @@ import { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "./callbacks";
  * @typeParam E - Identifies a more specific instance of the base array type
  * @param theArray - The array or array like object of elements to be searched.
  * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
- * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
- * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
- * @param thisArg - A value to use as this when executing callbackFn. Defaults to the array if not provided.
+ * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in theArray until
+ * the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+ * @param thisArg - A value to use as this when executing callbackFn, like the native function it is `undefined` when not provided.
  * @return `true` if the callback function returns a truthy value for at least one element in the array.
  * Otherwise, `false`.
  */

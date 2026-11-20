@@ -68,6 +68,10 @@ export type ArrGroupByCallbackFn<T> = (value: T, index: number, array: ArrayLike
 /**
  * The arrGroupBy() method groups array elements by the result of a callback function,
  * returning an object where keys are group identifiers and values are arrays of grouped elements.
+ *
+ * Like {@link https://nevware21.github.io/ts-utils/typedoc/functions/arrForEach.html | arrForEach} an empty slot of a
+ * sparse array (or a missing index of an array-like) is skipped, so the callbackFn isn't called for it and it isn't in
+ * any group (unlike `Object.groupBy()`, which groups it as `undefined`).
  * @function
  * @since 0.14.0
  * @group Array

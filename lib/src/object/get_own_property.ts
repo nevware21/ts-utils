@@ -6,8 +6,9 @@
  * Licensed under the MIT license.
  */
 
-import { GET_OWN_PROPERTY_DESCRIPTOR, GET_OWN_PROPERTY_NAMES, GET_OWN_PROPERTY_SYMBOLS, ObjClass } from "../internal/constants";
-import { _returnEmptyArray, _returnNothing } from "../internal/stubs";
+import { GET_OWN_PROPERTY_NAMES, ObjClass } from "../internal/constants";
+import { _objGetOwnPropertyDescriptor, _objGetOwnPropertySymbols } from "../internal/own_props";
+import { _returnEmptyArray } from "../internal/stubs";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { polyObjGetOwnPropertyDescriptors } from "../polyfills/object/objGetOwnProperty";
 
@@ -51,7 +52,7 @@ import { polyObjGetOwnPropertyDescriptors } from "../polyfills/object/objGetOwnP
  * ```
  * Note: In ES5, if the first argument to this method is not an object (a primitive), then it will cause a TypeError. In ES2015, a non-object first argument will be coerced to an object at first.
  */
-export const objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR)), _returnNothing));
+export const objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = _objGetOwnPropertyDescriptor;
 
 /**
  * The objGetOwnPropertyDescriptors() method returns all own property descriptors of a given object.
@@ -145,4 +146,4 @@ export const objGetOwnPropertyNames: (obj: any) => string[] = (/*#__PURE__*/_pur
  * console.log(symbolProps[1] === b); // true
  * ```
  */
-export const objGetOwnPropertySymbols: (obj: any) => symbol[] = (/* #__PURE__*/_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertySymbols>(ObjClass, GET_OWN_PROPERTY_SYMBOLS)), _returnEmptyArray));
+export const objGetOwnPropertySymbols: (obj: any) => symbol[] = _objGetOwnPropertySymbols;

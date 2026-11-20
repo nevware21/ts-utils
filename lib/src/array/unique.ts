@@ -12,7 +12,12 @@ import { arrForEach } from "./forEach";
 
 /**
  * The arrUnique() method returns a new array with duplicate elements removed.
- * Uses strict equality (===) for comparison and maintains insertion order.
+ * Uses the SameValueZero comparison (like strict equality `===`, except that `NaN` is equal to `NaN`) and maintains
+ * insertion order.
+ *
+ * Like {@link https://nevware21.github.io/ts-utils/typedoc/functions/arrForEach.html | arrForEach} an empty slot of a
+ * sparse array (or a missing index of an array-like) is skipped, so it isn't included as `undefined`, eg.
+ * `arrUnique([1, , 3])` is `[1, 3]`.
  * @function
  * @since 0.14.0
  * @group Array

@@ -8,7 +8,7 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { isUnsafeTarget } from "../../../../src/object/isUnsafeTarget";
-import { getInst } from "../../../../src/helpers/environment";
+import { getGlobal, getInst } from "../../../../src/helpers/environment";
 
 describe("object isUnsafeTarget tests", () => {
     it("should identify common built-in prototype objects", () => {
@@ -147,5 +147,113 @@ describe("object isUnsafeTarget tests", () => {
         if (typeof Set !== "undefined") {
             assert.isFalse(isUnsafeTarget(new Set()), "Set instance should be safe");
         }
+    });
+
+    it("should identify the %TypedArray% prototype that the typed arrays inherit from when available", () => {
+        if (typeof Uint8Array !== "undefined") {
+            const typedArrayProto = Object.getPrototypeOf(Uint8Array.prototype);
+            assert.notStrictEqual(typedArrayProto, Object.prototype, "The typed arrays inherit from %TypedArray%.prototype");
+            assert.isTrue(isUnsafeTarget(typedArrayProto), "%TypedArray%.prototype should be unsafe");
+            assert.isTrue(isUnsafeTarget(Object.getPrototypeOf(Int32Array.prototype)), "%TypedArray%.prototype should be unsafe");
+        }
+
+        let float16Array: any = getInst("Float16Array");
+        if (float16Array) {
+            assert.isTrue(isUnsafeTarget(float16Array["prototype"]), "Float16Array.prototype should be unsafe");
+        }
+    });
+
+    it("should identify the AggregateError, BigInt and Iterator prototype objects when available", () => {
+        let aggregateError: any = getInst("AggregateError");
+        if (aggregateError) {
+            assert.isTrue(isUnsafeTarget(aggregateError["prototype"]), "AggregateError.prototype should be unsafe");
+        }
+        let bigInt: any = getInst("BigInt");
+        if (bigInt) {
+            assert.isTrue(isUnsafeTarget(bigInt["prototype"]), "BigInt.prototype should be unsafe");
+        }
+        let iterator: any = getInst("Iterator");
+        if (iterator) {
+            assert.isTrue(isUnsafeTarget(iterator["prototype"]), "Iterator.prototype should be unsafe");
+        }
+    });
+
+    it("should identify the prototype of a class which is defined after the first check (eg. a polyfill)", function() {
+        // The classes that isUnsafeTarget looks for which this runtime doesn't define (so were not defined when it was
+        // first called), the test defines one of them (like a polyfill would) and then removes it
+        const classNames = [
+            "AggregateError", "Map", "Set", "WeakMap", "WeakSet", "Promise", "BigInt", "Iterator", "SharedArrayBuffer",
+            "Float16Array", "WeakRef", "FinalizationRegistry"
+        ];
+        let missingName: string | undefined;
+        for (let lp = 0; lp < classNames.length; lp++) {
+            if (!getInst(classNames[lp])) {
+                missingName = classNames[lp];
+                break;
+            }
+        }
+
+        if (!missingName) {
+            // Every class is defined by this runtime
+            this.skip();
+            return;
+        }
+
+        // Make sure the list of prototypes has been created before the "polyfill" is defined
+        assert.isTrue(isUnsafeTarget(Object.prototype));
+
+        const theGlobal: any = getGlobal();
+        const PolyfillClass: any = function () {
+            // A polyfill of the missing class
+        };
+        PolyfillClass.prototype.polyMethod = function () {
+            return 42;
+        };
+
+        theGlobal[missingName] = PolyfillClass;
+        try {
+            assert.isTrue(isUnsafeTarget(PolyfillClass.prototype), missingName + " polyfill prototype should be unsafe");
+            assert.isFalse(isUnsafeTarget(new PolyfillClass()), missingName + " polyfill instance should be safe");
+        } finally {
+            delete theGlobal[missingName];
+        }
+    });
+
+    it("should return false for the prototype of a class which is not a built-in", () => {
+        class MyClass {
+            public value = 1;
+        }
+
+        function MyFunction() {
+            // A function used as a class
+        }
+
+        assert.isFalse(isUnsafeTarget(MyClass.prototype), "A class prototype should be safe");
+        assert.isFalse(isUnsafeTarget((MyFunction as any).prototype), "A function prototype should be safe");
+        assert.isFalse(isUnsafeTarget(new MyClass()), "A class instance should be safe");
+    });
+});
+
+describe("isUnsafeTarget with a target which can't be checked", () => {
+    it("doesn't throw for a revoked Proxy", function() {
+        if (typeof Proxy !== "function" || !(Proxy as any).revocable) {
+            this.skip();
+            return;
+        }
+
+        const revocable = (Proxy as any).revocable({}, {});
+        revocable.revoke();
+        assert.isFalse(isUnsafeTarget(revocable.proxy));
+    });
+
+    it("doesn't throw for an object whose own constructor getter throws", () => {
+        const target: any = {};
+        Object.defineProperty(target, "constructor", {
+            get: () => {
+                throw new Error("constructor error");
+            }
+        });
+
+        assert.isFalse(isUnsafeTarget(target));
     });
 });

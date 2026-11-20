@@ -6,13 +6,13 @@
  * Licensed under the MIT license.
  */
 
-import { isUndefined } from "../helpers/base";
+import { isStrictUndefined } from "../helpers/base";
 import { EMPTY, LENGTH, StrProto, SUBSTRING } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunction, _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
-import { mathMax } from "../math/min_max";
 import { mathToInt } from "../math/to_int";
 import { asString } from "./as_string";
+import { _toRelIndex } from "../helpers/length";
 import { strSlice } from "./slice";
 
 /**
@@ -92,13 +92,11 @@ export function polyStrSubstr(value: string, start: number, length?: number): st
 
     value = asString(value);
 
-    // Like the native function the start and length are converted to integers (NaN and an omitted start are 0)
-    let theStart = mathToInt(start);
-    if (theStart < 0) {
-        theStart = mathMax(theStart + value[LENGTH], 0);
-    }
+    // Like the native function the start and length are converted to integers (NaN and an omitted start are 0), a
+    // negative start counts back from the end (and one after the end returns an empty string)
+    let theStart = _toRelIndex(start, value[LENGTH]);
 
-    let theLength = isUndefined(length) ? value[LENGTH] : mathToInt(length);
+    let theLength = isStrictUndefined(length) ? value[LENGTH] : mathToInt(length);
 
     return theLength > 0 ? strSlice(value, theStart, theStart + theLength) : EMPTY;
 }

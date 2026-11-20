@@ -9,6 +9,13 @@
 import { assert } from "@nevware21/tripwire-chai";
 import { arrIndexOfSubset, arrLastIndexOfSubset } from "../../../../src/array/arrIndexOfSubset";
 
+/**
+ * Returns whether the value is 0 rather than -0, without Object.is (which an ES5 runtime doesn't have)
+ */
+function _isPositiveZero(value: number) {
+    return value === 0 && 1 / value === Infinity;
+}
+
 describe("arrIndexOfSubset", () => {
 
     it("null / undefined", () => {
@@ -104,6 +111,14 @@ describe("arrIndexOfSubset", () => {
     it("NaN never matches", () => {
         assert.equal(arrIndexOfSubset([1, NaN, 2], [NaN, 2]), -1);
         assert.equal(arrIndexOfSubset([1, NaN, 2], [1, NaN]), -1);
+    });
+
+    it("a fractional negative fromIndex or a length of -0 returns 0 (not -0), like indexOf()", () => {
+        assert.isTrue(_isPositiveZero(arrIndexOfSubset([1, 2], [1], -0.5)), "fromIndex -0.5");
+        assert.isTrue(_isPositiveZero(arrIndexOfSubset([1, 2], [], -0.5)), "fromIndex -0.5 with an empty subset");
+        assert.isTrue(_isPositiveZero(arrIndexOfSubset([1, 2], [1], -0)), "fromIndex -0");
+        assert.isTrue(_isPositiveZero(arrIndexOfSubset({ length: -0 } as any, [])), "length -0");
+        assert.isTrue(_isPositiveZero([1, 2].indexOf(1, -0.5)), "native indexOf");
     });
 });
 
@@ -206,6 +221,17 @@ describe("arrLastIndexOfSubset", () => {
         assert.equal(arrIndexOfSubset(array, [1, 2], -Infinity), 0);
     });
 
+    it("the string \"undefined\" fromIndex is converted (NaN is 0), it is not the default", () => {
+        const array = ["a", "b", "a"];
+        assert.equal(arrLastIndexOfSubset(array, ["a"], "undefined" as any), 0);
+        assert.equal(arrLastIndexOfSubset(array, ["a"], undefined), 2);
+        assert.equal(arrIndexOfSubset(array, ["a"], "undefined" as any), 0);
+        assert.equal(arrIndexOfSubset(array, ["b"], "undefined" as any), 1);
+
+        // Like lastIndexOf, which converts the fromIndex the same way
+        assert.equal(arrLastIndexOfSubset(array, ["a"], "undefined" as any), array.lastIndexOf("a", "undefined" as any));
+    });
+
     it("string compares characters, not substrings", () => {
         assert.equal(arrLastIndexOfSubset("abcbc", ["bc"]), -1);
         assert.equal(arrLastIndexOfSubset("abcbc", ["b", "c"]), 3);
@@ -219,5 +245,12 @@ describe("arrLastIndexOfSubset", () => {
         sparse[2] = 3;
         assert.equal(arrLastIndexOfSubset(sparse, [1, undefined]), 0);
         assert.equal(arrLastIndexOfSubset(sparse, [undefined]), 1);
+    });
+
+    it("a fractional negative fromIndex or a length of -0 returns 0 (not -0), like lastIndexOf()", () => {
+        assert.isTrue(_isPositiveZero(arrLastIndexOfSubset([1, 2], [1], -0.5)), "fromIndex -0.5");
+        assert.isTrue(_isPositiveZero(arrLastIndexOfSubset([1, 2], [], -0.5)), "fromIndex -0.5 with an empty subset");
+        assert.isTrue(_isPositiveZero(arrLastIndexOfSubset({ length: -0 } as any, [])), "length -0");
+        assert.isTrue(_isPositiveZero([1, 2].lastIndexOf(1, -0.5)), "native lastIndexOf");
     });
 });

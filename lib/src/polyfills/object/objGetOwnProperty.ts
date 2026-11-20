@@ -9,8 +9,9 @@
 import { arrForEach } from "../../array/forEach";
 import { arrIndexOf } from "../../array/indexOf";
 import { isArray, isString } from "../../helpers/base";
-import { GET_OWN_PROPERTY_DESCRIPTOR, GET_OWN_PROPERTY_NAMES, LENGTH, ObjClass, ObjProto } from "../../internal/constants";
-import { _returnEmptyArray, _returnNothing } from "../../internal/stubs";
+import { GET_OWN_PROPERTY_NAMES, GET_OWN_PROPERTY_SYMBOLS, LENGTH, ObjClass, ObjProto } from "../../internal/constants";
+import { _objGetOwnPropertyDescriptor } from "../../internal/own_props";
+import { _returnEmptyArray } from "../../internal/stubs";
 import { _throwIfNullOrUndefined } from "../../internal/throwIf";
 import { _pureAssign, _pureRef } from "../../internal/treeshake_helpers";
 import { polyObjHasOwn } from "../../object/has_own";
@@ -29,9 +30,11 @@ let _recursionCheckOwnDescriptors: boolean;
  */
 let _recursionCheckOwnSymbols: boolean;
 
-// Defining these locally to avoid tree-shaking issues with the polyfill and circular references
+// Defining these locally to avoid tree-shaking issues with the polyfill and circular references (the shared
+// _objGetOwnPropertyDescriptor is from own_props, which has no polyfill dependencies). Unlike the shared one, a
+// runtime without Object.getOwnPropertySymbols() uses the polyfill, which finds the well-known symbols
 const _objGetOwnPropertyNames: (obj: any) => string[] = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyNames>(ObjClass, GET_OWN_PROPERTY_NAMES)), _returnEmptyArray));
-const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => PropertyDescriptor | undefined = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyDescriptor>(ObjClass as any, GET_OWN_PROPERTY_DESCRIPTOR)), _returnNothing));
+const _objGetOwnPropertySymbols: (obj: any) => symbol[] = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertySymbols>(ObjClass, GET_OWN_PROPERTY_SYMBOLS)), _polyObjGetOwnPropertySymbols));
 
 /**
  * Polyfill implementation of Object.getOwnPropertyDescriptors for environments where it doesn't exist.
@@ -60,9 +63,10 @@ export function polyObjGetOwnPropertyDescriptors(obj: any): PropertyDescriptorMa
             _recursionCheckOwnDescriptors = true;
 
             // Get all property names, including non-enumerable ones if the environment supports it, and the
-            // symbol properties if supported in the environment
+            // symbol properties, every symbol when there is a native Object.getOwnPropertySymbols() (eg. a runtime
+            // with Symbol but without Object.getOwnPropertyDescriptors()), otherwise only the well-known symbols
             arrForEach(_objGetOwnPropertyNames(obj), _addDescriptor);
-            arrForEach(_polyObjGetOwnPropertySymbols(obj), _addDescriptor);
+            arrForEach(_objGetOwnPropertySymbols(obj), _addDescriptor);
         } finally {
             _recursionCheckOwnDescriptors = false;
         }

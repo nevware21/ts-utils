@@ -7,7 +7,7 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
-import { _returnNothing, _returnEmptyArray, _returnFalse } from "../../../../src/internal/stubs";
+import { _returnNothing, _returnEmptyArray } from "../../../../src/internal/stubs";
 import { isArray, isUndefined } from "../../../../src/helpers/base";
 
 describe("stubs", () => {
@@ -51,15 +51,6 @@ describe("stubs", () => {
             
             assert.isTrue(isArray(objectResult), "Expected an array to be returned for object type");
             assert.strictEqual(objectResult.length, 0, "Expected the array to be empty for object type");
-        });
-    });
-
-    describe("_returnFalse", () => {
-        it("should return false", () => {
-            const result = _returnFalse();
-            
-            assert.isBoolean(result, "Expected a boolean to be returned");
-            assert.isFalse(result, "Expected false to be returned");
         });
     });
 });

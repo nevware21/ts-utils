@@ -8,9 +8,9 @@
 
 import { arrForEach } from "../array/forEach";
 import { isStrictNullOrUndefined } from "../helpers/base";
-import { CALL, UNDEF_VALUE } from "../internal/constants";
+import { CALL } from "../internal/constants";
 import { _objForEachKey } from "./for_each_key";
-import { objGetOwnPropertySymbols } from "./get_own_property";
+import { _objGetOwnPropertySymbols } from "../internal/own_props";
 import { isUnsafePropKey } from "./isUnsafePropKey";
 import { _objPropertyIsEnumerable } from "./property_is_enumerable";
 
@@ -25,9 +25,10 @@ import { _objPropertyIsEnumerable } from "./property_is_enumerable";
  * `Object.getOwnPropertySymbols`. Use {@link forEachOwnKeySafe} when iterating untrusted input
  * to filter out unsafe keys like `__proto__`, `constructor`, and `prototype`.
  *
- * If reading a property value throws (for example a getter that throws an exception), the exception
- * is caught and the `callbackFn` is still called for that key with an `undefined` value, so a single
- * throwing getter does not stop the iteration of the remaining keys.
+ * If reading a property value throws (for example a getter that throws an exception), the exception is caught and
+ * the key is skipped (the `callbackFn` is not called for it), so a single throwing getter does not stop the iteration of
+ * the remaining keys, and a helper which copies the values (eg. {@link objExtend} or {@link objDeepCopy}) doesn't copy
+ * `undefined` for it (replacing an existing value). Since 0.20.0, previously the exception stopped the iteration.
  * @since 0.14.0
  * @group Object
  * @typeParam T - The source type.
@@ -73,13 +74,14 @@ export function forEachOwnKey<T>(theObject: T, callbackfn: (key: PropertyKey, va
         // Resolve the `this` value once, reusing the thisArg variable to keep the minified output small
         thisArg = isStrictNullOrUndefined(thisArg) ? theObject : thisArg;
         if (_objForEachKey(theObject, callbackfn, thisArg) !== -1) {
-            arrForEach(objGetOwnPropertySymbols(theObject), (key) => {
+            arrForEach(_objGetOwnPropertySymbols(theObject), (key) => {
                 if (_objPropertyIsEnumerable(theObject, key)) {
-                    let value: any = UNDEF_VALUE;
+                    let value: any;
                     try {
                         value = theObject[key as keyof T];
                     } catch (e) {
-                        // A throwing getter, so just pass undefined as the value
+                        // A throwing getter, so the key is skipped
+                        return;
                     }
 
                     // arrForEach stops when -1 is returned
@@ -100,7 +102,7 @@ export function forEachOwnKey<T>(theObject: T, callbackfn: (key: PropertyKey, va
  * user-supplied objects, parsed JSON).
  *
  * As with {@link forEachOwnKey}, if reading a property value throws (for example a throwing getter)
- * the `callbackFn` is called for that key with an `undefined` value and the iteration continues.
+ * the key is skipped and the iteration continues.
  * @since 0.14.0
  * @group Object
  * @typeParam T - The source type.

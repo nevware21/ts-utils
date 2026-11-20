@@ -184,6 +184,29 @@ describe("substring string helpers", () => {
                 }
             }
         });
+
+        it("an undefined start is 0 and an undefined length is the rest of the string, like String.prototype.substr", () => {
+            // An undefined start
+            assert.equal(polyStrSubstr("abcdef", undefined as any), "abcdef");
+            assert.equal(polyStrSubstr("abcdef", undefined as any, 2), "ab");
+            assert.equal(polyStrSubstr("abcdef", undefined as any, undefined), "abcdef");
+
+            // An undefined (or missing) length
+            assert.equal(polyStrSubstr("abcdef", 2), "cdef");
+            assert.equal(polyStrSubstr("abcdef", 2, undefined), "cdef");
+            assert.equal(polyStrSubstr("abcdef", -2, undefined), "ef");
+
+            // Only undefined is the default length, the string "undefined" is converted to an integer (NaN is 0)
+            assert.equal(polyStrSubstr("abcdef", 2, "undefined" as any), "");
+
+            // The native function returns the same
+            assert.equal(polyStrSubstr("abcdef", undefined as any), "abcdef".substr(undefined as any));
+            assert.equal(polyStrSubstr("abcdef", undefined as any, 2), "abcdef".substr(undefined as any, 2));
+            assert.equal(polyStrSubstr("abcdef", undefined as any, undefined), "abcdef".substr(undefined as any, undefined));
+            assert.equal(polyStrSubstr("abcdef", 2, undefined), "abcdef".substr(2, undefined));
+            assert.equal(polyStrSubstr("abcdef", -2, undefined), "abcdef".substr(-2, undefined));
+            assert.equal(polyStrSubstr("abcdef", 2, "undefined" as any), "abcdef".substr(2, "undefined" as any));
+        });
     });
 
     function _expectThrow(cb: () => void): Error {

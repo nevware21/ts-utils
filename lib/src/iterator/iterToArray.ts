@@ -8,14 +8,22 @@
 
 import { fnCall } from "../funcs/funcs";
 import { isFunction } from "../helpers/base";
-import { iterForOf } from "./forOf";
+import { _iterForOf } from "./forOf";
 import { _asIterator, _getIteratorThisArg } from "./helpers";
 import { IterMapCallbackFn } from "./types";
 
 /**
  * Materializes an iterator / iterable / array-like value as an array.
+ * The value is processed like `for...of` (and {@link iterForOf}), so an iterable (including a string or an array) is
+ * processed using its iterator (a string by its code points on a runtime which supports `Symbol.iterator`) and an
+ * iterator which is not iterable is used as-is. Unlike `for...of` (and iterForOf, which only also processes an array)
+ * any other array-like which is not iterable (eg. `{ length: 2, 0: "a", 1: "b" }`, or `arguments` or a string on a
+ * runtime without `Symbol.iterator`) is processed using its indexes, and (like iterForOf) a `Map` or `Set` which is
+ * not iterable (eg. on IE 11) returns its `[key, value]` entries / values.
  * @since 0.15.0
  * @group Iterator
+ * @throws TypeError when the value's `[Symbol.iterator]` isn't `null`, `undefined` or a function, when its
+ * `[Symbol.iterator]()` doesn't return an iterator, or the iterator's `next()` returns a value which is not an object
  * @example
  * ```ts
  * iterToArray(createRangeIterator(1, 3)); // [1, 2, 3]
@@ -28,11 +36,11 @@ export function iterToArray<T, R = T>(iter: Iterator<T> | Iterable<T> | ArrayLik
     let values: R[] = [];
 
     if (isFunction(mapFn)) {
-        iterForOf(source, (value, count) => {
+        _iterForOf(source, (value, count) => {
             values.push(fnCall(mapFn, _getIteratorThisArg(source, thisArg), value, count || 0));
         });
     } else {
-        iterForOf(source, (value) => {
+        _iterForOf(source, (value) => {
             values.push(value as any as R);
         });
     }

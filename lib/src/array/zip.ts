@@ -7,8 +7,9 @@
  */
 
 import { isArrayLike } from "../helpers/base";
-import { getLength } from "../helpers/length";
+import { _toLength } from "../helpers/length";
 import { mathMin } from "../math/min_max";
+import { LENGTH } from "../internal/constants";
 
 /**
  * The arrZip() method creates a new array of grouped elements, where the first array contains
@@ -39,31 +40,33 @@ export function arrZip(): any[][] {
     let arrays: ArrayLike<ArrayLike<any>> = arguments;
     let result: any[][];
 
-    if (arrays.length !== 0) {
+    if (arrays[LENGTH] !== 0) {
         // Filter out null/undefined arrays and find the minimum length
         const validArrays: ArrayLike<any>[] = [];
 
-        for (let i = 0; i < arrays.length; i++) {
+        for (let i = 0; i < arrays[LENGTH]; i++) {
             if (isArrayLike(arrays[i])) {
                 validArrays.push(arrays[i]);
             }
         }
         
-        if (validArrays.length !== 0) {
+        if (validArrays[LENGTH] !== 0) {
             // Find the minimum length among all valid arrays
             let minLen = Infinity;
 
-            for (let lp = 0; lp < validArrays.length; lp++) {
-                minLen = mathMin(minLen, getLength(validArrays[lp]));
+            for (let lp = 0; lp < validArrays[LENGTH]; lp++) {
+                minLen = mathMin(minLen, _toLength(validArrays[lp]));
             }
             
-            if (isFinite(minLen) && minLen !== 0) {
+            // A result which would be longer than an array can be (2^32 - 1), eg. when every array has an Infinity length,
+            // is not created (rather than adding groups until the runtime runs out of memory)
+            if (minLen !== 0 && minLen <= 0xFFFFFFFF) {
                 result = [];
 
                 for (let lp = 0; lp < minLen; lp++) {
                     const group: any[] = [];
 
-                    for (let j = 0; j < validArrays.length; j++) {
+                    for (let j = 0; j < validArrays[LENGTH]; j++) {
                         group.push(validArrays[j][lp]);
                     }
 

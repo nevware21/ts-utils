@@ -178,10 +178,13 @@
     "module": "lib/dist/es5/mod/ts-utils.js",
     "esnext:module": "lib/dist/es6/mod/ts-utils.js",
     "types": "lib/dist/types/ts-utils.d.ts",
-    "sideEffects": false,
+    "sideEffects": [
+        "./lib/bundle/es5/ts-polyfills-utils.js",
+        "./lib/bundle/es5/ts-polyfills-utils.min.js"
+    ],
     "scripts": {
         "build": "grunt ts_utils --verbose && npm run package && npm run dtsgen",
-        "rebuild": "npm run build && npm run test && npm run size && npm run size-check",
+        "rebuild": "npm run build && npm run test && npm run size && npm run size-check && npm run bundle-check",
         "package": "rollup -c lib/rollup.config.js --bundleConfigAsCjs",
         "test": "npm run test:es5 && npm run test:esnext && npm run coverage:report",
         "test:es5": "npm run test:node && npm run test:browser && npm run test:worker",
@@ -212,6 +215,7 @@
         "size": "size-limit",
         "size-save": "size-limit --clean-dir --save-bundle build/size",
         "size-check": "node lib/test/bundle-size-check.js && node lib/test/bundle-pure-annotations-check.js && node lib/test/no-side-effects-annotations-check.js",
+        "bundle-check": "node lib/test/bundle-runtime-check.js",
         "ts-versions-check": "node lib/test/typescript-versions-check.js",
         "link-check": "node lib/test/readme-links-check.js",
         "readme-link-check": "npm run docs && npm run link-check"
@@ -269,6 +273,7 @@
         "codecov": "^3.8.3",
         "copyfiles": "^2.4.1",
         "cross-env": "^10.1.0",
+        "esbuild": "^0.28.1",
         "eslint": "^8.56.0",
         "eslint-formatter-codeframe": "^7.32.1",
         "eslint-plugin-security": "^1.5.0",

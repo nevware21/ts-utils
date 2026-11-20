@@ -10,7 +10,7 @@ import { assert } from "@nevware21/tripwire-chai";
 import {
     isArray, isArrayLike, isBoolean, isDate, isDefined, isFunction, isNullOrUndefined, isNumber, isObject, isString, isTypeof,
     isUndefined, isRegExp, isFile, isFormData, isBlob, isArrayBuffer, isError, isPromiseLike, isPromise, isNotTruthy,
-    isTruthy, isStrictUndefined, isStrictNullOrUndefined, isPrimitive, isPrimitiveType, isMap
+    isTruthy, isStrictUndefined, isStrictNullOrUndefined, isPrimitive, isPrimitiveType, isMap, isStringObject, isStringLike
 } from "../../../../src/helpers/base";
 import { polyObjCreate } from "../../../../src//object/create";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
@@ -350,6 +350,122 @@ describe("base helpers", () => {
             assert.equal(isString(_simplePromiseLike()), false, "Checking _simplePromiseLike");
             assert.equal(isString(Object.create(null)), false, "Checking Object.create(null)");
             assert.equal(isString(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
+        });
+    });
+
+    describe("isStringObject", () => {
+        it("Validate String objects", () => {
+            assert.equal(isStringObject(new String("")), true, "Checking new String('')");
+            assert.equal(isStringObject(new String("aa")), true, "Checking new String('aa')");
+            assert.equal(isStringObject(Object("aa")), true, "Checking Object('aa')");
+            assert.equal(isStringObject(Object("")), true, "Checking Object('')");
+        });
+
+        it("Validate a String object with extra properties is still a String object", () => {
+            let value: any = new String("abc");
+            value.extra = 1;
+            assert.equal(isStringObject(value), true, "Checking new String('abc') with an extra property");
+        });
+
+        it("Validate primitive strings are not String objects", () => {
+            assert.equal(isStringObject(""), false, "Checking ''");
+            assert.equal(isStringObject("aa"), false, "Checking 'aa'");
+            assert.equal(isStringObject("null"), false, "Checking 'null'");
+            assert.equal(isStringObject("undefined"), false, "Checking 'undefined'");
+            assert.equal(isStringObject(String("aa")), false, "Checking String('aa')");
+            assert.equal(isStringObject(new String("aa").valueOf()), false, "Checking new String('aa').valueOf()");
+        });
+
+        it("Validate other values", () => {
+            assert.equal(isStringObject(null), false, "Checking null");
+            assert.equal(isStringObject(undefined), false, "Checking undefined");
+            assert.equal(isStringObject(new Date()), false, "Checking Date");
+            assert.equal(isStringObject(1), false, "Checking 1");
+            assert.equal(isStringObject(new Number(1)), false, "Checking new Number(1)");
+            assert.equal(isStringObject(_dummyFunction), false, "Checking _dummyFunction");
+            assert.equal(isStringObject([]), false, "Checking []");
+            assert.equal(isStringObject(["a", "a"]), false, "Checking ['a', 'a']");
+            assert.equal(isStringObject({ length: 2, 0: "a", 1: "a" }), false, "Checking an array-like object");
+            assert.equal(isStringObject({ toString: () => "aa" }), false, "Checking an object with a toString()");
+            assert.equal(isStringObject(new Array(1)), false, "Checking new Array(1)");
+            assert.equal(isStringObject(true), false, "Checking true");
+            assert.equal(isStringObject(new Boolean(true)), false, "Checking new Boolean(true)");
+            assert.equal(isStringObject(new RegExp("")), false, "Checking new RegExp('')");
+            _isFileCheck(isStringObject, false);
+            _isFormDataCheck(isStringObject, false);
+            _isBlobCheck(isStringObject, false);
+            assert.equal(isStringObject(new ArrayBuffer(0)), false, "Checking new ArrayBuffer([])");
+            assert.equal(isStringObject(new Error("Test Error")), false, "Checking new Error('')");
+            assert.equal(isStringObject(new TestError("Test TestError")), false, "Checking new TestError('')");
+            assert.equal(isStringObject(_simplePromise()), false, "Checking _simplePromise");
+            assert.equal(isStringObject(_simplePromiseLike()), false, "Checking _simplePromiseLike");
+            assert.equal(isStringObject(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isStringObject(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
+        });
+
+        it("Validate a Symbol.toStringTag changes the result (like isDate and isRegExp)", () => {
+            if (typeof Symbol === "function" && Symbol.toStringTag) {
+                let tagged: any = {};
+                tagged[Symbol.toStringTag] = "String";
+                assert.equal(isStringObject(tagged), true, "Checking an object tagged as a String");
+
+                let retagged: any = new String("abc");
+                retagged[Symbol.toStringTag] = "Other";
+                assert.equal(isStringObject(retagged), false, "Checking a String object tagged as Other");
+            }
+        });
+    });
+
+    describe("isStringLike", () => {
+        it("Validate primitive strings", () => {
+            assert.equal(isStringLike(""), true, "Checking ''");
+            assert.equal(isStringLike("aa"), true, "Checking 'aa'");
+            assert.equal(isStringLike("null"), true, "Checking 'null'");
+            assert.equal(isStringLike("undefined"), true, "Checking 'undefined'");
+            assert.equal(isStringLike(String("aa")), true, "Checking String('aa')");
+        });
+
+        it("Validate String objects", () => {
+            assert.equal(isStringLike(new String("")), true, "Checking new String('')");
+            assert.equal(isStringLike(new String("aa")), true, "Checking new String('aa')");
+            assert.equal(isStringLike(Object("aa")), true, "Checking Object('aa')");
+        });
+
+        it("Validate the result matches isString or isStringObject", () => {
+            let values: any[] = [
+                "", "aa", new String(""), new String("aa"), Object("aa"), null, undefined, 0, 1, true, false,
+                [], ["a"], {}, { length: 1, 0: "a" }, { toString: () => "aa" }, new Date(), new Number(1),
+                new Boolean(true), new RegExp(""), _dummyFunction, Object.create(null)
+            ];
+
+            for (let lp = 0; lp < values.length; lp++) {
+                assert.equal(isStringLike(values[lp]), isString(values[lp]) || isStringObject(values[lp]), "Checking " + dumpObj(values[lp]));
+            }
+        });
+
+        it("Validate other values", () => {
+            assert.equal(isStringLike(null), false, "Checking null");
+            assert.equal(isStringLike(undefined), false, "Checking undefined");
+            assert.equal(isStringLike(new Date()), false, "Checking Date");
+            assert.equal(isStringLike(0), false, "Checking 0");
+            assert.equal(isStringLike(1), false, "Checking 1");
+            assert.equal(isStringLike(new Number(1)), false, "Checking new Number(1)");
+            assert.equal(isStringLike(_dummyFunction), false, "Checking _dummyFunction");
+            assert.equal(isStringLike([]), false, "Checking []");
+            assert.equal(isStringLike(["a", "a"]), false, "Checking ['a', 'a']");
+            assert.equal(isStringLike({ length: 2, 0: "a", 1: "a" }), false, "Checking an array-like object");
+            assert.equal(isStringLike({ toString: () => "aa" }), false, "Checking an object with a toString()");
+            assert.equal(isStringLike(true), false, "Checking true");
+            assert.equal(isStringLike(new Boolean(true)), false, "Checking new Boolean(true)");
+            assert.equal(isStringLike(new RegExp("")), false, "Checking new RegExp('')");
+            _isFileCheck(isStringLike, false);
+            _isFormDataCheck(isStringLike, false);
+            _isBlobCheck(isStringLike, false);
+            assert.equal(isStringLike(new ArrayBuffer(0)), false, "Checking new ArrayBuffer([])");
+            assert.equal(isStringLike(new Error("Test Error")), false, "Checking new Error('')");
+            assert.equal(isStringLike(_simplePromise()), false, "Checking _simplePromise");
+            assert.equal(isStringLike(Object.create(null)), false, "Checking Object.create(null)");
+            assert.equal(isStringLike(polyObjCreate(null)), false, "Checking polyObjCreate(null)");
         });
     });
 

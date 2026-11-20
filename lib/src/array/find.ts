@@ -45,9 +45,9 @@ import { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "./callbacks";
  * @typeParam E - Identifies a more specific instance of the base array type
  * @param theArray - The array or array like object of elements to be searched.
  * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
- * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
- * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
- * @param thisArg - A value to use as this when executing callbackFn. Defaults to the array if not provided.
+ * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in theArray until
+ * the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+ * @param thisArg - A value to use as this when executing callbackFn, like the native function it is `undefined` when not provided.
  * @return The first element in the array that satisfies the provided testing function. Otherwise, undefined
  * is returned.
  * @example
@@ -80,7 +80,7 @@ import { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "./callbacks";
  *
  * // Array Like
  * console.log(arrFind({ length: 4, 0: 4, 1: 6, 2: 8, 3: 12 }, isPrime)); // undefined, not found
- * console.log(arrFind({ length: 4:, 0: 4, 1: 5, 2: 8, 3: 12 }, isPrime)); // 5
+ * console.log(arrFind({ length: 4, 0: 4, 1: 5, 2: 8, 3: 12 }, isPrime)); // 5
  * ```
  */
 export const arrFind =  (/*#__PURE__*/_unwrapFunctionWithPoly("find", ArrProto, polyArrFind) as <T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any) => T | E | undefined);
@@ -111,9 +111,9 @@ export const arrFind =  (/*#__PURE__*/_unwrapFunctionWithPoly("find", ArrProto, 
  * @typeParam E - Identifies a more specific instance of the base array type
  * @param theArray - The array or array like object of elements to be searched.
  * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
- * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
- * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
- * @param thisArg - A value to use as this when executing callbackFn. Defaults to the array if not provided.
+ * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in theArray until
+ * the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+ * @param thisArg - A value to use as this when executing callbackFn, like the native function it is `undefined` when not provided.
  * @return The index of the first element in the array that passes the test. Otherwise, -1.
  * @example
  * ```ts
@@ -147,7 +147,7 @@ export const arrFind =  (/*#__PURE__*/_unwrapFunctionWithPoly("find", ArrProto, 
  *
  * // Array Like
  * arrFindIndex({ length: 5, 0: 4, 1: 6, 2: 8, 3: 9, 4: 12 }, isPrime) // -1
- * arrFindIndex({ length: 5:, 0: 4, 1: 6, 2: 7, 3: 9, 4: 12 }, isPrime) // 2
+ * arrFindIndex({ length: 5, 0: 4, 1: 6, 2: 7, 3: 9, 4: 12 }, isPrime) // 2
  * ```
  */
 export const arrFindIndex = (/*#__PURE__*/_unwrapFunctionWithPoly("findIndex", ArrProto, polyArrFindIndex) as <T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any) => number);
@@ -184,9 +184,9 @@ export const arrFindIndex = (/*#__PURE__*/_unwrapFunctionWithPoly("findIndex", A
  * @typeParam E - Identifies a more specific instance of the base array type
  * @param theArray - The array or array like object of elements to be searched.
  * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
- * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
- * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
- * @param thisArg - A value to use as this when executing callbackFn. Defaults to the array if not provided.
+ * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in theArray until
+ * the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+ * @param thisArg - A value to use as this when executing callbackFn, like the native function it is `undefined` when not provided.
  * @return The last element in the array that satisfies the provided testing function. Otherwise, undefined
  * is returned.
  * @example
@@ -249,9 +249,9 @@ export const arrFindLast = (/*#__PURE__*/_unwrapFunctionWithPoly("findLast", Arr
  * @typeParam E - Identifies a more specific instance of the base array type
  * @param theArray - The array or array like object of elements to be searched.
  * @param callbackFn - A function that accepts up to three arguments of type {@link ArrPredicateCallbackFn} or
- * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in the thArray until
- * the predicate returns a value which is coercible to the Boolean value false, or until the end of the array.
- * @param thisArg - A value to use as this when executing callbackFn. Defaults to the array if not provided.
+ * {@link ArrPredicateCallbackFn2}. The predicate function is called for each element in theArray until
+ * the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
+ * @param thisArg - A value to use as this when executing callbackFn, like the native function it is `undefined` when not provided.
  * @return The index of the last (highest-index) element in the array that passes the test. Otherwise -1 if
  * no matching element is found.
  * @example
@@ -268,7 +268,7 @@ export const arrFindLast = (/*#__PURE__*/_unwrapFunctionWithPoly("findLast", Arr
  *   return fruit.name === "cherries";
  * }
  *
- * arrFindLastIndex(inventory, isCherries)' // 2
+ * arrFindLastIndex(inventory, isCherries) // 2
  * // called === 1
  *
  * called = 0;
@@ -294,11 +294,11 @@ export const arrFindLast = (/*#__PURE__*/_unwrapFunctionWithPoly("findLast", Arr
  *
  * // Array Like
  * called = 0;
- * arrFindLastIndex({ length: 5: 0: 4, 1: 6, 2: 8, 3: 9, 4: 12 }, isPrime); // -1
+ * arrFindLastIndex({ length: 5, 0: 4, 1: 6, 2: 8, 3: 9, 4: 12 }, isPrime); // -1
  * // called === 5
  *
  * called = 0;
- * arrFindLastIndex({ length: 5: 0: 4, 1: 6, 2: 7, 3: 9, 4: 12 }, isPrime); // 2
+ * arrFindLastIndex({ length: 5, 0: 4, 1: 6, 2: 7, 3: 9, 4: 12 }, isPrime); // 2
  * // called === 3
 
  * ```

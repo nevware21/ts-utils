@@ -12,7 +12,7 @@ import {
     decodeBase64Url, encodeAsHex, decodeHex, encodeAsUri, decodeUri, _encodeBase64Polyfill,
     _decodeBase64Polyfill
 } from "../../../../src/helpers/encode";
-import { arrContains } from "../../../../src/array/includes";
+import { strContains } from "../../../../src/string/includes";
 import { strRepeat } from "../../../../src/string/repeat";
 
 describe("encodeAsJson helper", () => {
@@ -69,8 +69,8 @@ describe("encodeAsJson helper", () => {
         invalid.c = invalid;
 
         let invalidJson = encodeAsJson(invalid);
-        assert.ok(arrContains(invalidJson, "[object Error]"), "Contains Error: " + invalidJson);
-        assert.ok(arrContains(invalidJson, "circular structure"), "Contains circular structure " + invalidJson);
+        assert.ok(strContains(invalidJson, "[object Error]"), "Contains Error: " + invalidJson);
+        assert.ok(strContains(invalidJson, "circular structure"), "Contains circular structure " + invalidJson);
     });
 });
 

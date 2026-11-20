@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { isArrayLike } from "../helpers/base";
+import { isStrictNullOrUndefined } from "../helpers/base";
 import { arrUnique } from "./unique";
 import { arrAppend } from "./append";
 import { _arrSliceToArr } from "./slice";
@@ -14,7 +14,14 @@ import { arrForEach } from "./forEach";
 
 /**
  * The arrUnion() method returns a new array containing all unique elements from all provided arrays.
- * Uses strict equality (===) for comparison and maintains insertion order.
+ * Uses the SameValueZero comparison (like strict equality `===`, except that `NaN` is equal to `NaN`) and maintains
+ * insertion order.
+ *
+ * Like the other array helpers (eg.
+ * {@link https://nevware21.github.io/ts-utils/typedoc/functions/arrForEach.html | arrForEach}) a string (or `String`
+ * object) is read by index, so it is split into its UTF-16 code units (a surrogate pair, eg. an emoji, is two values),
+ * unlike {@link arrFrom}, which splits it into its code points (as do the iterator helpers, eg. {@link iterUnion}, on a
+ * runtime with `Symbol.iterator`).
  * @since 0.14.0
  * @group Array
  * @group ArrayLike
@@ -35,12 +42,16 @@ import { arrForEach } from "./forEach";
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function arrUnion<T>(...arrays: ArrayLike<T>[]): T[];
+/*#__NO_SIDE_EFFECTS__*/
 export function arrUnion<T>(): T[] {
     let combined: T[] = [];
     let theArgs = arguments;
 
     arrForEach(theArgs, (arr) => {
-        if (isArrayLike(arr)) {
+        // A null or undefined value is skipped, any other value is read like an array-like (as in v0.16.0), so its length
+        // is converted like the native functions (eg. a string length, or a function's length) and a value without a
+        // length adds nothing
+        if (!isStrictNullOrUndefined(arr)) {
             combined = arrAppend(combined, _arrSliceToArr(arr));
         }
     });

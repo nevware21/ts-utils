@@ -27,12 +27,3 @@ export function _returnNothing<T>(): T | undefined {
 export function _returnEmptyArray<T>(): T[] {
     return [];
 }
-
-/**
- * Stub function that returns false.
- * @internal
- * @returns false
- */
-export function _returnFalse(): boolean {
-    return false;
-}

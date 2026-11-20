@@ -6,7 +6,6 @@
  * Licensed under the MIT license.
  */
 
-import { objDefine } from "../object/define";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 
@@ -248,39 +247,26 @@ export function createIterableIterator<T>(ctx: CreateIteratorContext<T>): Iterab
 export function createIterator<T>(ctx: CreateIteratorContext<T>): Iterator<T> {
     let isDone = false;
 
-    function _value(): T {
-        return ctx.v;
-    }
-
     function _next(): IteratorResult<T> {
         if (!isDone) {
             isDone = (ctx.n ? ctx.n(arguments) : true);
         }
 
-        let result  = {
-            done: isDone
-        };
-
-        if (!isDone) {
-            objDefine<IteratorResult<T>>(result as any, "value", { g: _value });
-        }
-
-        return result as IteratorResult<T>;
+        // Like the native iterators the value is read when the result is created, so a result keeps its value
+        // (previously it was a getter which returned the current value, so an earlier result had a later value). The
+        // done and value are own properties of the literal, as an assignment would call an inherited setter (or throw
+        // for an inherited read-only property), eg. an Object.prototype.value accessor would intercept every value
+        return (isDone ? { done: isDone } : { done: isDone, value: ctx.v }) as IteratorResult<T>;
     }
 
-    function _return(value?: T): IteratorReturnResult<T> {
-        isDone = true;
-        return {
-            done: true,
-            value: ctx.r && ctx.r(value)
-        };
-    }
-
-    function _throw(e?: any): IteratorResult<T> {
-        isDone = true;
-        return {
-            done: true,
-            value: ctx.t && ctx.t(e)
+    // The return() and throw() functions, which are done and return the result of the ctx's r() or t() function
+    function _doneFn(fnName: "r" | "t") {
+        return function (value?: any): IteratorReturnResult<T> {
+            isDone = true;
+            return {
+                done: true,
+                value: ctx[fnName] && ctx[fnName](value)
+            };
         };
     }
 
@@ -289,11 +275,11 @@ export function createIterator<T>(ctx: CreateIteratorContext<T>): Iterator<T> {
     };
     
     if (ctx.r) {
-        theIterator.return = _return;
+        theIterator.return = _doneFn("r");
     }
 
     if (ctx.t) {
-        theIterator.throw = _throw;
+        theIterator.throw = _doneFn("t");
     }
 
     return theIterator;

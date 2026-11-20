@@ -14,7 +14,7 @@ import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { CALL } from "../../../../src/internal/constants";
 
 describe("string helpers", () => {
-    describe("strEndsWith null / undefined", () => {
+    it("strEndsWith null / undefined", () => {
         _expectThrow(() => {
             _checkEndsWith(null, null as any);
         });
@@ -66,7 +66,7 @@ describe("string helpers", () => {
         _checkEndsWith("", undefined as any);
     });
 
-    describe("strEndsWith With values", () => {
+    it("strEndsWith With values", () => {
         _checkEndsWith("", "");
         _checkEndsWith("", "", 0);
         _checkEndsWith("", "", 10);

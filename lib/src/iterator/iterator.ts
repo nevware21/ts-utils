@@ -6,10 +6,31 @@
  * Licensed under the MIT license.
  */
 
-import { getKnownSymbol } from "../symbol/symbol";
+import { getKnownSymbol, isSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 import { isFunction, isStrictNullOrUndefined } from "../helpers/base";
+import { asString } from "../string/as_string";
 import { IAsyncIterable } from "./types";
+
+let _iterKey: PropertyKey;
+
+/**
+ * @internal
+ * @ignore
+ * Returns the property key of the iterator function (`Symbol.iterator`), which is only resolved once. On a runtime
+ * without Symbol it is the (unique) string key of the polyfill symbol rather than the polyfill symbol object, so it
+ * isn't converted into its string key by every property access (which is ~50x slower)
+ * @returns The property key of the iterator function
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function _getIterKey(): PropertyKey {
+    if (!_iterKey) {
+        let sym: any = getKnownSymbol(WellKnownSymbols.iterator);
+        _iterKey = isSymbol(sym) ? sym : asString(sym);
+    }
+
+    return _iterKey;
+}
 
 /**
  * Checks if the type of value looks like an iterator instance (contains a next function).
@@ -55,7 +76,7 @@ export function isIterator<T = any>(value: any): value is Iterator<T> {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function isIterable<T = any>(value: any): value is Iterable<T> {
-    return !isStrictNullOrUndefined(value) && isFunction(value[getKnownSymbol(WellKnownSymbols.iterator)]);
+    return !isStrictNullOrUndefined(value) && isFunction(value[_getIterKey()]);
 }
 
 /**

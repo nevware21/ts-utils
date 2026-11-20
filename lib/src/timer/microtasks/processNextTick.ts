@@ -9,7 +9,7 @@
 import { isFunction } from "../../helpers/base";
 import { createCachedValue, ICachedValue } from "../../helpers/cache";
 import { getInst, isNode } from "../../helpers/environment";
-import { _globalLazyTestHooks, _initTestHooks } from "../../helpers/lazy";
+import { _initTestHooks } from "../../helpers/lazy";
 import { ScheduleMicrotaskFn } from "../../helpers/types";
 import { UNDEF_VALUE } from "../../internal/constants";
 import { _runMicroTask } from "./runMicrotask";
@@ -48,8 +48,7 @@ function _resolveProcessNextTickFn(): ScheduleMicrotaskFn | undefined {
  * @since 0.15.0
  */
 export function _getProcessNextTickFn(): ScheduleMicrotaskFn | undefined {
-    !_globalLazyTestHooks && _initTestHooks();
-    if (!_nextTickFn || _globalLazyTestHooks.lzy) {
+    if (_initTestHooks().lzy || !_nextTickFn) {
         _nextTickFn = createCachedValue(_resolveProcessNextTickFn());
     }
 

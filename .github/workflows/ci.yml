@@ -53,6 +53,9 @@ jobs:
     - name: Bundle Size Checks
       run: npm run size-check
 
+    - name: Bundle Runtime Checks
+      run: npm run bundle-check
+
     - name: TypeScript version checks
       if: matrix.node == 22
       run: npm run ts-versions-check

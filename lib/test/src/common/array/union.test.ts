@@ -62,3 +62,14 @@ describe("arrUnion", () => {
         assert.deepEqual(arrUnion(null, undefined), []);
     });
 });
+
+describe("arrUnion with array-likes", () => {
+    it("reads any value except null and undefined like an array-like, converting its length like the native functions", () => {
+        assert.deepEqual(arrUnion({ length: "2", 0: "x", 1: "y" } as any), ["x", "y"], "A string length");
+        assert.deepEqual(arrUnion([1], { length: 1.5, 0: 2, 1: 3 } as any), [1, 2], "A fractional length");
+        assert.deepEqual(arrUnion([1], function (value: any) {
+            return value;
+        } as any), [1, undefined], "A function's length");
+        assert.deepEqual(arrUnion([1], 5 as any, {} as any, true as any), [1], "A value without a length adds nothing");
+    });
+});

@@ -6,12 +6,11 @@
  * Licensed under the MIT license.
  */
 
-import { isUndefined } from "../helpers/base";
-import { EMPTY, LENGTH, StrProto } from "../internal/constants";
+import { isStrictUndefined } from "../helpers/base";
+import { EMPTY, LENGTH, StrProto, SUBSTRING } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { mathToInt } from "../math/to_int";
 import { asString } from "./as_string";
-import { strSubstring } from "./substring";
 
 /*#__NO_SIDE_EFFECTS__*/
 function _padValue(value: string, targetLength: number, padString?: string) {
@@ -23,16 +22,19 @@ function _padValue(value: string, targetLength: number, padString?: string) {
     if (len < targetLength) {
         // Like the native functions only an undefined padString uses the default, any other value (including null) is
         // converted into a string
-        result = isUndefined(padString) ? " " : asString(padString);
+        result = isStrictUndefined(padString) ? " " : asString(padString);
         targetLength = targetLength - len;
 
-        // Doubled until it is long enough and then truncated, an empty padString can't pad the value so it is returned as-is
-        // (rather than doubling "" forever). This doesn't use strRepeat() so the polyfills don't include its polyfill.
+        // Doubled until it is long enough (only adding what is missing, so it is never longer than the result, which
+        // may be close to the maximum length of a string) and then truncated to remove any extra from a long padString.
+        // An empty padString can't pad the value so it is returned as-is (rather than doubling "" forever). This doesn't
+        // use strRepeat() so the polyfills don't include its polyfill. The result is always a primitive string, so its
+        // own substring() is called directly (rather than via strSubstring(), which is slower)
         while (result && result[LENGTH] < targetLength) {
-            result += result;
+            result += result[SUBSTRING](0, targetLength - result[LENGTH]);
         }
 
-        result = strSubstring(result, 0, targetLength);
+        result = result[SUBSTRING](0, targetLength);
     }
 
     return result;

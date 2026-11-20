@@ -6,9 +6,9 @@
  * Licensed under the MIT license.
  */
 
-import { isStrictNullOrUndefined, isString } from "../helpers/base";
-import { dumpObj } from "../helpers/diagnostics";
+import { isFunction, isStrictNullOrUndefined } from "../helpers/base";
 import { throwTypeError } from "../helpers/throw";
+import { ObjClass } from "./constants";
 
 /**
  * Throws a TypeError if the provided object is null or undefined.
@@ -25,14 +25,28 @@ export function _throwIfNullOrUndefined(obj: any): void {
 }
 
 /**
- * Throws a TypeError if the provided value is not a string.
- * This is a utility function to ensure that the value is a string before performing string operations.
- * @param value - The value to check
+ * Converts the value into an object like the native functions (ToObject), so a primitive value is returned as its
+ * wrapper object (eg. a `String` object for a string) and an object is returned as-is.
+ * @param value - The value to convert
+ * @returns The value as an object
+ * @throws TypeError if the value is `null` or `undefined`
  * @internal
- * @since 0.12.0
+ * @ignore
  */
-export function _throwIfNotString(value: any): void {
-    if (!isString(value)) {
-        throwTypeError("'" + dumpObj(value) + "' is not a string");
+export function _toObject<T>(value: T): T {
+    _throwIfNullOrUndefined(value);
+    return ObjClass(value);
+}
+
+/**
+ * Throws a TypeError if the callback is not a function, like the native array functions which check it before any
+ * value is processed (so an empty array still throws).
+ * @param callbackFn - The callback function to check
+ * @internal
+ * @ignore
+ */
+export function _throwIfNotCallbackFn(callbackFn: any): void {
+    if (!isFunction(callbackFn)) {
+        throwTypeError("callbackFn must be a function");
     }
 }

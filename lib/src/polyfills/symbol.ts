@@ -8,7 +8,8 @@
 
 import { WellKnownSymbols, _wellKnownSymbolMap } from "../symbol/well_known";
 import { throwTypeError } from "../helpers/throw";
-import { SYMBOL, TO_STRING } from "../internal/constants";
+import { DUMP_ERR_MAX_LENGTH, LENGTH, SYMBOL, SYMBOL_TYPE, TO_STRING } from "../internal/constants";
+import { dumpObj } from "../helpers/diagnostics";
 import { objHasOwn } from "../object/has_own";
 import { asString } from "../string/as_string";
 import { _GlobalPolySymbols, _getGlobalConfig } from "../internal/global";
@@ -71,7 +72,7 @@ export function polyNewSymbol(description?: string | number): symbol {
     _setProp("v", symString);
     _setProp("_uid", uniqueId);
 
-    return _tagAsPolyfill(theSymbol as any, "symbol") as symbol;
+    return _tagAsPolyfill(theSymbol as any, SYMBOL_TYPE) as symbol;
 }
 
 /**
@@ -86,7 +87,7 @@ export function polySymbolFor(key: string): symbol {
     let registry = _globalSymbolRegistry();
     if (!objHasOwn(registry.k, key)) {
         let newSymbol: any = polyNewSymbol(key);
-        let regId = objKeys(registry.s).length;
+        let regId = objKeys(registry.s)[LENGTH];
         newSymbol[UNIQUE_REGISTRY_ID] = () => regId + "_" + newSymbol[TO_STRING]();
         registry.k[key] = newSymbol;
         registry.s[newSymbol[UNIQUE_REGISTRY_ID]()] = asString(key);
@@ -105,7 +106,7 @@ export function polySymbolFor(key: string): symbol {
 /*#__NO_SIDE_EFFECTS__*/
 export function polySymbolKeyFor(sym: symbol): string | undefined {
     if (!sym || !sym[TO_STRING] || strSubstring(sym[TO_STRING](), 0, 6) != SYMBOL) {
-        throwTypeError((sym as any) + " is not a symbol");
+        throwTypeError(dumpObj(sym, 0, DUMP_ERR_MAX_LENGTH) + " is not a symbol");
     }
 
     const regId = _isPolyfill(sym) && (sym as any)[UNIQUE_REGISTRY_ID] && (sym as any)[UNIQUE_REGISTRY_ID]();

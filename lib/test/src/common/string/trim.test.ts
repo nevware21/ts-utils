@@ -13,67 +13,67 @@ import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isUndefined } from "../../../../src/helpers/base";
 
 describe("string helpers", () => {
-    describe("trim null / undefined", () => {
+    it("trim null / undefined", () => {
         _checkTrim(null);
         _checkTrim(undefined);
     });
 
-    describe("polyTrim null / undefined", () => {
+    it("polyTrim null / undefined", () => {
         _checkPolyTrim(null);
         _checkPolyTrim(undefined);
     });
 
-    describe("trimStart null / undefined", () => {
+    it("trimStart null / undefined", () => {
         _checkTrimStart(null);
         _checkTrimStart(undefined);
     });
 
-    describe("polyTrimStart null / undefined", () => {
+    it("polyTrimStart null / undefined", () => {
         _checkPolyTrimStart(null);
         _checkPolyTrimStart(undefined);
     });
 
-    describe("trimEnd null / undefined", () => {
+    it("trimEnd null / undefined", () => {
         _checkTrimEnd(null);
         _checkTrimEnd(undefined);
     });
 
-    describe("polyTrimEnd null / undefined", () => {
+    it("polyTrimEnd null / undefined", () => {
         _checkPolyTrimEnd(null);
         _checkPolyTrimEnd(undefined);
     });
 
-    describe("trim with non-nullish falsy values", () => {
+    it("trim with non-nullish falsy values", () => {
         _checkTrim(0);
         _checkTrim(false);
     });
 
-    describe("polyTrim with non-nullish falsy values", () => {
+    it("polyTrim with non-nullish falsy values", () => {
         _checkPolyTrim(0);
         _checkPolyTrim(false);
     });
 
-    describe("trimStart with non-nullish falsy values", () => {
+    it("trimStart with non-nullish falsy values", () => {
         _checkTrimStart(0);
         _checkTrimStart(false);
     });
 
-    describe("polyTrimStart with non-nullish falsy values", () => {
+    it("polyTrimStart with non-nullish falsy values", () => {
         _checkPolyTrimStart(0);
         _checkPolyTrimStart(false);
     });
 
-    describe("trimEnd with non-nullish falsy values", () => {
+    it("trimEnd with non-nullish falsy values", () => {
         _checkTrimEnd(0);
         _checkTrimEnd(false);
     });
 
-    describe("polyTrimEnd with non-nullish falsy values", () => {
+    it("polyTrimEnd with non-nullish falsy values", () => {
         _checkPolyTrimEnd(0);
         _checkPolyTrimEnd(false);
     });
 
-    describe("trim With values", () => {
+    it("trim With values", () => {
         _checkTrim("null");
         _checkTrim("undefined");
         _checkTrim("");
@@ -97,7 +97,7 @@ describe("string helpers", () => {
         _checkTrim(" abba     ");
     });
 
-    describe("polyTrim With values", () => {
+    it("polyTrim With values", () => {
         _checkPolyTrim("null");
         _checkPolyTrim("undefined");
         _checkPolyTrim("");
@@ -121,7 +121,7 @@ describe("string helpers", () => {
         _checkPolyTrim(" abba     ");
     });
 
-    describe("trimStart With values", () => {
+    it("trimStart With values", () => {
         _checkTrimStart("null");
         _checkTrimStart("undefined");
         _checkTrimStart("");
@@ -145,7 +145,7 @@ describe("string helpers", () => {
         _checkTrimStart(" abba     ");
     });
 
-    describe("polyTrimStart With values", () => {
+    it("polyTrimStart With values", () => {
         _checkPolyTrimStart("null");
         _checkPolyTrimStart("undefined");
         _checkPolyTrimStart("");
@@ -169,7 +169,7 @@ describe("string helpers", () => {
         _checkPolyTrimStart(" abba     ");
     });
 
-    describe("trimEnd With values", () => {
+    it("trimEnd With values", () => {
         _checkTrimEnd("null");
         _checkTrimEnd("undefined");
         _checkTrimEnd("");
@@ -193,7 +193,7 @@ describe("string helpers", () => {
         _checkTrimEnd(" abba     ");
     });
 
-    describe("polyTrimEnd With values", () => {
+    it("polyTrimEnd With values", () => {
         _checkPolyTrimEnd("null");
         _checkPolyTrimEnd("undefined");
         _checkPolyTrimEnd("");
@@ -217,7 +217,7 @@ describe("string helpers", () => {
         _checkPolyTrimEnd(" abba     ");
     });
 
-    describe("trim with special whitespace", () => {
+    it("trim with special whitespace", () => {
         _checkTrim("\t");
         _checkTrim("\t ");
         _checkTrim(" \t ");
@@ -229,7 +229,7 @@ describe("string helpers", () => {
         _checkTrim("\v");
     });
 
-    describe("polyTrim with special whitespace", () => {
+    it("polyTrim with special whitespace", () => {
         _checkPolyTrim("\t");
         _checkPolyTrim("\t ");
         _checkPolyTrim(" \t ");
@@ -241,7 +241,7 @@ describe("string helpers", () => {
         _checkPolyTrim("\v");
     });
 
-    describe("trimStart with special whitespace", () => {
+    it("trimStart with special whitespace", () => {
         _checkTrimStart("\t");
         _checkTrimStart("\t ");
         _checkTrimStart(" \t ");
@@ -253,7 +253,7 @@ describe("string helpers", () => {
         _checkTrimStart("\v");
     });
 
-    describe("polyTrimStart with special whitespace", () => {
+    it("polyTrimStart with special whitespace", () => {
         _checkPolyTrimStart("\t");
         _checkPolyTrimStart("\t ");
         _checkPolyTrimStart(" \t ");
@@ -265,7 +265,7 @@ describe("string helpers", () => {
         _checkPolyTrimStart("\v");
     });
 
-    describe("trimEnd with special whitespace", () => {
+    it("trimEnd with special whitespace", () => {
         _checkTrimEnd("\t");
         _checkTrimEnd("\t ");
         _checkTrimEnd(" \t ");
@@ -277,7 +277,7 @@ describe("string helpers", () => {
         _checkTrimEnd("\v");
     });
 
-    describe("polyTrimEnd with special whitespace", () => {
+    it("polyTrimEnd with special whitespace", () => {
         _checkPolyTrimEnd("\t");
         _checkPolyTrimEnd("\t ");
         _checkPolyTrimEnd(" \t ");
@@ -458,3 +458,15 @@ describe("string helpers", () => {
     }
 });
 
+describe("trim polyfills with a long run of whitespace", () => {
+    it("quickly trim a string with a long run of whitespace before its end", () => {
+        // A regular expression for the whitespace at the end (/\s+$/g) took quadratic time for this (~7s for 80k spaces)
+        const spaces = new Array(100001).join(" ");
+
+        assert.equal(polyStrTrimEnd(spaces + "x "), spaces + "x");
+        assert.equal(polyStrTrim(spaces + "x " + spaces), "x");
+        assert.equal(polyStrTrimStart(spaces + "x" + spaces), "x" + spaces);
+        assert.equal(polyStrTrimEnd(spaces), "");
+        assert.equal(polyStrTrim("a" + spaces + "b"), "a" + spaces + "b", "Whitespace inside the string is kept");
+    });
+});

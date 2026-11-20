@@ -6,8 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { LENGTH } from "../internal/constants";
-import { objDefine } from "../object/define";
+import { LENGTH, UNDEF_VALUE } from "../internal/constants";
 import { createIterator, CreateIteratorContext } from "./create";
 
 /**
@@ -38,22 +37,20 @@ export function createArrayIterator<T>(values: T[]): Iterator<T> {
     let theValues = values ? values.slice() : [];
     let len = theValues[LENGTH];
 
-    function _value(): T {
-        if (idx >= 0 && idx < len) {
-            return theValues[idx];
-        }
-    }
-
-    function _getNext() {
-        idx++;
-        return idx >= len;
-    }
-
+    // The ctx has its own v (so setting it doesn't call an inherited setter, eg. an Object.prototype.v accessor)
     let ctx: CreateIteratorContext<T> = {
-        n: _getNext
-    };
+        v: UNDEF_VALUE,
+        n: function () {
+            idx++;
+            let isDone = idx >= len;
+            if (!isDone) {
+                // The value is set when it is read by createIterator()
+                ctx.v = theValues[idx];
+            }
 
-    objDefine(ctx, "v", { g: _value });
+            return isDone;
+        }
+    };
 
     return createIterator<T>(ctx);
 }

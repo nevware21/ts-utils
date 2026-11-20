@@ -87,3 +87,25 @@ describe("strTruncate helper", () => {
         return null as any;
     }
 });
+
+describe("strTruncate surrogate pairs", () => {
+    const pair = String.fromCharCode(0xD83D, 0xDE00);
+
+    it("doesn't split a surrogate pair of the value", () => {
+        // Previously the high surrogate of the pair was kept, which is not valid text
+        assert.equal(strTruncate("a" + pair + "b", 2), "a");
+        assert.equal(strTruncate("a" + pair + "b", 3), "a" + pair);
+        assert.equal(strTruncate("abc" + pair + "def", 7, "..."), "abc...");
+        assert.equal(strTruncate("abcd" + pair + "ef", 7, "..."), "abcd...");
+    });
+
+    it("doesn't split a surrogate pair of the suffix", () => {
+        assert.equal(strTruncate("abcdef", 2, pair + "!"), pair);
+        assert.equal(strTruncate("abcdef", 1, pair + "!"), "");
+    });
+
+    it("doesn't change a value which is within the length", () => {
+        assert.equal(strTruncate("a" + pair, 3), "a" + pair);
+        assert.equal(strTruncate(pair + pair, 4, "..."), pair + pair);
+    });
+});

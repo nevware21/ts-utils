@@ -9,6 +9,7 @@
 import { isStrictUndefined } from "../helpers/base";
 import { forEachOwnKeySafe } from "./forEachOwnKey";
 import { isUnsafeTarget } from "./isUnsafeTarget";
+import { LENGTH } from "../internal/constants";
 
 /**
  * Copies own enumerable properties from `source` to `target` **only** when the predicate
@@ -111,7 +112,7 @@ export function objDefaults<T>(target: T): T {
     // The sources are the arguments after the target, which are only read so they are not copied into a new array
     let theArgs = arguments;
     if (target && !isUnsafeTarget(target)) {
-        for (let lp = 1; lp < theArgs.length; lp++) {
+        for (let lp = 1; lp < theArgs[LENGTH]; lp++) {
             let source = theArgs[lp];
             if (source) {
                 forEachOwnKeySafe(source, (key, value) => {

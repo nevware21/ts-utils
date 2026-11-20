@@ -221,8 +221,10 @@ describe("create iterator helpers", () => {
                 assert.ok(true, "Expected the exception to be thrown");
             }
     
-            assert.equal(done, false, "Check that the return was called");
-            assert.equal(thrown, true, "Check that the throw was called");
+            // Like for...of, the iterator is closed (return() is called) when the callbackfn throws, rather than
+            // calling throw()
+            assert.equal(done, true, "Check that the return was called");
+            assert.equal(thrown, false, "Check that the throw was not called");
             assert.equal(values.length, 10, "" + dumpObj(values));
             assert.equal(values[0], 0, "0:" + dumpObj(values));
             assert.equal(values[1], 1, "1:" + dumpObj(values));
@@ -372,7 +374,8 @@ describe("create iterator helpers", () => {
             assert.equal(values.length, 2);
         });
 
-        it("throw callback is invoked on iterForOf error", () => {
+        it("return callback, rather than the throw callback, is invoked on iterForOf error", () => {
+            let done = false;
             let thrown = false;
             let idx = -1;
             let theValues = [1, 2, 3];
@@ -384,6 +387,10 @@ describe("create iterator helpers", () => {
                         this.v = theValues[idx];
                     }
                     return isDone;
+                },
+                r: function(value) {
+                    done = true;
+                    return value;
                 },
                 t: function(value) {
                     thrown = true;
@@ -402,7 +409,9 @@ describe("create iterator helpers", () => {
                 assert.ok(true, "expected exception caught");
             }
 
-            assert.equal(thrown, true, "throw callback must be called when iterForOf body throws");
+            // Like for...of, the iterator is closed (return() is called) when the iterForOf body throws
+            assert.equal(done, true, "return callback must be called when iterForOf body throws");
+            assert.equal(thrown, false, "throw callback must not be called when iterForOf body throws");
         });
 
         it("empty sequence returns done immediately", () => {
@@ -433,5 +442,23 @@ describe("create iterator helpers", () => {
 
             assert.equal(values.length, 0, "null next should produce no values");
         });
+    });
+});
+
+describe("createIterator results keep their value", () => {
+    it("a result's value is the value when it was returned, like the native iterators", () => {
+        const iterator = createArrayIterator([10, 20, 30]);
+        const first = iterator.next();
+        const second = iterator.next();
+
+        // Previously the value was a getter of the iterator's current value, so the first result also returned 20
+        assert.equal(first.value, 10);
+        assert.equal(second.value, 20);
+        assert.deepEqual(Object.getOwnPropertyDescriptor(first, "value"), { value: 10, writable: true, enumerable: true, configurable: true });
+
+        const native = ([10, 20, 30] as any)[getKnownSymbol(WellKnownSymbols.iterator)]();
+        const nativeFirst = native.next();
+        native.next();
+        assert.equal(nativeFirst.value, first.value);
     });
 });

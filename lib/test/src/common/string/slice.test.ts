@@ -12,7 +12,7 @@ import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isUndefined } from "../../../../src/helpers/base";
 
 describe("string helpers", () => {
-    describe("strSlice null / undefined", () => {
+    it("strSlice null / undefined", () => {
         _checkSlice(null, 0);
         _checkSlice(null, 2);
         _checkSlice(null, -2);
@@ -31,7 +31,7 @@ describe("string helpers", () => {
         _checkSlice(undefined, -2, 2);
     });
 
-    describe("strSlice With values", () => {
+    it("strSlice With values", () => {
         _checkSlice("", 0);
         _checkSlice("null", 0);
         _checkSlice("abcdefg", 0);

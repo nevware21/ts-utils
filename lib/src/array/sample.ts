@@ -9,7 +9,7 @@
 import { isArrayLike } from "../helpers/base";
 import { mathFloor } from "../math/floor";
 import { mathRandom } from "../math/random";
-import { getLength } from "../helpers/length";
+import { _toLength } from "../helpers/length";
 
 /**
  * The arrSample() method returns a random element from the array.
@@ -37,7 +37,8 @@ export function arrSample<T>(theArray: ArrayLike<T> | null | undefined): T | und
     let result: T | undefined;
 
     if (isArrayLike(theArray)) {
-        const len = getLength(theArray);
+        // A fractional length is truncated (like the native functions), so the index is always within the length
+        const len = _toLength(theArray);
         if (len !== 0) {
             const index = mathFloor(mathRandom() * len);
             result = theArray[index];

@@ -8,7 +8,7 @@
 
 import { NULL_VALUE, UNDEF_VALUE } from "../internal/constants";
 import { _getGlobalValue } from "../internal/global";
-import { ILazyValue, _globalLazyTestHooks, _initTestHooks, getLazy } from "./lazy";
+import { ILazyValue, _initTestHooks, getLazy } from "./lazy";
 import { ICachedValue, createCachedValue } from "./cache";
 import { safe } from "./safe";
 import { ScheduleMicrotaskFn } from "./types";
@@ -31,8 +31,7 @@ let _cachedGlobal: ICachedValue<Window>;
 export function _getGlobalInstFn<T>(getFn: (...args: unknown[]) => T, theArgs?: unknown[]): () => T | null | undefined {
     let cachedValue: ICachedValue<T>;
     return function() {
-        !_globalLazyTestHooks && _initTestHooks();
-        if (!cachedValue || _globalLazyTestHooks.lzy) {
+        if (_initTestHooks().lzy || !cachedValue) {
             cachedValue = createCachedValue(safe(getFn, theArgs).v);
         }
         
@@ -90,8 +89,7 @@ export function lazySafeGetInst<T>(name: string | number | symbol) : ILazyValue<
  * cause the cached global to be reset.
  */
 export function getGlobal(useCached?: boolean): Window {
-    !_globalLazyTestHooks && _initTestHooks();
-    if (!_cachedGlobal || useCached === false || _globalLazyTestHooks.lzy) {
+    if (_initTestHooks().lzy || !_cachedGlobal || useCached === false) {
         _cachedGlobal = createCachedValue(safe(_getGlobalValue).v || NULL_VALUE);
     }
 

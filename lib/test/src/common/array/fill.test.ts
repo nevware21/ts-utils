@@ -181,10 +181,15 @@ describe("polyArrFill compared to the native function", () => {
                 for (let end = 0; end < values.length; end++) {
                     const actual = polyArrFill(sources[lp].slice(), 9, values[start], values[end]) as number[];
                     const expected = nativeFill.call(sources[lp].slice(), 9, values[start], values[end]);
-                    const details = "length " + sources[lp].length + " start [" + String(values[start]) + "] end [" + String(values[end]) + "]";
 
-                    assert.deepEqual(actual, expected, details);
-                    assert.equal(Object.keys(actual).length, sources[lp].length, "No extra properties: " + details);
+                    // The arrays only contain numbers, so they are compared as strings first and the (much slower)
+                    // assertions only run for a difference, which keeps the ~6000 combinations fast
+                    if (actual.join() !== expected.join() || actual.length !== expected.length || Object.keys(actual).length !== sources[lp].length) {
+                        const details = "length " + sources[lp].length + " start [" + String(values[start]) + "] end [" + String(values[end]) + "]";
+
+                        assert.deepEqual(actual, expected, details);
+                        assert.equal(Object.keys(actual).length, sources[lp].length, "No extra properties: " + details);
+                    }
                 }
             }
         }
@@ -210,5 +215,30 @@ describe("polyArrFill with indexes above 2^31", () => {
 
         polyArrFill(arrayLike, 9, -(BIG + 1), 3);
         assert.deepEqual(_filled(arrayLike), ["2"]);
+    });
+});
+
+describe("polyArrFill converts the value like the native function", () => {
+    it("should convert a length which is not a number", () => {
+        const arrayLike: any = { length: "2", 0: "x", 1: "y", 2: "z" };
+
+        assert.strictEqual(polyArrFill(arrayLike, 0), arrayLike);
+        assert.deepEqual([arrayLike[0], arrayLike[1], arrayLike[2]], [0, 0, "z"], "Only the first 2 indexes are filled");
+    });
+
+    it("should throw a TypeError for null and undefined", () => {
+        assert.throws(() => polyArrFill(null as any, 0), TypeError);
+        assert.throws(() => polyArrFill(undefined as any, 0), TypeError);
+    });
+
+    it("should return a primitive value as its object", () => {
+        const numResult: any = polyArrFill(5 as any, 0);
+        assert.equal(typeof numResult, "object");
+        assert.equal(numResult.valueOf(), 5);
+
+        // Nothing is written as the start is past the end of the string
+        const strResult: any = polyArrFill("abc" as any, 0, 3);
+        assert.equal(typeof strResult, "object");
+        assert.equal(String(strResult), "abc");
     });
 });

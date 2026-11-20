@@ -23,6 +23,15 @@ export const UNDEFINED = "undefined";
 export const CONSTRUCTOR = "constructor";
 export const SYMBOL = "Symbol";
 export const LENGTH = "length";
+export const SYMBOL_TYPE = "symbol";
+
+/**
+ * @internal
+ * @ignore
+ * The maximum length of the `dumpObj()` of a value which is included in an error message, so a large value (which
+ * may be controlled by the caller) doesn't create a large error message
+ */
+export const DUMP_ERR_MAX_LENGTH = 1024;
 export const NAME = "name";
 export const CALL = "call";
 export const TO_STRING = "toString";

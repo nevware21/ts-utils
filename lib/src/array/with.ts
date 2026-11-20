@@ -8,9 +8,9 @@
 
 import { ArrProto } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
-import { isArrayLike } from "../helpers/base";
-import { _toLength } from "../helpers/length";
+import { _toArrayLength } from "../helpers/length";
 import { throwRangeError } from "../helpers/throw";
+import { _pushOwnValue } from "../object/define";
 
 /**
  * The arrWith() method is the copying version of using the bracket notation to change the value
@@ -26,7 +26,8 @@ import { throwRangeError } from "../helpers/throw";
  * @param value - The new value to set at the index
  * @returns A new array with the element at index replaced, every other index is read from `theArray` so an
  * empty slot of a sparse array is `undefined` in the new array
- * @throws RangeError if the index is out of bounds
+ * @throws RangeError if the index is out of bounds, or (when the polyfill is used) the length is longer than an array
+ * can be (2^32 - 1)
  * @example
  * ```ts
  * arrWith([1, 2, 3], 1, 5);       // [1, 5, 3]
@@ -56,17 +57,17 @@ export const arrWith = (/*#__PURE__*/_unwrapFunctionWithPoly("with", ArrProto as
  * @param value - The new value to set at the index
  * @returns A new array with the element at index replaced, every other index is read from `theArray` so an
  * empty slot of a sparse array is `undefined` in the new array
- * @throws RangeError if the index is out of bounds
+ * @throws RangeError if the index is out of bounds (so a value without a length, eg. a number, always throws), or
+ * (when the polyfill is used) the length is longer than an array can be (2^32 - 1)
+ * @throws TypeError if `theArray` is `null` or `undefined`
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyArrWith<T>(theArray: ArrayLike<T>, index: number, value: T): T[] {
     let result: T[];
-    
-    if (!isArrayLike(theArray)) {
-        throwRangeError("Invalid array");
-    }
-    
-    const len = _toLength(theArray.length);
+
+    // Like the native function the length of the value is converted (eg. a string length), reading it throws a
+    // TypeError for null and undefined (rather than including a message)
+    const len = _toArrayLength(theArray);
     // Convert the index (NaN becomes 0), any other value outside of the range is rejected by the check
     let idx = +index || 0;
 
@@ -82,10 +83,12 @@ export function polyArrWith<T>(theArray: ArrayLike<T>, index: number, value: T):
         idx = len + idx;
     }
     
-    // Like the native function every other index is read into the new array (so an empty slot is undefined)
+    // Like the native function every other index is read into the new array (so an empty slot is undefined), and (like
+    // polyArrFrom) each value is added as an own property, so a setter or read-only property of the same index on
+    // Array.prototype (or Object.prototype) doesn't stop it being added
     result = [];
     for (let lp = 0; lp < len; lp++) {
-        result[lp] = lp === idx ? value : theArray[lp];
+        _pushOwnValue(result, lp === idx ? value : theArray[lp]);
     }
 
     return result;

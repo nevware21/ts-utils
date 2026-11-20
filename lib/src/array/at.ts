@@ -8,7 +8,6 @@
 
 import { ArrProto } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
-import { isArrayLike } from "../helpers/base";
 import { _toLength } from "../helpers/length";
 
 /**
@@ -48,22 +47,25 @@ export const arrAt = (/*#__PURE__*/_unwrapFunctionWithPoly("at", ArrProto as any
  * @param theArray - The array or array-like object to get element from
  * @param index - The index of the element to return
  * @returns The element at the specified index, or undefined if out of range
+ * @throws TypeError if `theArray` is `null` or `undefined`
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyArrAt<T>(theArray: ArrayLike<T>, index: number): T | undefined {
     let result: T | undefined;
-    
-    if (isArrayLike(theArray)) {
-        const len = _toLength(theArray.length);
-        // Convert the index (NaN becomes 0), any other value outside of the range is rejected by the check
-        let idx = +index || 0;
 
-        // Check the bounds before truncating, which uses % as a bitwise operator would wrap the indexes of an array longer than 2^31
-        if (len && idx > -len - 1 && idx < len) {
-            idx -= idx % 1;
-            result = theArray[idx < 0 ? len + idx : idx];
-        }
+    // Like the native function the length of the value is converted (eg. a string length), so a value without a length
+    // (eg. a number) has no elements, and reading it throws a TypeError for null and undefined (rather than including
+    // a message)
+    const len = _toLength(theArray);
+
+    // Convert the index (NaN becomes 0), any other value outside of the range is rejected by the check
+    let idx = +index || 0;
+
+    // Check the bounds before truncating, which uses % as a bitwise operator would wrap the indexes of an array longer than 2^31
+    if (len && idx > -len - 1 && idx < len) {
+        idx -= idx % 1;
+        result = theArray[idx < 0 ? len + idx : idx];
     }
-    
+
     return result;
 }

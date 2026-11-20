@@ -14,7 +14,7 @@ import { _resolveScheduleFn } from "./microtasks/resolveScheduleFn";
 import { _eTaskQueueType } from "./microtasks/taskQueue";
 import { _addMicrotaskQueue } from "./microtasks/timerQueue";
 import { fnBindArgs } from "../funcs/fnBindArgs";
-import { UNDEF_VALUE } from "../internal/constants";
+import { LENGTH, UNDEF_VALUE } from "../internal/constants";
 import { MicrotaskFn, ScheduleMicrotaskFn } from "../helpers/types";
 
 let _defaultOptions: MicroTaskOptions | undefined;
@@ -75,7 +75,10 @@ export function setMicroTaskFallbackOptions(options?: MicroTaskOptions): void {
  *
  * It uses the native `queueMicrotask` when available, otherwise falls back to
  * `Promise.resolve().then(...)`, and if `Promise` is unavailable it falls back to
- * `scheduleTimeout(..., 0)`.
+ * `scheduleTimeout(..., 0)`. With the `scheduleTimeout` fallback the pending callbacks are also run just before the
+ * callback of any timeout or interval created by this library (eg. {@link scheduleTimeout}, {@link createTimeout} or
+ * {@link scheduleInterval}), so like native microtasks they run before a timer which was started before them (and one
+ * which cancels that timer stops its callback), but not before a native `setTimeout()` / `setInterval()` callback.
  * Unlike standard microtasks, this helper returns a cancellable `ITimerHandler`
  * so scheduled callbacks can be canceled before execution.
  * This provides consistent microtask scheduling behavior across all supported runtimes,
@@ -122,7 +125,10 @@ export function scheduleMicrotask(callback: () => void, options?: MicroTaskOptio
  *
  * It uses the native `queueMicrotask` when available, otherwise falls back to
  * `Promise.resolve().then(...)`, and if `Promise` is unavailable it falls back to
- * `scheduleTimeout(..., 0)`.
+ * `scheduleTimeout(..., 0)`. With the `scheduleTimeout` fallback the pending callbacks are also run just before the
+ * callback of any timeout or interval created by this library (eg. {@link scheduleTimeout}, {@link createTimeout} or
+ * {@link scheduleInterval}), so like native microtasks they run before a timer which was started before them (and one
+ * which cancels that timer stops its callback), but not before a native `setTimeout()` / `setInterval()` callback.
  * Unlike standard microtasks, this helper returns a cancellable `ITimerHandler`
  * so scheduled callbacks can be canceled before execution.
  * This provides consistent microtask scheduling behavior across all supported runtimes,
@@ -155,7 +161,7 @@ export function scheduleMicrotask<TArgs extends any[]>(callback: (...args: TArgs
     let callbackArgs: TArgs | undefined;
     let theOptions: MicroTaskOptions | undefined;
 
-    if (arguments.length > 1 && argsOrOptions && isArray(argsOrOptions)) {
+    if (arguments[LENGTH] > 1 && argsOrOptions && isArray(argsOrOptions)) {
         callbackArgs = argsOrOptions as TArgs;
         theOptions = options;
     } else {

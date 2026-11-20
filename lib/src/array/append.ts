@@ -8,12 +8,19 @@
 
 import { isArray, isUndefined } from "../helpers/base";
 import { isIterable, isIterator } from "../iterator/iterator";
-import { iterForOf } from "../iterator/forOf";
+import { _getMapSetValues, iterForOf } from "../iterator/forOf";
 import { fnApply } from "../funcs/funcs";
+import { OBJECT } from "../internal/constants";
 
 /**
  * Appends the `elms` to the `target` where the elms may be an array, a single object
  * or an iterator object
+ *
+ * An array, an iterator or an iterable (eg. a `Set`) adds each of its values, any other value is added as a single
+ * element. On a runtime without `Symbol.iterator` (eg. IE) a `Map` (its `[key, value]` entries) or `Set` (its
+ * values) is still added using a copy of its entries / values, but a value which is only iterable where there is
+ * `Symbol.iterator` (eg. an `arguments` object or a typed array) is added as a single element, use {@link arrFrom}
+ * (eg. `arrAppend(target, arrFrom(arguments))`) to add its values on every runtime.
  * @group Array
  * @group Iterator
  * @example
@@ -50,15 +57,19 @@ import { fnApply } from "../funcs/funcs";
  */
 export function arrAppend<T>(target: T[], elms: T | T[] | Iterator<T>): T[] {
     if (!isUndefined(elms) && target) {
+        let values: any[];
         if (isArray(elms)) {
             // This is not just "target.push(elms)" but becomes effectively "target.push(elms[0], elms[1], ...)"
             fnApply(target.push, target, elms);
-        } else if (isIterator<T>(elms) || isIterable<T>(elms)) {
-            iterForOf(elms, (elm) => {
+        } else if (isIterator<T>(elms) || isIterable<T>(elms) || (values = typeof elms === OBJECT && _getMapSetValues(elms))) {
+            // A Map or Set which isn't iterable (eg. IE 11, which has no iterator functions) appends a copy of its
+            // entries / values, each is pushed (like an iterable) so a large Map or Set can't exceed the argument limit
+            // of apply(). Any other value is appended as-is
+            iterForOf(values || elms as Iterable<T>, (elm) => {
                 target.push(elm);
             });
         } else {
-            target.push(elms);
+            target.push(elms as T);
         }
     }
 

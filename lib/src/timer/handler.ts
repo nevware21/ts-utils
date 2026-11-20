@@ -146,26 +146,35 @@ export interface _TimerHandler {
     /**
      * The callback function that should be called when the timer operation
      * has completed and will not automatically rescheduled
-     * @returns
+     * @param keep - Keep the current timer, as it was started (eg. by a refresh() from a microtask run before the
+     * callback) after the timer which has completed, otherwise there is no pending timer
      */
-    dn: () => void
+    dn: (keep?: boolean) => void
 }
 
 /**
  * @ignore
  * @internal
  * Internal function to create and manage an ITimerHandler implementation, the object returned from this function
- * it directly used / returned by the pulic functions used to create timers (idle, interval and timeout)
- * @param startTimer - Should the timer be started as part of creating the handler
+ * it directly used / returned by the pulic functions used to create timers (idle, interval and timeout). The timer is
+ * not started, call refresh() once the handler has been assigned (as a callback which is run synchronously may use the
+ * handler)
  * @param refreshFn - The function used to create/start or refresh the timer
  * @param cancelFn - The function used to cancel the timer.
  * @returns The new ITimerHandler instance
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId: T) => T, cancelFn: (timerId: T) => void): _TimerHandler {
+export function _createTimerHandler<T>(refreshFn: (timerId: T) => T, cancelFn: (timerId: T) => void): _TimerHandler {
     let ref = true;
-    let timerId: T = startTimer ? refreshFn(NULL_VALUE) : NULL_VALUE;
+    let timerId: T = NULL_VALUE;
     let theTimerHandler: ITimerHandler;
+
+    // Incremented each time the timer's callback runs (dn()), so a refresh whose callback was run synchronously while
+    // the timer was being started (eg. by a setTimeout override) doesn't keep the id of that (already run) timer, and
+    // keeps the timer of a refresh() (or the cancel()) made by that callback. Only the callback is counted, so a
+    // cancel() or refresh() made by another callback (eg. one run by the override while starting this timer) doesn't
+    // stop the new timer from being kept
+    let changes = 0;
 
     function _unref() {
         ref = false;
@@ -179,7 +188,12 @@ export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId:
     }
 
     function _refresh() {
-        timerId = refreshFn(timerId);
+        let change = changes;
+        let newTimerId = refreshFn(timerId);
+        if (change === changes) {
+            timerId = newTimerId;
+        }
+
         if (!ref) {
             _unref();
         }
@@ -220,8 +234,9 @@ export function _createTimerHandler<T>(startTimer: boolean, refreshFn: (timerId:
 
     return {
         h: theTimerHandler,
-        dn: () => {
-            timerId = NULL_VALUE;
+        dn: (keep?: boolean) => {
+            !keep && (timerId = NULL_VALUE);
+            changes++;
         }
     };
 }

@@ -409,6 +409,45 @@ describe("object polyfills", () => {
             assert.isUndefined((result as any).polluted);
         });
 
+        it("should define each key, so a read-only or setter property of Object.prototype doesn't stop it being added", () => {
+            const readOnlyKey = "__testFromEntriesReadOnly";
+            const setterKey = "__testFromEntriesSetter";
+            let setterCalled = false;
+
+            // Like a frozen Object.prototype (eg. SES lockdown) or a setter added to it
+            Object.defineProperty(Object.prototype, readOnlyKey, { value: "proto", writable: false, configurable: true });
+            Object.defineProperty(Object.prototype, setterKey, {
+                set: function () {
+                    setterCalled = true;
+                },
+                configurable: true
+            });
+
+            try {
+                const result = polyObjFromEntries([[readOnlyKey, 1], [setterKey, 2]] as any);
+
+                assert.isTrue(Object.prototype.hasOwnProperty.call(result, readOnlyKey), "The read-only key is an own property");
+                assert.equal(result[readOnlyKey], 1);
+                assert.isTrue(Object.prototype.hasOwnProperty.call(result, setterKey), "The setter key is an own property");
+                assert.equal(result[setterKey], 2);
+                assert.isFalse(setterCalled, "The setter of Object.prototype was not called");
+
+                // Each property is enumerable, writable and configurable, like the native function
+                const desc = Object.getOwnPropertyDescriptor(result, readOnlyKey);
+                assert.isTrue(desc.enumerable);
+                assert.isTrue(desc.writable);
+                assert.isTrue(desc.configurable);
+                assert.deepEqual(Object.keys(result), [readOnlyKey, setterKey]);
+
+                if (typeof (Object as any).fromEntries === "function") {
+                    assert.deepEqual(Object.keys((Object as any).fromEntries([[readOnlyKey, 1], [setterKey, 2]])), [readOnlyKey, setterKey]);
+                }
+            } finally {
+                delete (Object.prototype as any)[readOnlyKey];
+                delete (Object.prototype as any)[setterKey];
+            }
+        });
+
         it("should handle empty iterables", () => {
             const emptyArray: any[] = [];
             const emptyMap = new Map();
@@ -992,6 +1031,34 @@ describe("object polyfills", () => {
             
             // Ensure the descriptor for 'a' is consistent between methods
             assert.deepEqual(descForA, allDescs.a);
+        });
+
+        it("should include every symbol key when there is a native Object.getOwnPropertySymbols", () => {
+            const objGetOwnPropertySymbols = (Object as any).getOwnPropertySymbols;
+            if (typeof Symbol !== "function" || typeof objGetOwnPropertySymbols !== "function") {
+                return;
+            }
+
+            // A symbol which isn't a well-known symbol (eg. on a runtime with Symbol but without the native
+            // Object.getOwnPropertyDescriptors(), the polyfill uses the native Object.getOwnPropertySymbols())
+            const sym = Symbol("test");
+            const registered = Symbol.for("polyObjGetOwnPropertyDescriptors.test");
+            const obj: any = { a: 1 };
+            obj[sym] = "symbol value";
+            Object.defineProperty(obj, registered, { value: 2, enumerable: false });
+
+            const descriptors: any = polyObjGetOwnPropertyDescriptors(obj);
+
+            assert.equal(descriptors[sym].value, "symbol value");
+            assert.isTrue(descriptors[sym].enumerable);
+            assert.equal(descriptors[registered].value, 2);
+            assert.isFalse(descriptors[registered].enumerable);
+            assert.deepEqual(objGetOwnPropertySymbols(descriptors), [sym, registered]);
+
+            const nativeDescriptors = (Object as any).getOwnPropertyDescriptors;
+            if (nativeDescriptors) {
+                assert.deepEqual(descriptors, nativeDescriptors(obj));
+            }
         });
     });
 

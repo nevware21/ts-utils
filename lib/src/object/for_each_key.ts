@@ -7,7 +7,7 @@
  */
 
 import { isFunction, isObject, isStrictNullOrUndefined } from "../helpers/base";
-import { CALL, UNDEF_VALUE } from "../internal/constants";
+import { CALL } from "../internal/constants";
 import { objHasOwn } from "./has_own";
 import { isUnsafePropKey } from "./isUnsafePropKey";
 
@@ -16,8 +16,9 @@ import { isUnsafePropKey } from "./isUnsafePropKey";
  * @ignore
  * Shared implementation for {@link objForEachKey} and {@link forEachOwnKey}, iterates the own enumerable
  * string keys of the object via a for...in loop. Each value is read inline within a try/catch (rather than
- * via a helper function call per key) so that a throwing getter passes `undefined` as the value instead of
- * aborting the iteration, while exceptions thrown by the callback still propagate.
+ * via a helper function call per key) so that the key of a throwing getter is skipped instead of aborting the
+ * iteration (rather than passing `undefined`, which a helper like objExtend would copy), while exceptions thrown by
+ * the callback still propagate.
  * @param theObject - The object to iterate over
  * @param callbackfn - The callback to call for each key, returning -1 stops the iteration
  * @param ctx - The already resolved `this` value to use when calling the callback
@@ -26,11 +27,12 @@ import { isUnsafePropKey } from "./isUnsafePropKey";
 export function _objForEachKey<T>(theObject: T, callbackfn: (key: string, value: T[keyof T]) => void | number, ctx: any): number | void {
     for (const prop in theObject) {
         if (objHasOwn(theObject, prop)) {
-            let value: any = UNDEF_VALUE;
+            let value: any;
             try {
                 value = theObject[prop as keyof T];
             } catch (e) {
-                // A throwing getter, so just pass undefined as the value
+                // A throwing getter, so the key is skipped
+                continue;
             }
 
             if (callbackfn[CALL](ctx, prop, value) === -1) {
@@ -44,13 +46,17 @@ export function _objForEachKey<T>(theObject: T, callbackfn: (key: string, value:
  * Calls the provided `callbackFn` function once for each key in an object. This is equivalent to `arrForEach(Object.keys(theObject), callbackFn)` or
  * if not using the array helper `Object.keys(theObject).forEach(callbackFn)` except that this helper avoids creating a temporary array of the object
  * keys before iterating over them and like the `arrForEach` helper you CAN stop or break the iteration by returning -1 from the `callbackFn` function.
+ * As the keys are not read first, a key which is deleted by the `callbackFn` before it is reached is not visited (rather
+ * than being visited with an `undefined` value), and (like for...in) whether a key added by the `callbackFn` is visited
+ * depends on the runtime.
  *
  * **Note:** This helper only iterates string (and numeric) keys (via for...in loop) and does NOT include enumerable symbol keys.
  * If you need to iterate all keys including symbol, use {@link forEachOwnKey} or {@link forEachOwnKeySafe} instead.
  *
- * If reading a property value throws (for example a getter that throws an exception), the exception is caught and the
- * `callbackFn` is still called for that key with an `undefined` value, so a single throwing getter does not stop the
- * iteration of the remaining keys.
+ * If reading a property value throws (for example a getter that throws an exception), the exception is caught and
+ * the key is skipped (the `callbackFn` is not called for it), so a single throwing getter does not stop the iteration of
+ * the remaining keys, and a helper which copies the values (eg. {@link objExtend} or {@link objDeepCopy}) doesn't copy
+ * `undefined` for it (replacing an existing value). Since 0.20.0, previously the exception stopped the iteration.
  *
  * Caution: this helper does not filter unsafe keys like `__proto__`, `constructor`, or `prototype`.
  * If your callback uses the returned key to assign directly to another object (for example
@@ -92,7 +98,7 @@ export function _objForEachKey<T>(theObject: T, callbackfn: (key: string, value:
  * // A throwing getter does not stop the iteration
  * const obj = { a: 1, get b(): number { throw new Error("fail"); }, c: 3 };
  * objForEachKey(obj, (key, value) => {
- *     console.log(key, value);  // a 1, b undefined, c 3
+ *     console.log(key, value);  // a 1, c 3 (b is skipped)
  * });
  * ```
  * @see {@link objForEachKeySafe} for safe iteration that filters unsafe keys
@@ -112,8 +118,8 @@ export function objForEachKey<T>(theObject: T, callbackfn: (key: string, value: 
  * Like {@link objForEachKey}, this helper iterates only string keys (via for...in loop) and does NOT include enumerable symbol keys.
  * If you need to iterate both string and symbol keys, use {@link forEachOwnKeySafe} instead.
  *
- * As with {@link objForEachKey}, if reading a property value throws (for example a throwing getter) the `callbackFn`
- * is called for that key with an `undefined` value and the iteration continues.
+ * As with {@link objForEachKey}, if reading a property value throws (for example a throwing getter) the key is skipped
+ * and the iteration continues.
  * @group Object
  * @since 0.14.0
  * @typeParam T - The object type

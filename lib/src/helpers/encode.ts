@@ -6,13 +6,12 @@
  * Licensed under the MIT license.
  */
 
-import { EMPTY, NULL_VALUE, StrCls, TO_STRING, UNDEF_VALUE } from "../internal/constants";
+import { EMPTY, LENGTH, NULL_VALUE, StrCls, TO_STRING, UNDEF_VALUE } from "../internal/constants";
 import { _pureRef } from "../internal/treeshake_helpers";
 import { asString } from "../string/as_string";
 import { strCamelCase } from "../string/conversion";
 import { strPadStart } from "../string/pad";
 import { strReplace } from "../string/replace";
-import { strSubstr } from "../string/substring";
 import { strUpper } from "../string/upper_lower";
 import { isNumber, isStrictNullOrUndefined, isString, isUndefined } from "./base";
 import { getInst } from "./environment";
@@ -94,7 +93,7 @@ function _decodeBase64(value: string): string {
  * followed by valid UTF-8.
  */
 function _fromBinary(value: string): string {
-    if (value.length > 3 && _hasUtf8Bom(value)) {
+    if (value[LENGTH] > 3 && _hasUtf8Bom(value)) {
         try {
             return decodeURIComponent(strReplace(value.substring(3), /[%\x80-\xFF]/g, (match) => "%" + match.charCodeAt(0)[TO_STRING](16)));
         } catch (e) {
@@ -401,7 +400,7 @@ export function encodeAsHex(value: string): string {
         result = _toBinary(asString(value));
 
         let hex = [];
-        for (let idx = 0; idx < result.length; idx++) {
+        for (let idx = 0; idx < result[LENGTH]; idx++) {
             let code = result.charCodeAt(idx);
 
             hex.push(HEX_CHARS[(code >> 4) & 0xf], HEX_CHARS[code & 0xf]);
@@ -437,8 +436,9 @@ export function decodeHex(value: string): string {
     if (value || !isStrictNullOrUndefined(value)) {
         let theValue = asString(value);
 
-        for (let idx = 0; idx < theValue.length; idx += 2) {
-            result.push(_fromCharCode(parseInt(strSubstr(theValue, idx, 2), 16)));
+        // The value is a (primitive) string, so its own substring() is called directly
+        for (let idx = 0; idx < theValue[LENGTH]; idx += 2) {
+            result.push(_fromCharCode(parseInt(theValue.substring(idx, idx + 2), 16)));
         }
     }
 
@@ -512,7 +512,7 @@ export function _encodeBase64Polyfill(str: string): string {
     if (str || !isStrictNullOrUndefined(str)) {
         str = asString(str);
 
-        let len = str.length;
+        let len = str[LENGTH];
         let lp = 0;
 
         while (lp < len) {
@@ -549,18 +549,18 @@ export function _decodeBase64Polyfill(str: string): string {
     if (str || !isStrictNullOrUndefined(str)) {
         // Like atob(), ASCII whitespace is ignored and the padding is optional
         str = strReplace(asString(str), /[\t\n\f\r ]+/g, EMPTY);
-        if (!(str.length % 4)) {
+        if (!(str[LENGTH] % 4)) {
             str = strReplace(str, /==?$/, EMPTY);
         }
 
-        if (str.length % 4 === 1 || /[^A-Za-z0-9+\/]/.test(str)) {
+        if (str[LENGTH] % 4 === 1 || /[^A-Za-z0-9+\/]/.test(str)) {
             throwError("Invalid character");
         }
 
         // Build the Base64 character cache if it doesn't exist
         if (!_base64Cache) {
             _base64Cache = {};
-            for (let i = 0; i < BASE64_CHARS.length; i++) {
+            for (let i = 0; i < BASE64_CHARS[LENGTH]; i++) {
                 _base64Cache[BASE64_CHARS[i]] = i;
             }
         }
@@ -568,7 +568,7 @@ export function _decodeBase64Polyfill(str: string): string {
         // Each character is 6 bits, every 8 bits is a byte and any remaining bits are discarded (like atob())
         let bits = 0;
         let bitCount = 0;
-        for (let idx = 0; idx < str.length; idx++) {
+        for (let idx = 0; idx < str[LENGTH]; idx++) {
             bits = (bits << 6) | _base64Cache[str[idx]];
             bitCount += 6;
 

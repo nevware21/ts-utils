@@ -15,7 +15,7 @@ import { _resolveScheduleFn } from "./microtasks/resolveScheduleFn";
 import { _addNextTickToQueue } from "./microtasks/timerQueue";
 import { _eTaskQueueType } from "./microtasks/taskQueue";
 import { fnBindArgs } from "../funcs/fnBindArgs";
-import { UNDEF_VALUE } from "../internal/constants";
+import { LENGTH, UNDEF_VALUE } from "../internal/constants";
 import { MicrotaskFn, ScheduleMicrotaskFn } from "../helpers/types";
 import { _getMicrotaskQueueFn } from "./microtasks/microtaskQueue";
 
@@ -45,7 +45,9 @@ export interface NextTickOptions {
 
     /**
      * The maximum number of queued nextTick callbacks that may be pending at once when using the fallback queues.
-     * When the limit is reached, scheduling throws a RangeError.
+     * When the limit is reached, scheduling throws a RangeError. A callback which has already run is not pending (so
+     * a callback which schedules another isn't limited by the callbacks run before it), while a cancelled callback
+     * is still counted until the queue is next run.
      */
     maxQueuedTasks?: number;
 }
@@ -212,7 +214,7 @@ export function scheduleNextTick<TArgs extends any[]>(callback: (...args: TArgs)
     let callbackArgs: TArgs | undefined;
     let theOptions: NextTickOptions | undefined;
 
-    if (arguments.length > 1 && argsOrOptions && isArray(argsOrOptions)) {
+    if (arguments[LENGTH] > 1 && argsOrOptions && isArray(argsOrOptions)) {
         callbackArgs = argsOrOptions as TArgs;
         theOptions = options;
     } else {

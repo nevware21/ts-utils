@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { ArrCls, FUNCTION, LENGTH, NULL_VALUE, OBJECT, ObjProto, TO_STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
+import { ArrCls, FUNCTION, LENGTH, NULL_VALUE, OBJECT, ObjProto, SYMBOL_TYPE, TO_STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
 import { _isPolyfillType } from "../internal/poly_helpers";
 import { _pureRef } from "../internal/treeshake_helpers";
 import { safeGet } from "./safe_get";
@@ -195,7 +195,7 @@ export function isStrictUndefined(arg: any): arg is undefined {
  *
  * let value = null;
  * isNullOrUndefined(value);        // true
- * let value = undefined;
+ * value = undefined;
  * isNullOrUndefined(value);        // true
  *
  * isNullOrUndefined("");           // false
@@ -225,7 +225,7 @@ export function isNullOrUndefined(value:  any): boolean {
  *
  * let value = null;
  * isStrictNullOrUndefined(value);        // true
- * let value = undefined;
+ * value = undefined;
  * isStrictNullOrUndefined(value);        // true
  *
  * isStrictNullOrUndefined("");           // false
@@ -241,23 +241,23 @@ export function isStrictNullOrUndefined(value: any): value is null | undefined {
 }
 
 /**
- * Checks if the passed value is defined, which means it is not strictly `undefined` (and not `null`).
- * A string value of `"undefined"` is considered to be defined. When this returns `true`, TypeScript narrows
- * the type to `Exclude<T, undefined>`, removing `undefined` from the type.
+ * Checks if the passed value is defined, which means it is not strictly `undefined` (so `null` is defined, use
+ * {@link isStrictNullOrUndefined} to also exclude `null`). A string value of `"undefined"` is considered to be defined.
+ * When this returns `true`, TypeScript narrows the type to `Exclude<T, undefined>`, removing `undefined` from the type.
  * @group Type Identity
  * @group Value Check
  * @typeParam T - The expected type of the value when it is defined.
  * @param arg - The value to check
- * @returns `true` if the value is defined (not `null` and not `undefined`), narrowing the type to `Exclude<T, undefined>`.
+ * @returns `true` if the value is defined (not `undefined`), narrowing the type to `Exclude<T, undefined>`.
  * @example
  * ```ts
- * isDefined(null);         // false
+ * isDefined(null);         // true
  * isDefined(undefined);    // false
  * isDefined("undefined");  // true
  *
  * let value = null;
- * isDefined(value);        // false
- * let value = undefined;
+ * isDefined(value);        // true
+ * value = undefined;
  * isDefined(value);        // false
  *
  * isDefined("");           // true
@@ -376,18 +376,19 @@ export function isPrimitive(value: any): value is string | number | bigint | boo
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function isPrimitiveType(theType: string): boolean {
-    !_primitiveTypes && (_primitiveTypes = [ "string", "number", "boolean", UNDEFINED, "symbol", "bigint" ]);
+    !_primitiveTypes && (_primitiveTypes = [ "string", "number", "boolean", UNDEFINED, SYMBOL_TYPE, "bigint" ]);
 
     return !!(theType !== OBJECT && _primitiveTypes.indexOf(theType) !== -1);
 }
 
 /**
- * Checks to see if the past value is a string value
+ * Checks to see if the past value is a string value, which is only a primitive string (`typeof value === "string"`), a
+ * String object (eg. `new String("")`) is not a string value, use {@link isStringObject} to check for one.
  * @function
  * @group Type Identity
  * @group String
  * @param value - The value to check
- * @returns
+ * @returns True if the value is a primitive string, otherwise false
  * @example
  * ```ts
  * isString("");            // true
@@ -398,9 +399,80 @@ export function isPrimitiveType(theType: string): boolean {
  * isString(null);          // false
  * isString(undefined);     // false
  * isString(0);             // false
+ * isString(new String("")); // false (a String object, see isStringObject)
+ * isString(Object(""));    // false (a String object, see isStringObject)
  * ```
  */
 export const isString: (value: any) => value is string = (/*#__PURE__*/_createIs<string>("string"));
+
+/**
+ * Checks if the value is a String object (a string wrapped in an object), eg. `new String("abc")` or `Object("abc")`,
+ * rather than a primitive string (see {@link isString}). A String object has the length, indexes and functions of its
+ * string, but it is an object, so `typeof` returns `"object"`, it is truthy even when it is empty, and `===` (and
+ * `Map` / `Set` keys) compare the object rather than its value. Use {@link isStringLike} to check for either.
+ *
+ * Like {@link isDate} and {@link isRegExp} the check uses {@link objToString}, so a String object from another realm
+ * (eg. an iframe) is also identified, and on a runtime with `Symbol.toStringTag` an object can change the result.
+ *
+ * The value is narrowed to `String & object` rather than `String`, as TypeScript treats a primitive `string` as a
+ * `String`, so `value is String` would narrow a `string | number` value to `string` (and to `number` when it is
+ * false), while a primitive string is never a String object. A value declared as `String` (which may also be a
+ * primitive string) is `never` when this is false, so declare it as `string | String` (which is `string` when false)
+ * or use {@link isStringLike}.
+ * @since 0.20.0
+ * @group Type Identity
+ * @group String
+ * @param value - The value to check
+ * @returns True if the value is a String object, otherwise false
+ * @example
+ * ```ts
+ * isStringObject(new String(""));      // true
+ * isStringObject(new String("abc"));   // true
+ * isStringObject(Object("abc"));       // true
+ *
+ * isStringObject("abc");               // false (a primitive string, see isString)
+ * isStringObject(String("abc"));       // false (String() without new returns a primitive string)
+ * isStringObject(null);                // false
+ * isStringObject(undefined);           // false
+ * isStringObject({});                  // false
+ * isStringObject(["a", "b", "c"]);     // false
+ * ```
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function isStringObject(value: any): value is String & object {
+    return !!value && typeof value === OBJECT && objToString(value) === "[object String]";
+}
+
+/**
+ * Checks if the value is a string, either a primitive string (see {@link isString}) or a String object (see
+ * {@link isStringObject}), eg. `"abc"`, `new String("abc")` or `Object("abc")`. A String object has the length,
+ * indexes and functions of its string but it is still an object, so use {@link asString} (or `value.valueOf()`) to
+ * get the primitive string when one is needed, eg. to compare it using `===` or to use it as a `Map` key.
+ * @since 0.20.0
+ * @group Type Identity
+ * @group String
+ * @param value - The value to check
+ * @returns True if the value is a primitive string or a String object, otherwise false
+ * @example
+ * ```ts
+ * isStringLike("");                        // true
+ * isStringLike("abc");                     // true
+ * isStringLike(String("abc"));             // true
+ * isStringLike(new String(""));            // true
+ * isStringLike(Object("abc"));             // true
+ *
+ * isStringLike(null);                      // false
+ * isStringLike(undefined);                 // false
+ * isStringLike(0);                         // false
+ * isStringLike(["a", "b", "c"]);           // false
+ * isStringLike({ length: 1, 0: "a" });     // false (an array-like object)
+ * isStringLike({ toString: () => "abc" }); // false (an object which converts to a string)
+ * ```
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function isStringLike(value: any): value is string | String {
+    return isString(value) || isStringObject(value);
+}
 
 /**
  * Checks to see if the past value is a function value

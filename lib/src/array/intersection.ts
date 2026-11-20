@@ -6,14 +6,19 @@
  * Licensed under the MIT license.
  */
 
-import { isArrayLike } from "../helpers/base";
+import { isArrayLike, isStrictNullOrUndefined } from "../helpers/base";
 import { arrForEach } from "./forEach";
 import { arrIncludes } from "./includes";
 import { _strArgsToArr } from "./slice";
+import { LENGTH } from "../internal/constants";
 
 /**
  * The arrIntersection() method returns a new array containing elements that exist in all provided arrays.
  * Uses strict equality (===) for comparison and maintains order from the first array.
+ *
+ * Like {@link https://nevware21.github.io/ts-utils/typedoc/functions/arrForEach.html | arrForEach} an empty slot (or a
+ * missing index) of the first array is skipped, so it isn't included as `undefined`, while one in another array matches
+ * an `undefined` value of the first array.
  * @since 0.14.0
  * @group Array
  * @group ArrayLike
@@ -34,19 +39,35 @@ import { _strArgsToArr } from "./slice";
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function arrIntersection<T>(...arrays: ArrayLike<T>[]): T[];
+/*#__NO_SIDE_EFFECTS__*/
 export function arrIntersection<T>(): T[] {
-    const result: T[] = [];
     // A string's own includes() matches a substring, so its characters are compared instead
-    let theArrays = _strArgsToArr(arguments as ArrayLike<ArrayLike<T>>);
-    
-    if (theArrays.length > 0) {
+    return _arrIntersection(_strArgsToArr(arguments as ArrayLike<ArrayLike<T>>));
+}
+
+/**
+ * @internal
+ * @ignore
+ * Returns the unique values of the first array-like which are included in every other array-like (a first value which
+ * isn't an array-like, or a later null or undefined value, includes nothing), used by arrIntersection() and
+ * iterIntersection()
+ * @param theArrays - The array-likes
+ * @returns The values which are included in every array-like
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function _arrIntersection<T>(theArrays: ArrayLike<ArrayLike<T>>): T[] {
+    const result: T[] = [];
+
+    if (theArrays[LENGTH] > 0) {
         
         const firstArray = theArrays[0];
         if (isArrayLike(firstArray)) {
             arrForEach(firstArray, (item) => {
                 let inAll = true;
                 arrForEach(theArrays, (arr, index) => {
-                    if (index > 0 && !(isArrayLike(arr) && arrIncludes(arr, item))) {
+                    // A null or undefined later value includes nothing, any other value is searched like an array-like
+                    // (as in v0.16.0), so its length is converted like the native functions (eg. a string length)
+                    if (index > 0 && !(!isStrictNullOrUndefined(arr) && arrIncludes(arr, item))) {
                         inAll = false;
                         return -1; // Break out of forEach
                     }

@@ -8,6 +8,13 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
+import { polyArrFrom } from "../../../../src/polyfills/array";
+import { mathToInt } from "../../../../src/math/to_int";
+import { polyObjCreate } from "../../../../src/object/create";
+import { polyObjFromEntries } from "../../../../src/polyfills/object/objFromEntries";
+import { polyObjKeys } from "../../../../src/polyfills/object/objKeys";
+import { polyStrIncludes } from "../../../../src/string/includes";
+import { polySymbolKeyFor } from "../../../../src/polyfills/symbol";
 
 describe("diagnostic helpers", () => {
     describe("dumpObj", () => {
@@ -163,3 +170,171 @@ describe("diagnostic helpers", () => {
     });
 });
 
+describe("dumpObj maxLength", () => {
+    const value = { a: 1, b: "Hello", c: { d: 2, e: "Darkness" } };
+
+    it("doesn't limit the length when it is omitted, zero, negative or not shorter than the dump", () => {
+        const full = dumpObj(value);
+
+        assert.equal(dumpObj(value, false, undefined), full);
+        assert.equal(dumpObj(value, false, 0), full);
+        assert.equal(dumpObj(value, false, -1), full);
+        assert.equal(dumpObj(value, false, NaN), full);
+        assert.equal(dumpObj(value, false, full.length), full, "A dump which is the maximum length is not changed");
+        assert.equal(dumpObj(value, false, full.length + 10), full);
+    });
+
+    it("truncates the dump to the length, ending with \"...\" (which is included in the length)", () => {
+        const full = dumpObj(value);
+
+        assert.equal(dumpObj(value, false, 20), "[object Object]: ...");
+        assert.equal(dumpObj(value, false, full.length - 1), full.substring(0, full.length - 4) + "...");
+        assert.equal(dumpObj(value, false, 20).length, 20);
+
+        // A length which is too short for any of the dump is only the "...", and a length less than 3 is rounded up to 3
+        assert.equal(dumpObj(value, false, 3), "...");
+        assert.equal(dumpObj(value, false, 2), "...");
+        assert.equal(dumpObj(value, false, 1), "...");
+        assert.equal(dumpObj(value, false, 0.5), "...");
+    });
+
+    it("truncates a formatted dump", () => {
+        const formatted = dumpObj(value, true);
+        const result = dumpObj(value, true, 30);
+
+        assert.equal(result.length, 30);
+        assert.equal(result, formatted.substring(0, 27) + "...");
+    });
+
+    it("limits the dump of a value in an error message to 1024 characters", () => {
+        let message: string;
+        try {
+            polyArrFrom([1], { value: new Array(5001).join("x") } as any);
+        } catch (e) {
+            message = e.message;
+        }
+
+        assert.include(message, "is not a function");
+        assert.equal(message.length, 1024 + " is not a function".length, "The message should be limited");
+        assert.equal(message.substring(1021, 1024), "...");
+    });
+});
+
+describe("dumpObj values which throw", () => {
+    it("doesn't recurse forever for a value which throws itself", () => {
+        const value = {
+            toJSON(): any {
+                throw this;
+            }
+        };
+
+        const result = dumpObj(value);
+        assert.equal(result.substring(0, 17), "[object Object]: ");
+        assert.equal(dumpObj(value, 0, 1024), result);
+
+        // The error (the value itself) is only dumped once
+        assert.equal(result, "[object Object]:  - [object Object]:  - ");
+    });
+
+    it("doesn't throw for an error with a throwing getter", () => {
+        const error = new Error("test error");
+        Object.defineProperty(error, "stack", {
+            get: () => {
+                throw new Error("stack getter error");
+            }
+        });
+
+        const result = dumpObj(error);
+        assert.include(result, "stack getter error");
+    });
+
+    it("an error message for a value which throws itself is a TypeError, like the native function", () => {
+        const mapFn: any = {
+            toJSON(): any {
+                throw this;
+            }
+        };
+
+        assert.throws(() => polyArrFrom([], mapFn), TypeError);
+        assert.throws(() => (Array as any).from([], mapFn), TypeError);
+    });
+
+    it("only uses a number maxLength, so the array passed to a callback (eg. by map) doesn't limit it", () => {
+        // TypeScript rejects arr.map(dumpObj) as the array isn't a number, but JavaScript code may still use it
+        assert.deepEqual([5].map(dumpObj as any), [dumpObj(5)]);
+        assert.equal(dumpObj({ a: 1 }, false, "5" as any), dumpObj({ a: 1 }));
+    });
+
+    it("rounds a fractional maxLength down, and a positive maxLength less than 3 up to 3", () => {
+        assert.equal(dumpObj({ a: 1 }, false, 5.5), "[o...");
+        assert.equal(dumpObj({ a: 1 }, false, 2.5), "...");
+        assert.equal(dumpObj({ a: 1 }, false, 0.5), "...");
+    });
+
+    it("doesn't throw when the type of the value can't be read (eg. its Symbol.toStringTag getter throws)", function() {
+        if (typeof Symbol !== "function" || !Symbol.toStringTag) {
+            this.skip();
+            return;
+        }
+
+        const value: any = {};
+        Object.defineProperty(value, Symbol.toStringTag, {
+            get: () => {
+                throw new Error("tag error");
+            }
+        });
+
+        assert.include(dumpObj(value), "tag error");
+    });
+
+    it("doesn't split a surrogate pair when it truncates", () => {
+        const pair = String.fromCharCode(0xD83D, 0xDE00);
+        const value = pair + pair + pair + pair;
+        const full = dumpObj(value);
+
+        for (let len = 18; len < full.length; len++) {
+            const result = dumpObj(value, 0, len);
+            assert.isAtMost(result.length, len);
+            assert.equal(result.substring(result.length - 3), "...");
+
+            const last = result.charCodeAt(result.length - 4);
+            assert.isFalse(last >= 0xD800 && last <= 0xDBFF, "A high surrogate should not be the last character for a length of " + len);
+        }
+    });
+});
+
+describe("error messages limit the dump of a value", () => {
+    const big = new Array(5001).join("x");
+
+    function _getError(fn: () => void): any {
+        try {
+            fn();
+        } catch (e) {
+            return e;
+        }
+    }
+
+    it("limits the dump of the value to 1024 characters", () => {
+        const regExp: any = /a/;
+        regExp.v = big;
+
+        const cases: any[] = [
+            ["mathToInt", () => mathToInt({ valueOf: () => Infinity, v: big }, true), RangeError],
+            ["polyObjCreate", () => polyObjCreate(big), TypeError],
+            ["polyObjFromEntries entry", () => polyObjFromEntries([big] as any), TypeError],
+            ["polyObjFromEntries iterable", () => polyObjFromEntries({ v: big } as any), TypeError],
+            ["polyObjKeys", () => polyObjKeys(big), TypeError],
+            ["polyStrIncludes", () => polyStrIncludes("a", regExp), TypeError],
+            ["polyArrFrom", () => polyArrFrom([1], { v: big } as any), TypeError],
+            ["polySymbolKeyFor", () => polySymbolKeyFor(big as any), TypeError]
+        ];
+
+        for (let lp = 0; lp < cases.length; lp++) {
+            const error = _getError(cases[lp][1]);
+            const message: string = error ? error.message : "";
+            assert.instanceOf(error, cases[lp][2], cases[lp][0] + " should throw");
+            assert.isAtMost(message.length, 1100, cases[lp][0] + " message should be limited, was " + message.length);
+            assert.include(message, "...", cases[lp][0] + " message should be truncated");
+        }
+    });
+});

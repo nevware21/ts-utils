@@ -25,7 +25,9 @@ import { BoundFunction } from "./types";
  *
  * `fnApply` is the intrinsic `Function.prototype.call` bound to the intrinsic `Function.prototype.apply`, so
  * `fnApply(fn, thisArg, argArray)` is `fn.apply(thisArg, argArray)` without any wrapper function, and it doesn't
- * depend on the `call` or `apply` properties of `fn` (which may have been overridden).
+ * depend on the `call` or `apply` properties of `fn` (which may have been overridden). As it is a bound intrinsic
+ * function, when `fn` is not a function the `TypeError` thrown by the runtime names `fnApply` (or the name it was
+ * imported as) rather than `fn`, eg. `"fnApply is not a function"` (since 0.20.0).
  *
  * @function
  * @since 0.9.8
@@ -88,7 +90,9 @@ export const fnApply: <F extends (...args: any) => any, T>(fn: F, thisArg: T, ar
  *
  * `fnCall` is the intrinsic `Function.prototype.call` bound to itself, so `fnCall(fn, thisArg, ...args)` is
  * `fn.call(thisArg, ...args)` without any wrapper function or copying of the arguments, and it doesn't depend
- * on the `call` or `apply` properties of `fn` (which may have been overridden).
+ * on the `call` or `apply` properties of `fn` (which may have been overridden). As it is a bound intrinsic
+ * function, when `fn` is not a function the `TypeError` thrown by the runtime names `fnCall` (or the name it was
+ * imported as) rather than `fn`, eg. `"fnCall is not a function"` (since 0.20.0).
  *
  * @function
  * @since 0.9.8

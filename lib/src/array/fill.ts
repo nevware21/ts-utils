@@ -6,37 +6,10 @@
  * Licensed under the MIT license.
  */
 
-import { ArrProto, UNDEF_VALUE } from "../internal/constants";
+import { ArrProto, ObjClass, UNDEF_VALUE } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
-import { isArrayLike } from "../helpers/base";
-import { _toLength } from "../helpers/length";
+import { _toLength, _toRelIndex } from "../helpers/length";
 import { WritableArrayLike } from "../helpers/arrayLike";
-
-/**
- * @internal
- * @ignore
- * Converts a start / end value into the position within the array that it identifies, which is always in range.
- * @param value - The value to convert (NaN becomes 0)
- * @param len - The length of the array
- * @returns The position within the array
- */
-/*#__NO_SIDE_EFFECTS__*/
-function _getFillIdx(value: number, len: number): number {
-    let idx = +value || 0;
-
-    // Check the bounds before truncating, which uses % as a bitwise operator would wrap the indexes of an array longer than 2^31
-    if (idx <= -len) {
-        return 0;
-    }
-
-    if (idx >= len) {
-        return len;
-    }
-
-    idx -= idx % 1;
-
-    return idx < 0 ? len + idx : idx;
-}
 
 /**
  * The arrFill() method changes all elements in an array to a static value, from a start index
@@ -74,20 +47,22 @@ export const arrFill = (/*#__PURE__*/_unwrapFunctionWithPoly("fill", ArrProto, p
  * @param value - Value to fill the array with
  * @param start - Start index (inclusive), defaults to 0
  * @param end - End index (exclusive), defaults to array.length
- * @returns The modified array
+ * @returns The modified array, like the native function a primitive value is converted to an object (eg. a number
+ * returns its `Number` object, and filling a string throws a TypeError as its characters are read-only)
+ * @throws TypeError if `theArray` is `null` or `undefined`
  */
-/*#__NO_SIDE_EFFECTS__*/
 export function polyArrFill<T>(theArray: WritableArrayLike<T>, value: T, start?: number, end?: number): WritableArrayLike<T> {
-    if (isArrayLike(theArray)) {
-        const len = _toLength(theArray.length);
-        const startIdx = _getFillIdx(start, len);
-        const endIdx = end === UNDEF_VALUE ? len : _getFillIdx(end, len);
-        
-        // Fill the array
-        for (let i = startIdx; i < endIdx; i++) {
-            theArray[i] = value;
-        }
+    // Like the native function the length of the value is converted (eg. a string length), reading it throws a
+    // TypeError for null and undefined (rather than including a message), and the value is converted to an object
+    const len = _toLength(theArray);
+    const theObj = ObjClass(theArray);
+    const startIdx = _toRelIndex(start, len);
+    const endIdx = end === UNDEF_VALUE ? len : _toRelIndex(end, len);
+
+    // Fill the array
+    for (let i = startIdx; i < endIdx; i++) {
+        theObj[i] = value;
     }
-    
-    return theArray;
+
+    return theObj;
 }

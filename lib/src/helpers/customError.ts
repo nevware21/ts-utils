@@ -50,6 +50,12 @@ function  _setName(baseClass: any, name: string) {
 
 /**
  * Create a Custom Error class which may be used to throw custom errors.
+ *
+ * On a runtime which can't set the prototype of an existing object (IE 9 / 10, which have no `Object.setPrototypeOf`
+ * or `__proto__`), calling the native `Error` returns a new object rather than initializing the instance, so the
+ * instance is that `Error` with the class's `name` and the own enumerable properties of the class's prototype (not
+ * those of a custom error class it extends), but it is not an `instanceof` the class (it is still an `instanceof Error`
+ * and {@link isError} is true).
  * @group Error
  * @param name - The name of the Custom Error
  * @param constructCb - [Optional] An optional callback function to call when a
@@ -185,6 +191,10 @@ export function createCustomError<T extends ErrorConstructor = CustomErrorConstr
                 let orgProto = objGetPrototypeOf(_this);
                 if (orgProto !== objGetPrototypeOf(_self)) {
                     objSetPrototypeOf(_self, orgProto);
+
+                    // A runtime which can't set the prototype (eg. IE 9 / 10) only copies the prototype's own enumerable
+                    // properties, so also define the (non-enumerable) name on the instance
+                    objGetPrototypeOf(_self) !== orgProto && safe(objDefine, [_self, NAME, { v: name, c: true, e: false }]);
                 }
             }
 

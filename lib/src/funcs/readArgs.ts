@@ -7,20 +7,20 @@
  */
 
 import { arrSlice } from "../array/slice";
-import { CALL, LENGTH, UNDEF_VALUE } from "../internal/constants";
-import { iterForOf } from "../iterator/forOf";
+import { LENGTH, UNDEF_VALUE } from "../internal/constants";
+import { _getMapSetValues, _iterForOf } from "../iterator/forOf";
+import { _getIterKey } from "../iterator/iterator";
+import { fnCall } from "./funcs";
 import { objHasOwn } from "../object/has_own";
-import { getKnownSymbol, hasSymbol } from "../symbol/symbol";
-import { WellKnownSymbols } from "../symbol/well_known"
-import { ICachedValue, createCachedValue } from "../helpers/cache";
-
-let _iterSymbol: ICachedValue<symbol>;
+import { _pushOwnValue } from "../object/define";
 
 /**
  * Read the arguments from the provided array, iterator /  or generator function
  * When processing an Iterable and a negative start or end is provided the entire
  * iterator will be processed into an array before applying the start / end restrictions
- * and when undefined or \>= 0 any iterator will not be fully processed.
+ * and when undefined or \>= 0 any iterator will not be fully processed. A `Map` (its `[key, value]` entries) or `Set`
+ * (its values) which isn't iterable (eg. on IE 11, which has no iterator functions) is read (since 0.20.0) from a copy
+ * of its entries / values.
  * @param theArgs - The arguments to process, may be ArrayLike or an Iterable
  * @param start - Zero-based index at which to start extraction, converted to an integer.
  * - Negative index counts back from the end of the array or iteration
@@ -35,6 +35,10 @@ let _iterSymbol: ICachedValue<symbol>;
  * end to be extracted.
  * - If end is positioned before or at start after normalization, nothing is extracted.
  * @returns A new array with the extracted elements
+ * @throws TypeError when a value without a `length` has a `[Symbol.iterator]` which isn't a function (a falsy value,
+ * eg. `null`, is ignored), an iterable's `[Symbol.iterator]()` doesn't return an iterator, the iterator's `next()`
+ * returns a value which is not an object, or (like `for...of`) when it stops early (at the end index) and the
+ * iterator's `return()` doesn't return an object
  * @example
  * ```ts
  * function myFunc<T>(firstArg: T, ...otherArgs) {
@@ -90,23 +94,20 @@ export function readArgs<T = any>(theArgs: ArrayLike<T> | Iterable<T>, start?: n
         // Does not contain a length property so lets check if it's an iterable
         // IArgument is both ArrayLike and an iterable, so prefering to treat it as
         // an array for performance
-        !_iterSymbol && (_iterSymbol = createCachedValue(hasSymbol() && getKnownSymbol(WellKnownSymbols.iterator)));
-        let iterFn: any;
-        if (_iterSymbol.v) {
-            iterFn = (theArgs as any)[_iterSymbol.v];
-        }
-
+        let iterFn: any = (theArgs as any)[_getIterKey()];
         if (iterFn) {
             let values: T[] = [];
-            let from = (start === UNDEF_VALUE || start < 0) ? 0 : start;
             let to = end < 0 || start < 0 ? UNDEF_VALUE : end;
-            iterForOf<T>(iterFn[CALL](theArgs), (value, cnt) => {
-                if (to !== UNDEF_VALUE && cnt >= to) {
+            _iterForOf<T>(fnCall(iterFn, theArgs), (value, cnt) => {
+                // Like arrSlice() the start and end are converted to integers, as cnt + 1 <= x is only true when cnt is
+                // before the truncated x (so a fraction is truncated, and it's never true for NaN, which is 0)
+                if (to !== UNDEF_VALUE && !(cnt + 1 <= to)) {
                     return -1;
                 }
 
-                if (cnt >= from) {
-                    values.push(value);
+                if (!(cnt + 1 <= start)) {
+                    // Like Array.from() each value is added as an own property
+                    _pushOwnValue(values, value);
                 }
             });
 
@@ -114,7 +115,12 @@ export function readArgs<T = any>(theArgs: ArrayLike<T> | Iterable<T>, start?: n
                 return values;
             }
 
+            // The values before a positive start were not added, so only a negative (or NaN) start is still applied
             theArgs = values;
+            start = start > 0 ? 0 : start;
+        } else {
+            // A Map or Set which isn't iterable (eg. IE 11) is read from a copy of its entries / values
+            theArgs = _getMapSetValues(theArgs) || theArgs;
         }
     }
 
