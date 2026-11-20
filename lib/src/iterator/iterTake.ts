@@ -24,10 +24,10 @@ import { mathFloor } from "../math/floor";
  * once the source throws, and its `return()` only closes the source when it isn't already done. Unlike the native
  * `take()`, a negative or `NaN` count is used as 0 (so the source is closed by the first `next()`) rather than throwing
  * a `RangeError` when it is created, and a fractional count is truncated.
- * @throws TypeError from its `next()` (the value isn't checked when it is created) when the value's
- * `[Symbol.iterator]()` doesn't return an iterator or the source's `next()` (or `return()`, when the count is reached)
- * returns a value which is not an object, and from its `return()` when the source's `return()` returns a value which is
- * not an object
+ * @throws TypeError when it is created if the value's `[Symbol.iterator]` isn't `null`, `undefined` or a function, from
+ * its `next()` (the iterator isn't checked when it is created) when the value's `[Symbol.iterator]()` doesn't return an
+ * iterator or the source's `next()` (or `return()`, when the count is reached) returns a value which is not an object,
+ * and from its `return()` when the source's `return()` returns a value which is not an object
  * @since 0.15.0
  * @group Iterator
  * @example

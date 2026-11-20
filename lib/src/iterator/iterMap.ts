@@ -22,10 +22,10 @@ import { IterMapCallbackFn } from "./types";
  * object, the source is closed (by calling its `return()` with no arguments) when the callbackfn throws, it is done
  * once the source or the callbackfn throws, its `return()` only closes the source when it isn't already done, and a
  * TypeError is thrown when its `next()` or `return()` is called by the callbackfn.
- * @throws TypeError from its `next()` (the value isn't checked when it is created) when the value's
- * `[Symbol.iterator]()` doesn't return an iterator or the source's `next()` returns a value which is not an object,
- * from its `return()` when the source's `return()` returns a value which is not an object, and when its `next()` or
- * `return()` is called by the callbackfn
+ * @throws TypeError when it is created if the value's `[Symbol.iterator]` isn't `null`, `undefined` or a function, from
+ * its `next()` (the iterator isn't checked when it is created) when the value's `[Symbol.iterator]()` doesn't return an
+ * iterator or the source's `next()` returns a value which is not an object, from its `return()` when the source's
+ * `return()` returns a value which is not an object, and when its `next()` or `return()` is called by the callbackfn
  * @since 0.15.0
  * @group Iterator
  * @example

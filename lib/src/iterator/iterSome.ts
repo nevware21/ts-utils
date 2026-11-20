@@ -21,9 +21,9 @@ import { IterPredicateCallbackFn } from "./types";
  * IE 11) using a copy of its `[key, value]` entries / values.
  * @since 0.15.0
  * @group Iterator
- * @throws TypeError when the value's `[Symbol.iterator]()` doesn't return an iterator, or the iterator's `next()`
- * returns a value which is not an object, or (like `for...of`) when it stops early and the iterator's `return()`
- * doesn't return an object
+ * @throws TypeError when the value's `[Symbol.iterator]` isn't `null`, `undefined` or a function, when its
+ * `[Symbol.iterator]()` doesn't return an iterator, or the iterator's `next()` returns a value which is not an object,
+ * or (like `for...of`) when it stops early and the iterator's `return()` doesn't return an object
  * @example
  * ```ts
  * iterSome([1, 3, 5, 8], (value) => value % 2 === 0); // true

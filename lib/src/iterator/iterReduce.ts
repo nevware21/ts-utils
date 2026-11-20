@@ -22,8 +22,9 @@ import { LENGTH } from "../internal/constants";
  * IE 11) using a copy of its `[key, value]` entries / values.
  * @since 0.15.0
  * @group Iterator
- * @throws TypeError when the value's `[Symbol.iterator]()` doesn't return an iterator, or the iterator's `next()`
- * returns a value which is not an object, or when the iterator is empty and there is no initialValue
+ * @throws TypeError when the value's `[Symbol.iterator]` isn't `null`, `undefined` or a function, when its
+ * `[Symbol.iterator]()` doesn't return an iterator, or the iterator's `next()` returns a value which is not an object,
+ * or when the iterator is empty and there is no initialValue
  * @example
  * ```ts
  * iterReduce([1, 2, 3, 4], (prev, value) => (prev as number) + value, 0); // 10

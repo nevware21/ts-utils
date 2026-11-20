@@ -7,7 +7,7 @@
  */
 
 import { fnCall } from "../funcs/funcs";
-import { isArrayLike, isFunction, isStrictNullOrUndefined } from "../helpers/base";
+import { isArrayLike, isStrictNullOrUndefined } from "../helpers/base";
 import { safe } from "../helpers/safe";
 import { throwTypeError } from "../helpers/throw";
 import { createIterableIterator, CreateIteratorContext } from "./create";
@@ -20,9 +20,12 @@ export function _asIterator<T>(iter: Iterator<T> | Iterable<T> | ArrayLike<T>): 
     if (!isStrictNullOrUndefined(iter)) {
         // Like for...of (and iterForOf), an iterable is processed using the iterator returned by its [Symbol.iterator]()
         // (which is only read once), even when it is also an array-like (eg. a string is processed by its code points) or
-        // has a next() function (eg. a jQuery collection), and only an iterator which is not iterable is used as-is
+        // has a next() function (eg. a jQuery collection), and only an iterator which is not iterable is used as-is.
+        // Like Array.from() (and iterForOf / polyArrFrom) only a null or undefined [Symbol.iterator] is ignored, any
+        // other value which isn't a function throws a TypeError (the runtime's own, from calling it) rather than the
+        // value being used as an iterator or array-like
         let iteratorFn = (iter as any)[_getIterKey()];
-        if (isFunction(iteratorFn)) {
+        if (!isStrictNullOrUndefined(iteratorFn)) {
             return fnCall(iteratorFn, iter);
         }
 

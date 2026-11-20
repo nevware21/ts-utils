@@ -22,8 +22,8 @@ import { IterMapCallbackFn } from "./types";
  * not iterable (eg. on IE 11) returns its `[key, value]` entries / values.
  * @since 0.15.0
  * @group Iterator
- * @throws TypeError when the value's `[Symbol.iterator]()` doesn't return an iterator, or the iterator's `next()`
- * returns a value which is not an object
+ * @throws TypeError when the value's `[Symbol.iterator]` isn't `null`, `undefined` or a function, when its
+ * `[Symbol.iterator]()` doesn't return an iterator, or the iterator's `next()` returns a value which is not an object
  * @example
  * ```ts
  * iterToArray(createRangeIterator(1, 3)); // [1, 2, 3]
