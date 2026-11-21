@@ -81,20 +81,32 @@ export function scheduleInterval<A extends any[]>(callback: (...args: A) => void
     // Copy the arguments as they are kept and reused by refresh() after this call has returned
     let theArguments = ArrSlice[CALL](arguments);
     let intervalFn = theArguments[0];
+
+    // Counts the setInterval calls which are running, so a callback which setInterval runs synchronously (eg. an
+    // override) is identified
+    let starting = 0;
+
     theArguments[0] = function (this: any) {
         let enabled = handler.h.enabled;
 
         // Like a timeout, any pending fallback microtasks are run first, and (like a native microtask, which runs
-        // before the timer) one which cancels the interval stops this call. The callback is called with the `this` which
-        // setInterval passes (eg. Node's Timeout, so `clearInterval(this)` or `this.unref()` work as they did when the
-        // callback was passed to setInterval directly)
-        _runMicrotasks();
+        // before the timer) one which cancels the interval stops this call. While setInterval runs the callback
+        // synchronously the handler doesn't have the new interval yet (so a cancel() would be lost when it is stored),
+        // so the pending microtasks are left to run before a later timer's callback (or by the fallback timer). The
+        // callback is called with the `this` which setInterval passes (eg. Node's Timeout, so `clearInterval(this)` or
+        // `this.unref()` work as they did when the callback was passed to setInterval directly)
+        !starting && _runMicrotasks();
         (!enabled || handler.h.enabled) && fnApply(intervalFn, this, arguments);
     };
 
     let handler = _createTimerHandler((intervalId: any) => {
         intervalId && clearInterval(intervalId);
-        return fnApply(setInterval, UNDEF_VALUE, theArguments)
+        starting++;
+        try {
+            return fnApply(setInterval, UNDEF_VALUE, theArguments);
+        } finally {
+            starting--;
+        }
     }, (intervalId: any) => {
         fnApply(clearInterval, UNDEF_VALUE, [ intervalId ]);
     });

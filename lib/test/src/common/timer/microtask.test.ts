@@ -14,9 +14,10 @@ import { scheduleMicrotask, setMicroTaskFallbackOptions } from "../../../../src/
 import { _getMicrotaskQueueFn } from "../../../../src/timer/microtasks/microtaskQueue";
 import { _addMicrotaskQueue, _resetSharedTimer } from "../../../../src/timer/microtasks/timerQueue";
 import { _runMicroTask } from "../../../../src/timer/microtasks/runMicrotask";
-import { createTimeout, scheduleTimeout, setTimeoutOverrides } from "../../../../src/timer/timeout";
+import { createTimeout, scheduleTimeout, scheduleTimeoutWith, setTimeoutOverrides } from "../../../../src/timer/timeout";
 import { _clearTaskQueues, _eTaskQueueType } from "../../../../src/timer/microtasks/taskQueue";
 import { scheduleInterval } from "../../../../src/timer/interval";
+import { ITimerHandler } from "../../../../src/timer/handler";
 
 describe("microtask tests", () => {
     let orgPromise: any;
@@ -955,6 +956,109 @@ describe("microtask tests", () => {
                 assert.equal(calls, 1, "The callback was only called once");
                 assert.equal(theTimer.enabled, false, "The timer is not enabled once its callback has run");
             });
+
+            it("a microtask which cancels an interval isn't lost when the setInterval of its refresh() runs the callback synchronously", () => {
+                let runPending = _setSyncOverride();
+                let theGlobal: any = getGlobal();
+                let orgSetInterval = theGlobal.setInterval;
+                let orgClearInterval = theGlobal.clearInterval;
+                let intervals: { [id: number]: () => void } = {};
+                let nextId = 1;
+                let runIntervalNow = false;
+                let events: string[] = [];
+                let enabled = true;
+                let runningIntervals = -1;
+
+                // A setInterval which runs the callback synchronously (before the id is returned) when runIntervalNow is set
+                theGlobal.setInterval = function (callback: () => void) {
+                    let id = nextId++;
+                    intervals[id] = callback;
+                    if (runIntervalNow) {
+                        runIntervalNow = false;
+                        callback();
+                    }
+
+                    return id;
+                };
+
+                theGlobal.clearInterval = function (id: number) {
+                    delete intervals[id];
+                };
+
+                try {
+                    let theInterval: ITimerHandler = scheduleInterval(() => {
+                        events.push("interval");
+                    }, 10);
+
+                    // Queued, so the fallback queue is run before the next timer's callback
+                    scheduleMicrotask(() => {
+                        events.push("cancel");
+                        theInterval.cancel();
+                    }, {
+                        useTimeout: true
+                    });
+
+                    // The callback of the new interval is called while setInterval is running (so the handler doesn't
+                    // have the new interval yet), so the microtask is left to run by the fallback timer
+                    runIntervalNow = true;
+                    theInterval.refresh();
+                    runPending();
+                    runPending();
+
+                    enabled = theInterval.enabled;
+                    runningIntervals = Object.keys(intervals).length;
+                    theInterval.cancel();
+                } finally {
+                    theGlobal.setInterval = orgSetInterval;
+                    theGlobal.clearInterval = orgClearInterval;
+                }
+
+                assert.deepEqual(events, ["interval", "cancel"], "The callback was called and then the microtask cancelled the interval");
+                assert.equal(enabled, false, "The interval is not enabled");
+                assert.equal(runningIntervals, 0, "The interval started by refresh() was cleared");
+            });
+        });
+
+        it("a timer callback which runs synchronously inside a microtask (eg. a fake clock) doesn't run the queued microtasks again", (done) => {
+            let events: string[] = [];
+            let timers: Array<() => void> = [];
+            let theTimer = scheduleTimeoutWith([
+                (function (callback: () => void) {
+                    timers.push(callback);
+                    return timers.length;
+                }) as any,
+                function (id: any) {
+                    timers[id - 1] = null as any;
+                }
+            ], () => {
+                events.push("timeout");
+            }, 10);
+
+            scheduleMicrotask(() => {
+                events.push("A");
+
+                // Like a fake clock which is ticked inside a microtask, the timer's callback is run synchronously (and it
+                // runs the pending microtasks first, which are already being run)
+                timers.forEach((callback) => {
+                    callback && callback();
+                });
+            });
+
+            scheduleMicrotask(() => {
+                events.push("B");
+            }, {
+                useTimeout: true
+            });
+
+            orgSetTimeout(() => {
+                theTimer.cancel();
+                try {
+                    assert.deepEqual(events, ["A", "timeout", "B"], "Each task and the timer's callback was only called once");
+                    done();
+                } catch (e) {
+                    done(e);
+                }
+            }, 30);
         });
     });
 

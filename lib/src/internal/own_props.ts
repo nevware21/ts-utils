@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { GET_OWN_PROPERTY_DESCRIPTOR, GET_OWN_PROPERTY_SYMBOLS, ObjClass } from "./constants";
+import { GET_OWN_PROPERTY_DESCRIPTOR, GET_OWN_PROPERTY_NAMES, GET_OWN_PROPERTY_SYMBOLS, ObjClass } from "./constants";
 import { _returnEmptyArray, _returnNothing } from "./stubs";
 import { _pureAssign, _pureRef } from "./treeshake_helpers";
 
@@ -26,3 +26,24 @@ export const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => P
  * Object.getOwnPropertySymbols() or a stub which returns an empty array
  */
 export const _objGetOwnPropertySymbols: (obj: any) => symbol[] = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertySymbols>(ObjClass, GET_OWN_PROPERTY_SYMBOLS)), _returnEmptyArray));
+
+/**
+ * @internal
+ * @ignore
+ * Object.getOwnPropertyNames() (defined by every supported runtime, ES5) or a stub which returns an empty array
+ */
+export const _objGetOwnPropertyNames: (obj: any) => string[] = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertyNames>(ObjClass, GET_OWN_PROPERTY_NAMES)), _returnEmptyArray));
+
+/**
+ * @internal
+ * @ignore
+ * The native Object.getPrototypeOf() (defined by every supported runtime, ES5)
+ */
+export const _objGetPrototypeOf: (value: any) => any = (/*#__PURE__*/_pureRef<typeof Object.getPrototypeOf>(ObjClass, "getPrototypeOf"));
+
+/**
+ * @internal
+ * @ignore
+ * The native Object.create() (defined by every supported runtime, ES5)
+ */
+export const _objCreate: (proto: any, properties?: PropertyDescriptorMap & ThisType<any>) => any = (/*#__PURE__*/_pureRef<typeof Object.create>(ObjClass, "create"));

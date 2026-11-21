@@ -261,3 +261,76 @@ describe("polyArrFlatMap converts the value like the native function", () => {
         assert.strictEqual(arrays[1], arrays[0], "The same object is passed for every value");
     });
 });
+
+describe("polyArrFlatMap adds the values like the native function", () => {
+    const kinds: { [name: string]: (calls: string[]) => PropertyDescriptor } = {
+        setter: (calls) => ({
+            set: () => {
+                calls.push("set");
+            },
+            configurable: true
+        }),
+        "read-only": () => ({
+            value: "RO",
+            writable: false,
+            configurable: true
+        })
+    };
+
+    Object.keys(kinds).forEach((kind) => {
+        it("adds each value as an own property when Array.prototype has a " + kind + " for the index", () => {
+            const previous = Object.getOwnPropertyDescriptor(Array.prototype, "0");
+            const calls: string[] = [];
+            let mapped: any[];
+            let notMapped: any[];
+            try {
+                Object.defineProperty(Array.prototype, "0", kinds[kind](calls));
+
+                // An array (whose values are added) and a value which isn't an array
+                mapped = polyArrFlatMap(["a", "b"], (value: string) => [value + "1", value + "2"]);
+                notMapped = polyArrFlatMap(["a", "b"], (value: string) => value);
+            } finally {
+                // Restore Array.prototype before any assert is used
+                if (previous) {
+                    Object.defineProperty(Array.prototype, "0", previous);
+                } else {
+                    delete (Array.prototype as any)[0];
+                }
+            }
+
+            assert.deepEqual(calls, [], "The Array.prototype setter was not called");
+            assert.deepEqual(Object.getOwnPropertyDescriptor(mapped, "0"), { value: "a1", writable: true, enumerable: true, configurable: true });
+            assert.deepEqual(mapped, ["a1", "a2", "b1", "b2"]);
+            assert.deepEqual(Object.getOwnPropertyDescriptor(notMapped, "0"), { value: "a", writable: true, enumerable: true, configurable: true });
+            assert.deepEqual(notMapped, ["a", "b"]);
+        });
+    });
+
+    it("reads the length once, before checking the callbackFn (like the native function)", () => {
+        let order: string[] = [];
+        const arrayLike: any = {
+            0: "a",
+            get length() {
+                order.push("length");
+                return 1;
+            }
+        };
+
+        assert.throws(() => polyArrFlatMap(arrayLike, undefined as any), TypeError);
+        assert.deepEqual(order, ["length"], "The length was read before the callbackFn was checked");
+
+        order = [];
+        assert.deepEqual(polyArrFlatMap(arrayLike, (value: string) => {
+            order.push("callbackFn");
+            return [value];
+        }), ["a"]);
+        assert.deepEqual(order, ["length", "callbackFn"], "The length was only read once");
+
+        const nativeFlatMap = (Array.prototype as any).flatMap;
+        if (nativeFlatMap) {
+            order = [];
+            assert.throws(() => nativeFlatMap.call(arrayLike, undefined), TypeError);
+            assert.deepEqual(order, ["length"], "Array.prototype.flatMap reads the length before checking the callbackFn");
+        }
+    });
+});

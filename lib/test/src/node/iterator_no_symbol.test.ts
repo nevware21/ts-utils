@@ -420,4 +420,32 @@ describe("iterForOf and the helpers which use it on a runtime without Symbol", (
         assert.deepEqual(Object.getOwnPropertyDescriptor(results.set, "0"), { value: "own", writable: true, enumerable: true, configurable: true });
         assert.deepEqual(results.entries, { k: "v" }, "polyObjFromEntries of a Map");
     });
+
+    it("polyObjFromEntries reads an array or a string by its indexes (like their native iterators), and arrAppend appends every value of an array", () => {
+        const results = _runWithoutSymbol((modules) => {
+            const run = (fn: () => any) => {
+                try {
+                    return fn();
+                } catch (e) {
+                    return (e as any).name;
+                }
+            };
+
+            return {
+                array: run(() => modules.fromEntries.polyObjFromEntries([["a", 1], ["b", 2]])),
+                emptyString: run(() => modules.fromEntries.polyObjFromEntries("")),
+                emptyStringObject: run(() => modules.fromEntries.polyObjFromEntries(new String(""))),
+                string: run(() => modules.fromEntries.polyObjFromEntries("ab")),
+                notIterable: run(() => modules.fromEntries.polyObjFromEntries({ a: 1 })),
+                append: modules.append.arrAppend([0], [1, 2])
+            };
+        });
+
+        assert.deepEqual(results.array, { a: 1, b: 2 }, "An array");
+        assert.deepEqual(results.emptyString, {}, "An empty string has no entries");
+        assert.deepEqual(results.emptyStringObject, {}, "An empty String object has no entries");
+        assert.equal(results.string, "TypeError", "The characters of a string are not entries");
+        assert.equal(results.notIterable, "TypeError", "An object isn't iterable");
+        assert.deepEqual(results.append, [0, 1, 2], "arrAppend of an array");
+    });
 });

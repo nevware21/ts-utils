@@ -1399,3 +1399,43 @@ describe("array helpers", () => {
         }
     }
 });
+
+describe("arrAppend with a Map whose [Symbol.iterator] isn't a function", () => {
+    function _map(iterFn: any): any {
+        const map: any = new Map([["k", "v"]]);
+        map[Symbol.iterator] = iterFn;
+        return map;
+    }
+
+    it("throws a TypeError for a [Symbol.iterator] which isn't null or undefined (incl. a falsy one), like Array.from", function() {
+        if (typeof Symbol !== "function" || !Symbol.iterator || typeof Map !== "function") {
+            this.skip();
+            return;
+        }
+
+        const nativeFrom = (Array as any).from;
+        [5, 0, false, "", {}].forEach((iterFn) => {
+            const details = "[Symbol.iterator] is " + JSON.stringify(iterFn);
+
+            assert.throws(() => arrAppend([], _map(iterFn)), TypeError, undefined, details);
+            if (nativeFrom) {
+                assert.throws(() => nativeFrom(_map(iterFn)), TypeError, undefined, "Array.from: " + details);
+            }
+        });
+    });
+
+    it("appends a Map with a null or undefined [Symbol.iterator] (it isn't iterable) as a single value", function() {
+        if (typeof Symbol !== "function" || !Symbol.iterator || typeof Map !== "function") {
+            this.skip();
+            return;
+        }
+
+        // A Map or Set which isn't iterable only appends a copy of its entries on a runtime without Symbol.iterator (eg.
+        // IE 11), see iterator_no_symbol.test.ts
+        [null, undefined].forEach((iterFn) => {
+            const map = _map(iterFn);
+            assert.deepEqual(arrAppend([0], map), [0, map], "[Symbol.iterator] is " + iterFn);
+        });
+    });
+});
+

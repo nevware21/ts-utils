@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { _asIterator, _callIterFn, _createIterHelper, _iterNext } from "./helpers";
+import { _asIterator, _callIterFn, _createIterHelper } from "./helpers";
 import { IterMapCallbackFn } from "./types";
 
 /**
@@ -39,14 +39,14 @@ export function iterMap<T, R = T>(iter: Iterator<T> | Iterable<T>, callbackfn: I
     let source = _asIterator(iter);
     let index = 0;
 
-    return _createIterHelper<T, R>(source, (ctx) => {
+    return _createIterHelper<T, R>(source, (ctx, next) => {
         // Like the native helper the result's done (and value) is only read once
-        let next = _iterNext(source);
-        if (next.done) {
+        let result = next();
+        if (result.done) {
             return true;
         }
 
-        ctx.v = _callIterFn(source, callbackfn, thisArg, next.value, index++);
+        ctx.v = _callIterFn(source, callbackfn, thisArg, result.value, index++);
         return false;
     });
 }

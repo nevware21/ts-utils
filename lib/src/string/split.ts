@@ -7,7 +7,7 @@
  */
 
 import { StrProto } from "../internal/constants";
-import { _unwrapFunction, _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
+import { _unwrapFunction } from "../internal/unwrapFunction";
 import { polyStrSymSplit } from "../polyfills/split";
 
 /**
@@ -44,17 +44,19 @@ export const strSplit: (value: string, separator: string | RegExp, limit?: numbe
 
 /**
  * The `strSymSplit()` splits a string into substrings using the [`Symbol.split`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/split)
- * method from the splitter object to provide custom behavior. If the runtime supports symbols
- * then the default runtime `split` method will be called, It will use {@link getKnownSymbol}
- * to get the {@link WellKnownSymbols.split} symbol which will return the runtime symbol or the
- * polyfill symbol when not supported by the runtime.
+ * method from the splitter object to provide custom behavior. If the runtime has a native
+ * `Symbol.split` then the runtime `split` method will be called, otherwise (eg. IE) the
+ * {@link polyStrSymSplit} polyfill calls the splitter's method for the polyfill symbol. Use
+ * {@link getKnownSymbol} to get the {@link WellKnownSymbols.split} symbol which will return the
+ * runtime symbol or the polyfill symbol when not supported by the runtime.
  * @function
  * @since 0.9.1
  * @group String
  * @param value - The string value to be split into substrings.
  * @param splitter - The object which contains a Symbol.split method, Omitting splitter or passing
- * an object that doesn't contain a Symbol.split causes it to return an array with the calling
- * string as a single element.
+ * null or undefined returns an array with the calling string as a single element, like the
+ * native `split` any other value without a Symbol.split method is converted to a string (a
+ * RegExp is used as the pattern) which is used to split the string.
  * @param limit - A non-negative integer specifying a limit on the number of substrings to be
  * included in the array. If provided, splits the string at each occurrence of the specified
  * separator, but stops when limit entries have been placed in the array. Any leftover text is
@@ -88,4 +90,4 @@ export const strSplit: (value: string, separator: string | RegExp, limit?: numbe
  * console.log(strSymSplit(myString, splitByNumber)); // [ "a", "bc", "c5d", "e", "f" ]
  * ```
  */
-export const strSymSplit: (value: string, splitter: { [Symbol.split](string: string, limit?: number): string[]; }, limit?: number) => string[] = (/*#__PURE__*/_unwrapFunctionWithPoly("split", StrProto, polyStrSymSplit));
+export const strSymSplit: (value: string, splitter: { [Symbol.split](string: string, limit?: number): string[]; }, limit?: number) => string[] = polyStrSymSplit;

@@ -1589,8 +1589,9 @@ describe("object polyfills", () => {
                 assert.ok(false,
                     "Native threw but poly didn't [" + dumpObj(polyThrew) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
             } else {
-                assert.equal(isUndefined(polyResult), !!nativeThrew || isUndefined(nativeResult) || !!nativeResult,
-                    "Checking whether the Native and polyfill threw or returned undefined [" + dumpObj(polyThrew || polyResult) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
+                // Like Object.keys() (ES2015+) a primitive (other than null or undefined) returns its keys
+                assert.deepEqual(polyResult, nativeResult,
+                    "Checking the Native and polyfill result [" + dumpObj(polyResult) + "] - [" + dumpObj(nativeResult) + "] for [" + dumpObj(value) + "]");
             }
         }
     }
@@ -1661,3 +1662,68 @@ describe("object polyfills", () => {
         }
     }
 });
+
+describe("polyObjFromEntries with a [Symbol.iterator] which isn't a function", () => {
+    function _map(iterFn: any): any {
+        const map: any = new Map([["k", "v"]]);
+        map[Symbol.iterator] = iterFn;
+        return map;
+    }
+
+    it("throws a TypeError for a [Symbol.iterator] which isn't null or undefined (incl. a falsy one), like Object.fromEntries", function() {
+        if (typeof Symbol !== "function" || !Symbol.iterator || typeof Map !== "function") {
+            this.skip();
+            return;
+        }
+
+        const nativeFromEntries = (Object as any).fromEntries;
+        [5, 0, false, "", {}].forEach((iterFn) => {
+            const details = "[Symbol.iterator] is " + JSON.stringify(iterFn);
+
+            assert.throws(() => polyObjFromEntries(_map(iterFn)), TypeError, undefined, details);
+            if (nativeFromEntries) {
+                assert.throws(() => nativeFromEntries(_map(iterFn)), TypeError, undefined, "Object.fromEntries: " + details);
+            }
+        });
+    });
+
+    it("throws a TypeError for a Map with a null or undefined [Symbol.iterator] (it isn't iterable), like Object.fromEntries", function() {
+        if (typeof Symbol !== "function" || !Symbol.iterator || typeof Map !== "function") {
+            this.skip();
+            return;
+        }
+
+        // A Map or Set which isn't iterable is only read from a copy of its entries on a runtime without Symbol.iterator
+        // (eg. IE 11), see iterator_no_symbol.test.ts
+        const nativeFromEntries = (Object as any).fromEntries;
+        [null, undefined].forEach((iterFn) => {
+            assert.throws(() => polyObjFromEntries(_map(iterFn)), TypeError, undefined, "[Symbol.iterator] is " + iterFn);
+            if (nativeFromEntries) {
+                assert.throws(() => nativeFromEntries(_map(iterFn)), TypeError, undefined, "Object.fromEntries: [Symbol.iterator] is " + iterFn);
+            }
+
+            assert.throws(() => polyObjFromEntries(({ [Symbol.iterator]: iterFn }) as any), TypeError, undefined, "An object (not a Map) with a [Symbol.iterator] of " + iterFn);
+        });
+    });
+
+    it("reads the [Symbol.iterator] once, like Object.fromEntries", function() {
+        if (typeof Symbol !== "function" || !Symbol.iterator) {
+            this.skip();
+            return;
+        }
+
+        const entries: any = [["a", 1]];
+        let reads = 0;
+        const iterable: any = {};
+        Object.defineProperty(iterable, Symbol.iterator, {
+            get: () => {
+                reads++;
+                return () => entries[Symbol.iterator]();
+            }
+        });
+
+        assert.deepEqual(polyObjFromEntries(iterable), { a: 1 });
+        assert.equal(reads, 1, "The [Symbol.iterator] was read once");
+    });
+});
+

@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { _asIterator, _callIterFn, _createIterHelper, _iterNext } from "./helpers";
+import { _asIterator, _callIterFn, _createIterHelper } from "./helpers";
 import { IterPredicateCallbackFn } from "./types";
 
 /**
@@ -39,15 +39,15 @@ export function iterFilter<T>(iter: Iterator<T> | Iterable<T>, callbackfn: IterP
     let source = _asIterator(iter);
     let index = 0;
 
-    return _createIterHelper<T, T>(source, (ctx) => {
+    return _createIterHelper<T, T>(source, (ctx, next) => {
         for (;;) {
-            let next = _iterNext(source);
-            if (next.done) {
+            let result = next();
+            if (result.done) {
                 return true;
             }
 
             // The value is only read once
-            let value = next.value;
+            let value = result.value;
             if (_callIterFn(source, callbackfn, thisArg, value, index++)) {
                 ctx.v = value;
                 return false;

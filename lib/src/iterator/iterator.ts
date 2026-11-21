@@ -11,6 +11,7 @@ import { WellKnownSymbols } from "../symbol/well_known";
 import { isFunction, isStrictNullOrUndefined } from "../helpers/base";
 import { asString } from "../string/as_string";
 import { IAsyncIterable } from "./types";
+import { SYMBOL_TYPE } from "../internal/constants";
 
 let _iterKey: PropertyKey;
 
@@ -30,6 +31,19 @@ export function _getIterKey(): PropertyKey {
     }
 
     return _iterKey;
+}
+
+/**
+ * @internal
+ * @ignore
+ * Identifies whether Symbol.iterator is a native symbol, so the native values (eg. an array, a string, a Map or a Set)
+ * are iterable, otherwise (eg. IE, or with a global Symbol shim) the native iterators are emulated. Unlike the cached
+ * _getIterKey(), it follows the lazy Symbol value (like hasSymbol())
+ * @returns true when Symbol.iterator is a native symbol
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function _hasNativeIterator(): boolean {
+    return typeof getKnownSymbol(WellKnownSymbols.iterator) === SYMBOL_TYPE;
 }
 
 /**

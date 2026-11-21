@@ -9,7 +9,6 @@
 import { LENGTH } from "../internal/constants";
 import { _unwrapProp } from "../internal/unwrapFunction";
 import { throwRangeError } from "./throw";
-import { mathTrunc } from "../math/trunc";
 
 /**
  * Interface to identify that an object contains the length property used as a type
@@ -72,20 +71,35 @@ export function _toLength(value: ArrayLike<any>): number {
 /**
  * @internal
  * @ignore
- * Returns the length of the array or array-like value as the length of a new array, like {@link _toLength} but (like
- * the native functions) it throws a RangeError for a length which is longer than an array can be (2^32 - 1), rather
- * than adding values until the runtime runs out of memory. It is not annotated as having no side effects, as the
- * check is part of what it does (unlike eg. `readArgs()`, where an unused call can be removed).
- * @param value - The array or array-like value to return the length of
+ * Checks the length of a new array, like the native functions (ArrayCreate) it throws a RangeError for a length which
+ * is longer than an array can be (2^32 - 1), rather than adding values until the runtime runs out of memory. It is not
+ * annotated as having no side effects, as the check is what it does.
+ * @param len - The (converted) length of the new array
  * @returns The length
  */
-export function _toArrayLength(value: ArrayLike<any>): number {
-    let len = _toLength(value);
+export function _checkArrayLength(len: number): number {
     if (len > 0xFFFFFFFF) {
         throwRangeError("Invalid array length");
     }
 
     return len;
+}
+
+/**
+ * @internal
+ * @ignore
+ * Converts the value to an integer like the native ToIntegerOrInfinity() (eg. for an index, position or count), so NaN
+ * and -0 are 0, a fraction is truncated and Infinity is kept (as Infinity % 1 is NaN). An integer (the usual value) is
+ * returned as-is, and the truncation doesn't use mathTrunc(), so its polyfill isn't included with the functions which use
+ * this.
+ * @param value - The value to convert
+ * @returns The integer
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function _toInt(value: any): number {
+    let num = +value;
+
+    return num % 1 ? num - num % 1 : (num || 0);
 }
 
 /**
@@ -100,8 +114,7 @@ export function _toArrayLength(value: ArrayLike<any>): number {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function _toRelIndex(value: number, len: number): number {
-    // Truncated with mathTrunc() (rather than idx - idx % 1) so a small integer index stays an integer (rather than a double)
-    let idx = mathTrunc(+value) || 0;
+    let idx = _toInt(value);
 
     if (idx <= -len) {
         return 0;

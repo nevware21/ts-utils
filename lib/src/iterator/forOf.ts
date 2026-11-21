@@ -7,13 +7,14 @@
  */
 
 import { fnCall } from "../funcs/funcs";
-import { isArray, isFunction, isMap, isPrimitive, isSet, isStrictNullOrUndefined } from "../helpers/base";
-import { _toArrayLength } from "../helpers/length";
+import { isArray, isFunction, isMap, isPrimitive, isSet, isStrictNullOrUndefined, isString, isStringObject } from "../helpers/base";
+import { asString } from "../string/as_string";
+import { _checkArrayLength, _toLength } from "../helpers/length";
 import { safe } from "../helpers/safe";
 import { throwTypeError } from "../helpers/throw";
 import { CALL, FUNCTION, NULL_VALUE, OBJECT } from "../internal/constants";
 import { _pushOwnValue } from "../object/define";
-import { _getIterKey, isIterator } from "./iterator";
+import { _getIterKey, _hasNativeIterator, isIterator } from "./iterator";
 
 /**
  * @internal
@@ -110,8 +111,9 @@ export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value
         } else {
             // On a runtime without Symbol.iterator (eg. IE) an array isn't iterable, so (like the native array iterator,
             // where it is iterable) its values are read by index as they are iterated, and a Map or Set (eg. IE 11) is
-            // processed using a copy of its entries / values
-            let values = isArray(iter) ? iter : _getMapSetValues(iter);
+            // processed using a copy of its entries / values. Where there is a native Symbol.iterator (like for...of) an
+            // array, Map or Set which isn't iterable (eg. its own [Symbol.iterator] is undefined) isn't processed
+            let values = isArray(iter) && !_hasNativeIterator() ? iter : _getMapSetValues(iter);
             values && _iterForOf(_createIndexIterator(values), callbackfn, thisArg);
         }
     }
@@ -131,10 +133,12 @@ export function _getMapSetValues(value: any): any[] | null {
     let values: any[] = NULL_VALUE;
     let isMapValue: boolean;
 
-    // An object which is only identified as a Map or Set (eg. by its Symbol.toStringTag) without a forEach() function
-    // isn't one, so (like a value which isn't iterable) it has no values. The forEach() is checked first, as most
-    // values don't have one and it's quicker than identifying the value
-    if (value && isFunction(value.forEach) && ((isMapValue = isMap(value)) || isSet(value))) {
+    // Only on a runtime without a native Symbol.iterator (eg. IE 11, where a Map or Set isn't iterable), as where there
+    // is one (like the native functions) a Map or Set which isn't iterable (eg. its own [Symbol.iterator] is null) is
+    // not iterated. An object which is only identified as a Map or Set (eg. by its Symbol.toStringTag) without a
+    // forEach() function isn't one, so (like a value which isn't iterable) it has no values. The forEach() is checked
+    // before identifying the value, as most values don't have one and it's quicker
+    if (!_hasNativeIterator() && value && isFunction(value.forEach) && ((isMapValue = isMap(value)) || isSet(value))) {
         values = [];
         value.forEach((theValue: any, key: any) => {
             // Like polyArrFrom each value is added as an own property, so an Array.prototype setter doesn't stop it
@@ -157,12 +161,26 @@ export function _getMapSetValues(value: any): any[] | null {
  * @param values - The array or array-like to read
  * @returns The iterator
  */
+/**
+ * @internal
+ * @ignore
+ * Without a native iterator (eg. IE) returns the string of a string or String object, which the native functions would
+ * iterate (converted like the String iterator, so a String object's own toString() is used), otherwise (and for any
+ * other value) null
+ * @param value - The value
+ * @returns The string, or null
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function _getEmulatedString(value: any): string | null {
+    return !_hasNativeIterator() && (isString(value) || isStringObject(value)) ? asString(value) : NULL_VALUE;
+}
+
 /*#__NO_SIDE_EFFECTS__*/
 export function _createIndexIterator<T>(values: ArrayLike<T>): Iterator<T> {
     let idx = 0;
 
     return {
-        next: () => (idx < _toArrayLength(values) ? { value: values[idx++] } : { done: true }) as IteratorResult<T>
+        next: () => (idx < _checkArrayLength(_toLength(values)) ? { value: values[idx++] } : { done: true }) as IteratorResult<T>
     };
 }
 
@@ -187,9 +205,13 @@ export function _iterForOf<T>(iter: Iterator<T>, callbackfn: (value: T, count?: 
     // a result which is not an object or is done. A TypeError is thrown when the iterator is not an object with a
     // next() function (eg. when the [Symbol.iterator]() of an iterable doesn't return an iterator)
     let closeIter = false;
+
+    // Like for...of the iterator must be an object, whose next() is read once (and called for every value)
+    _throwIfNotResult(iter);
+    let nextFn = iter.next;
     try {
         for (;;) {
-            iterResult = iter.next();
+            iterResult = fnCall(nextFn, iter);
 
             // The result is checked inline (only calling _throwIfNotResult to throw the TypeError when it isn't an
             // object), as a call for every value is noticeably slower (eg. for a generator)

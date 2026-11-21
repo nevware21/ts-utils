@@ -7,8 +7,10 @@
  */
 
 import { arrForEach } from "../array/forEach";
-import { objDefine } from "../object/define";
-import { ArrCls, ArrProto, GET_OWN_PROPERTY_NAMES, ObjClass, StrProto } from "./constants";
+import { _pushOwnValue, objDefine, objDefineProp } from "../object/define";
+import { fnApply } from "../funcs/funcs";
+import { safe } from "../helpers/safe";
+import { ArrCls, ArrProto, GET_OWN_PROPERTY_NAMES, LENGTH, ObjClass, StrProto } from "./constants";
 import { polyIsArray, polyArrIncludes, polyArrFind, polyArrFindIndex, polyArrFindLastIndex, polyArrFindLast, polyArrFrom } from "../polyfills/array";
 import { polyObjIs } from "../polyfills/object/objIs";
 import { polyObjKeys, polyObjEntries, polyObjValues } from "../polyfills/object/objKeys";
@@ -16,7 +18,6 @@ import { polyStrStartsWith } from "../string/starts_with";
 import { polyStrEndsWith } from "../string/ends_with";
 import { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "../polyfills/trim";
 import { polyStrPadEnd, polyStrPadStart } from "../string/pad";
-import { makePolyFn } from "./poly_helpers";
 import { polyStrSubstr } from "../string/substring";
 import { polyStrIncludes } from "../string/includes";
 import { polyStrReplaceAll } from "../string/replace_all";
@@ -34,15 +35,79 @@ import { polyArrWith } from "../array/with";
 import { polyStrAt } from "../string/at";
 import { polyStrMatchAll } from "../string/match_all";
 
+/**
+ * @internal
+ * @ignore
+ * Creates the function which is installed for a polyfill, a prototype polyfill (eg. String.prototype.startsWith) is
+ * passed the instance (this) as its first argument, while a static one (eg. Array.from) is called with its arguments
+ * (and this) as-is. Unlike the native functions it is a constructor (with a prototype), as an ES5 function can't be
+ * created without them and identifying a call with new would read the prototype of the instance (eg. a Proxy's
+ * getPrototypeOf trap would be called), which the native functions don't.
+ * @param poly - The polyfill function
+ * @param isStatic - The polyfill is a static (class) function
+ * @returns The function to install
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function makePolyFn<T extends Function>(poly: T, isStatic?: boolean): T {
+    return function(this: any): T {
+        let theArgs: any = arguments;
+        if (!isStatic) {
+            // Each argument is added as an own property, so a setter or read-only property of the same index on
+            // Array.prototype doesn't change the arguments (the instance is added first, so the prototype of
+            // Array.prototype is checked)
+            theArgs = [];
+            _pushOwnValue(theArgs, this);
+            for (let lp = 0; lp < arguments[LENGTH]; lp++) {
+                _pushOwnValue(theArgs, arguments[lp]);
+            }
+        }
+
+        return fnApply(poly as any, this, theArgs);
+    } as any;
+}
+
 function _addPolyfills(target: any, polyfills: any, isProto?: boolean) {
-    arrForEach(polyObjKeys(polyfills), (key) => {
+    let installed: { p: Function, f: Function }[] = [];
+    let keys = polyObjKeys(polyfills);
+
+    // A native function is used for a missing alias (another trim key with the same polyfill)
+    arrForEach(keys, (key) => {
+        if (target[key]) {
+            installed.push({ p: polyfills[key], f: target[key] });
+        }
+    });
+
+    arrForEach(keys, (key) => {
         if (!target[key]) {
-            // A prototype polyfill passes the instance (this) as the first argument, while a static (class) function
-            // like Object.entries() or Array.from() is called with its arguments as-is. It is defined (writable and
-            // configurable but not enumerable) like the native functions, so for-in over an array, a string object
-            // or the classes doesn't include it (Object.defineProperty is defined by every supported ES5 runtime)
+            let poly = polyfills[key];
+            let isTrim = key.indexOf("trim") === 0;
+            let theFn: Function = null;
+
+            // Like the native functions, an alias (trimLeft for trimStart and trimRight for trimEnd) is the same
+            // function. Only the trim functions have aliases, other keys can share a polyfill (eg. isFrozen and
+            // isSealed) but are different native functions, so they don't use each other's function
+            isTrim && arrForEach(installed, (entry) => {
+                if (entry.p === poly) {
+                    theFn = entry.f;
+                }
+            });
+
+            if (!theFn) {
+                // A prototype polyfill passes the instance (this) as the first argument, while a static (class)
+                // function like Object.entries() or Array.from() is called with its arguments as-is. Like the native
+                // functions it has the native function's name and length (where they can be changed, ES2015+, so not on
+                // IE), the trim functions have no arguments and a few have 2, every other one has 1 argument
+                theFn = makePolyFn(poly, !isProto);
+                safe(objDefineProp, [theFn, "name", { value: key, configurable: true }]);
+                safe(objDefineProp, [theFn, LENGTH, { value: isTrim ? 0 : (/^(substr|replaceAll|with|hasOwn|is)$/.test(key) ? 2 : 1), configurable: true }]);
+                installed.push({ p: poly, f: theFn });
+            }
+
+            // It is defined (writable and configurable but not enumerable) like the native functions, so for-in over an
+            // array, a string object or the classes doesn't include it (Object.defineProperty is defined by every
+            // supported ES5 runtime)
             objDefine(target, key, {
-                v: isProto ? makePolyFn(polyfills[key]) : polyfills[key],
+                v: theFn,
                 w: true,
                 e: false
             });

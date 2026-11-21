@@ -642,17 +642,21 @@ describe("a value which is identified as a Map or Set (by its Symbol.toStringTag
     });
 });
 
-// Like on a runtime without Symbol.iterator (eg. IE, where an array isn't iterable and IE 11's Map / Set have no
-// iterator functions), an own [Symbol.iterator] of undefined makes the value not iterable, so iterForOf uses its
-// fallback. The node-only iterator_no_symbol tests also check the fallback with the modules loaded again without
-// Symbol, but the code of a module which is loaded again isn't included in the coverage
+// An own [Symbol.iterator] of undefined makes the value not iterable, so (like for...of, where a TypeError is thrown)
+// iterForOf doesn't process it on a runtime with Symbol.iterator. Its fallback (an array by its indexes, a Map / Set
+// using a copy of its entries / values) is only used on a runtime without Symbol.iterator (eg. IE, where an array isn't
+// iterable and IE 11's Map / Set have no iterator functions), which the node-only iterator_no_symbol tests check with
+// the modules loaded again without Symbol
 describe("iterForOf with an array, Map or Set which isn't iterable", () => {
+    // The native for...of (ES2015 syntax isn't used, so this compiles to ES5)
+    const nativeForOf = new Function("iterable", "for (const value of iterable) { }");
+
     function _notIterable<T>(value: T): T {
         (value as any)[Symbol.iterator] = undefined;
         return value;
     }
 
-    it("processes an array by its indexes, including a value added by the callbackFn", function() {
+    it("doesn't process an array which isn't iterable, like for...of", function() {
         if (typeof Symbol !== "function" || !Symbol.iterator) {
             this.skip();
             return;
@@ -668,7 +672,8 @@ describe("iterForOf with an array, Map or Set which isn't iterable", () => {
             }
         });
 
-        assert.deepEqual(values, [1, 2, 3, 4], "Like the native array iterator, the values are read as they are iterated");
+        assert.deepEqual(values, [], "The array isn't iterable, so it has no values");
+        assert.throws(() => nativeForOf(arr), TypeError, undefined, "for...of of the array");
     });
 
     it("stops processing an array when the callbackFn returns -1", function() {
@@ -679,7 +684,8 @@ describe("iterForOf with an array, Map or Set which isn't iterable", () => {
 
         const values: number[] = [];
 
-        iterForOf(_notIterable([1, 2, 3]), (value) => {
+        // An (iterable) array, as one which isn't iterable isn't processed
+        iterForOf([1, 2, 3], (value) => {
             values.push(value);
             if (value === 2) {
                 return -1;
@@ -689,7 +695,7 @@ describe("iterForOf with an array, Map or Set which isn't iterable", () => {
         assert.deepEqual(values, [1, 2]);
     });
 
-    it("processes the entries of a Map and the values of a Set using their forEach()", function() {
+    it("doesn't process a Map or Set which isn't iterable, like for...of", function() {
         if (typeof Symbol !== "function" || !Symbol.iterator) {
             this.skip();
             return;
@@ -697,20 +703,20 @@ describe("iterForOf with an array, Map or Set which isn't iterable", () => {
 
         const mapValues: any[] = [];
         const setValues: string[] = [];
+        const map = _notIterable(new Map<string, number>([["a", 1], ["b", 2]]));
         const set = _notIterable(new Set(["x", "y"]));
 
-        iterForOf(_notIterable(new Map<string, number>([["a", 1], ["b", 2]])), (value) => {
+        iterForOf(map, (value) => {
             mapValues.push(value);
         });
 
         iterForOf(set, (value) => {
             setValues.push(value);
-            if (value === "x") {
-                set.add("z");
-            }
         });
 
-        assert.deepEqual(mapValues, [["a", 1], ["b", 2]], "The [key, value] entries of the Map");
-        assert.deepEqual(setValues, ["x", "y"], "The values of the Set, a value added while it is processed isn't processed (a copy of the values is used)");
+        assert.deepEqual(mapValues, [], "The Map isn't iterable, so it has no entries");
+        assert.deepEqual(setValues, [], "The Set isn't iterable, so it has no values");
+        assert.throws(() => nativeForOf(map), TypeError, undefined, "for...of of the Map");
+        assert.throws(() => nativeForOf(set), TypeError, undefined, "for...of of the Set");
     });
 });

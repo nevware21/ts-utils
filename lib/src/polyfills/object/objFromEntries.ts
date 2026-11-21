@@ -6,16 +6,16 @@
  * Licensed under the MIT license.
  */
 
-import { isArray, isPrimitive, isString } from "../../helpers/base";
+import { isArray, isPrimitive, isStrictNullOrUndefined, isString } from "../../helpers/base";
+import { fnCall } from "../../funcs/funcs";
 import { dumpObj } from "../../helpers/diagnostics";
 import { throwTypeError } from "../../helpers/throw";
 import { DUMP_ERR_MAX_LENGTH, LENGTH, NULL_VALUE } from "../../internal/constants";
 import { _throwIfNullOrUndefined } from "../../internal/throwIf";
-import { _getMapSetValues, iterForOf } from "../../iterator/forOf";
-import { isIterable } from "../../iterator/iterator";
-import { objDefine } from "../../object/define";
-import { asString } from "../../string/as_string";
-import { isSymbol } from "../../symbol/symbol";
+import { _getEmulatedString, _getMapSetValues, _iterForOf } from "../../iterator/forOf";
+import { _getIterKey, _hasNativeIterator } from "../../iterator/iterator";
+import { _setOwnValue } from "../../object/define";
+
 
 /**
  * Creates a new object from an array of [key, value] pairs.
@@ -24,12 +24,14 @@ import { isSymbol } from "../../symbol/symbol";
  * Like the native `Object.fromEntries()`:
  * - Each entry must be an object, its `0` property is the key and its `1` property is the value (so an entry
  * with only a key has an `undefined` value).
- * - Each key is defined as an own property (rather than assigned), so a `__proto__` key does not change the
- * prototype of the new object, and a setter or read-only property of the same name on `Object.prototype` doesn't
- * stop the key being added.
- * - A `null` or `undefined` value, a value which is not iterable (an array is always supported, as is (since 0.20.0) a
- * `Map` or `Set` which has no iterator function, eg. on IE 11) or an entry which is not an object (including an empty
- * slot of a sparse array) throws a `TypeError`.
+ * - Each key is converted once (a symbol is used as-is, an object by its `Symbol.toPrimitive` or `toString()`) and
+ * is defined as an own property (rather than assigned), so a `__proto__` key does not change the prototype of the new
+ * object, and a setter or read-only property of the same name on `Object.prototype` doesn't stop the key being added.
+ * - The value's iterator (`[Symbol.iterator]`, read once) is used, including an array's own one. On a runtime without
+ * `Symbol` (eg. IE, which has no iterators) an array or a string is read by its indexes and (since 0.20.0) a `Map` or
+ * `Set` by a copy of its entries / values.
+ * - A `null` or `undefined` value, a value which is not iterable or an entry which is not an object (including an
+ * empty slot of a sparse array) throws a `TypeError`.
  *
  * @since 0.12.0
  * @group Polyfill
@@ -47,36 +49,39 @@ export function polyObjFromEntries<T = any>(entries: any): T {
             throwTypeError(dumpObj(entry, 0, DUMP_ERR_MAX_LENGTH) + " is not an entry object");
         }
 
-        // Convert the key once (like the native function), then add it as an own (enumerable, configurable and
-        // writable) property. When the result already "has" the key (it is inherited, eg. "__proto__" including an
-        // object key which converts to it, or a setter or a read-only property of the same name on Object.prototype,
-        // or it is a duplicate key) it is defined rather than assigned, so the prototype of the result can't be changed
-        // and the key is still added. Otherwise it is assigned, as defining every key is ~25x slower. Object.defineProperty
-        // is defined by every runtime which needs this polyfill (ES5).
-        let key = entry[0];
-        let value = entry[1];
-        // A string key (the usual case) is used as-is, without the symbol check and conversion
-        key = isString(key) || isSymbol(key) ? key : asString(key);
-        if (key in result) {
-            objDefine(result, key, { v: value, w: true });
-        } else {
-            result[key] = value;
-        }
+        // Like the native function the key is converted once (to a symbol or a string, an object using its
+        // Symbol.toPrimitive("string") or its toString() / valueOf()) and it is added as an own (enumerable, configurable
+        // and writable) property, so an inherited setter or read-only property (eg. "__proto__", or one added to
+        // Object.prototype) doesn't stop it being added or change the prototype of the result
+        _setOwnValue(result, entry[0], entry[1]);
     }
 
     _throwIfNullOrUndefined(entries);
 
-    // A Map or Set which isn't iterable (eg. IE 11, which has no iterator functions) uses a copy of its entries / values
-    let values: ArrayLike<any> = isArray(entries) ? entries : (isIterable(entries) ? NULL_VALUE : _getMapSetValues(entries));
-    if (values) {
-        // Like the array iterator every index is visited (an empty slot is undefined, which throws)
+    // Like Object.fromEntries() the iterator function is read once, from every value (including an array, so its own or
+    // a replaced Array.prototype one is used), and only a null or undefined one is ignored (any other value which isn't
+    // a function throws a TypeError, the runtime's own, from calling it)
+    let iterFn: any = (entries as any)[_getIterKey()];
+    if (!isStrictNullOrUndefined(iterFn)) {
+        _iterForOf(fnCall(iterFn, entries), addEntry);
+    } else {
+        // On a runtime without Symbol (which has no iterator functions, eg. IE) the native iterators are emulated: an
+        // array (like the array iterator every index is visited, an empty slot is undefined which throws) or a string
+        // or String object (converted like the String iterator, whose characters are not entries, so only an empty
+        // string doesn't throw) is read by its indexes, and a Map or Set which isn't iterable (eg. IE 11) uses a copy of
+        // its entries / values. Otherwise the value isn't iterable
+        let values: any = _getEmulatedString(entries);
+        if (values === NULL_VALUE) {
+            values = isArray(entries) && !_hasNativeIterator() ? entries : _getMapSetValues(entries);
+        }
+
+        if (!values && !isString(values)) {
+            throwTypeError(dumpObj(entries, 0, DUMP_ERR_MAX_LENGTH) + " is not iterable");
+        }
+
         for (let idx = 0; idx < values[LENGTH]; idx++) {
             addEntry(values[idx]);
         }
-    } else if (isIterable(entries)) {
-        iterForOf(entries, addEntry);
-    } else {
-        throwTypeError(dumpObj(entries, 0, DUMP_ERR_MAX_LENGTH) + " is not iterable");
     }
 
     return result as T;

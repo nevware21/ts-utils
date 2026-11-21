@@ -6,13 +6,17 @@
  * Licensed under the MIT license.
  */
 
-import { ArrProto, LENGTH } from "../internal/constants";
+import { ArrCls, ArrProto, CONSTRUCTOR, NULL_VALUE, UNDEF_VALUE } from "../internal/constants";
+import { _getNativeSymbol } from "../internal/native_symbol";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { _throwIfNotCallbackFn, _toObject } from "../internal/throwIf";
-import { isArray } from "../helpers/base";
+import { isArray, isPrimitive, isUndefined } from "../helpers/base";
+import { isNativeFn } from "../funcs/isNative";
 import { ArrFlatMapCallbackFn } from "./callbacks";
 import { arrForEach } from "./forEach";
 import { fnCall } from "../funcs/funcs";
+import { _toLength } from "../helpers/length";
+import { _pushOwnValue, _setOwnValue } from "../object/define";
  
 
 /**
@@ -42,6 +46,7 @@ import { fnCall } from "../funcs/funcs";
  * single value or an array of values to flatten into the result.
  * @param thisArg - The value to use as the `this` when executing the `callbackFn`.
  * @returns A new array containing the mapped and flattened values.
+ * @throws TypeError if `theArray` is `null` or `undefined`, or `callbackFn` is not a function (even when the array is empty)
  * @example
  * ```ts
  * arrFlatMap([1, 2, 3], (value) => [value, value * 10]);
@@ -79,24 +84,58 @@ export const arrFlatMap = (/*#__PURE__*/_unwrapFunctionWithPoly("flatMap", ArrPr
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyArrFlatMap<T, R = T>(theArray: ArrayLike<T>, callbackFn: ArrFlatMapCallbackFn<T, R>, thisArg?: any): R[] {
-    // Like the native function the array is converted to an object, so a string's callbackFn is passed its String object
+    // Like the native function the array is converted to an object (so a string's callbackFn is passed its String
+    // object) and its length is read once, before the callbackFn is checked
     let theObj = _toObject(theArray);
+    let len = _toLength(theObj);
     _throwIfNotCallbackFn(callbackFn);
 
-    let result: R[] = [];
-    let callbackThis = arguments[LENGTH] > 2 ? thisArg : undefined;
+    let result: R[];
+    let ctor: any;
+    let isSpecies: boolean;
+    let targetIdx = 0;
 
-    arrForEach(theObj, (theValue, index) => {
-        let value = fnCall(callbackFn, callbackThis, theValue, index, theObj as any);
-        if (isArray(value)) {
-            arrForEach(value as any, (mappedValue) => {
-                result.push(mappedValue);
-            });
-        } else {
-            result.push(value as R);
+    // Like the native function (ArraySpeciesCreate) the result of an array is created by its constructor's
+    // [Symbol.species] (eg. a subclass of Array creates an instance of the subclass), which is only read on a runtime
+    // with a native Symbol.species, as on any other runtime (eg. IE) the native array functions create an Array. Another
+    // realm's Array (eg. an iframe's, identified by its native source) creates an Array of this realm, a null species is
+    // ignored, and a constructor or species which isn't a constructor throws a TypeError (the runtime's own)
+    let speciesSym = _getNativeSymbol("species");
+    if (speciesSym && isArray(theObj)) {
+        ctor = (theObj as any)[CONSTRUCTOR];
+        if (ctor !== ArrCls && isNativeFn(ctor, "Array")) {
+            ctor = UNDEF_VALUE;
         }
-    });
 
+        if (!isPrimitive(ctor)) {
+            ctor = ctor[speciesSym];
+            if (ctor === NULL_VALUE) {
+                ctor = UNDEF_VALUE;
+            }
+        }
+
+        isSpecies = !isUndefined(ctor) && ctor !== ArrCls;
+    }
+
+    result = isSpecies ? new ctor(0) : [];
+
+    // Like the native function an empty slot is skipped, and each value is added as an own property (so a setter or
+    // read-only property of the same index on Array.prototype doesn't stop it being added), a species' result is
+    // defined (like the native function a TypeError is thrown when it can't be) at the next index
+    function _addValue(value: any) {
+        isSpecies ? _setOwnValue(result, targetIdx++, value, true) : _pushOwnValue(result, value);
+    }
+
+    for (let idx = 0; idx < len; idx++) {
+        if (idx in theObj) {
+            let value = fnCall(callbackFn, thisArg, (theObj as any)[idx], idx, theObj as any);
+            if (isArray(value)) {
+                arrForEach(value as any, _addValue);
+            } else {
+                _addValue(value);
+            }
+        }
+    }
 
     return result;
 }

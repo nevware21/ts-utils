@@ -7,17 +7,18 @@
  */
 
 import { ArrFromMapFn, ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "../array/callbacks";
-import { isArray, isFunction, isNullOrUndefined, isStrictNullOrUndefined, isString, isStringObject, isStrictUndefined, objToString } from "../helpers/base";
+import { isArray, isFunction, isNullOrUndefined, isStrictNullOrUndefined, isString, isStrictUndefined, objToString } from "../helpers/base";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
-import { CALL, DUMP_ERR_MAX_LENGTH, LENGTH, NULL_VALUE, ObjClass } from "../internal/constants";
-import { asString } from "../string/as_string";
-import { _throwIfNotCallbackFn, _throwIfNullOrUndefined } from "../internal/throwIf";
-import { _toArrayLength, _toLength, _toRelIndex } from "../helpers/length";
+import { ArrCls, DUMP_ERR_MAX_LENGTH, LENGTH, UNDEF_VALUE } from "../internal/constants";
+import { _throwIfNotCallbackFn, _throwIfNullOrUndefined, _toObject } from "../internal/throwIf";
+import { _checkArrayLength, _toLength, _toRelIndex } from "../helpers/length";
 import { fnCall } from "../funcs/funcs";
-import { _getMapSetValues, _iterForOf } from "../iterator/forOf";
-import { _pushOwnValue } from "../object/define";
-import { getKnownSymbol, hasSymbol } from "../symbol/symbol";
+import { isConstructor } from "../funcs/isNative";
+import { _getEmulatedString, _getMapSetValues, _iterForOf } from "../iterator/forOf";
+import { _hasNativeIterator } from "../iterator/iterator";
+import { _pushOwnValue, _setOwnValue } from "../object/define";
+import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 
 /**
@@ -58,9 +59,10 @@ export function polyIsArray<T>(value: any): value is T[] {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyArrIncludes<T>(theArray: ArrayLike<T>, searchElement: T, fromIndex?: number): boolean {
-    _throwIfNullOrUndefined(theArray);
-
-    let len = _toLength(theArray);
+    // Like the native function the value is converted to an object (null and undefined throw a TypeError) and its length
+    // and values are read from the object
+    let theObj = _toObject(theArray);
+    let len = _toLength(theObj);
     if (len) {
         // Convert the fromIndex like the native function (NaN is 0, a negative index counts back from the end, before the
         // start is 0 and from the end, including Infinity, searches nothing)
@@ -69,7 +71,7 @@ export function polyArrIncludes<T>(theArray: ArrayLike<T>, searchElement: T, fro
         // SameValueZero, NaN is the only value which is not equal to itself
         let isNaNValue = searchElement !== searchElement;
         for (; idx < len; idx++) {
-            let value = theArray[idx];
+            let value = theObj[idx];
             if (value === searchElement || (isNaNValue && value !== value)) {
                 return true;
             }
@@ -148,9 +150,39 @@ export function polyArrIncludes<T>(theArray: ArrayLike<T>, searchElement: T, fro
  * ```
  */
 export function polyArrFind<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): T | E | undefined {
-    let result;
-    let idx = polyArrFindIndex(theArray, callbackFn, thisArg);
-    return idx !== -1 ? theArray[idx] : result;
+    return _arrFind(theArray, callbackFn, thisArg, false, true);
+}
+
+/**
+ * @internal
+ * @ignore
+ * The shared implementation of polyArrFind(), polyArrFindIndex(), polyArrFindLast() and polyArrFindLastIndex().
+ * Like the native functions the length is read before the callbackFn is checked (reading it throws a TypeError for
+ * null and undefined, rather than including a message), the array is converted to an object (so a string's callbackFn
+ * is passed its String object), every index is visited (an empty slot is undefined, so there is no "in" check), the
+ * callbackFn is called with the intrinsic call (not its own call property), and the value which was passed to the
+ * callbackFn is returned (the index isn't read again, so a getter is only called once and a value the callbackFn
+ * changed isn't returned).
+ * @param theArray - The array or array like object of elements to be searched.
+ * @param callbackFn - The predicate function
+ * @param thisArg - The value to use as this when executing callbackFn
+ * @param isLast - Search from the last index to the first
+ * @param isValue - Return the value (or undefined), rather than the index (or -1)
+ */
+function _arrFind<T>(theArray: ArrayLike<T>, callbackFn: Function, thisArg: any, isLast: boolean, isValue: boolean): any {
+    let theObj = _toObject(theArray);
+    let len = _toLength(theObj);
+    _throwIfNotCallbackFn(callbackFn);
+
+    for (let lp = 0; lp < len; lp++) {
+        let idx = isLast ? len - lp - 1 : lp;
+        let value = theObj[idx];
+        if (fnCall(callbackFn as any, thisArg, value, idx, theObj)) {
+            return isValue ? value : idx;
+        }
+    }
+
+    return isValue ? UNDEF_VALUE : -1;
 }
 
 /**
@@ -185,21 +217,7 @@ export function polyArrFind<T, E extends T>(theArray: ArrayLike<T>, callbackFn: 
  * @throws TypeError if `theArray` is `null` or `undefined`, or `callbackFn` is not a function (even when the array is empty)
  */
 export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
-    // Like the native function the length is read before the callbackFn is checked (reading it throws a TypeError for
-    // null and undefined, rather than including a message), and the array is converted to an object (so a string's
-    // callbackFn is passed its String object)
-    let len = _toLength(theArray);
-    let theObj = ObjClass(theArray);
-    _throwIfNotCallbackFn(callbackFn);
-
-    // Like the native function every index is visited (an empty slot is undefined), so there is no "in" check
-    for (let idx = 0; idx < len; idx++) {
-        if (callbackFn[CALL](thisArg, theObj[idx], idx, theObj)) {
-            return idx;
-        }
-    }
-
-    return -1;
+    return _arrFind(theArray, callbackFn, thisArg, false, false);
 }
 
 /**
@@ -269,9 +287,7 @@ export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbac
  * ```
  */
 export function polyArrFindLast<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): T | E | undefined {
-    let result;
-    let idx = polyArrFindLastIndex(theArray, callbackFn, thisArg);
-    return idx !== -1 ? theArray[idx] : result;
+    return _arrFind(theArray, callbackFn, thisArg, true, true);
 }
 
 /**
@@ -306,19 +322,7 @@ export function polyArrFindLast<T, E extends T>(theArray: ArrayLike<T>, callback
  * @throws TypeError if `theArray` is `null` or `undefined`, or `callbackFn` is not a function (even when the array is empty)
  */
 export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
-    // See polyArrFindIndex(), the length is read before the callbackFn is checked and the array is converted to an object
-    let len = _toLength(theArray);
-    let theObj = ObjClass(theArray);
-    _throwIfNotCallbackFn(callbackFn);
-
-    // Like the native function every index is visited (an empty slot is undefined), so there is no "in" check
-    for (let idx = len - 1; idx >= 0; idx--) {
-        if (callbackFn[CALL](thisArg, theObj[idx], idx, theObj)) {
-            return idx;
-        }
-    }
-
-    return -1;
+    return _arrFind(theArray, callbackFn, thisArg, true, false);
 }
 
 /**
@@ -330,14 +334,17 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
  * returns an empty array (use {@link iterToArray} to read its values). Otherwise (when the iterator function is `null`
  * or `undefined`) the value is used as an array-like value (eg. `arguments` or
  * a `NodeList`), so every index up to its length is read (an empty slot or missing index is `undefined`) and any other
- * value (eg. a number) returns an empty array. An array is always read using its indexes, like the native array
- * iterator its length is read for each index, so a value added to it while it is read (eg. by the `mapFn`) is also
- * read and the reading stops at its new length when values are removed, while (like the native function) any other
- * array-like is read up to the length it had when it was called.
- * - A string (or a `String` object) is split into its code points (so a surrogate pair is a single value), this is also
- * done for runtimes which don't support `Symbol.iterator`.
- * - A `Map` returns its `[key, value]` entries and a `Set` its values, this is also done (since 0.20.0) for a `Map` or
- * `Set` which has no iterator function (eg. on IE 11) using its `forEach()`.
+ * value (eg. a number) returns an empty array. The iterator function of every value is used (since 0.20.0, including a
+ * string's and an array's, eg. an array's own one).
+ * - On a runtime without `Symbol.iterator` (eg. IE) the native iterators are emulated: an array is read using its
+ * indexes, like the native array iterator its length is read for each index (so a value added to it while it is read,
+ * eg. by the `mapFn`, is also read and the reading stops at its new length when values are removed), while (like the
+ * native function) any other array-like is read up to the length it had when it was called. A string (or a `String`
+ * object) is split into its code points (so a surrogate pair is a single value), and (since 0.20.0) a `Map` returns
+ * its `[key, value]` entries and a `Set` its values (using its `forEach()`).
+ * - When it is called with a constructor as its `this` (since 0.20.0, other than `Array`, eg. `MyArray.from(value)` for
+ * a subclass of Array when it is installed as `Array.from`), the result is created with the constructor (with no
+ * arguments for an iterable, or the length for an array-like), each value is defined on it and its `length` is set.
  * - The `mapFn` is called with the value and its index (without using its own `call` property), and each value is
  * added as an own property of the new array (even when `Array.prototype` has a setter or read-only property for the
  * index).
@@ -387,8 +394,13 @@ export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, cal
  * ```
  */
 export function polyArrFrom<T, U = T>(theValue: ArrayLike<T> | Iterable<T>, mapFn?: ArrFromMapFn<T, U>, thisArg?: any): U[] {
-    let result: any[] = [];
-    let iterFn: any;
+    let result: any;
+    let count = 0;
+
+    // Like the native function a `this` which is a constructor (other than Array, eg. a subclass of Array when this is
+    // installed as Array.from) creates the result
+    let ctor: any = this;
+    let isCtor = ctor !== ArrCls && isConstructor(ctor);
 
     // Like the native function the mapFn and the iterator function (when they are not undefined, or null for the
     // iterator function) must be functions
@@ -402,35 +414,51 @@ export function polyArrFrom<T, U = T>(theValue: ArrayLike<T> | Iterable<T>, mapF
     _throwIfNullOrUndefined(theValue);
 
     // Each value's index is the number of values added before it, like the native function the mapFn is called
-    // without using its own (replaceable) call property and each value is added as an own property
+    // without using its own (replaceable) call property and each value is added as an own property (defined on the
+    // result of a constructor, so a TypeError is thrown when it can't be)
     function _addValue(value: T) {
-        _pushOwnValue(result, mapFn ? fnCall(mapFn, thisArg, value, result[LENGTH]) : value);
+        let theValue = mapFn ? fnCall(mapFn, thisArg, value, count) : value;
+        isCtor ? _setOwnValue(result, count, theValue, true) : _pushOwnValue(result, theValue);
+        count++;
     }
 
-    if (!isString(theValue) && !isArray(theValue)) {
-        // Like the native function the iterator function is only read once
-        iterFn = (theValue as any)[getKnownSymbol(WellKnownSymbols.iterator)];
-    }
-
+    // Like the native function the iterator function is read once, from every value (so a string uses its
+    // String.prototype one, and an array its own or Array.prototype's, eg. one which has been replaced)
+    let iterFn: any = (theValue as any)[getKnownSymbol(WellKnownSymbols.iterator)];
     if (!isStrictNullOrUndefined(iterFn)) {
         // Like the native function a value (other than null or undefined) which is not a function throws, rather than
         // the value being used as an array-like, and the iterator it returns is used as-is
         _throwIfNotFunction(iterFn);
+        result = isCtor ? new ctor() : [];
         _iterForOf(fnCall(iterFn, theValue), _addValue);
     } else {
-        // A string is split into each surrogate pair (or any other single code unit, including an unpaired surrogate), as
-        // is a String object on a runtime without Symbol (which has no iterator function), which (like the String iterator
-        // of a runtime with Symbol) is converted to a string, so its own toString() is used. A Map or Set which has no
-        // iterator function (eg. IE 11) returns its entries / values, like the native function where they are iterable
-        let strValue: string = isString(theValue) ? theValue : (!hasSymbol() && isStringObject(theValue) ? asString(theValue) : NULL_VALUE);
+        // On a runtime without Symbol (which has no iterator functions, eg. IE) the native iterators are emulated: a
+        // string or String object is converted to a string (so a String object's own toString() is used, like the
+        // String iterator) and split into each surrogate pair (or any other single code unit, including an unpaired
+        // surrogate), an array's length is read for each index (like the array iterator, as the mapFn may change it)
+        // and a Map or Set returns a copy of its entries / values. Otherwise (and on a runtime with Symbol, where the
+        // value isn't iterable) the value is an array-like, whose length is only read once
+        let strValue = _getEmulatedString(theValue);
         let values: ArrayLike<any> = isString(strValue) ? strValue.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\s\S]/g) || [] :
-            (isArray(theValue) ? theValue : (_getMapSetValues(theValue) || theValue as ArrayLike<T>));
-        // An array's length is read for each index (like the native array iterator), as the mapFn may change it, while
-        // (like the native function) the length of any other array-like is only read once
-        let isArr = isArray(values);
-        for (let idx = 0, len = _toArrayLength(values); idx < (isArr ? values[LENGTH] : len); idx++) {
+            (_getMapSetValues(theValue) || theValue as ArrayLike<T>);
+        // An emulated iterator (a string's values, an array or a Map / Set's copy) is read like an iterable (so a
+        // constructor is called without arguments), any other array-like's length is read once (and like the native
+        // function, it is passed to a constructor, while an Array can't be longer than 2^32 - 1)
+        let isArr = !_hasNativeIterator() && isArray(values);
+        let len = isArr ? 0 : _toLength(values);
+        if (!isCtor) {
+            _checkArrayLength(len);
+        }
+
+        result = isCtor ? (isArr ? new ctor() : new ctor(len)) : [];
+        for (let idx = 0; idx < (isArr ? values[LENGTH] : len); idx++) {
             _addValue(values[idx]);
         }
+    }
+
+    if (isCtor) {
+        // Like the native function the length of a constructor's result is set
+        result[LENGTH] = count;
     }
 
     return result;

@@ -109,3 +109,20 @@ describe("strTruncate surrogate pairs", () => {
         assert.equal(strTruncate(pair + pair, 4, "..."), pair + pair);
     });
 });
+
+describe("strTruncate converts the maxLength to an integer", () => {
+    it("converts a fraction, -0, Infinity, a string, a boolean and an object with a valueOf", () => {
+        assert.equal(strTruncate("hello", 2.9), "he");
+        assert.equal(strTruncate("hello", 0.5), "");
+        assert.equal(strTruncate("hello", -0), "");
+        assert.equal(strTruncate("hello", -1.5), "");
+        assert.equal(strTruncate("hello", -Infinity), "");
+        assert.equal(strTruncate("hello", null as any), "");
+        assert.equal(strTruncate("hello", "x" as any), "");
+        assert.equal(strTruncate("hello", "3" as any), "hel");
+        assert.equal(strTruncate("hello", true as any), "h");
+        assert.equal(strTruncate("hello", { valueOf: () => 2 } as any), "he");
+        assert.equal(strTruncate("hello world", 7.9, "..."), "hell...");
+    });
+});
+

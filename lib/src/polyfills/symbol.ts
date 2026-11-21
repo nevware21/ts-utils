@@ -8,15 +8,14 @@
 
 import { WellKnownSymbols, _wellKnownSymbolMap } from "../symbol/well_known";
 import { throwTypeError } from "../helpers/throw";
-import { DUMP_ERR_MAX_LENGTH, LENGTH, SYMBOL, SYMBOL_TYPE, TO_STRING } from "../internal/constants";
+import { DUMP_ERR_MAX_LENGTH, EMPTY, LENGTH, SYMBOL, SYMBOL_TYPE, TO_STRING, UNDEF_VALUE } from "../internal/constants";
 import { dumpObj } from "../helpers/diagnostics";
 import { objHasOwn } from "../object/has_own";
 import { asString } from "../string/as_string";
 import { _GlobalPolySymbols, _getGlobalConfig } from "../internal/global";
-import { strSubstring } from "../string/substring";
 import { objKeys } from "../object/object";
-import { objDefine } from "../object/define";
-import { _isPolyfill } from "../internal/poly_helpers";
+import { _setOwnValue, objDefine } from "../object/define";
+import { _isPolyfill, _isPolyfillType } from "../internal/poly_helpers";
 import { _tagAsPolyfill } from "../internal/poly_utils";
 import { objCreate } from "../object/create";
 import { _uniqueInstanceId } from "../internal/instance";
@@ -31,13 +30,25 @@ let _polyId = 0;
 function _globalSymbolRegistry(): _GlobalPolySymbols {
     if (!_polySymbols) {
         let gblCfg = _getGlobalConfig();
-        _polySymbols = gblCfg.gblSym = gblCfg.gblSym || { k: {}, s:{} };
+        // The keys have no prototype, so a key which is an Object.prototype name (eg. "__proto__" or "valueOf") is
+        // its own key (a registry created by an earlier version is a {}, which _setOwnValue() also handles)
+        _polySymbols = gblCfg.gblSym = gblCfg.gblSym || { k: objCreate(null), s: {} };
     }
 
     return _polySymbols;
 }
 
 let _wellKnownSymbolCache: { [key in keyof typeof WellKnownSymbols ]: symbol };
+
+/**
+ * Like the native ToString() (used by Symbol() and Symbol.for()), a symbol (a native or a polyfill one) can't be
+ * converted to a string
+ */
+function _throwIfSymbol(value: any): void {
+    if (typeof value === SYMBOL_TYPE || _isPolyfillType(value, SYMBOL_TYPE)) {
+        throwTypeError("Cannot convert a Symbol value to a string");
+    }
+}
 
 /**
  * Returns a new (polyfill) Symbol object for the provided description that's guaranteed to be unique.
@@ -52,9 +63,14 @@ let _wellKnownSymbolCache: { [key in keyof typeof WellKnownSymbols ]: symbol };
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyNewSymbol(description?: string | number): symbol {
+    // Like the native Symbol() the description is converted to a string once (so an object's toString() is used, and a
+    // symbol throws a TypeError), and an undefined description is undefined (and empty in the symbol's string)
+    _throwIfSymbol(description);
+    const desc = description === UNDEF_VALUE ? UNDEF_VALUE : asString(description);
+
     // Create a unique identifier for this symbol instance
     const uniqueId = "_" + _polyId++ + "_" + _uniqueInstanceId.v;
-    const symString = SYMBOL + "(" + description + ")";
+    const symString = SYMBOL + "(" + (desc === UNDEF_VALUE ? EMPTY : desc) + ")";
     
     function _setProp(name: string, value: any) {
         objDefine(theSymbol as any, name, {
@@ -66,7 +82,7 @@ export function polyNewSymbol(description?: string | number): symbol {
     
     let theSymbol = objCreate(null) as symbol;
 
-    _setProp("description", asString(description));
+    _setProp("description", desc);
     _setProp(TO_STRING, () => symString + POLY_SYM + uniqueId);
     _setProp("valueOf", () => theSymbol);
     _setProp("v", symString);
@@ -84,13 +100,17 @@ export function polyNewSymbol(description?: string | number): symbol {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polySymbolFor(key: string): symbol {
+    // Like the native function the key is converted to a string once (a symbol throws a TypeError)
+    _throwIfSymbol(key);
+    key = asString(key);
+
     let registry = _globalSymbolRegistry();
     if (!objHasOwn(registry.k, key)) {
         let newSymbol: any = polyNewSymbol(key);
         let regId = objKeys(registry.s)[LENGTH];
         newSymbol[UNIQUE_REGISTRY_ID] = () => regId + "_" + newSymbol[TO_STRING]();
-        registry.k[key] = newSymbol;
-        registry.s[newSymbol[UNIQUE_REGISTRY_ID]()] = asString(key);
+        _setOwnValue(registry.k, key, newSymbol);
+        registry.s[newSymbol[UNIQUE_REGISTRY_ID]()] = key;
     }
 
     return registry.k[key];
@@ -105,7 +125,13 @@ export function polySymbolFor(key: string): symbol {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polySymbolKeyFor(sym: symbol): string | undefined {
-    if (!sym || !sym[TO_STRING] || strSubstring(sym[TO_STRING](), 0, 6) != SYMBOL) {
+    // Like the native function a value which isn't a symbol throws a TypeError (without converting it), and a native
+    // symbol uses the native registry
+    if (typeof sym === SYMBOL_TYPE) {
+        return (Symbol as any).keyFor(sym);
+    }
+
+    if (!_isPolyfillType(sym, SYMBOL_TYPE)) {
         throwTypeError(dumpObj(sym, 0, DUMP_ERR_MAX_LENGTH) + " is not a symbol");
     }
 
@@ -138,7 +164,8 @@ export function polySymbolKeyFor(sym: symbol): string | undefined {
 export function polyGetKnownSymbol(name: string | WellKnownSymbols): symbol {
     !_wellKnownSymbolCache && (_wellKnownSymbolCache = {} as any);
     let result: symbol;
-    let knownName: WellKnownSymbols = (_wellKnownSymbolMap as any)[name];
+    // Only a name of the map itself (not an inherited one, eg. "toString")
+    let knownName: WellKnownSymbols = objHasOwn(_wellKnownSymbolMap, name) ? (_wellKnownSymbolMap as any)[name] : UNDEF_VALUE;
     if (knownName) {
         result = (_wellKnownSymbolCache as any)[knownName] = _wellKnownSymbolCache[knownName] || polyNewSymbol(SYMBOL + "." + knownName);
     }

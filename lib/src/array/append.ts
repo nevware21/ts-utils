@@ -6,11 +6,12 @@
  * Licensed under the MIT license.
  */
 
-import { isArray, isUndefined } from "../helpers/base";
-import { isIterable, isIterator } from "../iterator/iterator";
-import { _getMapSetValues, iterForOf } from "../iterator/forOf";
-import { fnApply } from "../funcs/funcs";
-import { OBJECT } from "../internal/constants";
+import { isArray, isObject, isStrictNullOrUndefined, isUndefined } from "../helpers/base";
+import { _getIterKey, _hasNativeIterator, isIterator } from "../iterator/iterator";
+import { _getMapSetValues, _iterForOf } from "../iterator/forOf";
+import { fnApply, fnCall } from "../funcs/funcs";
+import { ArrProto, LENGTH, NULL_VALUE, UNDEF_VALUE } from "../internal/constants";
+import { _pushOwnValue } from "../object/define";
 
 /**
  * Appends the `elms` to the `target` where the elms may be an array, a single object
@@ -57,19 +58,45 @@ import { OBJECT } from "../internal/constants";
  */
 export function arrAppend<T>(target: T[], elms: T | T[] | Iterator<T>): T[] {
     if (!isUndefined(elms) && target) {
+        // Like spread the iterator function is read once (from every value, so an array's own or a replaced
+        // Array.prototype one is used) and only a null or undefined one is ignored, any other value is used as the
+        // iterator function (so a TypeError is thrown for one which isn't a function)
+        let iterKey = _getIterKey();
+        let iterFn: any = elms !== NULL_VALUE ? (elms as any)[iterKey] : UNDEF_VALUE;
+        let iter: Iterator<T>;
         let values: any[];
-        if (isArray(elms)) {
-            // This is not just "target.push(elms)" but becomes effectively "target.push(elms[0], elms[1], ...)"
+
+        if (isArray(elms) && (iterFn === (ArrProto as any)[iterKey] || isStrictNullOrUndefined(iterFn) || !_hasNativeIterator())) {
+            // An array which uses the native array iterator (or which has no iterator function, or any array on a
+            // runtime without a native iterator, eg. IE) is not just "target.push(elms)" but becomes effectively
+            // "target.push(elms[0], elms[1], ...)"
             fnApply(target.push, target, elms);
-        } else if (isIterator<T>(elms) || isIterable<T>(elms) || (values = typeof elms === OBJECT && _getMapSetValues(elms))) {
-            // A Map or Set which isn't iterable (eg. IE 11, which has no iterator functions) appends a copy of its
-            // entries / values, each is pushed (like an iterable) so a large Map or Set can't exceed the argument limit
-            // of apply(). Any other value is appended as-is
-            iterForOf(values || elms as Iterable<T>, (elm) => {
-                target.push(elm);
-            });
         } else {
-            target.push(elms as T);
+            if (!isStrictNullOrUndefined(iterFn)) {
+                iter = fnCall(iterFn, elms);
+            } else if (isIterator<T>(elms)) {
+                // An iterator which isn't iterable (eg. on a runtime without Symbol.iterator) is used as-is
+                iter = elms;
+            } else {
+                // A Map or Set which isn't iterable (eg. IE 11, which has no iterator functions) appends a copy of its
+                // entries / values, any other value is appended as-is
+                values = isObject(elms) && _getMapSetValues(elms);
+            }
+
+            if (iter || values) {
+                // Like spread every value is read before any are appended, so the target isn't changed when the
+                // iterator throws, then each is pushed (so a large iterable can't exceed the argument limit of apply())
+                values = values || [];
+                iter && _iterForOf(iter, (value) => {
+                    _pushOwnValue(values, value);
+                });
+
+                for (let idx = 0; idx < values[LENGTH]; idx++) {
+                    target.push(values[idx]);
+                }
+            } else {
+                target.push(elms as T);
+            }
         }
     }
 

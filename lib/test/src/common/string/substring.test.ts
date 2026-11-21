@@ -247,3 +247,13 @@ describe("substring string helpers", () => {
     }
 });
 
+
+describe("polyStrSubstr converts the length like String.prototype.substr", () => {
+    it("converts a fraction, -0, Infinity, a string, a boolean and an object with a valueOf", () => {
+        const lengths: any[] = [null, NaN, -0, 0, 0.5, 1.5, 2.9, -1.5, Infinity, -Infinity, "2", "x", "", true, false, { valueOf: () => 2 }];
+        lengths.forEach((length) => {
+            assert.equal(polyStrSubstr("abcdef", 1, length), "abcdef".substr(1, length), "length is " + dumpObj(length));
+        });
+    });
+});
+

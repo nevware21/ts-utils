@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { UNDEF_VALUE } from "../internal/constants";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 
@@ -254,9 +255,10 @@ export function createIterator<T>(ctx: CreateIteratorContext<T>): Iterator<T> {
 
         // Like the native iterators the value is read when the result is created, so a result keeps its value
         // (previously it was a getter which returned the current value, so an earlier result had a later value). The
-        // done and value are own properties of the literal, as an assignment would call an inherited setter (or throw
-        // for an inherited read-only property), eg. an Object.prototype.value accessor would intercept every value
-        return (isDone ? { done: isDone } : { done: isDone, value: ctx.v }) as IteratorResult<T>;
+        // value and done are own properties of the literal (in the native order, and a done result's value is
+        // undefined), as an assignment would call an inherited setter (or throw for an inherited read-only property),
+        // eg. an Object.prototype.value accessor would intercept every value
+        return { value: isDone ? UNDEF_VALUE : ctx.v, done: isDone } as IteratorResult<T>;
     }
 
     // The return() and throw() functions, which are done and return the result of the ctx's r() or t() function
@@ -264,8 +266,8 @@ export function createIterator<T>(ctx: CreateIteratorContext<T>): Iterator<T> {
         return function (value?: any): IteratorReturnResult<T> {
             isDone = true;
             return {
-                done: true,
-                value: ctx[fnName] && ctx[fnName](value)
+                value: ctx[fnName] && ctx[fnName](value),
+                done: true
             };
         };
     }

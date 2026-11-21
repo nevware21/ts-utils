@@ -8,7 +8,7 @@
 
 import { dumpObj } from "../helpers/diagnostics";
 import { throwRangeError } from "../helpers/throw";
-import { mathTrunc } from "./trunc";
+import { _toInt } from "../helpers/length";
 import { DUMP_ERR_MAX_LENGTH } from "../internal/constants";
 
 /**
@@ -26,5 +26,5 @@ export function mathToInt(value: any, throwInfinity?: boolean): number {
         throwRangeError("invalid value [" + dumpObj(value, 0, DUMP_ERR_MAX_LENGTH) + "]");
     }
     
-    return result !== result || result === 0 ? 0 : mathTrunc(result);
+    return _toInt(result);
 }

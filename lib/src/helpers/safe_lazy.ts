@@ -78,8 +78,9 @@ export function safeGetLazy<T = boolean, F extends (...args: any[]) => T = (...a
  * // Changing the value is allowed
  * cachedValue.v = "new value";
  *
- * // Accessing the value again will return the new value
- * theValue === cachedValue.v;  // true
+ * // Accessing the value again will return the new value (theValue still has the previous value)
+ * cachedValue.v === "new value";  // true
+ * theValue === cachedValue.v;     // false
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/

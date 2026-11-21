@@ -461,4 +461,31 @@ describe("createIterator results keep their value", () => {
         native.next();
         assert.equal(nativeFirst.value, first.value);
     });
+
+    it("a result has its value and then done as own properties, and a done result's value is undefined, like the native iterators", () => {
+        const iterator = createIterator<number>({
+            n: function() {
+                return true;
+            },
+            r: function() {
+                return 42;
+            }
+        });
+
+        const done = iterator.next();
+        assert.deepEqual(objKeys(done), ["value", "done"], "The done result's keys");
+        assert.isTrue(Object.prototype.hasOwnProperty.call(done, "value"), "The done result has an own value");
+        assert.equal(done.value, undefined);
+        assert.equal(done.done, true);
+
+        const returned = iterator.return();
+        assert.deepEqual(objKeys(returned), ["value", "done"], "The return() result's keys");
+        assert.equal(returned.value, 42);
+
+        const values = createArrayIterator([1]);
+        assert.deepEqual(objKeys(values.next()), ["value", "done"], "A value result's keys");
+
+        const nativeIter = ([] as any)[getKnownSymbol(WellKnownSymbols.iterator)]();
+        assert.deepEqual(objKeys(nativeIter.next()), ["value", "done"], "The native done result's keys");
+    });
 });

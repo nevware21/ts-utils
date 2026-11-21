@@ -7,7 +7,7 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
-import { objDefineGet, objDefineAccessors, objDefine, objDefineProps, ObjDefinePropDescriptor } from "../../../../src/object/define";
+import { objDefineGet, objDefineAccessors, objDefine, objDefineProps, ObjDefinePropDescriptor, _pushOwnValue } from "../../../../src/object/define";
 import { objGetOwnPropertyDescriptor } from "../../../../src/object/get_own_property";
 import { objKeys } from "../../../../src/object/object";
 import { getLazy, getWritableLazy } from "../../../../src/helpers/lazy";
@@ -614,3 +614,90 @@ describe("objDefine descriptor handling", () => {
         assert.strictEqual(Object.getPrototypeOf(target), Object.prototype, "The prototype should not be changed");
     });
 });
+
+describe("_pushOwnValue", () => {
+    it("adds the value as the last index", () => {
+        const values: any[] = ["a"];
+        _pushOwnValue(values, "b");
+
+        assert.deepEqual(values, ["a", "b"]);
+        assert.deepEqual(Object.getOwnPropertyDescriptor(values, "1"), { value: "b", writable: true, enumerable: true, configurable: true });
+    });
+
+    it("adds an own data property when Array.prototype has a setter or read-only value for the index", () => {
+        const previous = Object.getOwnPropertyDescriptor(Array.prototype, "0");
+        let setterCalls = 0;
+        const kinds: { [name: string]: PropertyDescriptor } = {
+            setter: {
+                set: () => {
+                    setterCalls++;
+                },
+                configurable: true
+            },
+            "read-only": {
+                value: "RO",
+                writable: false,
+                configurable: true
+            }
+        };
+        const results: { [name: string]: any[] } = {};
+
+        Object.keys(kinds).forEach((kind) => {
+            try {
+                Object.defineProperty(Array.prototype, "0", kinds[kind]);
+                results[kind] = [];
+                _pushOwnValue(results[kind], kind);
+            } finally {
+                // Restore Array.prototype before any assert is used
+                if (previous) {
+                    Object.defineProperty(Array.prototype, "0", previous);
+                } else {
+                    delete (Array.prototype as any)[0];
+                }
+            }
+        });
+
+        assert.equal(setterCalls, 0, "The Array.prototype setter was not called");
+        Object.keys(kinds).forEach((kind) => {
+            assert.deepEqual(Object.getOwnPropertyDescriptor(results[kind], "0"), { value: kind, writable: true, enumerable: true, configurable: true }, kind);
+            assert.equal(results[kind].length, 1, kind);
+        });
+    });
+
+    it("adds an own data property when Object.prototype has a get or set property (which isn't used by the descriptor)", () => {
+        const previous = Object.getOwnPropertyDescriptor(Array.prototype, "0");
+        const values: any[] = [];
+        let error: any;
+        try {
+            // Array.prototype first, as its descriptor would also use Object.prototype.get / set
+            Object.defineProperty(Array.prototype, "0", {
+                value: "RO",
+                writable: false,
+                configurable: true
+            });
+            (Object.prototype as any).get = function () {
+                return "get";
+            };
+            (Object.prototype as any).set = function () {
+                // Ignored
+            };
+
+            _pushOwnValue(values, "a");
+        } catch (e) {
+            error = e;
+        } finally {
+            // Restore Object.prototype first, before the Array.prototype descriptor is used
+            delete (Object.prototype as any).get;
+            delete (Object.prototype as any).set;
+            if (previous) {
+                Object.defineProperty(Array.prototype, "0", previous);
+            } else {
+                delete (Array.prototype as any)[0];
+            }
+        }
+
+        assert.equal(error, undefined, "No exception was thrown");
+        assert.deepEqual(Object.getOwnPropertyDescriptor(values, "0"), { value: "a", writable: true, enumerable: true, configurable: true });
+    });
+});
+

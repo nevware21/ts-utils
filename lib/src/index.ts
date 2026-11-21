@@ -50,6 +50,7 @@ export { arrWith } from "./array/with";
 export { arrZip } from "./array/zip";
 export { fnApply, fnBind, fnCall } from "./funcs/funcs";
 export { fnBindArgs } from "./funcs/fnBindArgs";
+export { isConstructor, isNativeFn } from "./funcs/isNative";
 export { createFnDeferredProxy, createProxyFuncs } from "./funcs/fnProxy";
 export { readArgs } from "./funcs/readArgs";
 export { BoundFunction, ProxyFunctionDef, TypeFuncNames } from "./funcs/types";

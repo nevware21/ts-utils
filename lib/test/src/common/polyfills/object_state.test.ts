@@ -18,14 +18,11 @@ import { _polyObjGetOwnPropertySymbols } from "../../../../src/polyfills/object/
 
 describe("object state polyfills", () => {
     describe("polyObjPreventExtensions", () => {
-        it("should throw for null and undefined", () => {
-            assert.throws(() => {
-                polyObjPreventExtensions(null);
-            }, TypeError);
-            
-            assert.throws(() => {
-                polyObjPreventExtensions(undefined);
-            }, TypeError);
+        it("should return null and undefined, like the native function", () => {
+            assert.strictEqual(polyObjPreventExtensions(null), null);
+            assert.strictEqual(polyObjPreventExtensions(undefined), undefined);
+            assert.strictEqual(Object.preventExtensions(null as any), null);
+            assert.strictEqual(Object.preventExtensions(undefined as any), undefined);
         });
 
         it("should return the object passed to it", () => {

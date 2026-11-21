@@ -62,9 +62,19 @@ export function _getIteratorThisArg<T>(source: Iterator<T>, thisArg?: any): any 
  * helper is done
  * @returns The new iterable iterator
  */
-export function _createIterHelper<T, R>(source: Iterator<T>, step: (ctx: CreateIteratorContext<R>) => boolean): IterableIterator<R> {
+export function _createIterHelper<T, R>(source: Iterator<T>, step: (ctx: CreateIteratorContext<R>, next: () => IteratorResult<T>) => boolean): IterableIterator<R> {
     let isDone: boolean;
     let isRunning: boolean;
+
+    // Like the native iterator helpers (GetIteratorDirect) the source's next() is read once, when the helper is created,
+    // and the step is passed a function which calls it (throwing a TypeError for a result which is not an object)
+    let nextFn = source.next;
+    let next = () => {
+        let result = fnCall(nextFn, source);
+        _throwIfNotResult(result);
+
+        return result;
+    };
 
     function _throwIfRunning(): void {
         if (isRunning) {
@@ -81,7 +91,7 @@ export function _createIterHelper<T, R>(source: Iterator<T>, step: (ctx: CreateI
             if (!isDone) {
                 isDone = isRunning = true;
                 try {
-                    isDone = step(this);
+                    isDone = step(this, next);
                 } finally {
                     isRunning = false;
                 }
@@ -99,21 +109,6 @@ export function _createIterHelper<T, R>(source: Iterator<T>, step: (ctx: CreateI
             return value;
         }
     });
-}
-
-/**
- * @internal
- * @ignore
- * Returns the next result of the source iterator, like the native iterator helpers (and iterForOf) a TypeError is thrown
- * when it is not an object (rather than a primitive result being processed, or looping forever)
- * @param source - The source iterator
- * @returns The next result
- */
-export function _iterNext<T>(source: Iterator<T>): IteratorResult<T> {
-    let result = source.next();
-    _throwIfNotResult(result);
-
-    return result;
 }
 
 /**

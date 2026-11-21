@@ -128,6 +128,13 @@ export const FuncApply = (/*#__PURE__*/_pureRef<typeof Function.prototype.apply>
 export const FuncBind = (/*#__PURE__*/_pureRef<typeof Function.prototype.bind>(FuncProto, "bind")) as Function;
 
 /**
+ * @internal
+ * @ignore
+ * The intrinsic `Function.prototype.toString`, captured when the module is loaded
+ */
+export const FuncToString = (/*#__PURE__*/_pureRef<typeof Function.prototype.toString>(FuncProto, TO_STRING)) as Function;
+
+/**
  * @ignore
  */
 export const DateCls = (/*#__PURE__*/_pureAssign(Date)) as DateConstructor;

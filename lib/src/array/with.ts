@@ -8,9 +8,10 @@
 
 import { ArrProto } from "../internal/constants";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
-import { _toArrayLength } from "../helpers/length";
+import { _checkArrayLength, _toInt, _toLength } from "../helpers/length";
 import { throwRangeError } from "../helpers/throw";
 import { _pushOwnValue } from "../object/define";
+import { _toObject } from "../internal/throwIf";
 
 /**
  * The arrWith() method is the copying version of using the bracket notation to change the value
@@ -28,6 +29,7 @@ import { _pushOwnValue } from "../object/define";
  * empty slot of a sparse array is `undefined` in the new array
  * @throws RangeError if the index is out of bounds, or (when the polyfill is used) the length is longer than an array
  * can be (2^32 - 1)
+ * @throws TypeError if `theArray` is `null` or `undefined`
  * @example
  * ```ts
  * arrWith([1, 2, 3], 1, 5);       // [1, 5, 3]
@@ -65,30 +67,30 @@ export const arrWith = (/*#__PURE__*/_unwrapFunctionWithPoly("with", ArrProto as
 export function polyArrWith<T>(theArray: ArrayLike<T>, index: number, value: T): T[] {
     let result: T[];
 
-    // Like the native function the length of the value is converted (eg. a string length), reading it throws a
-    // TypeError for null and undefined (rather than including a message)
-    const len = _toArrayLength(theArray);
-    // Convert the index (NaN becomes 0), any other value outside of the range is rejected by the check
-    let idx = +index || 0;
+    // Like the native function the value is converted to an object (null and undefined throw a TypeError), and then its
+    // length is converted (eg. a string length)
+    const theObj = _toObject(theArray);
+    const len = _toLength(theObj);
+    // Like the native function the index is converted to an integer (NaN is 0) and a negative index counts back from the
+    // end, an index outside of the array throws a RangeError, and then (when the new array is created) so does a length
+    // which is longer than an array can be (2^32 - 1)
+    let idx = _toInt(index);
+    if (idx < 0) {
+        idx += len;
+    }
 
-    // Check the bounds before truncating, which uses % as a bitwise operator would wrap the indexes of an array longer than 2^31
-    if (!len || idx <= -len - 1 || idx >= len) {
+    if (idx < 0 || idx >= len) {
         throwRangeError("Index out of bounds");
     }
 
-    idx -= idx % 1;
+    _checkArrayLength(len);
 
-    // Convert negative index to positive
-    if (idx < 0) {
-        idx = len + idx;
-    }
-    
     // Like the native function every other index is read into the new array (so an empty slot is undefined), and (like
     // polyArrFrom) each value is added as an own property, so a setter or read-only property of the same index on
     // Array.prototype (or Object.prototype) doesn't stop it being added
     result = [];
     for (let lp = 0; lp < len; lp++) {
-        _pushOwnValue(result, lp === idx ? value : theArray[lp]);
+        _pushOwnValue(result, lp === idx ? value : (theObj as any)[lp]);
     }
 
     return result;

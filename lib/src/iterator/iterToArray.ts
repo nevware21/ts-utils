@@ -9,6 +9,7 @@
 import { fnCall } from "../funcs/funcs";
 import { isFunction } from "../helpers/base";
 import { _iterForOf } from "./forOf";
+import { _pushOwnValue } from "../object/define";
 import { _asIterator, _getIteratorThisArg } from "./helpers";
 import { IterMapCallbackFn } from "./types";
 
@@ -35,13 +36,15 @@ export function iterToArray<T, R = T>(iter: Iterator<T> | Iterable<T> | ArrayLik
     let source = _asIterator(iter);
     let values: R[] = [];
 
+    // Like Array.from() each value is added as an own property, so a setter or read-only property of the same index on
+    // Array.prototype (or Object.prototype) doesn't stop it being added
     if (isFunction(mapFn)) {
         _iterForOf(source, (value, count) => {
-            values.push(fnCall(mapFn, _getIteratorThisArg(source, thisArg), value, count || 0));
+            _pushOwnValue(values, fnCall(mapFn, _getIteratorThisArg(source, thisArg), value, count || 0));
         });
     } else {
         _iterForOf(source, (value) => {
-            values.push(value as any as R);
+            _pushOwnValue(values, value as any as R);
         });
     }
 

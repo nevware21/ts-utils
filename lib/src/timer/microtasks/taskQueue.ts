@@ -52,6 +52,9 @@ let _taskQueues: { [key in _eTaskQueueType]?: (() => void)[] } | undefined;
  */
 let _runCount: number[] = [];
 
+// Identifies the queues which are being flushed
+let _flushing: boolean[] = [];
+
 export function _flushQueues(): void {
     if (_taskQueues) {
         _taskQueues[_eTaskQueueType.nextTick] && _flushTaskQueue(_eTaskQueueType.nextTick);
@@ -60,22 +63,31 @@ export function _flushQueues(): void {
 }
 
 export function _flushTaskQueue(queueType: _eTaskQueueType): void {
-    if (_taskQueues) {
-        let queue = _taskQueues[queueType];
-        let queueIdx = 0;
-        while (queue && queue[LENGTH] > queueIdx) {
-            // Counted before the task runs, so a task which it schedules only counts the tasks which are still pending
-            _runCount[queueType] = queueIdx + 1;
-            _runMicroTask(queue[queueIdx++]);
+    // Like native microtasks (which never run inside another microtask), a flush of a queue which is started while
+    // that queue is being flushed (eg. by a ts-utils timer callback which a fake clock runs synchronously inside a task)
+    // is ignored, as the outer flush continues with the remaining tasks (it would otherwise run the tasks which have
+    // already run again)
+    if (_taskQueues && !_flushing[queueType]) {
+        _flushing[queueType] = true;
+        try {
+            let queue = _taskQueues[queueType];
+            let queueIdx = 0;
+            while (queue && queue[LENGTH] > queueIdx) {
+                // Counted before the task runs, so a task which it schedules only counts the tasks which are still pending
+                _runCount[queueType] = queueIdx + 1;
+                _runMicroTask(queue[queueIdx++]);
 
-            // Special case for microtask queue to ensure nextTick queue is flushed between each microtask callback
-            if (queueType === _eTaskQueueType.microtask && _taskQueues[_eTaskQueueType.nextTick]) {
-                _flushTaskQueue(_eTaskQueueType.nextTick);
+                // Special case for microtask queue to ensure nextTick queue is flushed between each microtask callback
+                if (queueType === _eTaskQueueType.microtask && _taskQueues[_eTaskQueueType.nextTick]) {
+                    _flushTaskQueue(_eTaskQueueType.nextTick);
+                }
             }
-        }
 
-        _taskQueues[queueType] = UNDEF_VALUE;
-        _runCount[queueType] = 0;
+            _taskQueues[queueType] = UNDEF_VALUE;
+            _runCount[queueType] = 0;
+        } finally {
+            _flushing[queueType] = false;
+        }
     }
 }
 

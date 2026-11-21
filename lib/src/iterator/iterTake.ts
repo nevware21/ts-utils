@@ -7,7 +7,7 @@
  */
 
 import { _closeIter } from "./forOf";
-import { _asIterator, _createIterHelper, _iterNext } from "./helpers";
+import { _asIterator, _createIterHelper } from "./helpers";
 import { mathFloor } from "../math/floor";
 
 /**
@@ -41,7 +41,7 @@ export function iterTake<T>(iter: Iterator<T> | Iterable<T>, count: number): Ite
     let source = _asIterator(iter);
     let remaining = count > 0 ? mathFloor(count) : 0;
 
-    return _createIterHelper<T, T>(source, (ctx) => {
+    return _createIterHelper<T, T>(source, (ctx, next) => {
         if (remaining <= 0) {
             // Like the native take() the source is closed when the count is reached
             _closeIter(source);
@@ -49,12 +49,12 @@ export function iterTake<T>(iter: Iterator<T> | Iterable<T>, count: number): Ite
         }
 
         // Like the native take() the result's done (and value) is only read once
-        let next = _iterNext(source);
-        if (next.done) {
+        let result = next();
+        if (result.done) {
             return true;
         }
 
-        ctx.v = next.value;
+        ctx.v = result.value;
         remaining--;
         return false;
     });
