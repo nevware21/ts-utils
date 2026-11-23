@@ -152,7 +152,9 @@ export function _getMapSetValues(value: any): any[] | null {
  * are iterated, so a value added while it is iterated is also returned. It is used for an array (or array-like) which
  * isn't iterable, eg. on a runtime without Symbol.iterator. Like the native functions the length is converted to an
  * integer (a fraction is truncated, and NaN or a negative length is 0), and (like `Array.from()`) a length which is
- * longer than an array can be (2^32 - 1) throws a RangeError rather than (effectively) never ending. As the iterator
+ * longer than an array can be (2^32 - 1) throws a RangeError rather than (effectively) never ending. Like the native
+ * array iterator the index is read before the length and moves before the value is read (so a length getter or a value
+ * getter which calls next() doesn't change the value this returns), and once it is done it stays done. As the iterator
  * protocol allows, a result which isn't done has no done property and the done result has no value.
  * @param values - The array or array-like to read
  * @returns The iterator
@@ -162,7 +164,16 @@ export function _createIndexIterator<T>(values: ArrayLike<T>): Iterator<T> {
     let idx = 0;
 
     return {
-        next: () => (idx < _checkArrayLength(_toLength(values)) ? { value: values[idx++] } : { done: true }) as IteratorResult<T>
+        next: () => {
+            let index = idx;
+            if (values && index < _checkArrayLength(_toLength(values))) {
+                idx = index + 1;
+                return { value: values[index] } as IteratorResult<T>;
+            }
+
+            values = NULL_VALUE;
+            return { done: true } as IteratorResult<T>;
+        }
     };
 }
 

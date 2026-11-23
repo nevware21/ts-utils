@@ -105,6 +105,43 @@ describe("polyArrKeys", () => {
         }
     });
 
+    it("should return the same key from a next() whose length getter calls next(), like the native iterator", () => {
+        const getKeys = (keysFn: (value: any) => Iterator<number>) => {
+            let iter: Iterator<number>;
+            let reentered = false;
+            let nested: number[] = [];
+            let value: any = {
+                0: "a",
+                1: "b",
+                get length() {
+                    if (!reentered) {
+                        reentered = true;
+                        nested.push(iter.next().value);
+                    }
+
+                    return 2;
+                }
+            };
+
+            iter = keysFn(value);
+            let outer: number[] = [];
+            let next = iter.next();
+            while (!next.done) {
+                outer.push(next.value);
+                next = iter.next();
+            }
+
+            return { nested, outer };
+        };
+
+        // The nested next() returns key 0, and (as it read the index before the length) so does the outer next()
+        assert.deepEqual(getKeys(polyArrKeys), { nested: [0], outer: [0, 1] });
+
+        if (([] as any).keys) {
+            assert.deepEqual(getKeys((theValue) => (Array.prototype.keys as any).call(theValue)), { nested: [0], outer: [0, 1] }, "Array.prototype.keys");
+        }
+    });
+
     it("should not read the length until next() is called, and only move the index once it has been read", () => {
         let reads = 0;
         let fail = false;

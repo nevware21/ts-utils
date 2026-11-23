@@ -18,12 +18,6 @@ import { _objPropertyIsEnumerable } from "./property_is_enumerable";
 import { _objCreateNull, _objGetOwnPropertyDescriptor, _objGetOwnPropertySymbols, _objGetPrototypeOf } from "../internal/own_props";
 
 /**
- * Identifies whether Array.prototype's prototype is Object.prototype (the default), set when the first value of an
- * array is added by _pushOwnValue()
- */
-let _isDefaultArrChain: boolean;
-
-/**
  * Definition of the Property Descriptor mappings for the objDefine functions.
  * If a descriptor has neither of value, writable, get and set keys, it is treated as a data descriptor.
  * If a descriptor has both [value or writable] and [get or set] keys, an exception is thrown.
@@ -314,15 +308,11 @@ export function _setOwnValue(target: any, key: any, value: any, isDefine?: boole
  * defined like the native functions, so a TypeError is thrown when it can't be)
  */
 export function _pushOwnValue<T>(theArray: T[], value: T, idx: number = theArray[LENGTH], isDefine?: boolean): void {
-    if (!idx) {
-        // Checked when the first value is added (rather than for every value, which is ~4x slower). Without the ES5
-        // Object.getPrototypeOf (eg. ES3) the prototype of Array.prototype can't be changed, so it is the default one
-        _isDefaultArrChain = !_objGetPrototypeOf || _objGetPrototypeOf(ArrProto) === ObjProto;
-    }
-
-    // The (usual) assignment is inline, as this is called for every value (calling _setOwnValue() for each one is
-    // ~10-25% slower)
-    if (isDefine || !_isDefaultArrChain || idx in theArray) {
+    // The prototype of Array.prototype is checked for every value, as a callback or getter (eg. a mapFn) can change it
+    // between them. Without the ES5 Object.getPrototypeOf (eg. ES3) it can't be changed, so it is the default one. The
+    // (usual) assignment is inline, as this is called for every value (calling _setOwnValue() for each one is ~10-25%
+    // slower)
+    if (isDefine || (_objGetPrototypeOf && _objGetPrototypeOf(ArrProto) !== ObjProto) || idx in theArray) {
         _setOwnValue(theArray, idx, value, true);
     } else {
         theArray[idx] = value;

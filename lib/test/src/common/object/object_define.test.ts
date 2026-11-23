@@ -699,5 +699,43 @@ describe("_pushOwnValue", () => {
         assert.equal(error, undefined, "No exception was thrown");
         assert.deepEqual(Object.getOwnPropertyDescriptor(values, "0"), { value: "a", writable: true, enumerable: true, configurable: true });
     });
+
+    it("checks the prototype of Array.prototype for every value, so a Proxy which a callback adds after the first value isn't used", function() {
+        if (typeof Proxy !== "function") {
+            this.skip();
+            return;
+        }
+
+        const orgProto = Object.getPrototypeOf(Array.prototype);
+        let traps = "";
+        const proxy = new Proxy(orgProto, {
+            has: (target, key) => {
+                // A string rather than an array (whose push would call this Proxy's set trap)
+                typeof key === "string" && /^[0-9]+$/.test(key) && (traps += " has(" + key + ")");
+                return Reflect.has(target, key);
+            },
+            set: (target, key, value, receiver) => {
+                typeof key === "string" && /^[0-9]+$/.test(key) && (traps += " set(" + key + ")");
+                return Reflect.set(target, key, value, receiver);
+            }
+        });
+
+        const values: any[] = [];
+        try {
+            _pushOwnValue(values, "a");
+
+            // Like a mapFn (or a getter) which changes the prototype of Array.prototype between the values
+            Object.setPrototypeOf(Array.prototype, proxy);
+            _pushOwnValue(values, "b");
+            _pushOwnValue(values, "c");
+        } finally {
+            // Restored before any assert is used
+            Object.setPrototypeOf(Array.prototype, orgProto);
+        }
+
+        assert.equal(traps, "", "The Proxy's traps were not called");
+        assert.deepEqual(values, ["a", "b", "c"]);
+        assert.deepEqual(Object.getOwnPropertyDescriptor(values, "2"), { value: "c", writable: true, enumerable: true, configurable: true });
+    });
 });
 
