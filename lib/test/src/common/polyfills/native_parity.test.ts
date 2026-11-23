@@ -12,6 +12,7 @@ import { polyObjFromEntries } from "../../../../src/polyfills/object/objFromEntr
 import { polyObjGetOwnPropertyDescriptors } from "../../../../src/polyfills/object/objGetOwnProperty";
 import { polyObjEntries, polyObjKeys, polyObjValues } from "../../../../src/polyfills/object/objKeys";
 import { polyObjPreventExtensions } from "../../../../src/polyfills/object/objPreventExtensions";
+import { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } from "../../../../src/polyfills/symbol";
 import { polyObjHasOwn } from "../../../../src/object/has_own";
 import { polyArrWith } from "../../../../src/array/with";
 import { polyArrFlatMap } from "../../../../src/array/flatMap";
@@ -30,6 +31,7 @@ import { WellKnownSymbols } from "../../../../src/symbol/well_known";
 import { getGlobal } from "../../../../src/helpers/environment";
 import { _initTestHooks, setBypassLazyCache } from "../../../../src/helpers/lazy";
 import { polyStrSymSplit } from "../../../../src/polyfills/split";
+import { POLYFILL_TYPE_NAME } from "../../../../src/internal/poly_helpers";
 
 // The polyfills (and the helpers which work like a native function) compared with the native functions, for the
 // values and operations (eg. how often a getter or valueOf() is called) where they used to be different
@@ -485,6 +487,150 @@ describe("polyfills match the native functions", () => {
             if (!isES5) {
                 assert.strictEqual(nativeResult, 1, "Object.preventExtensions");
             }
+        });
+    });
+
+    describe("the Symbol polyfill", () => {
+        it("polySymbolFor() and polySymbolKeyFor() support the names of Object.prototype (eg. __proto__)", () => {
+            const protoSym = polySymbolFor("__proto__");
+
+            assert.equal(polySymbolKeyFor(protoSym), "__proto__");
+            assert.strictEqual(polySymbolFor("__proto__"), protoSym, "The same symbol is returned again");
+
+            const valueOfSym = polySymbolFor("valueOf");
+            assert.notEqual(typeof valueOfSym, "function", "valueOf is a symbol (not the inherited function)");
+            assert.equal(polySymbolKeyFor(valueOfSym), "valueOf");
+        });
+
+        it("polySymbolFor() converts the key once, like Symbol.for()", () => {
+            const calls: string[] = [];
+            const key = {
+                toString: () => {
+                    calls.push("toString");
+                    return "polySymbolFor.converted";
+                }
+            };
+
+            const sym = polySymbolFor(key as any);
+            assert.deepEqual(calls, ["toString"]);
+            assert.strictEqual(polySymbolFor("polySymbolFor.converted"), sym);
+        });
+
+        it("polyNewSymbol() has an undefined description when none is provided, like Symbol()", () => {
+            const sym: any = polyNewSymbol();
+
+            assert.isUndefined(sym.description);
+            assert.equal(String(sym).indexOf("Symbol()"), 0, "The string starts with Symbol()");
+            if (hasSymbol) {
+                assert.isUndefined((Symbol() as any).description, "Symbol()");
+            }
+        });
+
+        it("polyNewSymbol() converts an object description once (with its toString()), like Symbol()", () => {
+            const calls: string[] = [];
+            const description = {
+                toString: () => {
+                    calls.push("toString");
+                    return "o";
+                },
+                valueOf: () => {
+                    calls.push("valueOf");
+                    return "v";
+                }
+            };
+
+            const sym: any = polyNewSymbol(description as any);
+            assert.equal(sym.description, "o");
+            assert.equal(String(sym).indexOf("Symbol(o)"), 0);
+            assert.deepEqual(calls, ["toString"]);
+        });
+
+        it("polyNewSymbol() and polySymbolFor() throw a TypeError for a symbol, like Symbol() and Symbol.for()", () => {
+            assert.throws(() => polyNewSymbol(polyNewSymbol("a") as any), TypeError);
+            assert.throws(() => polySymbolFor(polyNewSymbol("a") as any), TypeError);
+            if (hasSymbol) {
+                assert.throws(() => polyNewSymbol(Symbol("a") as any), TypeError);
+                assert.throws(() => polySymbolFor(Symbol("a") as any), TypeError);
+                assert.throws(() => Symbol(Symbol("a") as any), TypeError, undefined, "Symbol()");
+            }
+        });
+
+        it("polySymbolKeyFor() throws a TypeError for a value which isn't a symbol (without converting it), like Symbol.keyFor()", () => {
+            const calls: string[] = [];
+            const notSymbol = {
+                toString: () => {
+                    calls.push("toString");
+                    return "Symbol(x)";
+                }
+            };
+
+            assert.throws(() => polySymbolKeyFor("Symbol(a)" as any), TypeError);
+            assert.throws(() => polySymbolKeyFor(notSymbol as any), TypeError);
+            assert.deepEqual(calls, [], "The value wasn't converted");
+            if (hasSymbol) {
+                assert.equal(polySymbolKeyFor(Symbol.for("polySymbolKeyFor.native")), "polySymbolKeyFor.native", "A native symbol uses the native registry");
+                assert.isUndefined(polySymbolKeyFor(Symbol("x")));
+            }
+        });
+
+        it("polyNewSymbol() and polySymbolFor() only convert an object description or key (without reading its other properties), like Symbol() and Symbol.for()", () => {
+            // A getter of the polyfill type on the prototype, which throws when it is read
+            const proto = {};
+            Object.defineProperty(proto, POLYFILL_TYPE_NAME, {
+                get: () => {
+                    throw new EvalError("read");
+                }
+            });
+
+            const description: any = Object.create(proto);
+            description.toString = () => "polyNewSymbol.getter";
+
+            assert.equal((polyNewSymbol(description) as any).description, "polyNewSymbol.getter");
+            assert.equal(polySymbolKeyFor(polySymbolFor(description)), "polyNewSymbol.getter");
+        });
+
+        it("an object which inherits the polyfill symbol type isn't a symbol, like the native functions", () => {
+            // Its own toString() is defined, as the symbol's (inherited) toString is read-only
+            const tagged: any = Object.create(polyNewSymbol("inherited") as any, {
+                toString: { value: () => "polyNewSymbol.inherited" }
+            });
+
+            assert.equal((polyNewSymbol(tagged) as any).description, "polyNewSymbol.inherited", "It is converted (rather than throwing)");
+            assert.throws(() => polySymbolKeyFor(tagged), TypeError, undefined, "It isn't a symbol");
+        });
+
+        it("polySymbolKeyFor() only returns the key of the registry's symbol, without calling a function of the value", () => {
+            const registered: any = polySymbolFor("polySymbolKeyFor.registered");
+            let calls = 0;
+
+            // An object with the (own) polyfill symbol type, which (where there is a Proxy, which can't be read to identify
+            // a symbol) isn't one of the polyfill symbols, so (like a value which isn't a symbol) it throws, otherwise
+            // (eg. IE) it can't be told apart from a symbol that isn't in the registry, so (like one) it has no key
+            const spoofed: any = {
+                description: "polySymbolKeyFor.registered",
+                _polyfill: true,
+                _urid: () => {
+                    calls++;
+                    return registered._urid();
+                }
+            };
+            spoofed[POLYFILL_TYPE_NAME] = "symbol";
+
+            if (hasProxy) {
+                assert.throws(() => polySymbolKeyFor(spoofed), TypeError, "object is not a symbol");
+            } else {
+                assert.isUndefined(polySymbolKeyFor(spoofed), "The spoofed symbol isn't in the registry");
+            }
+
+            assert.equal(calls, 0, "Its function wasn't called");
+            assert.isUndefined(polySymbolKeyFor(polyNewSymbol("polySymbolKeyFor.registered")), "A symbol with the same description");
+            assert.equal(polySymbolKeyFor(registered), "polySymbolKeyFor.registered", "The registry's symbol");
+        });
+
+        it("polyGetKnownSymbol() only returns a well-known symbol (not one for an inherited name, eg. toString)", () => {
+            assert.isUndefined(polyGetKnownSymbol("toString"));
+            assert.isUndefined(polyGetKnownSymbol("constructor"));
+            assert.ok(polyGetKnownSymbol("iterator"), "A well-known symbol");
         });
     });
     describe("polyStrPadStart and polyStrPadEnd", () => {

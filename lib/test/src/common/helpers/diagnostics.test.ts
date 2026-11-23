@@ -318,8 +318,7 @@ describe("error messages limit the dump of a value", () => {
             ["polyObjCreate", () => polyObjCreate(big), TypeError],
             ["polyObjFromEntries entry", () => polyObjFromEntries([big] as any), TypeError],
             ["polyObjFromEntries iterable", () => polyObjFromEntries({ v: big } as any), TypeError],
-            ["polyArrFrom", () => polyArrFrom([1], { v: big } as any), TypeError],
-            ["polySymbolKeyFor", () => polySymbolKeyFor(big as any), TypeError]
+            ["polyArrFrom", () => polyArrFrom([1], { v: big } as any), TypeError]
         ];
 
         for (let lp = 0; lp < cases.length; lp++) {
@@ -328,6 +327,18 @@ describe("error messages limit the dump of a value", () => {
             assert.instanceOf(error, cases[lp][2], cases[lp][0] + " should throw");
             assert.isAtMost(message.length, 1100, cases[lp][0] + " message should be limited, was " + message.length);
             assert.include(message, "...", cases[lp][0] + " message should be truncated");
+        }
+
+        // Like the native functions, the polyfills which check a value's type don't read (or convert) the value for the
+        // error, so the message only includes its type
+        const typeCases: any[] = [
+            ["polySymbolKeyFor", () => polySymbolKeyFor(big as any), "string is not a symbol"]
+        ];
+
+        for (let lp = 0; lp < typeCases.length; lp++) {
+            const error = _getError(typeCases[lp][1]);
+            assert.instanceOf(error, TypeError, typeCases[lp][0] + " should throw");
+            assert.equal(error.message, typeCases[lp][2], typeCases[lp][0] + " message only includes the type");
         }
     });
 });

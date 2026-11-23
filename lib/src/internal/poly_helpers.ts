@@ -22,16 +22,3 @@ export function makePolyFn<T extends Function>(poly: T): T {
         return poly.apply(this, theArgs);
     } as any;
 }
-
-
-/**
- * Checks if the target object is a polyfill.
- * @internal
- * @ignore
- * @group Polyfill
- * @param obj - The object to check.
- * @returns True if the object is a polyfill, false otherwise.
- */
-export function _isPolyfill(obj: any): boolean {
-    return !!(obj && obj[POLYFILL_TAG]);
-}
