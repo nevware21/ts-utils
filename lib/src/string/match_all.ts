@@ -27,7 +27,7 @@ import { createIterableIterator } from "../iterator/create";
  * The intrinsic RegExp.prototype.exec, captured when the module is loaded, which (like the native RegExpExec) is used
  * for a match when the matcher's exec isn't a function
  */
-const RegExpExec = (/*#__PURE__*/_pureRef<Function>(RegExpProto as any, "exec"));
+const RegExpExec = (/*#__PURE__*/_pureRef<RegExp["exec"]>(RegExpProto as any, "exec"));
 
 /**
  * Converts a lastIndex like the native ToLength(), so NaN or a negative value is 0, a fraction is truncated and a value
