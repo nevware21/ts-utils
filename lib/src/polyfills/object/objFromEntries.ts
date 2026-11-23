@@ -6,16 +6,14 @@
  * Licensed under the MIT license.
  */
 
-import { isArray, isPrimitive, isString } from "../../helpers/base";
+import { isArray, isPrimitive } from "../../helpers/base";
 import { dumpObj } from "../../helpers/diagnostics";
 import { throwTypeError } from "../../helpers/throw";
 import { DUMP_ERR_MAX_LENGTH, LENGTH, NULL_VALUE } from "../../internal/constants";
 import { _throwIfNullOrUndefined } from "../../internal/throwIf";
 import { _getMapSetValues, iterForOf } from "../../iterator/forOf";
 import { isIterable } from "../../iterator/iterator";
-import { objDefine } from "../../object/define";
-import { asString } from "../../string/as_string";
-import { isSymbol } from "../../symbol/symbol";
+import { _setOwnValue } from "../../object/define";
 
 /**
  * Creates a new object from an array of [key, value] pairs.
@@ -24,9 +22,9 @@ import { isSymbol } from "../../symbol/symbol";
  * Like the native `Object.fromEntries()`:
  * - Each entry must be an object, its `0` property is the key and its `1` property is the value (so an entry
  * with only a key has an `undefined` value).
- * - Each key is defined as an own property (rather than assigned), so a `__proto__` key does not change the
- * prototype of the new object, and a setter or read-only property of the same name on `Object.prototype` doesn't
- * stop the key being added.
+ * - Each key is converted once (a symbol is used as-is, an object by its `Symbol.toPrimitive` or `toString()`) and
+ * is defined as an own property (rather than assigned), so a `__proto__` key does not change the prototype of the new
+ * object, and a setter or read-only property of the same name on `Object.prototype` doesn't stop the key being added.
  * - A `null` or `undefined` value, a value which is not iterable (an array is always supported, as is (since 0.20.0) a
  * `Map` or `Set` which has no iterator function, eg. on IE 11) or an entry which is not an object (including an empty
  * slot of a sparse array) throws a `TypeError`.
@@ -47,21 +45,11 @@ export function polyObjFromEntries<T = any>(entries: any): T {
             throwTypeError(dumpObj(entry, 0, DUMP_ERR_MAX_LENGTH) + " is not an entry object");
         }
 
-        // Convert the key once (like the native function), then add it as an own (enumerable, configurable and
-        // writable) property. When the result already "has" the key (it is inherited, eg. "__proto__" including an
-        // object key which converts to it, or a setter or a read-only property of the same name on Object.prototype,
-        // or it is a duplicate key) it is defined rather than assigned, so the prototype of the result can't be changed
-        // and the key is still added. Otherwise it is assigned, as defining every key is ~25x slower. Object.defineProperty
-        // is defined by every runtime which needs this polyfill (ES5).
-        let key = entry[0];
-        let value = entry[1];
-        // A string key (the usual case) is used as-is, without the symbol check and conversion
-        key = isString(key) || isSymbol(key) ? key : asString(key);
-        if (key in result) {
-            objDefine(result, key, { v: value, w: true });
-        } else {
-            result[key] = value;
-        }
+        // Like the native function the key is converted once (to a symbol or a string, an object using its
+        // Symbol.toPrimitive("string") or its toString() / valueOf()) and it is added as an own (enumerable, configurable
+        // and writable) property, so an inherited setter or read-only property (eg. "__proto__", or one added to
+        // Object.prototype) doesn't stop it being added or change the prototype of the result
+        _setOwnValue(result, entry[0], entry[1]);
     }
 
     _throwIfNullOrUndefined(entries);

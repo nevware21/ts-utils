@@ -6,12 +6,9 @@
  * Licensed under the MIT license.
  */
 
-import { isFunction, isObject } from "../../helpers/base";
-import { throwTypeError } from "../../helpers/throw";
-import { _throwIfNullOrUndefined } from "../../internal/throwIf";
-
 /**
- * Polyfill implementation for Object.preventExtensions
+ * Polyfill implementation for Object.preventExtensions, which can't make an object non-extensible, so (like the native
+ * function, ES2015+) it returns the value it is passed, including a primitive value, `null` or `undefined`
  * @since 0.12.0
  * @group Polyfill
  * @group Object
@@ -20,13 +17,7 @@ import { _throwIfNullOrUndefined } from "../../internal/throwIf";
  * @returns The object that was passed to the function
  */
 export function polyObjPreventExtensions<T>(obj: T): T {
-    // Basic implementation if native method is not available
-    _throwIfNullOrUndefined(obj);
-    if (!isObject(obj) && !isFunction(obj)) {
-        throwTypeError("objPreventExtensions can only be called on Objects");
-    }
-
-    // If we can't make the object non-extensible, just return it
-    // We do not throw to maintain backward compatibility
+    // An object can't be made non-extensible without the native function, so (like the native function for a value which
+    // isn't an object) the value is returned
     return obj;
 }

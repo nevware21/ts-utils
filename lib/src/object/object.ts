@@ -14,6 +14,7 @@ import { polyObjIs } from "../polyfills/object/objIs";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { objIsFrozen } from "./object_state";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
+import { _objGetPrototypeOf } from "../internal/own_props";
 
 const _objFreeze = (/*#__PURE__*/_pureRef<typeof Object.freeze>(ObjClass, "freeze"));
 
@@ -197,7 +198,7 @@ export const objSeal: <T>(value: T) => T = (/*#__PURE__*/_pureAssign((/*#__PURE_
  * @group Object
  * @param value - The object whose prototype is to be returned, which may be null.
  */
-export const objGetPrototypeOf: (value: any) => any = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getPrototypeOf>(ObjClass, "getPrototypeOf")), _getProto));
+export const objGetPrototypeOf: (value: any) => any = (/*#__PURE__*/_pureAssign(_objGetPrototypeOf, _getProto));
 
 /**
  * Returns an array of key/values of the enumerable properties of an object
