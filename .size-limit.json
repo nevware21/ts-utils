@@ -68,7 +68,7 @@
   {
     "name": "es5-poly",
     "path": "lib/bundle/es5/ts-polyfills-utils.js",
-    "limit": "13 kb",
+    "limit": "13.25 kb",
     "brotli": false,
     "running": false
   },
@@ -99,7 +99,7 @@
   {
     "name": "es5-scheduleTimeout",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "1 kb",
+    "limit": "1.05 kb",
     "import": "{ scheduleTimeout }",
     "gzip": true,
     "running": false

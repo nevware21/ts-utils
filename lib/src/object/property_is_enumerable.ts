@@ -8,6 +8,7 @@
 
 import { isStrictNullOrUndefined } from "../helpers/base";
 import { safe } from "../helpers/safe";
+import { fnBind } from "../funcs/funcs";
 import { FuncCall, NULL_VALUE, ObjClass, ObjProto } from "../internal/constants";
 import { _pureRef } from "../internal/treeshake_helpers";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
@@ -86,4 +87,4 @@ export const objPropertyIsEnumerable: (obj: any, prop: PropertyKey) => boolean =
  * @param prop - The property name or symbol to check
  * @returns A Boolean indicating whether the specified property is enumerable
  */
-export const _objPropertyIsEnumerable: (obj: any, prop: PropertyKey) => boolean = (/*#__PURE__*/FuncCall.bind(/*#__PURE__*/_pureRef(ObjProto, "propertyIsEnumerable")));
+export const _objPropertyIsEnumerable: (obj: any, prop: PropertyKey) => boolean = (/*#__PURE__*/fnBind(FuncCall, /*#__PURE__*/_pureRef(ObjProto, "propertyIsEnumerable")) as any);

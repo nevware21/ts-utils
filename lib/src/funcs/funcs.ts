@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { FuncApply, FuncBind, FuncCall } from "../internal/constants";
+import { ArrSlice, CALL, FuncApply, FuncBind, FuncCall, LENGTH } from "../internal/constants";
 import { BoundFunction } from "./types";
 
 /**
@@ -27,7 +27,9 @@ import { BoundFunction } from "./types";
  * `fnApply(fn, thisArg, argArray)` is `fn.apply(thisArg, argArray)` without any wrapper function, and it doesn't
  * depend on the `call` or `apply` properties of `fn` (which may have been overridden). As it is a bound intrinsic
  * function, when `fn` is not a function the `TypeError` thrown by the runtime names `fnApply` (or the name it was
- * imported as) rather than `fn`, eg. `"fnApply is not a function"` (since 0.20.0).
+ * imported as) rather than `fn`, eg. `"fnApply is not a function"` (since 0.20.0). It is created with
+ * {@link fnBind}, so on a runtime without the native `Function.prototype.bind` (eg. ES3) it is a function which calls
+ * the intrinsic `Function.prototype.apply`.
  *
  * @function
  * @since 0.9.8
@@ -74,7 +76,7 @@ import { BoundFunction } from "./types";
  * fnApply(module1.log, module2, [ "friend" ]); // my friend : 42
  * ```
  */
-export const fnApply: <F extends (...args: any) => any, T>(fn: F, thisArg: T, argArray?: ArrayLike<any>) => ReturnType<F> = (/*#__PURE__*/FuncCall.bind(FuncApply));
+export const fnApply: <F extends (...args: any) => any, T>(fn: F, thisArg: T, argArray?: ArrayLike<any>) => ReturnType<F> = (/*#__PURE__*/fnBind(FuncCall, FuncApply) as any);
 
 /**
  * The `fnCall` function calls the function with the given `thisArg` as the `this` value and with
@@ -92,7 +94,9 @@ export const fnApply: <F extends (...args: any) => any, T>(fn: F, thisArg: T, ar
  * `fn.call(thisArg, ...args)` without any wrapper function or copying of the arguments, and it doesn't depend
  * on the `call` or `apply` properties of `fn` (which may have been overridden). As it is a bound intrinsic
  * function, when `fn` is not a function the `TypeError` thrown by the runtime names `fnCall` (or the name it was
- * imported as) rather than `fn`, eg. `"fnCall is not a function"` (since 0.20.0).
+ * imported as) rather than `fn`, eg. `"fnCall is not a function"` (since 0.20.0). It is created with
+ * {@link fnBind}, so on a runtime without the native `Function.prototype.bind` (eg. ES3) it is a function which calls
+ * the intrinsic `Function.prototype.apply`.
  *
  * @function
  * @since 0.9.8
@@ -138,7 +142,7 @@ export const fnApply: <F extends (...args: any) => any, T>(fn: F, thisArg: T, ar
  * fnCall(module1.log, module2, "friend"); // my friend : 42
  * ```
  */
-export const fnCall: <F extends (...args: any) => any, T>(fn: F, thisArg: T, ...args: Parameters<F>) => ReturnType<F> = (/*#__PURE__*/FuncCall.bind(FuncCall));
+export const fnCall: <F extends (...args: any) => any, T>(fn: F, thisArg: T, ...args: Parameters<F>) => ReturnType<F> = (/*#__PURE__*/fnBind(FuncCall, FuncCall) as any);
 
 /**
  * Creates a new function that when called will set the value of `thisArg` as the `this` keyword
@@ -248,5 +252,16 @@ export function fnBind<F extends (...args: any[]) => any, T>(fn: F, thisArg: T):
     // avoids slicing them into a new array, and using the intrinsic means this doesn't depend on the fn's own
     // (overridable) bind / call / apply properties. This remains a function (rather than an alias like fnCall)
     // to retain the overloads, and no other code runs before arguments is read.
-    return FuncCall.apply(FuncBind, arguments);
+    if (FuncBind) {
+        return FuncCall.apply(FuncBind, arguments);
+    }
+
+    // Without the native bind (eg. ES3) the function calls fn with thisArg and the bound arguments followed by its own
+    // (passed as-is when there are no bound arguments), using the intrinsic Function.prototype.apply. Unlike a native
+    // bound function it can't be used with new, and it doesn't have the name and length of fn
+    let boundArgs = ArrSlice[CALL](arguments, 2);
+
+    return function () {
+        return FuncApply[CALL](fn, thisArg, boundArgs[LENGTH] ? boundArgs.concat(ArrSlice[CALL](arguments)) : arguments);
+    };
 }
