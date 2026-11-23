@@ -23,13 +23,7 @@ declare let self: any;
  */
 export interface _GlobalPolySymbols {
     k: { [key: string ]: symbol },
-    s: { [sym: symbol ]: string },
-
-    /**
-     * The polyfill symbols (a WeakMap, where there is one), so a polyfill symbol can be identified without reading the
-     * value (an earlier version doesn't add its symbols)
-     */
-    w?: any
+    s: { [sym: symbol ]: string }
 }
 
 /**

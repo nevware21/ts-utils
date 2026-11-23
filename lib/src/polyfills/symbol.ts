@@ -8,7 +8,7 @@
 
 import { WellKnownSymbols, _wellKnownSymbolMap } from "../symbol/well_known";
 import { throwTypeError } from "../helpers/throw";
-import { EMPTY, FUNCTION, LENGTH, SYMBOL, SYMBOL_TYPE, TO_STRING, UNDEF_VALUE } from "../internal/constants";
+import { EMPTY, LENGTH, SYMBOL, SYMBOL_TYPE, TO_STRING, UNDEF_VALUE } from "../internal/constants";
 import { _throwTypeOf } from "../internal/throwIf";
 import { objHasOwn } from "../object/has_own";
 import { asString } from "../string/as_string";
@@ -33,10 +33,6 @@ function _globalSymbolRegistry(): _GlobalPolySymbols {
         // The keys have no prototype, so a key which is an Object.prototype name (eg. "__proto__" or "valueOf") is
         // its own key (a registry created by an earlier version is a {}, which _setOwnValue() also handles)
         _polySymbols = gblCfg.gblSym = gblCfg.gblSym || { k: _objCreateNull(), s: {} };
-
-        // The polyfill symbols, which is added to a registry of an earlier version. It is only needed (and created)
-        // where there is a Proxy (see _isPolySymbol()), every runtime with a Proxy also has a WeakMap
-        !_polySymbols.w && typeof Proxy === FUNCTION && (_polySymbols.w = new WeakMap());
     }
 
     return _polySymbols;
@@ -45,29 +41,18 @@ function _globalSymbolRegistry(): _GlobalPolySymbols {
 let _wellKnownSymbolCache: { [key in keyof typeof WellKnownSymbols ]: symbol };
 
 /**
- * Identifies a polyfill symbol without running any of the value's code, like the native functions which don't read a
- * value to identify a symbol. Where there is a Proxy (whose traps would see the value being read) it is identified by
- * itself (in the registry's WeakMap of the polyfill symbols, which only exists where there is a Proxy, so one created
- * by an earlier version of ts-utils, which doesn't add them, isn't identified there). Otherwise (eg. IE, where there is
- * no Proxy) it is identified by its own polyfill type, which is read as an own data property (so no getter is called,
- * and a value which inherits the type, eg. from Object.prototype, isn't a symbol), so a polyfill symbol of any instance
- * of ts-utils is identified. A polyfill symbol is an object (not a function).
+ * Identifies a polyfill symbol (of any instance or version of ts-utils) by its own polyfill type, which is read as an
+ * own data property, so no getter is called and a value which inherits the type (eg. from Object.prototype) or has it as
+ * an accessor isn't a symbol. A polyfill symbol is an object (not a function). Unlike the native functions the value's
+ * own property is read (eg. a Proxy's getOwnPropertyDescriptor trap is called), as every runtime with a Proxy has a
+ * native Symbol, so it is only seen when a polyfill function is called directly.
  */
 function _isPolySymbol(value: any): boolean {
-    let result = false;
-    if (isObject(value)) {
-        let syms = _globalSymbolRegistry().w;
-        if (syms) {
-            result = syms.has(value);
-        } else {
-            // Only an own data property, as the descriptor of an accessor has no value (so desc.value would read an
-            // inherited Object.prototype.value)
-            let desc = _objGetOwnPropertyDescriptor(value, POLYFILL_TYPE_NAME);
-            result = !!desc && objHasOwn(desc, "value") && desc.value === SYMBOL_TYPE;
-        }
-    }
+    // Only an own data property, as the descriptor of an accessor has no value (so desc.value would read an inherited
+    // Object.prototype.value)
+    let desc = isObject(value) ? _objGetOwnPropertyDescriptor(value, POLYFILL_TYPE_NAME) : UNDEF_VALUE;
 
-    return result;
+    return !!desc && objHasOwn(desc, "value") && desc.value === SYMBOL_TYPE;
 }
 
 /**
@@ -130,11 +115,7 @@ function _createPolySymbol(desc: string): symbol {
     _setProp("v", symString);
     _setProp("_uid", uniqueId);
 
-    // Added to the polyfill symbols, so it is identified without reading it (see _isPolySymbol())
-    let syms = _globalSymbolRegistry().w;
-    syms && syms.set(theSymbol, 1);
-
-    // Tagged as a polyfill symbol (also see _isPolySymbol())
+    // Tagged as a polyfill symbol (see _isPolySymbol())
     _setProp(POLYFILL_TAG, true);
     _setProp(POLYFILL_TYPE_NAME, SYMBOL_TYPE);
 
@@ -186,8 +167,7 @@ export function polySymbolKeyFor(sym: symbol): string | undefined {
     }
 
     // Like the native registry the key is found by the symbol's identity, so nothing is read from the value (eg. its
-    // description, which can be redefined), and a symbol which an earlier version added to the shared registry (which
-    // isn't identified where there is a Proxy, see _isPolySymbol()) still has its key
+    // description, which can be redefined)
     let keys = _globalSymbolRegistry().k;
     for (let key in keys) {
         if (objHasOwn(keys, key) && keys[key] === sym) {

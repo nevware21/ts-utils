@@ -604,9 +604,8 @@ describe("polyfills match the native functions", () => {
             const registered: any = polySymbolFor("polySymbolKeyFor.registered");
             let calls = 0;
 
-            // An object with the (own) polyfill symbol type, which (where there is a Proxy, which can't be read to identify
-            // a symbol) isn't one of the polyfill symbols, so (like a value which isn't a symbol) it throws, otherwise
-            // (eg. IE) it can't be told apart from a symbol that isn't in the registry, so (like one) it has no key
+            // An object with the (own) polyfill symbol type can't be told apart from a polyfill symbol (of any version)
+            // which isn't in the registry, so (like one) it has no key
             const spoofed: any = {
                 description: "polySymbolKeyFor.registered",
                 _polyfill: true,
@@ -617,11 +616,7 @@ describe("polyfills match the native functions", () => {
             };
             spoofed[POLYFILL_TYPE_NAME] = "symbol";
 
-            if (hasProxy) {
-                assert.throws(() => polySymbolKeyFor(spoofed), TypeError, "object is not a symbol");
-            } else {
-                assert.isUndefined(polySymbolKeyFor(spoofed), "The spoofed symbol isn't in the registry");
-            }
+            assert.isUndefined(polySymbolKeyFor(spoofed), "The spoofed symbol isn't in the registry");
 
             assert.equal(calls, 0, "Its function wasn't called");
             assert.isUndefined(polySymbolKeyFor(polyNewSymbol("polySymbolKeyFor.registered")), "A symbol with the same description");
@@ -655,7 +650,7 @@ describe("polyfills match the native functions", () => {
             polySymbolFor("the registry exists");
             const registry: any = _getGlobalConfig().gblSym;
 
-            // Like a polyfill symbol of an earlier version, which isn't in the registry's polyfill symbols (its WeakMap)
+            // Like a registered polyfill symbol of an earlier version
             const earlier: any = Object.create(null);
             Object.defineProperty(earlier, "description", { value: "an earlier version's key" });
             Object.defineProperty(earlier, POLYFILL_TYPE_NAME, { value: "symbol" });
@@ -669,9 +664,6 @@ describe("polyfills match the native functions", () => {
         });
 
         it("an object whose polyfill type is an accessor isn't a symbol (an inherited Object.prototype value isn't used), like the native functions", () => {
-            polySymbolFor("the registry exists");
-            const registry: any = _getGlobalConfig().gblSym;
-            const syms = registry.w;
             let typeReads = 0;
             const desc: any = {
                 toString: () => "converted"
@@ -687,9 +679,8 @@ describe("polyfills match the native functions", () => {
             let sym: any;
             let error: any;
             try {
-                // Without the registry's WeakMap (like a runtime without a Proxy, eg. IE) a polyfill symbol is identified by
-                // its own type, and the descriptor of an accessor has no value, so Object.prototype.value would be read
-                delete registry.w;
+                // A polyfill symbol is identified by its own type, and the descriptor of an accessor has no value, so
+                // Object.prototype.value would be read
                 Object.defineProperty(Object.prototype, "value", { value: "symbol", configurable: true, writable: true });
                 sym = polyNewSymbol(desc);
             } catch (e) {
@@ -697,13 +688,35 @@ describe("polyfills match the native functions", () => {
             } finally {
                 // Restored before any assert is used
                 delete (Object.prototype as any).value;
-                registry.w = syms;
             }
 
             assert.isUndefined(error, "An object with an accessor polyfill type isn't a symbol");
             assert.equal(sym.description, "converted", "Like Symbol(), the object is converted");
             assert.equal(typeReads, 0, "The accessor isn't called");
             assert.equal(Symbol(desc).description, "converted", "Symbol()");
+        });
+
+        it("a registered polyfill symbol and the shared registry have what an earlier version (v0.16.0) reads from them", () => {
+            // The names which v0.16.0 uses (rather than this version's constants, so changing one of them fails)
+            const sym: any = polySymbolFor("the shared registry contract");
+            const registry: any = (getGlobal() as any)["__tsUtils$gblCfg"].gblSym;
+
+            // Its polySymbolFor() returns the symbol of the registry's own key
+            assert.strictEqual(registry, _getGlobalConfig().gblSym, "The registry is in the global config");
+            assert.ok(Object.prototype.hasOwnProperty.call(registry.k, "the shared registry contract"), "The key is an own key of the registry");
+            assert.strictEqual(registry.k["the shared registry contract"], sym);
+
+            // Its polySymbolKeyFor() checks that the string starts with "Symbol" and that the symbol is a polyfill, then
+            // returns the key of the symbol's registry id (from the registry's s)
+            assert.equal(sym.toString().substring(0, 7), "Symbol(");
+            assert.isTrue(sym._polyfill, "The polyfill tag");
+            assert.equal(typeof sym._urid, "function", "The registry id function");
+            assert.equal(registry.s[sym._urid()], "the shared registry contract", "The key of the registry id");
+            assert.isUndefined((polyNewSymbol("the shared registry contract") as any)._urid, "A symbol which isn't registered has no registry id");
+
+            // Its isSymbol() reads the polyfill type, and this version only accepts an own data property
+            assert.isTrue(Object.getOwnPropertyDescriptor(sym, "_polyfill").value, "The polyfill tag is an own data property");
+            assert.equal(Object.getOwnPropertyDescriptor(sym, "__nw21$polytype__").value, "symbol", "The polyfill type is an own data property");
         });
     });
     describe("polyStrPadStart and polyStrPadEnd", () => {
