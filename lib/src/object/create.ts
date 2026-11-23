@@ -6,10 +6,11 @@
  * Licensed under the MIT license.
  */
 
-import { DUMP_ERR_MAX_LENGTH, __PROTO__, FUNCTION, ObjClass, OBJECT, PROTOTYPE } from "../internal/constants";
+import { DUMP_ERR_MAX_LENGTH, __PROTO__, FUNCTION, OBJECT, PROTOTYPE } from "../internal/constants";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
-import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
+import { _pureAssign } from "../internal/treeshake_helpers";
+import { _objCreate } from "../internal/own_props";
 import { objDefineProperties } from "./define";
 import { safe } from "../helpers/safe";
 import { isStrictNullOrUndefined } from "../helpers/base";
@@ -23,7 +24,7 @@ import { isStrictNullOrUndefined } from "../helpers/base";
  * @param obj - Object to use as a prototype. May be null
  * @param properties - JavaScript object that contains one or more property descriptors.
  */
-export const objCreate: (obj: any, properties?: PropertyDescriptorMap & ThisType<any>) => any = (/* #__PURE__*/_pureAssign((/* #__PURE__*/_pureRef<typeof Object.create>(ObjClass as any, "create")), polyObjCreate));
+export const objCreate: (obj: any, properties?: PropertyDescriptorMap & ThisType<any>) => any = (/* #__PURE__*/_pureAssign(_objCreate, polyObjCreate));
 
 /**
  * Creates an object that has the specified prototype, and that optionally contains specified properties. This helper exists to avoid adding a polyfil

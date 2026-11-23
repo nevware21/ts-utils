@@ -6,12 +6,17 @@
  * Licensed under the MIT license.
  */
 
-import { isObject } from "../../helpers/base";
-import { dumpObj } from "../../helpers/diagnostics";
-import { throwTypeError } from "../../helpers/throw";
-import { DUMP_ERR_MAX_LENGTH } from "../../internal/constants";
-import { _throwIfNullOrUndefined, _toObject } from "../../internal/throwIf";
-import { objHasOwn } from "../../object/has_own";
+import { fnCall } from "../../funcs/funcs";
+import { LENGTH, ObjProto } from "../../internal/constants";
+import { _objGetOwnPropertyNames } from "../../internal/own_props";
+import { _toObject } from "../../internal/throwIf";
+import { _pureRef } from "../../internal/treeshake_helpers";
+import { _pushOwnValue } from "../../object/define";
+import { _polyObjGetOwnPropertyNames } from "./objGetOwnProperty";
+
+// The intrinsic Object.prototype.propertyIsEnumerable (defined by every supported runtime, ES5), which (like the native
+// functions) gets the key's own property descriptor once
+const _objPropIsEnum: (this: any, key: PropertyKey) => boolean = (/*#__PURE__*/_pureRef<typeof Object.prototype.propertyIsEnumerable>(ObjProto, "propertyIsEnumerable"));
 
 /**
  * Iterates the own enumerable string keys of the object, passing only the key to the mapper. This intentionally
@@ -19,15 +24,22 @@ import { objHasOwn } from "../../object/has_own";
  * implementations, polyObjKeys never invokes getters and polyObjEntries / polyObjValues invoke each getter once
  * and propagate any exception it throws.
  * Like the native implementations the value is converted into an object, so a null or undefined value throws, the keys
- * of a string are the indexes of its characters and any other primitive value has no keys.
+ * of a string are the indexes of its characters and any other primitive value has no keys. Its own keys are read once
+ * (eg. a Proxy's ownKeys trap is only called once), and each one (in the same order, integer keys first) is included
+ * when it is still an own enumerable property, which is checked (once) as it is reached, so a property which a getter
+ * has removed or made non-enumerable is skipped, and (for polyObjEntries / polyObjValues) its value is then read once.
  */
-function _objIterateEntries<R>(obj: any, mapper: (key: string) => R): R[] {
+function _objIterateEntries<R>(obj: any, mapper: (theObj: any, key: string) => R): R[] {
     const result: R[] = [];
 
     const theObj = _toObject(obj);
-    for (const key in theObj) {
-        if (objHasOwn(theObj, key)) {
-            result.push(mapper(key));
+    // Without the ES5 Object.getOwnPropertyNames (eg. ES3) its polyfill is used, which (like v0.16.0) returns the own
+    // enumerable keys
+    const keys = (_objGetOwnPropertyNames || _polyObjGetOwnPropertyNames)(theObj);
+    for (let idx = 0; idx < keys[LENGTH]; idx++) {
+        let key = keys[idx];
+        if (fnCall(_objPropIsEnum, theObj, key)) {
+            _pushOwnValue(result, mapper(theObj, key));
         }
     }
 
@@ -44,12 +56,9 @@ function _objIterateEntries<R>(obj: any, mapper: (key: string) => R): R[] {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyObjKeys(obj: any): string[] {
-    _throwIfNullOrUndefined(obj);
-    if (!isObject(obj)) {
-        throwTypeError("non-object " + dumpObj(obj, 0, DUMP_ERR_MAX_LENGTH));
-    }
-
-    return _objIterateEntries<string>(obj, (k) => k);
+    // Like the native function (ES2015+) only null or undefined throws a TypeError, any other value (eg. a function, or
+    // a primitive such as a string, whose keys are its character indexes) is converted to an object
+    return _objIterateEntries<string>(obj, (_theObj, k) => k);
 }
 
 /**
@@ -79,7 +88,7 @@ export function polyObjKeys(obj: any): string[] {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyObjEntries<T = any>(value: {} | { [s: string]: T } | ArrayLike<T>): [string, T][] {
-    return _objIterateEntries<[string, T]>(value, (k) => [k, (value as any)[k]]);
+    return _objIterateEntries<[string, T]>(value, (theObj, k) => [k, theObj[k]]);
 }
 
 /**
@@ -109,5 +118,5 @@ export function polyObjEntries<T = any>(value: {} | { [s: string]: T } | ArrayLi
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyObjValues<T = any>(value: {} | { [s: string]: T } | ArrayLike<T>): T[] {
-    return _objIterateEntries<T>(value, (k) => (value as any)[k]);
+    return _objIterateEntries<T>(value, (theObj, k) => theObj[k]);
 }

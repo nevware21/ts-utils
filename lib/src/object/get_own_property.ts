@@ -6,9 +6,8 @@
  * Licensed under the MIT license.
  */
 
-import { GET_OWN_PROPERTY_NAMES, ObjClass } from "../internal/constants";
-import { _objGetOwnPropertyDescriptor, _objGetOwnPropertySymbols } from "../internal/own_props";
-import { _returnEmptyArray } from "../internal/stubs";
+import { ObjClass } from "../internal/constants";
+import { _objGetOwnPropertyDescriptor, _objGetOwnPropertyNames, _objGetOwnPropertySymbols } from "../internal/own_props";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { polyObjGetOwnPropertyDescriptors } from "../polyfills/object/objGetOwnProperty";
 
@@ -119,7 +118,7 @@ export const objGetOwnPropertyDescriptors: (obj: any) => PropertyDescriptorMap =
  * objGetOwnPropertyNames(obj); // ['hidden', 'visible']
  * ```
  */
-export const objGetOwnPropertyNames: (obj: any) => string[] = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertyNames>(ObjClass, GET_OWN_PROPERTY_NAMES)), _returnEmptyArray));
+export const objGetOwnPropertyNames: (obj: any) => string[] = (/*#__PURE__*/_pureAssign(_objGetOwnPropertyNames, () => []));
 
 /**
  * The `objGetOwnPropertySymbols()` method returns an array of all symbol properties found directly upon

@@ -10,7 +10,8 @@ import { assert } from "@nevware21/tripwire-chai";
 import { polyObjFromEntries } from "../../../../src/polyfills/object/objFromEntries";
 import { polyObjIs } from "../../../../src/polyfills/object/objIs";
 import { polyObjKeys, polyObjEntries, polyObjValues } from "../../../../src/polyfills/object/objKeys";
-import { polyObjGetOwnPropertyDescriptors, _polyObjGetOwnPropertySymbols, _polyObjGetOwnPropertyNames } from "../../../../src/polyfills/object/objGetOwnProperty";
+import { polyObjGetOwnPropertyDescriptors, _polyObjGetOwnPropertyNames } from "../../../../src/polyfills/object/objGetOwnProperty";
+import { _objGetOwnPropertySymbols } from "../../../../src/internal/own_props";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { isObject, isUndefined } from "../../../../src/helpers/base";
 import { objFromEntries } from "../../../../src/object/from_entries";
@@ -1062,7 +1063,9 @@ describe("object polyfills", () => {
         });
     });
 
-    describe("polyObjGetOwnPropertySymbols", () => {
+    // The shared Object.getOwnPropertySymbols() which the polyfills use (none without it, as without Symbol a polyfill
+    // symbol is a string key)
+    describe("_objGetOwnPropertySymbols", () => {
         // Skip entire suite if Symbols aren't supported
         before(function() {
             if (typeof Symbol !== "function") {
@@ -1073,7 +1076,7 @@ describe("object polyfills", () => {
         it("should return an empty array for objects with no symbols", () => {
             const obj = { a: 1, b: "string" };
             
-            const symbols = _polyObjGetOwnPropertySymbols(obj);
+            const symbols = _objGetOwnPropertySymbols(obj);
             
             assert.isArray(symbols);
             assert.equal(symbols.length, 0);
@@ -1091,7 +1094,7 @@ describe("object polyfills", () => {
                 yield 1;
             };
             
-            const symbols = _polyObjGetOwnPropertySymbols(obj);
+            const symbols = _objGetOwnPropertySymbols(obj);
             
             assert.isArray(symbols);
             assert.include(symbols, iteratorSym);
@@ -1108,7 +1111,7 @@ describe("object polyfills", () => {
             obj[sym3] = "value3";
             obj[getKnownSymbol(WellKnownSymbols.toStringTag)] = "test";
             
-            const symbols = _polyObjGetOwnPropertySymbols(obj);
+            const symbols = _objGetOwnPropertySymbols(obj);
             
             assert.isArray(symbols);
             assert.equal(symbols.length, 1, "Should find only one symbol property");
@@ -1124,51 +1127,13 @@ describe("object polyfills", () => {
                 prop2: sym2
             };
             
-            const symbols = _polyObjGetOwnPropertySymbols(obj);
+            const symbols = _objGetOwnPropertySymbols(obj);
             
             // Note: The symbol-valued properties wouldn't be returned
             // by Object.getOwnPropertySymbols since they're not symbol *keys*
             assert.isArray(symbols);
         });
         
-        it("should handle recursive calls safely", () => {
-            // This test ensures the recursion protection works
-            const sym = Symbol("test");
-            const obj: any = {};
-            obj[sym] = "value";
-            
-            // Call it again within its own test to check recursion guard
-            const symbols1 = _polyObjGetOwnPropertySymbols(obj);
-            const symbols2 = _polyObjGetOwnPropertySymbols(obj);
-            
-            assert.isArray(symbols1);
-            assert.isArray(symbols2);
-        });
-        
-        it("should be compatible with the native implementation when available", function() {
-            // Skip if native method doesn't exist
-            if (typeof Object.getOwnPropertySymbols !== "function") {
-                return;
-            }
-            
-            const sym = Symbol("test");
-            const obj: any = {};
-            obj[sym] = "value";
-            
-            let polyResult = _polyObjGetOwnPropertySymbols(obj);
-            let nativeResult = Object.getOwnPropertySymbols(obj);
-
-            assert.equal(nativeResult.length, 1, "Native should find the symbol property");
-            assert.equal(polyResult.length, 0, "Polyfill should not find the symbol property");
-
-            obj[getKnownSymbol(WellKnownSymbols.species)] = "test";
-
-            polyResult = _polyObjGetOwnPropertySymbols(obj);
-            nativeResult = Object.getOwnPropertySymbols(obj);
-
-            assert.equal(nativeResult.length, 2, "Native should find the symbol property");
-            assert.equal(polyResult.length, 1, "Polyfill should not find the symbol property");
-        });
     });
 
     describe("polyObjHasOwn", () => {
@@ -1574,7 +1539,9 @@ describe("object polyfills", () => {
             polyThrew = e;
         }
         try {
-            nativeResult = Object.keys(value);
+            // A primitive is converted to an object (like ES2015+), as an ES5 Object.keys (eg. IE 11) throws a TypeError
+            // for it, while null and undefined still throw
+            nativeResult = Object.keys(value === null || value === undefined ? value : Object(value));
         } catch (e) {
             nativeThrew = e;
         }
@@ -1589,8 +1556,9 @@ describe("object polyfills", () => {
                 assert.ok(false,
                     "Native threw but poly didn't [" + dumpObj(polyThrew) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
             } else {
-                assert.equal(isUndefined(polyResult), !!nativeThrew || isUndefined(nativeResult) || !!nativeResult,
-                    "Checking whether the Native and polyfill threw or returned undefined [" + dumpObj(polyThrew || polyResult) + "] - [" + dumpObj(nativeThrew || nativeResult) + "] for [" + dumpObj(value) + "]");
+                // Like Object.keys() (ES2015+) a primitive (other than null or undefined) returns its keys
+                assert.deepEqual(polyResult, nativeResult,
+                    "Checking the Native and polyfill result [" + dumpObj(polyResult) + "] - [" + dumpObj(nativeResult) + "] for [" + dumpObj(value) + "]");
             }
         }
     }
@@ -1661,3 +1629,4 @@ describe("object polyfills", () => {
         }
     }
 });
+
