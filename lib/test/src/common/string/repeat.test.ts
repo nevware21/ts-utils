@@ -64,6 +64,55 @@ describe("string helpers", () => {
         _checkPolyRepeat("abc", 1/0);
     });
 
+    it("polyStrRepeat throws a RangeError for a result which is longer than a string can be, like the native function", () => {
+        // The count isn't truncated to 32 bits (2^32 + 1 was 1, so this returned "ab")
+        assert.throws(() => polyStrRepeat("ab", Math.pow(2, 32) + 1), RangeError);
+        assert.throws(() => polyStrRepeat("a", Math.pow(2, 31)), RangeError);
+
+        // An empty string (or a count of 0) is never too long
+        assert.equal(polyStrRepeat("", Math.pow(2, 40)), "");
+        assert.equal(polyStrRepeat("ab", 0), "");
+
+        // A negative or infinite count throws, even for an empty string
+        assert.throws(() => polyStrRepeat("", -1), RangeError);
+        assert.throws(() => polyStrRepeat("", Infinity), RangeError);
+        if ((String.prototype as any).repeat) {
+            assert.throws(() => String.prototype.repeat.call("ab", Math.pow(2, 32) + 1), RangeError, undefined, "String.prototype.repeat");
+            assert.equal(String.prototype.repeat.call("", Math.pow(2, 40)), "", "String.prototype.repeat");
+            assert.throws(() => String.prototype.repeat.call("", Infinity), RangeError, undefined, "String.prototype.repeat");
+        }
+    });
+
+    it("polyStrRepeat converts the value before the count, and a Symbol throws a TypeError, like the native function", () => {
+        const getOrder = (repeatFn: (value: any, count: any) => string) => {
+            let order: string[] = [];
+            let result = repeatFn({
+                toString: () => {
+                    order.push("value");
+                    return "ab";
+                }
+            }, {
+                valueOf: () => {
+                    order.push("count");
+                    return 2;
+                }
+            });
+
+            return { result, order };
+        };
+
+        assert.deepEqual(getOrder(polyStrRepeat), { result: "abab", order: ["value", "count"] });
+        if ((String.prototype as any).repeat) {
+            assert.deepEqual(getOrder((value, count) => String.prototype.repeat.call(value, count)), { result: "abab", order: ["value", "count"] }, "String.prototype.repeat");
+        }
+
+        if (typeof Symbol === "function") {
+            assert.throws(() => polyStrRepeat(Symbol("value") as any, 1), TypeError);
+            assert.throws(() => polyStrRepeat("ab", Symbol("count") as any), TypeError);
+            (String.prototype as any).repeat && assert.throws(() => String.prototype.repeat.call("ab", Symbol("count") as any), TypeError);
+        }
+    });
+
     function _checkRepeat(value: any, count: number) {
         let repeatResult: any;
         let nativeResult: any;

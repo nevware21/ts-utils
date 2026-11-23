@@ -8,7 +8,7 @@
 
 import { EMPTY, LENGTH, SUBSTRING } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
-import { asString } from "../string/as_string";
+import { _toString } from "../string/as_string";
 import { strReplace } from "../string/replace";
 
 // A single whitespace (or line terminator) character, the characters which the native trim functions remove
@@ -18,7 +18,8 @@ const WHITESPACE = /\s/;
 function _createTrimFn(trimStart: boolean, trimEnd?: boolean): (value: string) => string {
     return function _doTrim(value: string): string {
         _throwIfNullOrUndefined(value);
-        value = asString(value);
+        // Like the native functions the value is converted to a string (a Symbol throws a TypeError)
+        value = _toString(value);
 
         if (value && trimStart) {
             // Anchored to the start, so it is only tried at the first character

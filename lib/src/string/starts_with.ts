@@ -9,8 +9,8 @@
 import { LENGTH, StrProto } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
-import { mathFloor } from "../math/floor";
-import { asString } from "./as_string";
+import { _toInt } from "../helpers/length";
+import { _toString } from "./as_string";
 import { _toSearchString } from "./includes";
 import { strSubstring } from "./substring";
 
@@ -29,8 +29,9 @@ export const strStartsWith: (value: string, searchString: string, position?: num
 
 /**
  * This method lets you determine whether or not a string begins with another string. This method is case-sensitive.
- * Like the native function the value (eg. a `String` object or a number) is converted to a string, but unlike it a
- * `Symbol` value or searchString is also converted (eg. to `"Symbol(abc)"`) rather than throwing a TypeError.
+ * Like the native function the value (eg. a `String` object or a number) and the searchString are converted to strings
+ * (since 0.20.0 a `Symbol` throws a TypeError, like the native function), and a regular expression searchString
+ * (identified like the native IsRegExp) throws a TypeError.
  * @group Polyfill
  * @group String
  * @param value - The value to be checked
@@ -47,12 +48,12 @@ export function polyStrStartsWith(value: string, searchString: string, position?
     // Like the native function the value (eg. a String object or a number) and then the searchString are converted to
     // strings (the searchString only once, and like polyStrIncludes() a RegExp throws a TypeError), and then the position
     // to a number (so NaN and a value which isn't a number are 0)
-    let theValue = asString(value);
+    let theValue = _toString(value);
     let searchValue = _toSearchString(searchString);
-    let pos = +position;
-
-    // A fractional position is truncated before the length is added, as the sum could otherwise round up
-    pos = pos > 0 ? mathFloor(pos) : 0;
+    // Like the native function the position is converted to an integer (so a fraction is truncated before the length is
+    // added, as the sum could otherwise round up) and a negative position is 0
+    let pos = _toInt(position);
+    pos = pos > 0 ? pos : 0;
 
     return strSubstring(theValue, pos, pos + searchValue[LENGTH]) === searchValue;
 }

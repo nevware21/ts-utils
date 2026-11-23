@@ -6,15 +6,17 @@
  * Licensed under the MIT license.
  */
 
-import { isFunction, isRegExp, isStrictNullOrUndefined, isString } from "../helpers/base";
-import { throwTypeError } from "../helpers/throw";
+import { fnCall } from "../funcs/funcs";
+import { isStrictNullOrUndefined } from "../helpers/base";
 import { createLiteralRegex } from "../helpers/regexp";
-import { StrProto } from "../internal/constants";
-import { _throwIfNullOrUndefined } from "../internal/throwIf";
-import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
+import { StrProto, UNDEF_VALUE } from "../internal/constants";
+import { _getNativeSymbol } from "../internal/native_symbol";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
-import { asString } from "./as_string";
+import { _isRegExp, _isRegExpObj, _throwIfNotGlobal } from "../internal/is_regexp";
+import { _throwIfNullOrUndefined } from "../internal/throwIf";
+import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
+import { _toString } from "./as_string";
 import { strReplace } from "./replace";
 
 /**
@@ -42,12 +44,17 @@ export const strReplaceAll: (value: string, searchValue: string | RegExp, replac
  * matches of a pattern replaced by a replacement.
  *
  * Matches the behaviour of the native `String.prototype.replaceAll()` method:
- * - A `RegExp` `searchValue` **must** carry the global (`g`) flag; a non-global `RegExp` throws a
- *   `TypeError`.
+ * - A regular expression `searchValue` (identified like the native IsRegExp, so a `RegExp` whose `Symbol.match` is
+ *   falsy isn't one and an object whose `Symbol.match` is truthy is) **must** have a global (`g`) flag in its `flags`;
+ *   a non-global one throws a `TypeError`.
  * - A string `searchValue` is treated as a literal pattern (special regex characters are escaped)
- *   and all occurrences are replaced.
- * - If `searchValue` exposes a `[Symbol.replace]` method, that method is called with the coerced
- *   string value and `replaceValue`, mirroring the native delegation behaviour.
+ *   and all occurrences are replaced. Like the native function the value and the `searchValue` are converted to
+ *   strings (a `Symbol` throws a `TypeError`).
+ * - If `searchValue` has a `[Symbol.replace]` (read once, a value which isn't `null`, `undefined` or a function throws
+ *   a `TypeError`), it is called with the (unconverted) value and `replaceValue`, like the native function. On a
+ *   runtime without a native `Symbol` (eg. IE) the method for the polyfill symbol
+ *   (`getKnownSymbol(WellKnownSymbols.replace)`) is called, and on a runtime without `Symbol.replace` a `RegExp` is
+ *   used like its native `[Symbol.replace]`.
  * - If `replaceValue` is a function it is invoked for each match with the matched substring,
  *   captured groups, the match index, and the original string.
  *
@@ -89,34 +96,31 @@ export const strReplaceAll: (value: string, searchValue: string | RegExp, replac
 export function polyStrReplaceAll(value: string, searchValue: string | RegExp, replaceValue: string | ((substring: string, ...args: any[]) => string)): string {
     _throwIfNullOrUndefined(value);
 
-    let matchSymbol = getKnownSymbol(WellKnownSymbols.match);
-    let replaceSymbol = getKnownSymbol(WellKnownSymbols.replace);
-    let replaceFn: (value: string, replaceValue: string | ((substring: string, ...args: any[]) => string)) => string;
-    let matcher: string | RegExp;
-    let isRegex = isRegExp(searchValue);
-    let theValue = isString(value) ? value : asString(value);
-    let isSearchNotNull = searchValue || !isStrictNullOrUndefined(searchValue);
+    // Like the native function (in the same order) a searchValue which isn't null or undefined is checked first: a
+    // regular expression (IsRegExp, eg. a RegExp whose Symbol.match isn't falsy or an object whose Symbol.match is
+    // truthy) must have a "g" in its flags, then its [Symbol.replace] (read once, only a null or undefined one is
+    // ignored, any other value which isn't a function throws a TypeError) is called with the value (not yet converted).
+    // On a runtime without a native Symbol (eg. IE) the method for the polyfill symbol is used, while a runtime with a
+    // native Symbol which has no Symbol.replace has no key for it
+    if (!isStrictNullOrUndefined(searchValue)) {
+        _isRegExp(searchValue) && _throwIfNotGlobal(searchValue, "searchValue");
 
-    if (isRegex && isSearchNotNull) {
-        isRegex = (searchValue as any)[matchSymbol] !== false;
-    }
-
-    if (isRegex) {
-        if (!(searchValue as RegExp).global) {
-            throwTypeError("searchValue must be a global regular expression");
+        let replaceSym = _getNativeSymbol("replace");
+        let replaceKey = replaceSym || getKnownSymbol(WellKnownSymbols.replace);
+        let replacer = replaceKey ? (searchValue as any)[replaceKey] : UNDEF_VALUE;
+        if (!isStrictNullOrUndefined(replacer)) {
+            return fnCall(replacer, searchValue, value, replaceValue);
         }
 
-        matcher = searchValue;
-    } else {
-        replaceFn = isSearchNotNull ? (searchValue as any)[replaceSymbol] : null;
-        if (isFunction(replaceFn)) {
-            return replaceFn.call(searchValue, theValue, replaceValue);
+        if (!replaceSym && _isRegExpObj(searchValue)) {
+            // On a runtime without Symbol.replace (eg. IE) a RegExp is used like its native [Symbol.replace]
+            return strReplace(_toString(value), searchValue as RegExp, replaceValue as any);
         }
-
-        let search = isString(searchValue) ? searchValue : asString(searchValue);
-
-        matcher = createLiteralRegex(search);
     }
 
-    return strReplace(theValue, matcher, replaceValue as any);
+    // Like the native function the value and then the searchValue are converted to strings (a Symbol throws a TypeError)
+    // and every occurrence of the searchValue is replaced
+    let theValue = _toString(value);
+
+    return strReplace(theValue, createLiteralRegex(_toString(searchValue)), replaceValue as any);
 }

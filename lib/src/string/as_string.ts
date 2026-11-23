@@ -6,8 +6,12 @@
  * Licensed under the MIT license.
  */
 
-import { StrCls } from "../internal/constants";
-import { _pureAssign } from "../internal/treeshake_helpers";
+import { EMPTY, StrCls, StrProto } from "../internal/constants";
+import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
+import { fnCall } from "../funcs/funcs";
+
+// The intrinsic String.prototype.concat (captured, so one which is replaced later isn't used)
+const _strConcat = (/*#__PURE__*/_pureRef<typeof String.prototype.concat>(StrProto, "concat"));
 
 /**
  * The asString() method returns a string representing the value by
@@ -30,3 +34,17 @@ import { _pureAssign } from "../internal/treeshake_helpers";
  * ```
  */
 export const asString: (value: any) => string = (/*#__PURE__*/_pureAssign(StrCls));
+
+/**
+ * @internal
+ * @ignore
+ * Converts the value to a string like the native ToString() (which the String.prototype functions use for their `this`
+ * and string arguments), so (unlike asString()) a Symbol throws a TypeError and an object is converted (once) using
+ * its Symbol.toPrimitive("string") or its toString() / valueOf()
+ * @param value - The value to convert
+ * @returns The string
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function _toString(value: any): string {
+    return fnCall(_strConcat, EMPTY, value);
+}

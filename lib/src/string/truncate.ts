@@ -10,7 +10,7 @@ import { isNullOrUndefined } from "../helpers/base";
 import { EMPTY, LENGTH } from "../internal/constants";
 import { _cutLength } from "../internal/surrogate";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
-import { mathToInt } from "../math/to_int";
+import { _toInt } from "../helpers/length";
 import { asString } from "./as_string";
 import { strLeft } from "./substring";
 
@@ -50,7 +50,8 @@ export function strTruncate(value: string, maxLength: number, suffix?: string): 
     _throwIfNullOrUndefined(value);
 
     let result: string;
-    let length = mathToInt(maxLength);
+    // Converted to an integer (NaN is 0)
+    let length = _toInt(maxLength);
 
     if (length > 0) {
         result = asString(value);

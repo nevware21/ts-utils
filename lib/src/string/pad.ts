@@ -7,37 +7,51 @@
  */
 
 import { isStrictUndefined } from "../helpers/base";
-import { EMPTY, LENGTH, StrProto, SUBSTRING } from "../internal/constants";
+import { throwRangeError } from "../helpers/throw";
+import { LENGTH, StrProto, SUBSTRING } from "../internal/constants";
+import { _throwIfNullOrUndefined } from "../internal/throwIf";
+import { _toInt } from "../helpers/length";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
-import { mathToInt } from "../math/to_int";
-import { asString } from "./as_string";
+import { _toString } from "./as_string";
 
+/**
+ * The shared implementation of polyStrPadStart() and polyStrPadEnd(), like the native functions null or undefined
+ * throws a TypeError, the value is converted to a string, then the targetLength to a length (ToLength, so NaN and a
+ * negative value are 0 and a fraction is truncated) and (only when the value is shorter) the padString to a string (a
+ * Symbol throws a TypeError, and only undefined uses the default). An empty padString returns the value as-is.
+ */
 /*#__NO_SIDE_EFFECTS__*/
-function _padValue(value: string, targetLength: number, padString?: string) {
-    let result = EMPTY;
-    targetLength = mathToInt(targetLength, true);
-    targetLength >>= 0;
+function _strPad(value: string, targetLength: number, padString: string, atStart: boolean): string {
+    _throwIfNullOrUndefined(value);
+    let theValue = _toString(value);
+    let maxLength = _toInt(targetLength);
 
-    let len = value[LENGTH];
-    if (len < targetLength) {
-        // Like the native functions only an undefined padString uses the default, any other value (including null) is
-        // converted into a string
-        result = isStrictUndefined(padString) ? " " : asString(padString);
-        targetLength = targetLength - len;
+    let len = theValue[LENGTH];
+    if (len < maxLength) {
+        let result = isStrictUndefined(padString) ? " " : _toString(padString);
+        maxLength -= len;
 
-        // Doubled until it is long enough (only adding what is missing, so it is never longer than the result, which
-        // may be close to the maximum length of a string) and then truncated to remove any extra from a long padString.
-        // An empty padString can't pad the value so it is returned as-is (rather than doubling "" forever). This doesn't
-        // use strRepeat() so the polyfills don't include its polyfill. The result is always a primitive string, so its
-        // own substring() is called directly (rather than via strSubstring(), which is slower)
-        while (result && result[LENGTH] < targetLength) {
-            result += result[SUBSTRING](0, targetLength - result[LENGTH]);
+        if (result) {
+            // Like the native functions a padded string which is longer than a string can be throws a RangeError (rather
+            // than first building a string up to the runtime's limit, which is less than 2^31 for every runtime)
+            if (maxLength > 0x7FFFFFFF) {
+                throwRangeError("Invalid string length");
+            }
+
+            // Doubled until it is long enough (only adding what is missing, so it is never longer than the result, which
+            // may be close to the maximum length of a string) and then truncated to remove any extra from a long
+            // padString. This doesn't use strRepeat() so the polyfills don't include its polyfill. The result is always a
+            // primitive string, so its own substring() is called directly (rather than via strSubstring(), which is slower)
+            while (result[LENGTH] < maxLength) {
+                result += result[SUBSTRING](0, maxLength - result[LENGTH]);
+            }
+
+            result = result[SUBSTRING](0, maxLength);
+            theValue = atStart ? result + theValue : theValue + result;
         }
-
-        result = result[SUBSTRING](0, targetLength);
     }
 
-    return result;
+    return theValue;
 }
 
 /**
@@ -86,7 +100,7 @@ export const strPadEnd: (value: string, targetLength: number, padString?: string
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyStrPadStart(value: string, targetLength: number, padString?: string): string {
-    return _padValue(value, targetLength, padString) + value;
+    return _strPad(value, targetLength, padString, true);
 }
 
 /**
@@ -103,5 +117,5 @@ export function polyStrPadStart(value: string, targetLength: number, padString?:
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyStrPadEnd(value: string, targetLength: number, padString?: string): string {
-    return value + _padValue(value, targetLength, padString);
+    return _strPad(value, targetLength, padString, false);
 }
