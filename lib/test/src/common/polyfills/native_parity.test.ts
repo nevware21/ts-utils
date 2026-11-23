@@ -32,6 +32,7 @@ import { getGlobal } from "../../../../src/helpers/environment";
 import { _initTestHooks, setBypassLazyCache } from "../../../../src/helpers/lazy";
 import { polyStrSymSplit } from "../../../../src/polyfills/split";
 import { POLYFILL_TYPE_NAME } from "../../../../src/internal/poly_helpers";
+import { _getGlobalConfig } from "../../../../src/internal/global";
 
 // The polyfills (and the helpers which work like a native function) compared with the native functions, for the
 // values and operations (eg. how often a getter or valueOf() is called) where they used to be different
@@ -631,6 +632,78 @@ describe("polyfills match the native functions", () => {
             assert.isUndefined(polyGetKnownSymbol("toString"));
             assert.isUndefined(polyGetKnownSymbol("constructor"));
             assert.ok(polyGetKnownSymbol("iterator"), "A well-known symbol");
+        });
+
+        it("polySymbolKeyFor() finds the key by the symbol's identity (without reading its description), like Symbol.keyFor()", () => {
+            const sym: any = polySymbolFor("keyFor by identity");
+            let reads = 0;
+            Object.defineProperty(sym, "description", {
+                get: () => {
+                    reads++;
+                    return "another key";
+                },
+                configurable: true
+            });
+
+            assert.equal(polySymbolKeyFor(sym), "keyFor by identity", "A redefined description doesn't change the key");
+            assert.equal(reads, 0, "The description isn't read");
+            assert.isUndefined(polySymbolKeyFor(polyNewSymbol("keyFor by identity")), "A symbol which isn't registered has no key");
+            assert.equal(Symbol.keyFor(Symbol.for("keyFor by identity")), "keyFor by identity", "Symbol.keyFor");
+        });
+
+        it("polySymbolKeyFor() returns the key of a symbol which an earlier version added to the shared registry", () => {
+            polySymbolFor("the registry exists");
+            const registry: any = _getGlobalConfig().gblSym;
+
+            // Like a polyfill symbol of an earlier version, which isn't in the registry's polyfill symbols (its WeakMap)
+            const earlier: any = Object.create(null);
+            Object.defineProperty(earlier, "description", { value: "an earlier version's key" });
+            Object.defineProperty(earlier, POLYFILL_TYPE_NAME, { value: "symbol" });
+            registry.k["an earlier version's key"] = earlier;
+            try {
+                assert.strictEqual(polySymbolFor("an earlier version's key"), earlier, "The registry's symbol is returned");
+                assert.equal(polySymbolKeyFor(earlier), "an earlier version's key");
+            } finally {
+                delete registry.k["an earlier version's key"];
+            }
+        });
+
+        it("an object whose polyfill type is an accessor isn't a symbol (an inherited Object.prototype value isn't used), like the native functions", () => {
+            polySymbolFor("the registry exists");
+            const registry: any = _getGlobalConfig().gblSym;
+            const syms = registry.w;
+            let typeReads = 0;
+            const desc: any = {
+                toString: () => "converted"
+            };
+            Object.defineProperty(desc, POLYFILL_TYPE_NAME, {
+                get: () => {
+                    typeReads++;
+                    return "symbol";
+                },
+                configurable: true
+            });
+
+            let sym: any;
+            let error: any;
+            try {
+                // Without the registry's WeakMap (like a runtime without a Proxy, eg. IE) a polyfill symbol is identified by
+                // its own type, and the descriptor of an accessor has no value, so Object.prototype.value would be read
+                delete registry.w;
+                Object.defineProperty(Object.prototype, "value", { value: "symbol", configurable: true, writable: true });
+                sym = polyNewSymbol(desc);
+            } catch (e) {
+                error = e;
+            } finally {
+                // Restored before any assert is used
+                delete (Object.prototype as any).value;
+                registry.w = syms;
+            }
+
+            assert.isUndefined(error, "An object with an accessor polyfill type isn't a symbol");
+            assert.equal(sym.description, "converted", "Like Symbol(), the object is converted");
+            assert.equal(typeReads, 0, "The accessor isn't called");
+            assert.equal(Symbol(desc).description, "converted", "Symbol()");
         });
     });
     describe("polyStrPadStart and polyStrPadEnd", () => {

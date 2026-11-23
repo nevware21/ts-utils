@@ -60,8 +60,10 @@ function _isPolySymbol(value: any): boolean {
         if (syms) {
             result = syms.has(value);
         } else {
+            // Only an own data property, as the descriptor of an accessor has no value (so desc.value would read an
+            // inherited Object.prototype.value)
             let desc = _objGetOwnPropertyDescriptor(value, POLYFILL_TYPE_NAME);
-            result = !!desc && desc.value === SYMBOL_TYPE;
+            result = !!desc && objHasOwn(desc, "value") && desc.value === SYMBOL_TYPE;
         }
     }
 
@@ -183,16 +185,21 @@ export function polySymbolKeyFor(sym: symbol): string | undefined {
         return (Symbol as any).keyFor(sym);
     }
 
+    // Like the native registry the key is found by the symbol's identity, so nothing is read from the value (eg. its
+    // description, which can be redefined), and a symbol which an earlier version added to the shared registry (which
+    // isn't identified where there is a Proxy, see _isPolySymbol()) still has its key
+    let keys = _globalSymbolRegistry().k;
+    for (let key in keys) {
+        if (objHasOwn(keys, key) && keys[key] === sym) {
+            return key;
+        }
+    }
+
     if (!_isPolySymbol(sym)) {
         _throwTypeOf(sym, " is not a symbol");
     }
 
-    // Like the native registry, only the symbol which the registry has for its key (its description) has a key, so the
-    // symbol itself is identified (rather than by calling a function of the value)
-    let registry = _globalSymbolRegistry();
-    let key = (sym as any).description;
-
-    return objHasOwn(registry.k, key) && registry.k[key] === sym ? key : UNDEF_VALUE;
+    return UNDEF_VALUE;
 }
 
 /**
