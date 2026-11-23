@@ -12,7 +12,6 @@ import { polyArrFrom } from "../../../../src/polyfills/array";
 import { mathToInt } from "../../../../src/math/to_int";
 import { polyObjCreate } from "../../../../src/object/create";
 import { polyObjFromEntries } from "../../../../src/polyfills/object/objFromEntries";
-import { polyObjKeys } from "../../../../src/polyfills/object/objKeys";
 import { polySymbolKeyFor } from "../../../../src/polyfills/symbol";
 
 describe("diagnostic helpers", () => {
@@ -319,7 +318,6 @@ describe("error messages limit the dump of a value", () => {
             ["polyObjCreate", () => polyObjCreate(big), TypeError],
             ["polyObjFromEntries entry", () => polyObjFromEntries([big] as any), TypeError],
             ["polyObjFromEntries iterable", () => polyObjFromEntries({ v: big } as any), TypeError],
-            ["polyObjKeys", () => polyObjKeys(big), TypeError],
             ["polyArrFrom", () => polyArrFrom([1], { v: big } as any), TypeError],
             ["polySymbolKeyFor", () => polySymbolKeyFor(big as any), TypeError]
         ];

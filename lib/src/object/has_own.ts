@@ -6,11 +6,13 @@
  * Licensed under the MIT license.
  */
 
-import { _objGetOwnPropertyDescriptor } from "../internal/own_props";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
-import { ObjClass } from "../internal/constants";
-import { objHasOwnProperty } from "./has_own_prop";
+import { ObjClass, ObjProto } from "../internal/constants";
+import { fnCall } from "../funcs/funcs";
+
+// The intrinsic Object.prototype.hasOwnProperty (so one which has been replaced isn't used)
+const _objHasOwnProperty: (this: any, prop: PropertyKey) => boolean = (/*#__PURE__*/_pureRef<typeof Object.prototype.hasOwnProperty>(ObjProto, "hasOwnProperty"));
 
 
 /**
@@ -92,8 +94,10 @@ export const objHasOwn: <T = any>(obj: T, prop: PropertyKey) => boolean = (/*#__
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyObjHasOwn<T = any>(obj: T, prop: PropertyKey): boolean {
-    // Ensure we're working with an object
+    // Like the native function null or undefined throws a TypeError (before the key is converted), then any other value
+    // is converted to an object (so a primitive, eg. "" which has a length, works on an ES5 runtime) and the key is
+    // converted once
     _throwIfNullOrUndefined(obj);
-        
-    return objHasOwnProperty(obj, prop) || !!_objGetOwnPropertyDescriptor(obj, prop)
+
+    return fnCall(_objHasOwnProperty, obj, prop);
 }

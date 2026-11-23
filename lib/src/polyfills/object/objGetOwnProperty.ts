@@ -6,38 +6,31 @@
  * Licensed under the MIT license.
  */
 
-import { arrForEach } from "../../array/forEach";
 import { arrIndexOf } from "../../array/indexOf";
 import { isArray, isString } from "../../helpers/base";
-import { GET_OWN_PROPERTY_NAMES, GET_OWN_PROPERTY_SYMBOLS, LENGTH, ObjClass, ObjProto } from "../../internal/constants";
-import { _objGetOwnPropertyDescriptor } from "../../internal/own_props";
-import { _returnEmptyArray } from "../../internal/stubs";
+import { LENGTH, NULL_VALUE, ObjClass, ObjProto, UNDEFINED, UNDEF_VALUE } from "../../internal/constants";
+import { _objGetOwnPropertyDescriptor, _objGetOwnPropertyNames, _objGetOwnPropertySymbols } from "../../internal/own_props";
 import { _throwIfNullOrUndefined } from "../../internal/throwIf";
-import { _pureAssign, _pureRef } from "../../internal/treeshake_helpers";
-import { polyObjHasOwn } from "../../object/has_own";
-import { getKnownSymbol } from "../../symbol/symbol";
-import { WellKnownSymbols } from "../../symbol/well_known";
+import { _pureRef } from "../../internal/treeshake_helpers";
+import { _setOwnValue } from "../../object/define";
 
-/**
- * An internal flag to prevent recursion when calling polyObjGetOwnPropertyDescriptors
- * from within itself. This is necessary to avoid infinite loops in certain environments.
- */
-let _recursionCheckOwnDescriptors: boolean;
+// The shared _objGetOwnPropertyDescriptor, _objGetOwnPropertyNames and _objGetOwnPropertySymbols are from own_props,
+// which has no polyfill dependencies (avoiding tree-shaking issues with the polyfill and circular references). The
+// symbols come from the native Object.getOwnPropertySymbols() (none without it): every runtime with a native Symbol
+// has it, and without Symbol a polyfill symbol is a string key, so getOwnPropertyNames() already returns it (the
+// well-known symbol polyfill, which an earlier version used, isn't needed and would add the Symbol polyfill)
 
-/**
- * An internal flag to prevent recursion when calling polyObjGetOwnPropertySymbols
- * from within itself. This is necessary to avoid infinite loops in certain environments.
- */
-let _recursionCheckOwnSymbols: boolean;
-
-// Defining these locally to avoid tree-shaking issues with the polyfill and circular references (the shared
-// _objGetOwnPropertyDescriptor is from own_props, which has no polyfill dependencies). Unlike the shared one, a
-// runtime without Object.getOwnPropertySymbols() uses the polyfill, which finds the well-known symbols
-const _objGetOwnPropertyNames: (obj: any) => string[] = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertyNames>(ObjClass, GET_OWN_PROPERTY_NAMES)), _returnEmptyArray));
-const _objGetOwnPropertySymbols: (obj: any) => symbol[] = (/* #__PURE__ */_pureAssign((/* #__PURE__ */_pureRef<typeof Object.getOwnPropertySymbols>(ObjClass, GET_OWN_PROPERTY_SYMBOLS)), _polyObjGetOwnPropertySymbols));
+// The native Reflect.ownKeys() (when there is one), which (like the native Object.getOwnPropertyDescriptors()) reads
+// every own key (names and symbols) once, eg. a Proxy's ownKeys trap is only called once
+const _reflectOwnKeys: (obj: any) => PropertyKey[] = (/* #__PURE__ */_pureRef<any>(typeof Reflect !== UNDEFINED ? Reflect : NULL_VALUE, "ownKeys"));
 
 /**
  * Polyfill implementation of Object.getOwnPropertyDescriptors for environments where it doesn't exist.
+ *
+ * Like the native function the value is converted to an object (so `null` and `undefined` throw a `TypeError`), its
+ * own keys (names and symbols) are read once, and the descriptor of each one is added as an own property of the
+ * result (so a `__proto__` key doesn't change the result's prototype, and a setter or read-only property of the same
+ * name on `Object.prototype` doesn't stop it being added).
  * @since 0.12.0
  * @group Polyfill
  * @group Object
@@ -46,74 +39,24 @@ const _objGetOwnPropertySymbols: (obj: any) => symbol[] = (/* #__PURE__ */_pureA
  */
 export function polyObjGetOwnPropertyDescriptors(obj: any): PropertyDescriptorMap {
     const result: PropertyDescriptorMap = {};
-        
-    // Ensure we're working with an object
+
     _throwIfNullOrUndefined(obj);
+    let theObj = ObjClass(obj);
 
-    if (!_recursionCheckOwnDescriptors) {
-        // Add the descriptor for each property
-        const _addDescriptor = (key: PropertyKey) => {
-            const descriptor = _objGetOwnPropertyDescriptor(obj, key);
-            if (descriptor !== undefined) {
-                result[key as any] = descriptor;
-            }
-        };
-
-        try {
-            _recursionCheckOwnDescriptors = true;
-
-            // Get all property names, including non-enumerable ones if the environment supports it, and the
-            // symbol properties, every symbol when there is a native Object.getOwnPropertySymbols() (eg. a runtime
-            // with Symbol but without Object.getOwnPropertyDescriptors()), otherwise only the well-known symbols
-            arrForEach(_objGetOwnPropertyNames(obj), _addDescriptor);
-            arrForEach(_objGetOwnPropertySymbols(obj), _addDescriptor);
-        } finally {
-            _recursionCheckOwnDescriptors = false;
+    // Every own key, read once with Reflect.ownKeys() when there is one, otherwise the property names (including
+    // non-enumerable ones) and the symbols (none without a native Object.getOwnPropertySymbols(), see above)
+    // The keys are looped here (rather than with arrForEach), so a replaced Function.prototype.call isn't used
+    let keys = _reflectOwnKeys ? _reflectOwnKeys(theObj) : (_objGetOwnPropertyNames(theObj) as PropertyKey[]).concat(_objGetOwnPropertySymbols(theObj));
+    for (let idx = 0; idx < keys[LENGTH]; idx++) {
+        const descriptor = _objGetOwnPropertyDescriptor(theObj, keys[idx]);
+        if (descriptor !== UNDEF_VALUE) {
+            _setOwnValue(result, keys[idx], descriptor);
         }
     }
 
     return result;
 }
 
-/**
- * Polyfill implementation for Object.getOwnPropertySymbols, this only returns the well known symbols
- * and not any user defined or unique (non-registered) symbols.
- * @internal Not directly exported, only used for polyfillling
- * @since 0.12.0
- * @group Polyfill
- * @group Object
- * @param obj - The object whose symbol properties are to be returned
- * @returns An array of all symbol properties found directly upon the given object
- */
-export function _polyObjGetOwnPropertySymbols(obj: any): symbol[] {
-    let result: any = [];
-    let objHasOwn = (ObjClass as any).hasOwn || polyObjHasOwn;
-
-    if (!_recursionCheckOwnSymbols) {
-        // Custom implementation for environments without native support but with Symbol
-        try {
-            _recursionCheckOwnSymbols = true;
-
-            // First check all well-known symbols
-            let symEnum: WellKnownSymbols = WellKnownSymbols.asyncIterator;
-            while (symEnum <= WellKnownSymbols.unscopables) {
-                var sym = getKnownSymbol(symEnum);
-                
-                // Check if this symbol exists as an own property on the object
-                // using objHasOwn instead of objHasOwnProperty to catch non-enumerable symbols
-                if (sym && objHasOwn(obj, sym)) {
-                    result.push(sym);
-                }
-
-                symEnum++;
-            }
-        } finally {
-            _recursionCheckOwnSymbols = false;
-        }
-    }
-    
-    return result;
-}
 
 
 /**

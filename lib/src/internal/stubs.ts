@@ -16,14 +16,3 @@
 export function _returnNothing<T>(): T | undefined {
     return;
 }
-
-/**
- * Stub function that returns an empty array.
- * This is used as a placeholder for polyfills or other functions that expect an array return value.
- * @internal
- * @returns An empty array of type T
- * @template T - The type of the array elements
- */
-export function _returnEmptyArray<T>(): T[] {
-    return [];
-}

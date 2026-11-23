@@ -8,6 +8,11 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { polyArrFind, polyArrFindLast } from "../../../../src/polyfills/array";
+import { polyObjFromEntries } from "../../../../src/polyfills/object/objFromEntries";
+import { polyObjGetOwnPropertyDescriptors } from "../../../../src/polyfills/object/objGetOwnProperty";
+import { polyObjEntries, polyObjKeys, polyObjValues } from "../../../../src/polyfills/object/objKeys";
+import { polyObjPreventExtensions } from "../../../../src/polyfills/object/objPreventExtensions";
+import { polyObjHasOwn } from "../../../../src/object/has_own";
 import { polyArrWith } from "../../../../src/array/with";
 import { polyArrFlatMap } from "../../../../src/array/flatMap";
 import { polyStrSubstr } from "../../../../src/string/substring";
@@ -89,6 +94,104 @@ describe("polyfills match the native functions", () => {
             reads = 0;
             assert.equal(polyArrFindLast(arrayLike, () => true), "x");
             assert.equal(reads, 1, "polyArrFindLast read the element once");
+        });
+    });
+
+    describe("polyObjFromEntries", () => {
+        it("converts an object key once and keeps a symbol (eg. from a Symbol object or Symbol.toPrimitive), like Object.fromEntries", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            const symObj = Object(Symbol.for("polyObjFromEntries.symObj"));
+            const toPrim: any = {};
+            toPrim[Symbol.toPrimitive] = () => Symbol.for("polyObjFromEntries.toPrim");
+            const calls: string[] = [];
+            const objKey = {
+                toString: () => {
+                    calls.push("toString");
+                    return "k";
+                }
+            };
+
+            const result: any = polyObjFromEntries([[symObj, 1], [toPrim, 2], [objKey, 3]] as any);
+
+            assert.equal(result[Symbol.for("polyObjFromEntries.symObj")], 1, "The Symbol object key");
+            assert.equal(result[Symbol.for("polyObjFromEntries.toPrim")], 2, "The Symbol.toPrimitive key");
+            assert.equal(result.k, 3, "The object key");
+            assert.deepEqual(calls, ["toString"], "The object key was converted once");
+
+            const nativeFromEntries = (Object as any).fromEntries;
+            if (nativeFromEntries) {
+                const nativeResult: any = nativeFromEntries([[symObj, 1], [toPrim, 2]]);
+                assert.equal(nativeResult[Symbol.for("polyObjFromEntries.symObj")], 1, "Object.fromEntries: the Symbol object key");
+                assert.equal(nativeResult[Symbol.for("polyObjFromEntries.toPrim")], 2, "Object.fromEntries: the Symbol.toPrimitive key");
+            }
+        });
+    });
+
+    describe("polyObjGetOwnPropertyDescriptors", () => {
+        it("adds an own __proto__ key (without changing the result's prototype), like Object.getOwnPropertyDescriptors", () => {
+            const value = JSON.parse("{\"__proto__\": { \"x\": 1 }, \"b\": 2}");
+            const result = polyObjGetOwnPropertyDescriptors(value);
+
+            assert.deepEqual(Object.getOwnPropertyNames(result), ["__proto__", "b"]);
+            assert.strictEqual(Object.getPrototypeOf(result), Object.prototype, "The prototype wasn't changed");
+            assert.deepEqual((Object.getOwnPropertyDescriptor(result, "__proto__") as any).value.value, { x: 1 });
+
+            const nativeFn = (Object as any).getOwnPropertyDescriptors;
+            if (nativeFn) {
+                assert.deepEqual(Object.getOwnPropertyNames(nativeFn(value)), ["__proto__", "b"], "Object.getOwnPropertyDescriptors");
+            }
+        });
+
+        it("adds a key which has a setter on Object.prototype", () => {
+            let setterCalls = 0;
+            let keys: string[];
+            try {
+                Object.defineProperty(Object.prototype, "polyDescriptorsKey", {
+                    set: () => {
+                        setterCalls++;
+                    },
+                    configurable: true
+                });
+
+                keys = Object.keys(polyObjGetOwnPropertyDescriptors({ polyDescriptorsKey: 1, a: 2 }));
+            } finally {
+                delete (Object.prototype as any).polyDescriptorsKey;
+            }
+
+            assert.deepEqual(keys, ["polyDescriptorsKey", "a"]);
+            assert.equal(setterCalls, 0, "The Object.prototype setter wasn't called");
+        });
+
+        it("reads the own keys of a Proxy once, and works when it is called again from a trap", function() {
+            if (!hasProxy) {
+                this.skip();
+                return;
+            }
+
+            const traps: string[] = [];
+            let nested: any;
+            const proxy = new Proxy({ a: 1, b: 2 }, {
+                ownKeys: (target: any) => {
+                    traps.push("ownKeys");
+                    return Reflect.ownKeys(target);
+                },
+                getOwnPropertyDescriptor: (target: any, key: PropertyKey) => {
+                    if (key === "a" && !nested) {
+                        // Called again (re-entrantly) for another object
+                        nested = polyObjGetOwnPropertyDescriptors({ c: 3 });
+                    }
+
+                    return Reflect.getOwnPropertyDescriptor(target, key);
+                }
+            });
+
+            assert.deepEqual(Object.keys(polyObjGetOwnPropertyDescriptors(proxy)), ["a", "b"]);
+            assert.deepEqual(traps, ["ownKeys"], "The ownKeys trap was called once");
+            assert.deepEqual(Object.keys(nested), ["c"], "The nested call returned the descriptors");
         });
     });
 
@@ -244,6 +347,129 @@ describe("polyfills match the native functions", () => {
             assert.deepEqual(nativeFlatMap.call([1, 2], mapper("native")), [1, 10, 2, 20], "Array.prototype.flatMap");
             assert.equal(reads.poly, 2, "The length of each returned array was read once");
             assert.equal(reads.native, 2, "Array.prototype.flatMap read each length once");
+        });
+    });
+
+    describe("polyObjHasOwn", () => {
+        it("works for a primitive (eg. a string's length) and converts the key once, like Object.hasOwn", () => {
+            const calls: string[] = [];
+            const key = {
+                toString: () => {
+                    calls.push("toString");
+                    return "zz";
+                }
+            };
+
+            assert.isTrue(polyObjHasOwn("", "length"), "\"\" has its own length");
+            assert.isFalse(polyObjHasOwn("abc", "x"));
+            assert.isFalse(polyObjHasOwn(0, "x"));
+            assert.isFalse(polyObjHasOwn({}, key as any));
+            assert.deepEqual(calls, ["toString"], "The key was converted once");
+            assert.throws(() => polyObjHasOwn(null, "x"), TypeError);
+
+            const nativeHasOwn = (Object as any).hasOwn;
+            if (nativeHasOwn) {
+                assert.isTrue(nativeHasOwn("", "length"), "Object.hasOwn");
+            }
+        });
+    });
+
+    describe("polyObjKeys, polyObjEntries and polyObjValues", () => {
+        it("return the keys of a primitive or a function (only null and undefined throw), like Object.keys (ES2015+)", () => {
+            const fn: any = function() {
+                // Empty
+            };
+            fn.a = 1;
+
+            assert.deepEqual(polyObjKeys("ab"), ["0", "1"]);
+            assert.deepEqual(polyObjKeys(1), []);
+            assert.deepEqual(polyObjKeys(true), []);
+            assert.deepEqual(polyObjKeys(fn), ["a"]);
+            assert.throws(() => polyObjKeys(null), TypeError);
+            assert.throws(() => polyObjKeys(undefined), TypeError);
+            assert.deepEqual(Object.keys("ab"), ["0", "1"], "Object.keys");
+            assert.deepEqual(Object.keys(fn), ["a"], "Object.keys");
+        });
+
+        it("skip a key which a getter made non-enumerable before it was reached, like Object.entries / Object.values", () => {
+            function _create(): any {
+                const value: any = { b: 2 };
+                Object.defineProperty(value, "a", {
+                    get: function(this: any) {
+                        Object.defineProperty(this, "b", { enumerable: false });
+                        return 1;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+
+                return value;
+            }
+
+            // Like the native functions the keys are in property creation order, "b" was created first
+            const nativeEntries = (Object as any).entries;
+            const expectedEntries = nativeEntries ? nativeEntries(_create()) : [["b", 2], ["a", 1]];
+            assert.deepEqual(polyObjEntries(_create()), expectedEntries);
+
+            // A getter which is reached first makes the later key non-enumerable
+            const getterFirst: any = {};
+            Object.defineProperty(getterFirst, "a", {
+                get: function(this: any) {
+                    Object.defineProperty(this, "b", { enumerable: false });
+                    return 1;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            getterFirst.b = 2;
+
+            assert.deepEqual(polyObjEntries(getterFirst), [["a", 1]]);
+
+            const getterFirst2: any = {};
+            Object.defineProperty(getterFirst2, "a", {
+                get: function(this: any) {
+                    Object.defineProperty(this, "b", { enumerable: false });
+                    return 1;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            getterFirst2.b = 2;
+            assert.deepEqual(polyObjValues(getterFirst2), [1]);
+        });
+
+        it("read the own keys of a Proxy once and each descriptor once", function() {
+            if (!hasProxy) {
+                this.skip();
+                return;
+            }
+
+            const traps: string[] = [];
+            const proxy = new Proxy({ a: 1, b: 2 }, {
+                ownKeys: (target: any) => {
+                    traps.push("ownKeys");
+                    return Reflect.ownKeys(target);
+                },
+                getOwnPropertyDescriptor: (target: any, key: PropertyKey) => {
+                    traps.push("gOPD " + String(key));
+                    return Reflect.getOwnPropertyDescriptor(target, key);
+                },
+                getPrototypeOf: (target: any) => {
+                    traps.push("getPrototypeOf");
+                    return Reflect.getPrototypeOf(target);
+                }
+            });
+
+            assert.deepEqual(polyObjEntries(proxy), [["a", 1], ["b", 2]]);
+            assert.deepEqual(traps, ["ownKeys", "gOPD a", "gOPD b"]);
+        });
+    });
+
+    describe("polyObjPreventExtensions", () => {
+        it("returns a primitive value, like Object.preventExtensions (ES2015+)", () => {
+            assert.strictEqual(polyObjPreventExtensions(1), 1);
+            assert.strictEqual(polyObjPreventExtensions("abc"), "abc");
+            assert.strictEqual(Object.preventExtensions(1 as any), 1, "Object.preventExtensions");
         });
     });
     describe("polyStrPadStart and polyStrPadEnd", () => {
