@@ -166,9 +166,11 @@ export function _createIndexIterator<T>(values: ArrayLike<T>): Iterator<T> {
     return {
         next: () => {
             let index = idx;
-            if (values && index < _checkArrayLength(_toLength(values))) {
+            let theValues = values;
+            if (theValues && index < _checkArrayLength(_toLength(theValues))) {
+                values = theValues;
                 idx = index + 1;
-                return { value: values[index] } as IteratorResult<T>;
+                return { value: theValues[index] } as IteratorResult<T>;
             }
 
             values = NULL_VALUE;
