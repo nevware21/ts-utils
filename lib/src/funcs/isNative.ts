@@ -121,7 +121,7 @@ export function isConstructor(value: any): value is (new (...args: any[]) => any
         } else {
             try {
                 // A {} is only an instance of Object (or a function whose prototype is Object.prototype)
-                result = ({} instanceof value) || !isGenerator(value);
+                result = (({} instanceof value) || result) && !isGenerator(value);
             } catch (e) {
                 result = false;
             }
