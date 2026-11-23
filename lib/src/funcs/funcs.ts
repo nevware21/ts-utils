@@ -6,8 +6,94 @@
  * Licensed under the MIT license.
  */
 
-import { FuncApply, FuncBind, FuncCall } from "../internal/constants";
+import { ArrSlice, CALL, FuncApply, FuncBind, FuncCall, LENGTH } from "../internal/constants";
 import { BoundFunction } from "./types";
+
+/**
+ * Creates a new function that when called will set the value of `thisArg` as the `this` keyword
+ * value when calling the provided `fn` instance, and all of the arguments passed to the new
+ * function will be passed along to the original provided instance (after any `argArray` arguments
+ * which are bound to it).
+ *
+ * `fnBind` is the intrinsic `Function.prototype.bind` bound to the intrinsic `Function.prototype.call`, so
+ * `fnBind(fn, thisArg, ...argArray)` is `fn.bind(thisArg, ...argArray)` without any wrapper function, and it doesn't
+ * depend on the `bind`, `call` or `apply` properties of `fn` (which may have been overridden). On a runtime
+ * without the native `Function.prototype.bind` (eg. ES3) it is a polyfill which returns a function that calls `fn`
+ * with `thisArg` and the bound arguments followed by its own arguments, using the intrinsic
+ * `Function.prototype.apply` (unlike a native bound function it can't be called with `new`, and it doesn't have the
+ * `name` and `length` of `fn`). Which one is used is resolved once, when the module is loaded.
+ * @function
+ * @since 0.9.8
+ * @group Function
+ * @param fn - The function instance to be called
+ * @param thisArg - The value to be used as the `this` when calling the `fn`
+ * @param argArray - Zero or more arguments to pre-bind to the function
+ * @returns The new (bound) function, which returns the value returned by the original `fn` after executing with
+ * the provided `thisArg`.
+ * @example
+ * ```ts
+ * const module1 = {
+ *     x: 21,
+ *     getX() {
+ *         return this.x;
+ *     },
+ * };
+ *
+ * // The 'this' parameter of 'getX' is bound to 'module'.
+ * console.log(module1.getX()); // 21
+ *
+ * // Create a new function 'boundGetX' with the 'this' parameter bound to 'module'.
+ * let module2 = {
+ *     x: 42
+ * };
+ *
+ * module2.getX = fnBind(module1.getX, module2);
+ * module2.getX(); // 42
+ *
+ * // It can also be used to proxy to the original function from the new one
+ * module2.getX = fnBind(module1.getX, module1);
+ * module2.getX(); // 21
+ *
+ * // A less-specific `Function`-typed call site, where the concrete parameter list is not available
+ * const host = {
+ *     prefix: "Hello",
+ *     log(value: string) {
+ *         return this.prefix + " " + value;
+ *     }
+ * };
+ *
+ * const dynamicLog: Function = host.log;
+ * const bound = fnBind(dynamicLog, host);
+ *
+ * bound("friend"); // "Hello friend"
+ * ```
+ */
+export const fnBind: {
+    /**
+     * Binds the `thisArg` to the `fn`, the new function is called with its own arguments
+     */
+    <F extends (...args: any[]) => any, T>(fn: F, thisArg: T): F;
+
+    /**
+     * Binds the `thisArg` and the `argArray` arguments to the `fn`, the new function is called with the bound
+     * arguments followed by its own arguments
+     */
+    <F extends (...args: any[]) => any, T, TArgs extends any[]>(fn: F, thisArg: T, ...argArray: TArgs): BoundFunction<F, TArgs>;
+
+    /**
+     * Fallback overload for less-specific `Function`-typed call sites where the concrete parameter
+     * list is not available, such as dynamic proxy wiring.
+     */
+    <F extends Function, T>(fn: F, thisArg: T, ...argArray: any[]): F;
+} = (FuncBind ? /*#__PURE__*/FuncCall.bind(FuncBind) : function (fn: Function, thisArg: any) {
+    // The polyfill (eg. ES3): the bound arguments are copied as they are kept, and the arguments of the new function are
+    // passed as-is when there are no bound arguments
+    let boundArgs = ArrSlice[CALL](arguments, 2);
+
+    return function () {
+        return FuncApply[CALL](fn, thisArg, boundArgs[LENGTH] ? boundArgs.concat(ArrSlice[CALL](arguments)) : arguments);
+    };
+});
 
 /**
  * The `fnApply` function calls the specified `fn` function with the given `thisArg` as the `this` value,
@@ -27,7 +113,9 @@ import { BoundFunction } from "./types";
  * `fnApply(fn, thisArg, argArray)` is `fn.apply(thisArg, argArray)` without any wrapper function, and it doesn't
  * depend on the `call` or `apply` properties of `fn` (which may have been overridden). As it is a bound intrinsic
  * function, when `fn` is not a function the `TypeError` thrown by the runtime names `fnApply` (or the name it was
- * imported as) rather than `fn`, eg. `"fnApply is not a function"` (since 0.20.0).
+ * imported as) rather than `fn`, eg. `"fnApply is not a function"` (since 0.20.0). It is created with
+ * {@link fnBind}, so on a runtime without the native `Function.prototype.bind` (eg. ES3) it is a function which calls
+ * the intrinsic `Function.prototype.apply`.
  *
  * @function
  * @since 0.9.8
@@ -74,7 +162,7 @@ import { BoundFunction } from "./types";
  * fnApply(module1.log, module2, [ "friend" ]); // my friend : 42
  * ```
  */
-export const fnApply: <F extends (...args: any) => any, T>(fn: F, thisArg: T, argArray?: ArrayLike<any>) => ReturnType<F> = (/*#__PURE__*/FuncCall.bind(FuncApply));
+export const fnApply: <F extends (...args: any) => any, T>(fn: F, thisArg: T, argArray?: ArrayLike<any>) => ReturnType<F> = (/*#__PURE__*/fnBind(FuncCall, FuncApply) as any);
 
 /**
  * The `fnCall` function calls the function with the given `thisArg` as the `this` value and with
@@ -92,7 +180,9 @@ export const fnApply: <F extends (...args: any) => any, T>(fn: F, thisArg: T, ar
  * `fn.call(thisArg, ...args)` without any wrapper function or copying of the arguments, and it doesn't depend
  * on the `call` or `apply` properties of `fn` (which may have been overridden). As it is a bound intrinsic
  * function, when `fn` is not a function the `TypeError` thrown by the runtime names `fnCall` (or the name it was
- * imported as) rather than `fn`, eg. `"fnCall is not a function"` (since 0.20.0).
+ * imported as) rather than `fn`, eg. `"fnCall is not a function"` (since 0.20.0). It is created with
+ * {@link fnBind}, so on a runtime without the native `Function.prototype.bind` (eg. ES3) it is a function which calls
+ * the intrinsic `Function.prototype.apply`.
  *
  * @function
  * @since 0.9.8
@@ -138,115 +228,4 @@ export const fnApply: <F extends (...args: any) => any, T>(fn: F, thisArg: T, ar
  * fnCall(module1.log, module2, "friend"); // my friend : 42
  * ```
  */
-export const fnCall: <F extends (...args: any) => any, T>(fn: F, thisArg: T, ...args: Parameters<F>) => ReturnType<F> = (/*#__PURE__*/FuncCall.bind(FuncCall));
-
-/**
- * Creates a new function that when called will set the value of `thisArg` as the `this` keyword
- * value whrn calling the provided `fn` instance, and all of the arguments passed to the new
- * function will be passed along to the original provided instance.
- * @param fn - The function instance to be called
- * @param thisArg - The value to be used as the `this` when calling the `fn`
- * @returns The value returned by the original `fn` after executing with the provided `thisArg`.
- * @since 0.9.8
- * @group Function
- * @example
- * ```ts
- * const module1 = {
- *     x: 21,
- *     getX() {
- *         return this.x;
- *     },
- * };
- *
- * // The 'this' parameter of 'getX' is bound to 'module'.
- * console.log(module1.getX()); // 21
- *
- * // Create a new function 'boundGetX' with the 'this' parameter bound to 'module'.
- * let module2 = {
- *     x: 42
- * };
- *
- * module2.getX = fnBind(module1.getX, module2);
- * module2.getX(); // 42
- *
- * // It can also be used to proxy to the original function from the new one
- * module2.getX = fnBind(module1.getX, module1);
- * module2.getX(); // 21
- * ```
- */
-/*#__NO_SIDE_EFFECTS__*/
-export function fnBind<F extends (...args: any[]) => any, T>(fn: F, thisArg: T): F;
-
-/**
- * Creates a new function that when called will set the value of `thisArg` as the `this` keyword
- * value whrn calling the provided `fn` instance, and all of the arguments passed to the new
- * function will be passed along to the original provided instance.
- * @param fn - The function instance to be called
- * @param thisArg - The value to be used as the `this` when calling the `fn`
- * @returns The value returned by the original `fn` after executing with the provided `thisArg`.
- * @since 0.9.8
- * @group Function
- * @example
- * ```ts
- * const module1 = {
- *     x: 21,
- *     getX() {
- *         return this.x;
- *     },
- * };
- *
- * // The 'this' parameter of 'getX' is bound to 'module'.
- * console.log(module1.getX()); // 21
- *
- * // Create a new function 'boundGetX' with the 'this' parameter bound to 'module'.
- * let module2 = {
- *     x: 42
- * };
- *
- * module2.getX = fnBind(module1.getX, module2);
- * module2.getX(); // 42
- *
- * // It can also be used to proxy to the original function from the new one
- * module2.getX = fnBind(module1.getX, module1);
- * module2.getX(); // 21
- * ```
- */
-/*#__NO_SIDE_EFFECTS__*/
-export function fnBind<F extends (...args: any[]) => any, T, TArgs extends any[]>(fn: F, thisArg: T, ...argArray: TArgs): BoundFunction<F, TArgs>;
-
-/**
- * Fallback overload for less-specific `Function`-typed call sites where the concrete parameter
- * list is not available, such as dynamic proxy wiring.
- * @param fn - The function instance to be called.
- * @param thisArg - The value to be used as the `this` when calling the `fn`.
- * @param argArray - Zero or more arguments to pre-bind to the function.
- * @returns The original function type with the bound `this` value and any provided arguments.
- * @since 0.9.8
- * @group Function
- * @example
- * ```ts
- * const host = {
- *     prefix: "Hello",
- *     log(value: string) {
- *         return this.prefix + " " + value;
- *     }
- * };
- *
- * const dynamicLog: Function = host.log;
- * const bound = fnBind(dynamicLog, host);
- *
- * bound("friend"); // "Hello friend"
- * ```
- */
-/*#__NO_SIDE_EFFECTS__*/
-export function fnBind<F extends Function, T>(fn: F, thisArg: T, ...argArray: any[]): F;
-
-/*#__NO_SIDE_EFFECTS__*/
-export function fnBind<F extends (...args: any[]) => any, T>(fn: F, thisArg: T): any {
-    // The arguments are [fn, thisArg, ...args], so this invokes the intrinsic Function.prototype.bind with fn
-    // as its `this`, which is fn.bind(thisArg, ...args). Passing the arguments object directly to apply()
-    // avoids slicing them into a new array, and using the intrinsic means this doesn't depend on the fn's own
-    // (overridable) bind / call / apply properties. This remains a function (rather than an alias like fnCall)
-    // to retain the overloads, and no other code runs before arguments is read.
-    return FuncCall.apply(FuncBind, arguments);
-}
+export const fnCall: <F extends (...args: any) => any, T>(fn: F, thisArg: T, ...args: Parameters<F>) => ReturnType<F> = (/*#__PURE__*/fnBind(FuncCall, FuncCall) as any);
