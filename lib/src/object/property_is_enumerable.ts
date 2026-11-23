@@ -8,8 +8,9 @@
 
 import { isStrictNullOrUndefined } from "../helpers/base";
 import { safe } from "../helpers/safe";
-import { NULL_VALUE, ObjClass, ObjProto } from "../internal/constants";
-import { _unwrapFunctionNoInstWithPoly, _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
+import { FuncCall, NULL_VALUE, ObjClass, ObjProto } from "../internal/constants";
+import { _pureRef } from "../internal/treeshake_helpers";
+import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { objHasOwnProperty } from "./has_own_prop";
 
 function _objPropertyIsEnum(obj: any, propKey: PropertyKey): boolean {
@@ -74,9 +75,9 @@ export const objPropertyIsEnumerable: (obj: any, prop: PropertyKey) => boolean =
  * The `_objPropertyIsEnumerable()` method returns a Boolean indicating whether the specified property
  * is enumerable and is a property of the specified object. This method is similar to the native
  * `Object.prototype.propertyIsEnumerable()` method, but it is a standalone function that can be used
- * without needing to call it on the object itself. This uses the native
- * `Object.prototype.propertyIsEnumerable()` implementation when it is available on the prototype
- * captured at module initialization time; otherwise it falls back to the helper polyfill implementation.
+ * without needing to call it on the object itself. This calls the native
+ * `Object.prototype.propertyIsEnumerable()` captured at module initialization time (it is ES3, so it is always
+ * available) using the intrinsic `Function.prototype.call`, so a null or undefined object throws a TypeError.
  *
  * @function
  * @since 0.14.0
@@ -85,4 +86,4 @@ export const objPropertyIsEnumerable: (obj: any, prop: PropertyKey) => boolean =
  * @param prop - The property name or symbol to check
  * @returns A Boolean indicating whether the specified property is enumerable
  */
-export const _objPropertyIsEnumerable: (obj: any, prop: PropertyKey) => boolean = (/*#__PURE__*/_unwrapFunctionNoInstWithPoly("propertyIsEnumerable", ObjProto, _objPropertyIsEnum));
+export const _objPropertyIsEnumerable: (obj: any, prop: PropertyKey) => boolean = (/*#__PURE__*/FuncCall.bind(/*#__PURE__*/_pureRef(ObjProto, "propertyIsEnumerable")));

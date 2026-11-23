@@ -26,3 +26,24 @@ export const _objGetOwnPropertyDescriptor: (target: any, prop: PropertyKey) => P
  * Object.getOwnPropertySymbols() or a stub which returns an empty array
  */
 export const _objGetOwnPropertySymbols: (obj: any) => symbol[] = (/*#__PURE__*/_pureAssign((/*#__PURE__*/_pureRef<typeof Object.getOwnPropertySymbols>(ObjClass, GET_OWN_PROPERTY_SYMBOLS)), _returnEmptyArray));
+
+/**
+ * @internal
+ * @ignore
+ * The native Object.create() (defined by every supported runtime, ES5)
+ */
+export const _objCreate: (proto: any, properties?: PropertyDescriptorMap & ThisType<any>) => any = (/*#__PURE__*/_pureRef<typeof Object.create>(ObjClass, "create"));
+
+/**
+ * @internal
+ * @ignore
+ * Creates an object without a prototype (so a key can't match an inherited property, eg. one added to
+ * Object.prototype) using the native Object.create(null), or (on a runtime without it, where an object without a
+ * prototype can't be created) an empty object, as polyObjCreate(null) does. Used rather than objCreate(null) so the
+ * polyObjCreate polyfill isn't included (and by the define helpers, which objCreate depends on).
+ * @returns A new object without a prototype, or an empty object
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function _objCreateNull(): any {
+    return _objCreate ? _objCreate(null) : {};
+}

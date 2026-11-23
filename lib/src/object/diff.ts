@@ -7,9 +7,10 @@
  */
 
 import { isStrictNullOrUndefined } from "../helpers/base";
-import { objCreate } from "./create";
+import { _objCreateNull } from "../internal/own_props";
 import { forEachOwnKey } from "./forEachOwnKey";
 import { objHasOwn } from "./has_own";
+import { UNDEF_VALUE } from "../internal/constants";
 
 /**
  * Returns a shallow diff of two objects: a new object containing only the own enumerable
@@ -45,12 +46,12 @@ import { objHasOwn } from "./has_own";
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function objDiff<T, U extends Partial<T> = Partial<T>>(base: T, modified: U): Partial<U> {
-    const result: Partial<U> = objCreate(null);
+    const result: Partial<U> = _objCreateNull();
 
     if (!isStrictNullOrUndefined(base)) {
         forEachOwnKey(modified, (key, value) => {
             const hasBase = objHasOwn(base, key);
-            const baseVal = hasBase ? (base as any)[key] : undefined;
+            const baseVal = hasBase ? (base as any)[key] : UNDEF_VALUE;
             if (!hasBase || baseVal !== value) {
                 (result as any)[key] = value;
             }

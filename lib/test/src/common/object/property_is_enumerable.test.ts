@@ -295,8 +295,8 @@ describe("object property_is_enumerable tests", () => {
         });
 
         it("should propagate errors for null/undefined unlike objPropertyIsEnumerable which uses safe()", () => {
-            // _objPropertyIsEnumerable is built with _unwrapFunctionNoInstWithPoly, which captures
-            // ObjProto.propertyIsEnumerable at module-load time.  That cached reference cannot be
+            // _objPropertyIsEnumerable is the intrinsic Function.prototype.call bound to the
+            // ObjProto.propertyIsEnumerable captured at module-load time.  That cached reference cannot be
             // replaced at runtime, so a "native unavailable" scenario cannot be simulated in a live
             // test.  The meaningful behavioral difference to verify here is that _objPropertyIsEnumerable
             // does NOT wrap calls in safe(), so passing null or undefined lets the underlying native

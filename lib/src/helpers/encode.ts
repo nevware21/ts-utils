@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { EMPTY, LENGTH, NULL_VALUE, StrCls, TO_STRING, UNDEF_VALUE } from "../internal/constants";
+import { EMPTY, FUNCTION, LENGTH, NULL_VALUE, StrCls, TO_STRING, UNDEF_VALUE } from "../internal/constants";
 import { _pureRef } from "../internal/treeshake_helpers";
 import { asString } from "../string/as_string";
 import { strCamelCase } from "../string/conversion";
@@ -14,7 +14,6 @@ import { strPadStart } from "../string/pad";
 import { strReplace } from "../string/replace";
 import { strUpper } from "../string/upper_lower";
 import { isNumber, isStrictNullOrUndefined, isString, isUndefined } from "./base";
-import { getInst } from "./environment";
 import { throwError } from "./throw";
 import { dumpObj } from "./diagnostics";
 
@@ -27,24 +26,8 @@ const _fromCharCode = (/*#__PURE__*/_pureRef<typeof String.fromCharCode>(StrCls,
 const UTF8_BOM = "\xEF\xBB\xBF";
 const NON_LATIN1 = /[^\0-\xFF]/;
 const SURROGATES = /[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDFFF]/g;
-const _btoa = (/*#__PURE__*/_createBase64Fn("btoa", _encodeBase64Polyfill));
-const _atob = (/*#__PURE__*/_createBase64Fn("atob", _decodeBase64Polyfill));
 let _htmlEntityCache: { [key: string]: string};
 let _base64Cache: { [key: string]: number };
-
-/**
- * @internal
- * @ignore
- * Creates the function which calls the named native function when available, otherwise the polyfill (the decoding
- * polyfill follows the same rules as atob(), so it also throws for a value which isn't valid). The native function is
- * called without a `this`, as it fails in a browser when called as a member of another object.
- */
-/*#__NO_SIDE_EFFECTS__*/
-function _createBase64Fn(name: string, polyFn: (value: string) => string) {
-    let theFn: (value: string) => string;
-
-    return (value: string) => (theFn || (theFn = getInst<(value: string) => string>(name) || polyFn))(value);
-}
 
 /**
  * @internal
@@ -78,7 +61,10 @@ function _decodeBase64(value: string): string {
     let result: string;
 
     try {
-        result = _fromBinary(_atob(value));
+        // The native atob() is used when there is one (it is called without a `this`, as it fails in a browser when
+        // called as a member of another object), otherwise the polyfill, which follows the same rules as atob() (so it
+        // also throws for a value which isn't valid)
+        result = _fromBinary((typeof atob === FUNCTION ? atob : _decodeBase64Polyfill)(value));
     } catch (e) {
         // Not a valid base64 value
     }
@@ -286,7 +272,9 @@ export function encodeAsBase64(value: string): string {
     let result: string;
 
     if (value || !isStrictNullOrUndefined(value)) {
-        result = _btoa(_toBinary(asString(value)));
+        // The native btoa() is used when there is one (called without a `this`, see _decodeBase64()), otherwise the
+        // polyfill
+        result = (typeof btoa === FUNCTION ? btoa : _encodeBase64Polyfill)(_toBinary(asString(value)));
     }
 
     return result || EMPTY;

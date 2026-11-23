@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { objCreate } from "./create";
+import { _objCreateNull } from "../internal/own_props";
 import { forEachOwnKey } from "./forEachOwnKey";
 
 /**
@@ -34,7 +34,7 @@ import { forEachOwnKey } from "./forEachOwnKey";
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function objMapValues<T, U>(source: T, mapper: (value: T[keyof T], key: PropertyKey) => U): { [K in keyof T]: U } {
-    const result: any = objCreate(null);
+    const result: any = _objCreateNull();
     forEachOwnKey(source, (key, value) => {
         result[key] = mapper(value, key);
     });

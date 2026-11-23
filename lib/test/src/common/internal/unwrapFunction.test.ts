@@ -7,7 +7,7 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
-import { _unwrapFunction, _unwrapFunctionNoInstWithPoly, _unwrapFunctionWithPoly, _unwrapInstFunction } from "../../../../src/internal/unwrapFunction";
+import { _unwrapFunction, _unwrapFunctionWithPoly, _unwrapInstFunction } from "../../../../src/internal/unwrapFunction";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 // When there is neither a function nor a polyfill the runtime throws its own TypeError (for calling apply on
@@ -374,34 +374,11 @@ describe("_unwrapFunctionWithPoly", () => {
         }));
     });
 
-    it("test no class / prototype function and no polyfill for the no instance version", () => {
-        let wrappedFn = _unwrapFunctionNoInstWithPoly("test" as any, {} as any, null as any);
-        let instanceCalled = false;
-
-        assert.ok(_expectThrow(() => {
-            (wrappedFn as any)(null);
-        }));
-
-        // The instance function is never used, so this still throws
-        let instance = {
-            test: () => {
-                instanceCalled = true;
-            }
-        };
-
-        assert.ok(_expectThrow(() => {
-            (wrappedFn as any)(instance);
-        }));
-
-        assert.equal(instanceCalled, false, "The instance function was not called");
-    });
-
     it("the wrapped functions have no named parameters", () => {
         // In non-strict code (eg. a bundle without "use strict") a named parameter maps the arguments object to it,
         // which makes passing the arguments to apply() several times slower, so the value is read from the arguments
         assert.equal(_unwrapFunction("test", {} as any).length, 0, "_unwrapFunction");
         assert.equal(_unwrapFunctionWithPoly("test" as any, {} as any, null as any).length, 0, "_unwrapFunctionWithPoly");
-        assert.equal(_unwrapFunctionNoInstWithPoly("test" as any, {} as any, null as any).length, 0, "_unwrapFunctionNoInstWithPoly");
         assert.equal(_unwrapInstFunction("test").length, 0, "_unwrapInstFunction");
 
         // The value is still the first argument and the remaining arguments are passed to the function
@@ -443,10 +420,6 @@ describe("_unwrapFunctionWithPoly", () => {
         // Using the class / prototype fallback
         let fallbackFn = _unwrapFunctionWithPoly("test" as any, { test: test } as any, null as any);
         assert.equal((fallbackFn as any)({ x: 10 }, 1), 12);
-
-        // Only the class / prototype function is used
-        let noInstFn = _unwrapFunctionNoInstWithPoly("test" as any, { test: test } as any, null as any);
-        assert.equal((noInstFn as any)({ x: 10, test: () => "instance" }, 1), 12);
     });
 });
 

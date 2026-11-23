@@ -9,7 +9,7 @@
 import { arrForEach } from "../array/forEach";
 import { arrIndexOf } from "../array/indexOf";
 import { isArrayLike, isString } from "../helpers/base";
-import { objCreate } from "./create";
+import { _objCreateNull } from "../internal/own_props";
 import { forEachOwnKey } from "./forEachOwnKey";
 import { objHasOwn } from "./has_own";
 import { _objPropertyIsEnumerable } from "./property_is_enumerable";
@@ -43,7 +43,7 @@ export function objPick<T>(source: T, keys: ArrayLike<string>): Partial<T>;
 export function objPick<T>(source: T, keys: ArrayLike<PropertyKey>): Partial<T>;
 /*#__NO_SIDE_EFFECTS__*/
 export function objPick<T>(source: T, keys: ArrayLike<PropertyKey>): Partial<T> {
-    const result: Partial<T> = objCreate(null);
+    const result: Partial<T> = _objCreateNull();
     if (source && isArrayLike(keys)) {
         arrForEach(keys, (key) => {
             if (objHasOwn(source, key) && _objPropertyIsEnumerable(source, key)) {
@@ -83,7 +83,7 @@ export function objOmit<T>(source: T, keys: ArrayLike<string>): Partial<T>;
 export function objOmit<T>(source: T, keys: ArrayLike<PropertyKey>): Partial<T>;
 /*#__NO_SIDE_EFFECTS__*/
 export function objOmit<T>(source: T, keys: ArrayLike<PropertyKey>): Partial<T> {
-    const result: Partial<T> = objCreate(null);
+    const result: Partial<T> = _objCreateNull();
     if (source && isArrayLike(keys)) {
         forEachOwnKey(source, (key, value) => {
             let hasKey = arrIndexOf(keys, key) !== -1;
@@ -132,7 +132,7 @@ export function objOmit<T>(source: T, keys: ArrayLike<PropertyKey>): Partial<T> 
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function objPickBy<T>(source: T, predicate: (key: PropertyKey, value: T[keyof T]) => boolean): Partial<T> {
-    const result: Partial<T> = objCreate(null);
+    const result: Partial<T> = _objCreateNull();
     forEachOwnKey(source, (key, value) => {
         if (predicate(key, value)) {
             (result as any)[key] = value;
@@ -162,7 +162,7 @@ export function objPickBy<T>(source: T, predicate: (key: PropertyKey, value: T[k
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function objOmitBy<T>(source: T, predicate: (key: PropertyKey, value: T[keyof T]) => boolean): Partial<T> {
-    const result: Partial<T> = objCreate(null);
+    const result: Partial<T> = _objCreateNull();
     forEachOwnKey(source, (key, value) => {
         if (!predicate(key, value)) {
             (result as any)[key] = value;
