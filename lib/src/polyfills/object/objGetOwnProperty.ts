@@ -6,8 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { arrIndexOf } from "../../array/indexOf";
-import { isArray, isString } from "../../helpers/base";
+import { isString, objToString } from "../../helpers/base";
 import { LENGTH, NULL_VALUE, ObjClass, ObjProto, UNDEFINED, UNDEF_VALUE } from "../../internal/constants";
 import { _objGetOwnPropertyDescriptor, _objGetOwnPropertyNames, _objGetOwnPropertySymbols } from "../../internal/own_props";
 import { _throwIfNullOrUndefined } from "../../internal/throwIf";
@@ -44,13 +43,18 @@ export function polyObjGetOwnPropertyDescriptors(obj: any): PropertyDescriptorMa
     let theObj = ObjClass(obj);
 
     // Every own key, read once with Reflect.ownKeys() when there is one, otherwise the property names (including
-    // non-enumerable ones) and the symbols (none without a native Object.getOwnPropertySymbols(), see above)
-    // The keys are looped here (rather than with arrForEach), so a replaced Function.prototype.call isn't used
-    let keys = _reflectOwnKeys ? _reflectOwnKeys(theObj) : (_objGetOwnPropertyNames(theObj) as PropertyKey[]).concat(_objGetOwnPropertySymbols(theObj));
-    for (let idx = 0; idx < keys[LENGTH]; idx++) {
-        const descriptor = _objGetOwnPropertyDescriptor(theObj, keys[idx]);
-        if (descriptor !== UNDEF_VALUE) {
-            _setOwnValue(result, keys[idx], descriptor);
+    // non-enumerable ones) and then the symbols (none without a native Object.getOwnPropertySymbols(), see above), which
+    // are both read before any descriptor. The lists are looped here (rather than joined with concat(), or looped with
+    // arrForEach), so a replaced Array.prototype.concat (or its Symbol.isConcatSpreadable or Symbol.species) or
+    // Function.prototype.call isn't used
+    let keyLists: PropertyKey[][] = _reflectOwnKeys ? [_reflectOwnKeys(theObj)] : [_objGetOwnPropertyNames(theObj), _objGetOwnPropertySymbols(theObj)];
+    for (let lp = 0; lp < keyLists[LENGTH]; lp++) {
+        let keys = keyLists[lp];
+        for (let idx = 0; idx < keys[LENGTH]; idx++) {
+            const descriptor = _objGetOwnPropertyDescriptor(theObj, keys[idx]);
+            if (descriptor !== UNDEF_VALUE) {
+                _setOwnValue(result, keys[idx], descriptor);
+            }
         }
     }
 
@@ -81,12 +85,11 @@ export function _polyObjGetOwnPropertyNames(obj: any): string[] {
         }
     }
     
-    if (isArray(obj) || isString(obj)) {
-        // If the object is an array or string, we need to add the length property
-        if (arrIndexOf(result, LENGTH) === -1) {
-            // Only add length if it doesn't already exist in the result array
-            result.push(LENGTH);
-        }
+    // An array's or a string's length, which isn't enumerable (so it isn't one of the keys above). This polyfill is only
+    // used without the ES5 Object.getOwnPropertyNames (eg. ES3), so the array is identified without the ES5
+    // Array.isArray() (like polyIsArray)
+    if (isString(obj) || objToString(obj) === "[object Array]") {
+        result.push(LENGTH);
     }
 
     // For non-enumerable properties, we can't reliably get them in ES5

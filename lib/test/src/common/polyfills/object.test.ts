@@ -1539,7 +1539,9 @@ describe("object polyfills", () => {
             polyThrew = e;
         }
         try {
-            nativeResult = Object.keys(value);
+            // A primitive is converted to an object (like ES2015+), as an ES5 Object.keys (eg. IE 11) throws a TypeError
+            // for it, while null and undefined still throw
+            nativeResult = Object.keys(value === null || value === undefined ? value : Object(value));
         } catch (e) {
             nativeThrew = e;
         }

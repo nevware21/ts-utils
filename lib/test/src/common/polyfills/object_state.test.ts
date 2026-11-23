@@ -312,9 +312,17 @@ describe("object state polyfills", () => {
         });
         
         it("should handle primitive values", () => {
+            // Like the native function null and undefined throw, without one (eg. ES5, where a polyfill symbol is a string
+            // key) the shared function returns an empty array
+            if (typeof Object.getOwnPropertySymbols === "function") {
+                assert.throws(() => _objGetOwnPropertySymbols(null));
+                assert.throws(() => _objGetOwnPropertySymbols(undefined));
+            } else {
+                assert.deepEqual(_objGetOwnPropertySymbols(null), []);
+                assert.deepEqual(_objGetOwnPropertySymbols(undefined), []);
+            }
+
             // These should return empty arrays
-            assert.throws(() => _objGetOwnPropertySymbols(null));
-            assert.throws(() => _objGetOwnPropertySymbols(undefined));
             assert.isArray(_objGetOwnPropertySymbols(1));
             assert.isArray(_objGetOwnPropertySymbols("string"));
             assert.isArray(_objGetOwnPropertySymbols(true));

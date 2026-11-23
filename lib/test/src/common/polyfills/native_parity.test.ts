@@ -387,7 +387,9 @@ describe("polyfills match the native functions", () => {
             assert.deepEqual(polyObjKeys(fn), ["a"]);
             assert.throws(() => polyObjKeys(null), TypeError);
             assert.throws(() => polyObjKeys(undefined), TypeError);
-            assert.deepEqual(Object.keys("ab"), ["0", "1"], "Object.keys");
+            // Compared with the value converted to an object (like ES2015+), as an ES5 Object.keys (eg. IE 11) throws a
+            // TypeError for a primitive
+            assert.deepEqual(Object.keys(Object("ab")), ["0", "1"], "Object.keys");
             assert.deepEqual(Object.keys(fn), ["a"], "Object.keys");
         });
 
@@ -469,7 +471,20 @@ describe("polyfills match the native functions", () => {
         it("returns a primitive value, like Object.preventExtensions (ES2015+)", () => {
             assert.strictEqual(polyObjPreventExtensions(1), 1);
             assert.strictEqual(polyObjPreventExtensions("abc"), "abc");
-            assert.strictEqual(Object.preventExtensions(1 as any), 1, "Object.preventExtensions");
+
+            // The native function is only compared where it returns a value which isn't an object (ES2015+), as on ES5
+            // (eg. IE) it throws a TypeError
+            let isES5 = false;
+            let nativeResult: any;
+            try {
+                nativeResult = Object.preventExtensions(1 as any);
+            } catch (e) {
+                isES5 = true;
+            }
+
+            if (!isES5) {
+                assert.strictEqual(nativeResult, 1, "Object.preventExtensions");
+            }
         });
     });
     describe("polyStrPadStart and polyStrPadEnd", () => {
