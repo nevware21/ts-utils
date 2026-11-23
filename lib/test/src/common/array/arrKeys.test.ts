@@ -74,4 +74,71 @@ describe("polyArrKeys", () => {
         assert.throws(() => polyArrKeys(null as any));
         assert.throws(() => polyArrKeys(undefined as any));
     });
+
+    it("should read the length for each next(), like the native iterator", () => {
+        const getKeys = (keysFn: (value: any) => Iterator<number>) => {
+            let values = ["a"];
+            let iter = keysFn(values);
+            let result: number[] = [];
+            let next = iter.next();
+            while (!next.done) {
+                result.push(next.value);
+                if (values.length < 3) {
+                    // Grow the array while it is being iterated
+                    values.push("b");
+                }
+
+                next = iter.next();
+            }
+
+            // Once done, it stays done (even when the array grows again)
+            values.push("c");
+            assert.isTrue(iter.next().done, "Stays done");
+
+            return result;
+        };
+
+        assert.deepEqual(getKeys(polyArrKeys), [0, 1, 2]);
+
+        if (([] as any).keys) {
+            assert.deepEqual(getKeys((value) => (Array.prototype.keys as any).call(value)), [0, 1, 2], "Array.prototype.keys");
+        }
+    });
+
+    it("should not read the length until next() is called, and only move the index once it has been read", () => {
+        let reads = 0;
+        let fail = false;
+        let value: any = {
+            0: "a",
+            1: "b",
+            get length() {
+                reads++;
+                if (fail) {
+                    fail = false;
+                    throw new Error("length");
+                }
+
+                return 2;
+            }
+        };
+
+        const check = (keysFn: (value: any) => Iterator<number>, name: string) => {
+            reads = 0;
+            let iter = keysFn(value);
+            assert.equal(reads, 0, name + ": the length isn't read when the iterator is created");
+            assert.deepEqual(iter.next(), { value: 0, done: false }, name);
+            fail = true;
+            assert.throws(() => iter.next(), "length");
+            assert.deepEqual(iter.next(), { value: 1, done: false }, name + ": the index didn't move when the length threw");
+            let last = iter.next();
+            assert.isTrue(last.done, name + ": done");
+            assert.isUndefined(last.value, name + ": no value");
+            assert.equal(reads, 4, name + ": the length is read by each next()");
+        };
+
+        check(polyArrKeys, "polyArrKeys");
+        if (([] as any).keys) {
+            check((theValue) => (Array.prototype.keys as any).call(theValue), "Array.prototype.keys");
+        }
+    });
 });

@@ -8,7 +8,7 @@
 
 import { fnCall } from "../funcs/funcs";
 import { isArray, isFunction, isMap, isPrimitive, isSet, isStrictNullOrUndefined } from "../helpers/base";
-import { _toArrayLength } from "../helpers/length";
+import { _checkArrayLength, _toLength } from "../helpers/length";
 import { safe } from "../helpers/safe";
 import { throwTypeError } from "../helpers/throw";
 import { CALL, FUNCTION, NULL_VALUE, OBJECT } from "../internal/constants";
@@ -162,7 +162,7 @@ export function _createIndexIterator<T>(values: ArrayLike<T>): Iterator<T> {
     let idx = 0;
 
     return {
-        next: () => (idx < _toArrayLength(values) ? { value: values[idx++] } : { done: true }) as IteratorResult<T>
+        next: () => (idx < _checkArrayLength(_toLength(values)) ? { value: values[idx++] } : { done: true }) as IteratorResult<T>
     };
 }
 

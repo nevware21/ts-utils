@@ -8,11 +8,12 @@
 
 import { dumpObj } from "../helpers/diagnostics";
 import { throwRangeError } from "../helpers/throw";
-import { mathTrunc } from "./trunc";
+import { _toInt } from "../helpers/length";
 import { DUMP_ERR_MAX_LENGTH } from "../internal/constants";
 
 /**
- * Convert the provided value to an integer
+ * Convert the provided value to an integer, like the ECMAScript ToIntegerOrInfinity(): the value is converted to a number
+ * (once), NaN is 0, a fraction is truncated, and -0 (or a value between -1 and 0) is 0 (since 0.20.0, it was -0)
  * @group Math
  * @param value - The value to be converted to an integer.
  * @param throwInfinity - [Optional] Throws RangeError if value is Infinity, defaults to false
@@ -26,5 +27,5 @@ export function mathToInt(value: any, throwInfinity?: boolean): number {
         throwRangeError("invalid value [" + dumpObj(value, 0, DUMP_ERR_MAX_LENGTH) + "]");
     }
     
-    return result !== result || result === 0 ? 0 : mathTrunc(result);
+    return _toInt(result);
 }

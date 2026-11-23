@@ -60,14 +60,14 @@ export function polyArrKeys<T = any>(value: ArrayLike<T>): IterableIterator<numb
     _throwIfNullOrUndefined(value);
 
     let idx = -1;
-    let len = _toLength(value);
 
     return createIterableIterator<number>({
         n: function() {
-            idx++;
-            let isDone = idx >= len;
+            // Like the native array iterator the length is read (and converted) by each next() until the iterator is
+            // done (so it sees the array grow or shrink), and the index only moves once the length has been read
+            let isDone = idx + 1 >= _toLength(value);
             if (!isDone) {
-                this.v = idx;
+                this.v = ++idx;
             }
 
             return isDone;

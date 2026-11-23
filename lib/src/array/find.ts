@@ -50,6 +50,7 @@ import { ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "./callbacks";
  * @param thisArg - A value to use as this when executing callbackFn, like the native function it is `undefined` when not provided.
  * @return The first element in the array that satisfies the provided testing function. Otherwise, undefined
  * is returned.
+ * @throws TypeError if `theArray` is `null` or `undefined`, or `callbackFn` is not a function (even when the array is empty)
  * @example
  * ```ts
  * const inventory = [
@@ -115,6 +116,7 @@ export const arrFind =  (/*#__PURE__*/_unwrapFunctionWithPoly("find", ArrProto, 
  * the predicate returns a value which is coercible to the Boolean value true, or until the end of the array.
  * @param thisArg - A value to use as this when executing callbackFn, like the native function it is `undefined` when not provided.
  * @return The index of the first element in the array that passes the test. Otherwise, -1.
+ * @throws TypeError if `theArray` is `null` or `undefined`, or `callbackFn` is not a function (even when the array is empty)
  * @example
  * ```ts
  * const inventory: Array<{ name: string, quantity: number}> = [
@@ -189,6 +191,7 @@ export const arrFindIndex = (/*#__PURE__*/_unwrapFunctionWithPoly("findIndex", A
  * @param thisArg - A value to use as this when executing callbackFn, like the native function it is `undefined` when not provided.
  * @return The last element in the array that satisfies the provided testing function. Otherwise, undefined
  * is returned.
+ * @throws TypeError if `theArray` is `null` or `undefined`, or `callbackFn` is not a function (even when the array is empty)
  * @example
  * ```ts
  * const inventory = [
@@ -254,6 +257,7 @@ export const arrFindLast = (/*#__PURE__*/_unwrapFunctionWithPoly("findLast", Arr
  * @param thisArg - A value to use as this when executing callbackFn, like the native function it is `undefined` when not provided.
  * @return The index of the last (highest-index) element in the array that passes the test. Otherwise -1 if
  * no matching element is found.
+ * @throws TypeError if `theArray` is `null` or `undefined`, or `callbackFn` is not a function (even when the array is empty)
  * @example
  * ```ts
  * const inventory: Array<{ name: string, quantity: number}> = [
