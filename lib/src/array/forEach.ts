@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { isStrictNullOrUndefined, isString } from "../helpers/base";
+import { isStrictNullOrUndefined } from "../helpers/base";
 import { _toLength } from "../helpers/length";
 import { CALL, ObjClass } from "../internal/constants";
 
@@ -58,8 +58,9 @@ export function arrForEach<T = any>(theArray: ArrayLike<T>, callbackfn: (value: 
 export function arrForEach<T = any, A extends ArrayLike<T> = ArrayLike<T>>(theArray: A, callbackfn: (value: T, index: number, array: A) => void | number, thisArg?: any): void {
     if (theArray) {
         const len = _toLength(theArray);
-        // The "in" operator throws for a string primitive (which is ArrayLike), so use its object form
-        const theObj: any = isString(theArray) ? ObjClass(theArray) : theArray;
+        // The "in" operator throws for a primitive (eg. a string, which is ArrayLike), so use its object form (an object is
+        // returned as-is)
+        const theObj: any = ObjClass(theArray);
         for (let idx = 0; idx < len; idx++) {
             if (idx in theObj) {
                 if (callbackfn[CALL](isStrictNullOrUndefined(thisArg) ? theArray as any : thisArg, theArray[idx], idx, theArray) === -1) {

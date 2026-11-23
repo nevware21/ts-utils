@@ -1174,3 +1174,49 @@ describe("array polyfills convert the array like the native functions", () => {
         });
     });
 });
+
+describe("polyArrFind / polyArrFindIndex / polyArrFindLast / polyArrFindLastIndex call the callbackFn like the native functions", () => {
+    const findFns: { [name: string]: [string, Function] } = {
+        polyArrFind: ["find", polyArrFind],
+        polyArrFindIndex: ["findIndex", polyArrFindIndex],
+        polyArrFindLast: ["findLast", polyArrFindLast],
+        polyArrFindLastIndex: ["findLastIndex", polyArrFindLastIndex]
+    };
+    const expected: { [name: string]: any } = {
+        polyArrFind: "b",
+        polyArrFindIndex: 1,
+        polyArrFindLast: "b",
+        polyArrFindLastIndex: 1
+    };
+
+    Object.keys(findFns).forEach((name) => {
+        it(name + " calls the callbackFn itself, not its own call property", () => {
+            const [nativeName, findFn] = findFns[name];
+            const thisArg = { name: "thisArg" };
+            const thisValues: any[] = [];
+            let ownCalls = 0;
+
+            const callbackFn: any = function (this: any, value: string) {
+                thisValues.push(this);
+                return value === "b";
+            };
+
+            // Would find the first (or last) value, if it was used
+            callbackFn.call = () => {
+                ownCalls++;
+                return true;
+            };
+
+            assert.deepEqual(findFn(["a", "b", "c"], callbackFn, thisArg), expected[name]);
+            assert.equal(ownCalls, 0, "The callbackFn's own call property was not used");
+            assert.strictEqual(thisValues[0], thisArg, "The callbackFn was called with the thisArg");
+
+            const nativeFn = (Array.prototype as any)[nativeName];
+            if (nativeFn) {
+                assert.deepEqual(nativeFn.call(["a", "b", "c"], callbackFn, thisArg), expected[name], "Array.prototype." + nativeName);
+                assert.equal(ownCalls, 0, "The native function doesn't use the callbackFn's own call property");
+            }
+        });
+    });
+});
+

@@ -6,7 +6,8 @@
  * Licensed under the MIT license.
  */
 
-import { ArrProto, ObjClass, UNDEF_VALUE } from "../internal/constants";
+import { ArrProto, UNDEF_VALUE } from "../internal/constants";
+import { _toObject } from "../internal/throwIf";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
 import { _toLength, _toRelIndex } from "../helpers/length";
 import { WritableArrayLike } from "../helpers/arrayLike";
@@ -24,6 +25,7 @@ import { WritableArrayLike } from "../helpers/arrayLike";
  * @param start - Start index (inclusive), defaults to 0. Negative index counts from the end
  * @param end - End index (exclusive), defaults to array.length. Negative index counts from the end
  * @returns The modified array
+ * @throws TypeError if `theArray` is `null` or `undefined`
  * @example
  * ```ts
  * arrFill([1, 2, 3], 0);              // [0, 0, 0]
@@ -52,10 +54,10 @@ export const arrFill = (/*#__PURE__*/_unwrapFunctionWithPoly("fill", ArrProto, p
  * @throws TypeError if `theArray` is `null` or `undefined`
  */
 export function polyArrFill<T>(theArray: WritableArrayLike<T>, value: T, start?: number, end?: number): WritableArrayLike<T> {
-    // Like the native function the length of the value is converted (eg. a string length), reading it throws a
-    // TypeError for null and undefined (rather than including a message), and the value is converted to an object
-    const len = _toLength(theArray);
-    const theObj = ObjClass(theArray);
+    // Like the native function the value is converted to an object (null and undefined throw a TypeError), and then its
+    // length is converted (eg. a string length)
+    const theObj = _toObject(theArray);
+    const len = _toLength(theObj);
     const startIdx = _toRelIndex(start, len);
     const endIdx = end === UNDEF_VALUE ? len : _toRelIndex(end, len);
 

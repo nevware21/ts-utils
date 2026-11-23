@@ -7,8 +7,7 @@
  */
 
 import { isArrayLike, isStrictUndefined } from "../helpers/base";
-import { _toLength } from "../helpers/length";
-import { mathTrunc } from "../math/trunc";
+import { _toInt, _toLength } from "../helpers/length";
 
 /**
  * Searches theArray for the subset, forwards from the fromIndex (default 0) or backwards (isLast) from the fromIndex
@@ -25,7 +24,7 @@ function _findSubset<T>(theArray: ArrayLike<T>, subset: ArrayLike<T>, fromIndex:
         let subsetLen = _toLength(subset);
         // Converted like mathToInt() (NaN is 0), without including its Infinity check (and so dumpObj()) in a bundle
         // which only uses this, and -0 (eg. from -0.5) is 0
-        let pos = isStrictUndefined(fromIndex) ? (isLast ? len : 0) : (mathTrunc(+fromIndex) || 0);
+        let pos = isStrictUndefined(fromIndex) ? (isLast ? len : 0) : _toInt(fromIndex);
 
         if (pos < 0) {
             pos += len;

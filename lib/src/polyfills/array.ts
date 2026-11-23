@@ -10,15 +10,15 @@ import { ArrFromMapFn, ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from ".
 import { isArray, isFunction, isNullOrUndefined, isStrictNullOrUndefined, isString, isStringObject, isStrictUndefined, objToString } from "../helpers/base";
 import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
-import { CALL, DUMP_ERR_MAX_LENGTH, LENGTH, NULL_VALUE, ObjClass } from "../internal/constants";
+import { DUMP_ERR_MAX_LENGTH, LENGTH, NULL_VALUE, UNDEF_VALUE } from "../internal/constants";
 import { asString } from "../string/as_string";
-import { _throwIfNotCallbackFn, _throwIfNullOrUndefined } from "../internal/throwIf";
-import { _toArrayLength, _toLength, _toRelIndex } from "../helpers/length";
+import { _throwIfNotCallbackFn, _throwIfNullOrUndefined, _throwTypeOf, _toObject } from "../internal/throwIf";
+import { _checkArrayLength, _toLength, _toRelIndex } from "../helpers/length";
 import { fnCall } from "../funcs/funcs";
 import { _getMapSetValues, _iterForOf } from "../iterator/forOf";
-import { _pushOwnValue } from "../object/define";
 import { getKnownSymbol, hasSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
+import { _pushOwnValue } from "../object/define";
 
 /**
  * Polyfill support function for Array.isArray
@@ -58,9 +58,10 @@ export function polyIsArray<T>(value: any): value is T[] {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyArrIncludes<T>(theArray: ArrayLike<T>, searchElement: T, fromIndex?: number): boolean {
-    _throwIfNullOrUndefined(theArray);
-
-    let len = _toLength(theArray);
+    // Like the native function the value is converted to an object (null and undefined throw a TypeError) and its length
+    // and values are read from the object
+    let theObj = _toObject(theArray);
+    let len = _toLength(theObj);
     if (len) {
         // Convert the fromIndex like the native function (NaN is 0, a negative index counts back from the end, before the
         // start is 0 and from the end, including Infinity, searches nothing)
@@ -69,7 +70,7 @@ export function polyArrIncludes<T>(theArray: ArrayLike<T>, searchElement: T, fro
         // SameValueZero, NaN is the only value which is not equal to itself
         let isNaNValue = searchElement !== searchElement;
         for (; idx < len; idx++) {
-            let value = theArray[idx];
+            let value = theObj[idx];
             if (value === searchElement || (isNaNValue && value !== value)) {
                 return true;
             }
@@ -148,9 +149,39 @@ export function polyArrIncludes<T>(theArray: ArrayLike<T>, searchElement: T, fro
  * ```
  */
 export function polyArrFind<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): T | E | undefined {
-    let result;
-    let idx = polyArrFindIndex(theArray, callbackFn, thisArg);
-    return idx !== -1 ? theArray[idx] : result;
+    return _arrFind(theArray, callbackFn, thisArg, false, true);
+}
+
+/**
+ * @internal
+ * @ignore
+ * The shared implementation of polyArrFind(), polyArrFindIndex(), polyArrFindLast() and polyArrFindLastIndex().
+ * Like the native functions the array is converted to an object (so null and undefined throw a TypeError, and a
+ * string's callbackFn is passed its String object) and its length is read before the callbackFn is checked, every
+ * index is visited (an empty slot is undefined, so there is no "in" check), the
+ * callbackFn is called with the intrinsic call (not its own call property), and the value which was passed to the
+ * callbackFn is returned (the index isn't read again, so a getter is only called once and a value the callbackFn
+ * changed isn't returned).
+ * @param theArray - The array or array like object of elements to be searched.
+ * @param callbackFn - The predicate function
+ * @param thisArg - The value to use as this when executing callbackFn
+ * @param isLast - Search from the last index to the first
+ * @param isValue - Return the value (or undefined), rather than the index (or -1)
+ */
+function _arrFind<T>(theArray: ArrayLike<T>, callbackFn: Function, thisArg: any, isLast: boolean, isValue: boolean): any {
+    let theObj = _toObject(theArray);
+    let len = _toLength(theObj);
+    _throwIfNotCallbackFn(callbackFn);
+
+    for (let lp = 0; lp < len; lp++) {
+        let idx = isLast ? len - lp - 1 : lp;
+        let value = theObj[idx];
+        if (fnCall(callbackFn as any, thisArg, value, idx, theObj)) {
+            return isValue ? value : idx;
+        }
+    }
+
+    return isValue ? UNDEF_VALUE : -1;
 }
 
 /**
@@ -185,21 +216,7 @@ export function polyArrFind<T, E extends T>(theArray: ArrayLike<T>, callbackFn: 
  * @throws TypeError if `theArray` is `null` or `undefined`, or `callbackFn` is not a function (even when the array is empty)
  */
 export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
-    // Like the native function the length is read before the callbackFn is checked (reading it throws a TypeError for
-    // null and undefined, rather than including a message), and the array is converted to an object (so a string's
-    // callbackFn is passed its String object)
-    let len = _toLength(theArray);
-    let theObj = ObjClass(theArray);
-    _throwIfNotCallbackFn(callbackFn);
-
-    // Like the native function every index is visited (an empty slot is undefined), so there is no "in" check
-    for (let idx = 0; idx < len; idx++) {
-        if (callbackFn[CALL](thisArg, theObj[idx], idx, theObj)) {
-            return idx;
-        }
-    }
-
-    return -1;
+    return _arrFind(theArray, callbackFn, thisArg, false, false);
 }
 
 /**
@@ -269,9 +286,7 @@ export function polyArrFindIndex<T, E extends T>(theArray: ArrayLike<T>, callbac
  * ```
  */
 export function polyArrFindLast<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): T | E | undefined {
-    let result;
-    let idx = polyArrFindLastIndex(theArray, callbackFn, thisArg);
-    return idx !== -1 ? theArray[idx] : result;
+    return _arrFind(theArray, callbackFn, thisArg, true, true);
 }
 
 /**
@@ -306,19 +321,7 @@ export function polyArrFindLast<T, E extends T>(theArray: ArrayLike<T>, callback
  * @throws TypeError if `theArray` is `null` or `undefined`, or `callbackFn` is not a function (even when the array is empty)
  */
 export function polyArrFindLastIndex<T, E extends T>(theArray: ArrayLike<T>, callbackFn: ArrPredicateCallbackFn<T, E> | ArrPredicateCallbackFn2<T>, thisArg?: any): number {
-    // See polyArrFindIndex(), the length is read before the callbackFn is checked and the array is converted to an object
-    let len = _toLength(theArray);
-    let theObj = ObjClass(theArray);
-    _throwIfNotCallbackFn(callbackFn);
-
-    // Like the native function every index is visited (an empty slot is undefined), so there is no "in" check
-    for (let idx = len - 1; idx >= 0; idx--) {
-        if (callbackFn[CALL](thisArg, theObj[idx], idx, theObj)) {
-            return idx;
-        }
-    }
-
-    return -1;
+    return _arrFind(theArray, callbackFn, thisArg, true, false);
 }
 
 /**
@@ -428,7 +431,7 @@ export function polyArrFrom<T, U = T>(theValue: ArrayLike<T> | Iterable<T>, mapF
         // An array's length is read for each index (like the native array iterator), as the mapFn may change it, while
         // (like the native function) the length of any other array-like is only read once
         let isArr = isArray(values);
-        for (let idx = 0, len = _toArrayLength(values); idx < (isArr ? values[LENGTH] : len); idx++) {
+        for (let idx = 0, len = _checkArrayLength(_toLength(values)); idx < (isArr ? values[LENGTH] : len); idx++) {
             _addValue(values[idx]);
         }
     }

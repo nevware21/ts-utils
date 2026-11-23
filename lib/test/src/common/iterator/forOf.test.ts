@@ -8,7 +8,7 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { createArrayIterator } from "../../../../src/iterator/array";
-import { iterForOf } from "../../../../src/iterator/forOf";
+import { _createIndexIterator, iterForOf } from "../../../../src/iterator/forOf";
 import { createRangeIterator } from "../../../../src/iterator/range";
 import { objKeys } from "../../../../src/object/object";
 import { arrForEach } from "../../../../src/array/forEach";
@@ -561,6 +561,94 @@ describe("create iterator helpers", () => {
             assert.equal(reads, 1, "return should only be read once");
             assert.strictEqual(returnThis, iter, "return() should be called with the iterator as this");
         });
+    });
+});
+
+describe("the index iterator (used for an array or array-like which isn't iterable) works like the native array iterator", () => {
+    function _nativeValues(value: any): Iterator<any> | null {
+        return (Array.prototype as any).values ? (Array.prototype as any).values.call(value) : null;
+    }
+
+    it("returns the same value from a next() whose length getter calls next()", () => {
+        const getValues = (create: (value: any) => Iterator<any>) => {
+            let iter: Iterator<any>;
+            let reentered = false;
+            let nested: any[] = [];
+            let value: any = {
+                0: "a",
+                1: "b",
+                get length() {
+                    if (!reentered) {
+                        reentered = true;
+                        nested.push(iter.next().value);
+                    }
+
+                    return 2;
+                }
+            };
+
+            iter = create(value);
+            let outer: any[] = [];
+            let next = iter.next();
+            while (!next.done) {
+                outer.push(next.value);
+                next = iter.next();
+            }
+
+            return { nested, outer };
+        };
+
+        assert.deepEqual(getValues(_createIndexIterator), { nested: ["a"], outer: ["a", "b"] });
+        if (_nativeValues([])) {
+            assert.deepEqual(getValues(_nativeValues), { nested: ["a"], outer: ["a", "b"] }, "Array.prototype.values");
+        }
+    });
+
+    it("moves the index before the value is read, so a getter which calls next() gets the next value", () => {
+        const getValues = (create: (value: any) => Iterator<any>) => {
+            let iter: Iterator<any>;
+            let nested: any[] = [];
+            let value: any = {
+                length: 3,
+                get 0() {
+                    nested.push(iter.next().value);
+                    return "a";
+                },
+                1: "b",
+                2: "c"
+            };
+
+            iter = create(value);
+            let outer: any[] = [];
+            let next = iter.next();
+            while (!next.done) {
+                outer.push(next.value);
+                next = iter.next();
+            }
+
+            return { nested, outer };
+        };
+
+        assert.deepEqual(getValues(_createIndexIterator), { nested: ["b"], outer: ["a", "c"] });
+        if (_nativeValues([])) {
+            assert.deepEqual(getValues(_nativeValues), { nested: ["b"], outer: ["a", "c"] }, "Array.prototype.values");
+        }
+    });
+
+    it("stays done once it is done, even when the array grows", () => {
+        const check = (create: (value: any) => Iterator<any>, name: string) => {
+            let values = ["a"];
+            let iter = create(values);
+            assert.equal(iter.next().value, "a", name);
+            assert.isTrue(!!iter.next().done, name + ": done");
+            values.push("b");
+            assert.isTrue(!!iter.next().done, name + ": stays done");
+        };
+
+        check(_createIndexIterator, "_createIndexIterator");
+        if (_nativeValues([])) {
+            check(_nativeValues, "Array.prototype.values");
+        }
     });
 });
 

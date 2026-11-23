@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-import { LENGTH, ObjClass } from "../internal/constants";
+import { ArrProto, FUNCTION, LENGTH, OBJECT, ObjClass, ObjProto } from "../internal/constants";
 import { isFunction, isStrictUndefined } from "../helpers/base";
 import { objForEachKey } from "./for_each_key";
 import { objHasOwn } from "./has_own";
@@ -15,9 +15,7 @@ import { ILazyValue } from "../helpers/types";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
 import { arrForEach } from "../array/forEach";
 import { _objPropertyIsEnumerable } from "./property_is_enumerable";
-import { _objGetOwnPropertyDescriptor, _objGetOwnPropertySymbols } from "../internal/own_props";
-
-const _objCreate: (proto: null) => any = (/*#__PURE__*/_pureRef<typeof Object.create>(ObjClass, "create"));
+import { _objCreateNull, _objGetOwnPropertyDescriptor, _objGetOwnPropertySymbols, _objGetPrototypeOf } from "../internal/own_props";
 
 /**
  * Definition of the Property Descriptor mappings for the objDefine functions.
@@ -120,7 +118,7 @@ function _createProp(value: ObjDefinePropDescriptor): PropertyDescriptor {
     // Object.defineProperty() also reads the inherited properties of the descriptor, so it has no prototype (and only
     // the own properties of the value are used), so a property added to Object.prototype (eg. by prototype pollution
     // of "value", "get" or "l") can't change the defined property
-    let prop: PropertyDescriptor = _objCreate(null);
+    let prop: PropertyDescriptor = _objCreateNull();
     let lazyValue: ILazyValue<any>;
     prop[propMap["c"]] = true;
     prop[propMap["e"]] = true;
@@ -265,17 +263,57 @@ export function objDefine<T>(target: T, key: keyof T, propDesc: ObjDefinePropDes
 /**
  * @internal
  * @ignore
- * Adds the value to the end of the array as an own property, like the native functions which create an array (eg.
- * `Array.from()`), so a setter or read-only property of the same index on `Array.prototype` (or `Object.prototype`)
- * doesn't stop it being added. The value is only defined when the array "has" the index, which is when it is
- * inherited (which is rare), as defining every value is ~65x slower than assigning it.
+ * Adds (or replaces) the key of the target as an own data property (writable, enumerable and configurable), like the
+ * native CreateDataPropertyOrThrow() used by the functions which create an object (eg. `Object.fromEntries()`), so an
+ * inherited setter or read-only property (eg. "__proto__" or one added to Object.prototype) doesn't stop it being added
+ * (or change the prototype). The value is defined when `isDefine` is set (eg. for an object which was created by a
+ * constructor or species, which is defined like the native functions, so a TypeError is thrown when it can't be), when
+ * the target "has" the key (it is inherited or a duplicate, which is rare) or when the key is an object (so it is
+ * converted once, by the runtime, eg. its Symbol.toPrimitive / toString()), otherwise (for a new `{}` or `[]` whose
+ * prototype chain is the default one) it is assigned, as defining every value is ~65x slower than assigning it. The
+ * descriptor has no prototype (like objDefine()), so a property added to Object.prototype (eg. "get" or "set") can't
+ * change it, and using Object.defineProperty() directly keeps objDefine() out of the bundles which only use eg.
+ * arrWith, arrFlatMap or the polyfills.
+ * @param target - The object to add the property to
+ * @param key - The key of the property
+ * @param value - The value of the property
+ * @param isDefine - Always define the property
+ */
+export function _setOwnValue(target: any, key: any, value: any, isDefine?: boolean): void {
+    let keyType = typeof key;
+    if (isDefine || (key && (keyType === OBJECT || keyType === FUNCTION)) || key in target) {
+        let prop: PropertyDescriptor = _objCreateNull();
+        prop.value = value;
+        prop.writable = prop.enumerable = prop.configurable = true;
+        objDefineProp(target, key, prop);
+    } else {
+        target[key as any] = value;
+    }
+}
+
+/**
+ * @internal
+ * @ignore
+ * Adds the value to the end of the array (created by the caller, eg. a new `[]`), or at the index of an array which
+ * was created with its length (eg. by polyArrWith, as adding each value to the end is ~2x slower), as an own property,
+ * like the native functions which create an array (eg. `Array.from()`), so a setter or read-only property of the same
+ * index on `Array.prototype` (or `Object.prototype`) doesn't stop it being added. The value is only defined when the
+ * array "has" the index, which is when it is inherited (which is rare), as defining every value is ~65x slower than
+ * assigning it, or when the prototype of Array.prototype has been changed (eg. to a Proxy, which would see the "in"
+ * check and the assignment, while the native functions don't use the prototypes).
  * @param theArray - The array to add the value to
  * @param value - The value to add
+ * @param idx - The index of the value, the values must be added in order from 0, defaults to the end of the array
+ * @param isDefine - Always define the value (eg. for an array which was created by a constructor or species, which is
+ * defined like the native functions, so a TypeError is thrown when it can't be)
  */
-export function _pushOwnValue<T>(theArray: T[], value: T): void {
-    let idx = theArray[LENGTH];
-    if (idx in theArray) {
-        objDefine(theArray, idx, { v: value, w: true });
+export function _pushOwnValue<T>(theArray: T[], value: T, idx: number = theArray[LENGTH], isDefine?: boolean): void {
+    // The prototype of Array.prototype is checked for every value, as a callback or getter (eg. a mapFn) can change it
+    // between them. Without the ES5 Object.getPrototypeOf (eg. ES3) it can't be changed, so it is the default one. The
+    // (usual) assignment is inline, as this is called for every value (calling _setOwnValue() for each one is ~10-25%
+    // slower)
+    if (isDefine || (_objGetPrototypeOf && _objGetPrototypeOf(ArrProto) !== ObjProto) || idx in theArray) {
+        _setOwnValue(theArray, idx, value, true);
     } else {
         theArray[idx] = value;
     }
@@ -297,7 +335,7 @@ export function _pushOwnValue<T>(theArray: T[], value: T): void {
 export function objDefineProps<T>(target: T, propDescMap: ObjDefinePropDescriptorMap) {
     // The map has no prototype, so (like Object.defineProperties) a "__proto__" key (eg. from JSON.parse) is defined, and
     // a read-only property of Object.prototype (eg. when it is frozen) doesn't stop a key being added
-    let props: PropertyDescriptorMap = _objCreate(null);
+    let props: PropertyDescriptorMap = _objCreateNull();
 
     objForEachKey(propDescMap, (key, value: ObjDefinePropDescriptor) => {
         props[key] = _createProp(value);

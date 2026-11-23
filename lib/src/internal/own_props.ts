@@ -30,6 +30,13 @@ export const _objGetOwnPropertySymbols: (obj: any) => symbol[] = (/*#__PURE__*/_
 /**
  * @internal
  * @ignore
+ * The native Object.getPrototypeOf() (defined by every supported runtime, ES5)
+ */
+export const _objGetPrototypeOf: (value: any) => any = (/*#__PURE__*/_pureRef<typeof Object.getPrototypeOf>(ObjClass, "getPrototypeOf"));
+
+/**
+ * @internal
+ * @ignore
  * The native Object.create() (defined by every supported runtime, ES5)
  */
 export const _objCreate: (proto: any, properties?: PropertyDescriptorMap & ThisType<any>) => any = (/*#__PURE__*/_pureRef<typeof Object.create>(ObjClass, "create"));
