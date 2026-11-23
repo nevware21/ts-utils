@@ -35,16 +35,3 @@ export function makePolyFn<T extends Function>(poly: T): T {
 export function _isPolyfill(obj: any): boolean {
     return !!(obj && obj[POLYFILL_TAG]);
 }
-
-/**
- * Checks if the target object is of a specific polyfill type.
- * @internal
- * @ignore
- * @group Polyfill
- * @param obj - The object to check.
- * @param polyfillTypeName - The type name of the polyfill.
- * @returns True if the object is of the specified polyfill type, false otherwise.
- */
-export function _isPolyfillType(obj: any, polyfillTypeName: string): boolean {
-    return !!(obj && obj[POLYFILL_TYPE_NAME] === polyfillTypeName);
-}

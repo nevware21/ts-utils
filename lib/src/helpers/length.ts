@@ -7,7 +7,6 @@
  */
 
 import { LENGTH } from "../internal/constants";
-import { _unwrapProp } from "../internal/unwrapFunction";
 import { throwRangeError } from "./throw";
 import { mathTrunc } from "../math/trunc";
 
@@ -50,7 +49,7 @@ export interface IGetLength {
  * getLength({ length: () => 53; }); // returns the function that if called would return 53
  * ```
  */
-export const getLength: <T extends IGetLength>(value: T) => T["length"] = (/*#__PURE__*/_unwrapProp<IGetLength>(LENGTH));
+export const getLength: <T extends IGetLength>(value: T) => T["length"] = (value: IGetLength) => value[LENGTH];
 
 /**
  * @internal

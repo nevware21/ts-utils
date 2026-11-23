@@ -9,7 +9,6 @@
 import { isArray, isDate, isPrimitiveType, isStrictUndefined } from "../helpers/base";
 import { CALL, FUNCTION, LENGTH, NULL_VALUE, OBJECT } from "../internal/constants";
 import { _IdentityMap, _createIdentityMap } from "../internal/identity_map";
-import { objDefine } from "./define";
 import { forEachOwnKeySafe } from "./forEachOwnKey";
 import { isPlainObject } from "./is_plain_object";
 import { isUnsafeTarget } from "./isUnsafeTarget";
@@ -67,29 +66,6 @@ const defaultDeepCopyHandlers: ObjDeepCopyHandler[] = [
 /**
  * @internal
  * @ignore
- * Helper function used for detecting and handling recursive properties
- * @param visitMap - The current map of objects that have been visited
- * @param source - The value (object) to be copied
- * @param cb - The callback function to call if the current object has not already been processed.
- * @returns The new deep copied property, may be incomplete as the object is recursive and is still in the process of being copied
- */
-/*#__NO_SIDE_EFFECTS__*/
-function _getSetVisited(visitMap: _IdentityMap<_RecursiveVisitMap>, source: any, cb: (newEntry: _RecursiveVisitMap) => void) {
-    const newEntry: _RecursiveVisitMap = { v: source };
-
-    // Add the target to the visit map so that deep nested objects refer to the single instance
-    // Even if we have not finished processing it yet.
-    const theEntry = visitMap(source, newEntry);
-
-    // Now call the copy callback so that it populates the target
-    !theEntry && cb(newEntry);
-
-    return (theEntry || newEntry).v;
-}
-
-/**
- * @internal
- * @ignore
  * Internal helper which performs the recursive deep copy
  * @param visitMap - The current map of objects that have been visited
  * @param value - The value being copied
@@ -125,12 +101,19 @@ function _deepCopy<T>(visitMap: _IdentityMap<_RecursiveVisitMap>, value: T, ctx:
         path: newPath
     };
 
+    // The result is an accessor of the visit map entry, so the value a recursive reference gets follows the result
+    const newEntry: _RecursiveVisitMap = { v: value };
     let details: IObjDeepCopyHandlerDetails = {
         type: theType,
         isPrim: isPrim,
         isPlain: isPlain,
         value: value,
-        result: value,
+        get result() {
+            return newEntry.v;
+        },
+        set result(newValue: any) {
+            newEntry.v = newValue;
+        },
         path: newPath,
         origin: ctx.src,
         copy: <T>(source: T, newKey?: string | number | symbol): T => {
@@ -142,24 +125,17 @@ function _deepCopy<T>(visitMap: _IdentityMap<_RecursiveVisitMap>, value: T, ctx:
     };
 
     if (!isPrim) {
-        return _getSetVisited(visitMap, value, (newEntry) => {
-
-            // Use an accessor to set the new value onto the new entry
-            objDefine(details, "result", {
-                g: function () {
-                    return newEntry.v;
-                },
-                s: function (newValue: any) {
-                    newEntry.v = newValue;
-                }
-            });
-
+        // Add the value to the visit map before it is copied, so a recursive reference gets the same (partial) copy
+        const theEntry = visitMap(value, newEntry);
+        if (!theEntry) {
             let idx = 0;
             let handler: ObjDeepCopyHandler | null = userHandler;
             while (!(handler || (idx < defaultDeepCopyHandlers[LENGTH] ? defaultDeepCopyHandlers[idx++] : _defaultDeepCopyHandler))[CALL](ctx, details)) {
                 handler = NULL_VALUE;
             }
-        });
+        }
+
+        return (theEntry || newEntry).v;
     }
 
     // Only a primitive with a user handler gets here, which can override the provided value

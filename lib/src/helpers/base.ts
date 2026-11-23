@@ -7,7 +7,7 @@
  */
 
 import { ArrCls, FUNCTION, LENGTH, NULL_VALUE, OBJECT, ObjProto, SYMBOL_TYPE, TO_STRING, UNDEFINED, UNDEF_VALUE } from "../internal/constants";
-import { _isPolyfillType } from "../internal/poly_helpers";
+import { POLYFILL_TYPE_NAME } from "../internal/poly_helpers";
 import { _pureRef } from "../internal/treeshake_helpers";
 import { safeGet } from "./safe_get";
 import { IAsyncGeneratorFunction } from "./types";
@@ -40,7 +40,8 @@ export function _createIs<T>(theType: string): (value: any) => value is T {
 /*#__NO_SIDE_EFFECTS__*/
 export function _createIsWithPoly<T>(theType: string): (value: any) => value is T {
     return function (value: any): value is T {
-        return typeof value === theType || _isPolyfillType(value, theType);
+        // A polyfill (eg. a polyfill symbol) of the type has the type name
+        return typeof value === theType || (!!value && value[POLYFILL_TYPE_NAME] === theType);
     }
 }
 

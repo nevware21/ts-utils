@@ -7,8 +7,7 @@
  */
 
 import { fnApply, fnCall } from "../funcs/funcs";
-import { CONSTRUCTOR, NAME, NULL_VALUE, PROTOTYPE } from "../internal/constants";
-import { objCreate } from "../object/create";
+import { CONSTRUCTOR, NAME, PROTOTYPE } from "../internal/constants";
 import { objDefine } from "../object/define";
 import { objGetPrototypeOf } from "../object/object";
 import { objSetPrototypeOf } from "../object/set_proto";
@@ -23,24 +22,6 @@ export interface CustomErrorConstructor<T extends Error = Error> extends ErrorCo
     new(message?: string): T;
     (message?: string): T;
     readonly prototype: T;
-}
-
-/**
- * @internal
- * @ignore
- */
-/*#__NO_SIDE_EFFECTS__*/
-function _createCustomError<T>(name: string, d: any, b: any): T {
-    safe(objDefine, [ d, NAME, { v: name, c: true, e: false }]);
-    d = objSetPrototypeOf(d, b);
-    function __() {
-        this[CONSTRUCTOR] = d;
-        safe(objDefine, [this, NAME, { v: name, c: true, e: false }]);
-    }
-
-    d[PROTOTYPE] = b === NULL_VALUE ? objCreate(b) : ((__ as any)[PROTOTYPE] = b[PROTOTYPE], new (__ as any)());
-
-    return d;
 }
 
 function  _setName(baseClass: any, name: string) {
@@ -173,6 +154,10 @@ export function createCustomError<T extends ErrorConstructor = CustomErrorConstr
     let theBaseClass = errorBase || Error;
     let orgName = theBaseClass[PROTOTYPE][NAME];
     let captureFn = Error.captureStackTrace;
+
+    // The (non-enumerable) name of the class, its prototype and an instance whose prototype can't be set, objDefine()
+    // doesn't change the descriptor so it is shared
+    let nameDesc = { v: name, c: true, e: false };
     let ctorFn = function (this: any) {
         let _this = this;
         let theArgs = arguments;
@@ -194,7 +179,7 @@ export function createCustomError<T extends ErrorConstructor = CustomErrorConstr
 
                     // A runtime which can't set the prototype (eg. IE 9 / 10) only copies the prototype's own enumerable
                     // properties, so also define the (non-enumerable) name on the instance
-                    objGetPrototypeOf(_self) !== orgProto && safe(objDefine, [_self, NAME, { v: name, c: true, e: false }]);
+                    objGetPrototypeOf(_self) !== orgProto && safe(objDefine, [_self, NAME, nameDesc]);
                 }
             }
 
@@ -219,7 +204,18 @@ export function createCustomError<T extends ErrorConstructor = CustomErrorConstr
         }
     };
 
-    return _createCustomError<T>(name, ctorFn, theBaseClass);
+    safe(objDefine, [ctorFn, NAME, nameDesc]);
+    let theClass: any = objSetPrototypeOf(ctorFn, theBaseClass);
+    function __() {
+        this[CONSTRUCTOR] = theClass;
+        safe(objDefine, [this, NAME, nameDesc]);
+    }
+
+    // The base class is always a class (errorBase or Error), so the prototype inherits from its prototype
+    (__ as any)[PROTOTYPE] = theBaseClass[PROTOTYPE];
+    theClass[PROTOTYPE] = new (__ as any)();
+
+    return theClass;
 }
 
 /**
