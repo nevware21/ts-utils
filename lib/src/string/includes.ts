@@ -6,14 +6,13 @@
  * Licensed under the MIT license.
  */
 
-import { isRegExp } from "../helpers/base";
-import { dumpObj } from "../helpers/diagnostics";
 import { throwTypeError } from "../helpers/throw";
-import { DUMP_ERR_MAX_LENGTH, FUNCTION, OBJECT, StrProto, UNDEF_VALUE } from "../internal/constants";
+import { StrProto } from "../internal/constants";
+import { _isRegExp } from "../internal/is_regexp";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _pureAssign } from "../internal/treeshake_helpers";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction"
-import { asString } from "./as_string";
+import { _toString } from "./as_string";
 import { strIndexOf } from "./index_of";
 
 /**
@@ -57,9 +56,9 @@ export const strContains: (value: string, searchString: string, position?: numbe
 /**
  * The polyStrIncludes() method performs a case-sensitive search to determine whether one string
  * may be found within another string, returning `true` or `false` as appropriate.
- * Like the native function the value (eg. a `String` object, a number or an array) is converted to a string, but
- * unlike it a `Symbol` value or searchString is also converted (eg. to `"Symbol(abc)"`) rather than throwing a
- * TypeError.
+ * Like the native function the value (eg. a `String` object, a number or an array) and the searchString are converted
+ * to strings (since 0.20.0 a `Symbol` throws a TypeError, like the native function), and a regular expression
+ * searchString (identified like the native IsRegExp) throws a TypeError.
  * @since 0.9.0
  * @group String
  * @group Polyfill
@@ -78,7 +77,7 @@ export function polyStrIncludes(value: string, searchString: string, position?: 
 
     // Like the native function the value (eg. a String object, a number or an array) and then the searchString are
     // converted to strings (rather than the value's own indexOf() being used)
-    let theValue = asString(value);
+    let theValue = _toString(value);
 
     return strIndexOf(theValue, _toSearchString(searchString), position) !== -1;
 }
@@ -90,20 +89,20 @@ export function polyStrIncludes(value: string, searchString: string, position?: 
  * functions a RegExp throws a TypeError (rather than its source being searched for) and the value is only converted
  * once (so a toString() function is only called once). It is not annotated as having no side effects, as every caller
  * uses its result (so an annotation wouldn't allow any call to be removed).
- * Like the native IsRegExp() an object's `Symbol.match` decides whether it is a RegExp when it is defined (so a RegExp
- * whose `Symbol.match` is false is searched for as a string, and an object whose `Symbol.match` is truthy throws),
- * otherwise (and on a runtime without Symbol) its type does. The native Symbol is read directly (rather than with
- * getKnownSymbol(), which would include the Symbol polyfill in every bundle which uses these functions).
+ * Like the native IsRegExp() (see _isRegExp()) an object's `Symbol.match` decides whether it is a RegExp when it is
+ * defined (so a RegExp whose `Symbol.match` is false is searched for as a string, and an object whose `Symbol.match`
+ * is truthy throws), otherwise (and on a runtime without Symbol) whether it is a RegExp (without using its
+ * `Symbol.toStringTag`).
  * @param searchString - The value to convert
  * @returns The searchString as a string
  */
 export function _toSearchString(searchString: any): string {
-    let theType = typeof searchString;
-    let isMatch = typeof Symbol === FUNCTION && searchString && (theType === OBJECT || theType === FUNCTION) ? searchString[(Symbol as any).match] : UNDEF_VALUE;
-
-    if (isMatch !== UNDEF_VALUE ? !!isMatch : isRegExp(searchString)) {
-        throwTypeError("'searchString' must not be a regular expression " + dumpObj(searchString, 0, DUMP_ERR_MAX_LENGTH));
+    // Like the native functions (IsRegExp) a regular expression throws a TypeError (without reading any more of its
+    // properties, so the message doesn't include it), then (like ToString) the value is converted to a string (a Symbol
+    // throws a TypeError)
+    if (_isRegExp(searchString)) {
+        throwTypeError("'searchString' must not be a regular expression");
     }
 
-    return asString(searchString);
+    return _toString(searchString);
 }

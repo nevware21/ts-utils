@@ -10,7 +10,7 @@ import { isStrictUndefined } from "../helpers/base";
 import { LENGTH, StrProto } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
-import { asString } from "./as_string";
+import { _toString } from "./as_string";
 import { _toSearchString } from "./includes";
 import { strSubstring } from "./substring";
 
@@ -28,8 +28,9 @@ export const strEndsWith: (value: string, searchString: string, length?: number)
 
 /**
  * This method lets you determine whether or not a string ends with another string. This method is case-sensitive.
- * Like the native function the value (eg. a `String` object or a number) is converted to a string, but unlike it a
- * `Symbol` value or searchString is also converted (eg. to `"Symbol(abc)"`) rather than throwing a TypeError.
+ * Like the native function the value (eg. a `String` object or a number) and the searchString are converted to strings
+ * (since 0.20.0 a `Symbol` throws a TypeError, like the native function), and a regular expression searchString
+ * (identified like the native IsRegExp) throws a TypeError.
  * @group Polyfill
  * @group String
  * @param value - The value to be checked
@@ -46,7 +47,7 @@ export function polyStrEndsWith(value: string, searchString: string, length?: nu
     // strings (the searchString only once, and like polyStrIncludes() a RegExp throws a TypeError), and then the length
     // to a number (so NaN, the "undefined" string and a value which isn't a number are 0) which can't be longer than
     // the value, substring() truncates a fraction and treats a negative index as 0
-    let theValue = asString(value);
+    let theValue = _toString(value);
     let searchValue = _toSearchString(searchString);
     let len = theValue[LENGTH];
     let end = +length;

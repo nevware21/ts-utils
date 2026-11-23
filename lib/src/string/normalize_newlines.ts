@@ -11,6 +11,7 @@ import { throwTypeError } from "../helpers/throw";
 import { asString } from "./as_string";
 import { strReplace } from "./replace";
 import { arrIndexOf } from "../array/indexOf";
+import { UNDEF_VALUE } from "../internal/constants";
 
 const _validNewlines = ["\n", "\r\n", "\r", "\n\r"];
 
@@ -28,7 +29,7 @@ const _validNewlines = ["\n", "\r\n", "\r", "\n\r"];
 export function strNormalizeNewlines(value: string, newlineType?: "\n" | "\r\n" | "\r" | "\n\r"): string {
     _throwIfNullOrUndefined(value);
     
-    let target = newlineType !== undefined ? newlineType : "\n";
+    let target = newlineType !== UNDEF_VALUE ? newlineType : "\n";
 
     if (arrIndexOf(_validNewlines, target) === -1) {
         throwTypeError("Unsupported newlineType value");
