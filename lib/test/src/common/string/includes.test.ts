@@ -245,16 +245,17 @@ describe("polyStrIncludes null and undefined values", () => {
 });
 
 describe("polyStrIncludes Symbol values", () => {
-    it("converts a Symbol value or searchString (a documented difference from the native function, which throws a TypeError)", function() {
+    it("throws a TypeError for a Symbol value or searchString, like the native function", function() {
         if (typeof Symbol !== "function") {
             this.skip();
             return;
         }
 
-        // This is the documented behaviour of polyStrIncludes (see its docs and the CHANGELOG), rather than the native
-        // behaviour, as the value and searchString are converted with asString()
-        assert.isTrue(polyStrIncludes(Symbol("abc") as any, "b"), "The value is converted to \"Symbol(abc)\"");
-        assert.isTrue(polyStrIncludes("Symbol(abc)", Symbol("abc") as any), "The searchString is converted to \"Symbol(abc)\"");
+        // Like the native function the value and searchString are converted with ToString(), which throws for a Symbol
+        assert.throws(() => polyStrIncludes(Symbol("abc") as any, "b"), TypeError, undefined, "The value");
+        assert.throws(() => polyStrIncludes("Symbol(abc)", Symbol("abc") as any), TypeError, undefined, "The searchString");
+        assert.throws(() => (String.prototype as any).includes.call(Symbol("abc"), "b"), TypeError, undefined, "String.prototype.includes");
+        assert.throws(() => "Symbol(abc)".includes(Symbol("abc") as any), TypeError, undefined, "String.prototype.includes searchString");
     });
 });
 

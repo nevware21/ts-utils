@@ -9,9 +9,56 @@
 import { assert } from "@nevware21/tripwire-chai";
 import { dumpObj } from "../../../../src/helpers/diagnostics";
 import { polyStrMatchAll, strMatchAll } from "../../../../src/string/match_all";
-import { getKnownSymbol } from "../../../../src/symbol/symbol";
+import { getKnownSymbol, hasSymbol } from "../../../../src/symbol/symbol";
+import { _initTestHooks, setBypassLazyCache } from "../../../../src/helpers/lazy";
 import { WellKnownSymbols } from "../../../../src/symbol/well_known";
 import { iterForOf } from "../../../../src/iterator/forOf";
+import { getGlobal } from "../../../../src/helpers/environment";
+
+/**
+ * Calls the callback like on a runtime without Symbol.matchAll (eg. an older runtime, where the polyfill emulates the
+ * native RegExp.prototype[Symbol.matchAll]) by replacing the global Symbol with one which has every other well-known
+ * symbol (the lazy Symbol is bypassed, so getKnownSymbol() also has no matchAll), and (when noFlags is set) like ES5
+ * (where RegExp.prototype has no flags) by removing RegExp.prototype.flags, then restores them. On a runtime without
+ * Symbol (eg. IE), which has no Symbol.matchAll, the global Symbol isn't replaced.
+ */
+function _withoutMatchAll<T>(noFlags: boolean, callback: () => T): T {
+    const theGlobal: any = getGlobal();
+    const orgSymbol = theGlobal.Symbol;
+    const flagsDesc = Object.getOwnPropertyDescriptor(RegExp.prototype, "flags");
+    const stubSymbol: any = function() {
+        // Not used
+    };
+
+    orgSymbol && Object.getOwnPropertyNames(orgSymbol).forEach((name) => {
+        if (name !== "matchAll" && name !== "length" && name !== "name" && name !== "prototype") {
+            stubSymbol[name] = orgSymbol[name];
+        }
+    });
+
+    _initTestHooks();
+    setBypassLazyCache(true);
+    try {
+        orgSymbol && (theGlobal.Symbol = stubSymbol);
+        if (noFlags && flagsDesc) {
+            delete (RegExp.prototype as any).flags;
+        }
+
+        return callback();
+    } finally {
+        if (orgSymbol) {
+            theGlobal.Symbol = orgSymbol;
+
+            // The lazy Symbol is read again (while it is bypassed), so it isn't left as the stub
+            hasSymbol();
+        }
+
+        setBypassLazyCache(false);
+        if (noFlags && flagsDesc) {
+            Object.defineProperty(RegExp.prototype, "flags", flagsDesc);
+        }
+    }
+}
 
 function _toMatchInfo(iterator: Iterator<RegExpExecArray>): string[] {
     let result: string[] = [];
@@ -163,14 +210,18 @@ describe("strMatchAll helper", () => {
         }, "ab", /(?:)/g);
     });
 
-    it("zero-length unicode matches advance by code point", () => {
+    it("zero-length unicode matches advance by code point", function() {
+        if (typeof Symbol !== "function" || !(String.prototype as any).matchAll) {
+            this.skip();
+            return;
+        }
+
         let value = "A\uD83D\uDE00B";
-        let matchAllSym = getKnownSymbol(WellKnownSymbols.matchAll);
         let polyRegex = /(?:)/gu;
         let nativeRegex = /(?:)/gu;
-        (polyRegex as any)[matchAllSym] = undefined;
 
-        let polyResult = _toMatchInfo(polyStrMatchAll(value, polyRegex));
+        // The emulation of RegExp.prototype[Symbol.matchAll] (on a runtime without Symbol.matchAll)
+        let polyResult = _withoutMatchAll(false, () => _toMatchInfo(polyStrMatchAll(value, polyRegex)));
         let nativeResult = _toMatchInfo((String.prototype as any).matchAll.call(value, nativeRegex));
         assert.deepEqual(polyResult, nativeResult);
     });
@@ -186,14 +237,56 @@ describe("strMatchAll helper", () => {
     });
 
     it("clones regex normalizing negative lastIndex to 0", () => {
-        let matchAllSym = getKnownSymbol(WellKnownSymbols.matchAll);
         let re = /\d/g;
         re.lastIndex = -5;
-        (re as any)[matchAllSym] = undefined; // force polyfill path
 
-        let matches = _toMatchInfo(polyStrMatchAll("a1b2c3", re));
+        // The emulation of RegExp.prototype[Symbol.matchAll] (on a runtime without Symbol.matchAll)
+        let matches = _withoutMatchAll(false, () => _toMatchInfo(polyStrMatchAll("a1b2c3", re)));
         // Negative lastIndex must be clamped to 0 by ToLength, so all digits are found.
         assert.deepEqual(matches, ["1:1:[]", "3:2:[]", "5:3:[]"]);
+    });
+
+    it("emulation returns only the first match of a non-global RegExp whose Symbol.match is false, like the native function", function() {
+        if (typeof Symbol !== "function" || !Symbol.match || !(String.prototype as any).matchAll) {
+            this.skip();
+            return;
+        }
+
+        let polyRegex: any = /a/;
+        polyRegex[Symbol.match] = false;
+        let nativeRegex: any = /a/;
+        nativeRegex[Symbol.match] = false;
+
+        // The emulation of RegExp.prototype[Symbol.matchAll] (on a runtime without Symbol.matchAll)
+        let polyResult = _withoutMatchAll(false, () => _toMatchInfo(polyStrMatchAll("abcabc", polyRegex)));
+        let nativeResult = _toMatchInfo((String.prototype as any).matchAll.call("abcabc", nativeRegex));
+        assert.deepEqual(polyResult, ["0:a:[]"]);
+        assert.deepEqual(nativeResult, ["0:a:[]"], "String.prototype.matchAll");
+    });
+
+    it("emulation uses a Proxy of a RegExp (which inherits from RegExp.prototype) like the native function", function() {
+        if (typeof Proxy !== "function") {
+            this.skip();
+            return;
+        }
+
+        // A Proxy which reads the RegExp's properties from the RegExp itself (so its getters work)
+        const forwarding = () => new Proxy(/\d/g, {
+            get: (target, key) => (target as any)[key]
+        });
+
+        // The emulation of RegExp.prototype[Symbol.matchAll] (on a runtime without Symbol.matchAll)
+        let polyResult = _withoutMatchAll(false, () => _toMatchInfo(polyStrMatchAll("a1b2c3", forwarding())));
+        assert.deepEqual(polyResult, ["1:1:[]", "3:2:[]", "5:3:[]"], "The Proxy is copied, not converted to a string");
+
+        // A Proxy with the default get, whose RegExp getters (eg. the flags) are called on the Proxy, throws a TypeError
+        assert.throws(() => _withoutMatchAll(false, () => polyStrMatchAll("a1b2c3", new Proxy(/\d/g, {}))), TypeError);
+
+        let nativeMatchAll = (String.prototype as any).matchAll;
+        if (nativeMatchAll) {
+            assert.deepEqual(_toMatchInfo(nativeMatchAll.call("a1b2c3", forwarding())), polyResult, "String.prototype.matchAll");
+            assert.throws(() => nativeMatchAll.call("a1b2c3", new Proxy(/\d/g, {})), TypeError, undefined, "String.prototype.matchAll");
+        }
     });
 
     it("clones regex preserving ignoreCase and multiline flags", () => {
@@ -203,27 +296,99 @@ describe("strMatchAll helper", () => {
     });
 
     it("clones regex when flags property is unavailable", () => {
-        let matchAllSym = getKnownSymbol(WellKnownSymbols.matchAll);
         let re = new RegExp("a", "gimuy");
         re.lastIndex = 1;
-        Object.defineProperty(re, "flags", { value: undefined });
-        (re as any)[matchAllSym] = undefined;
 
-        let matches = _toMatchInfo(polyStrMatchAll("ba", re));
+        // Like on an ES5 runtime without Symbol.matchAll, where RegExp.prototype has no flags (so the flags are read from
+        // the global, ignoreCase, multiline, unicode and sticky properties)
+        let matches = _withoutMatchAll(true, () => _toMatchInfo(polyStrMatchAll("ba", re)));
         assert.deepEqual(matches, ["1:a:[]"]);
     });
 
     it("clones regex preserving dotAll when flags property is unavailable", () => {
-        let matchAllSym = getKnownSymbol(WellKnownSymbols.matchAll);
         let re = new RegExp(".", "gs");
-        Object.defineProperty(re, "flags", { value: undefined });
-        (re as any)[matchAllSym] = undefined;
 
-        let iter = polyStrMatchAll("\n", re);
-        let first = iter.next();
-        assert.equal(first.done, false);
-        assert.equal(first.value[0], "\n");
-        assert.equal(iter.next().done, true);
+        // Like on a runtime without Symbol.matchAll, where RegExp.prototype has no flags
+        let results = _withoutMatchAll(true, () => {
+            let iter = polyStrMatchAll("\n", re);
+            let first = iter.next();
+            return { first, second: iter.next() };
+        });
+
+        assert.equal(results.first.done, false);
+        assert.equal(results.first.value[0], "\n");
+        assert.equal(results.second.done, true);
+    });
+
+    describe("on a runtime without Symbol.matchAll, a RegExp subclass is used like the native RegExp.prototype[Symbol.matchAll]", () => {
+        // The classes (created from their source, as ES5 can't subclass RegExp), or null on a runtime without classes
+        let classes: any;
+        try {
+            classes = new Function("log", [
+                "class Other extends RegExp { exec(value) { log.push(\"other exec\"); return super.exec(value); } }",
+                "class Logged extends RegExp {",
+                "    static get [Symbol.species]() { log.push(\"species\"); return Other; }",
+                "    exec(value) { log.push(\"exec\"); return super.exec(value); }",
+                "}",
+                "class BadExec extends RegExp { exec() { return \"x\"; } }",
+                "class NotGlobal extends RegExp { get flags() { return \"g\"; } get global() { return false; } }",
+                "return { Logged: Logged, BadExec: BadExec, NotGlobal: NotGlobal };"
+            ].join("\n"));
+        } catch (e) {
+            classes = null;
+        }
+
+        function _count(iter: Iterator<any>): number {
+            let count = 0;
+            while (!iter.next().done) {
+                count++;
+            }
+
+            return count;
+        }
+
+        it("creates the copy with its species constructor, and calls its exec for each match", function() {
+            if (!classes || typeof Symbol !== "function" || !Symbol.species || !(String.prototype as any).matchAll) {
+                this.skip();
+                return;
+            }
+
+            const log: string[] = [];
+            const theClasses = classes(log);
+            const nativeCount = _count((String.prototype as any).matchAll.call("aa", new theClasses.Logged("a", "g")));
+            const nativeLog = log.splice(0, log.length);
+            const count = _withoutMatchAll(false, () => _count(polyStrMatchAll("aa", new theClasses.Logged("a", "g"))));
+
+            assert.equal(count, nativeCount, "The same number of matches");
+            assert.equal(count, 2);
+            assert.deepEqual(log, nativeLog, "The species and exec were used like the native function");
+            assert.deepEqual(log, ["species", "other exec", "other exec", "other exec"]);
+        });
+
+        it("throws a TypeError when exec returns a value which isn't an object or null", function() {
+            if (!classes || typeof Symbol !== "function" || !Symbol.species || !(String.prototype as any).matchAll) {
+                this.skip();
+                return;
+            }
+
+            const theClasses = classes([]);
+            assert.throws(() => (String.prototype as any).matchAll.call("aa", new theClasses.BadExec("a", "g")).next(), TypeError, undefined, "The native function");
+            assert.throws(() => _withoutMatchAll(false, () => polyStrMatchAll("aa", new theClasses.BadExec("a", "g")).next()), TypeError);
+        });
+
+        it("identifies a global (and unicode) copy by its flags rather than its properties", function() {
+            if (!classes || typeof Symbol !== "function" || !Symbol.species || !(String.prototype as any).matchAll) {
+                this.skip();
+                return;
+            }
+
+            const theClasses = classes([]);
+            const nativeCount = _count((String.prototype as any).matchAll.call("aa", new theClasses.NotGlobal("a", "g")));
+            const count = _withoutMatchAll(false, () => _count(polyStrMatchAll("aa", new theClasses.NotGlobal("a", "g"))));
+
+            assert.equal(nativeCount, 2, "The native function used the flags");
+            assert.equal(count, nativeCount, "Every match was returned");
+        });
     });
 
     it("result exposes .index and .input on each match", () => {

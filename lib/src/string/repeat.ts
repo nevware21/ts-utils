@@ -6,13 +6,12 @@
  * Licensed under the MIT license.
  */
 
-import { isString } from "../helpers/base";
+import { _toInt } from "../helpers/length";
 import { throwRangeError } from "../helpers/throw";
-import { EMPTY, StrProto } from "../internal/constants";
+import { EMPTY, LENGTH, StrProto } from "../internal/constants";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { _unwrapFunctionWithPoly } from "../internal/unwrapFunction";
-import { mathToInt } from "../math/to_int";
-import { asString } from "./as_string";
+import { _toString } from "./as_string";
 
 /**
  * The `strRepeat()` method constructs and returns a new string which contains the
@@ -44,17 +43,27 @@ export const strRepeat: (value: string, count: number) => string = (/*#__PURE__*
 export function polyStrRepeat(value: string, count: number): string {
     _throwIfNullOrUndefined(value);
 
-    count = mathToInt(count, true);
-    if (count < 0) {
+    // Like the native function the value is converted to a string (a Symbol throws a TypeError) before the count is
+    // converted like ToIntegerOrInfinity (a fraction is truncated, NaN is 0 and a Symbol or BigInt throws a TypeError),
+    // and a negative or infinite count throws a RangeError (even for an empty string)
+    let pad = _toString(value);
+    let num = _toInt(count);
+    let result = EMPTY;
+    if (num < 0 || num === Infinity) {
         throwRangeError("invalid count must be >= 0 && < Infinity");
     }
 
-    let pad = isString(value) ? value : asString(value);
-    let result = EMPTY;
+    if (pad && num) {
+        // Like the native function a result which is longer than a string can be throws a RangeError (for every runtime
+        // that is less than 2^31), so the count is then less than 2^31 and is halved as a 32-bit value
+        if (pad[LENGTH] * num > 0x7FFFFFFF) {
+            throwRangeError("Invalid string length");
+        }
 
-    for (;count > 0; (count >>>= 1) && (pad += pad)) {
-        if (count & 1) {
-            result += pad;
+        for (;num > 0; (num >>>= 1) && (pad += pad)) {
+            if (num & 1) {
+                result += pad;
+            }
         }
     }
 
