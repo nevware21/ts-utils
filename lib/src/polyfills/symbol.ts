@@ -7,18 +7,15 @@
  */
 
 import { WellKnownSymbols, _wellKnownSymbolMap } from "../symbol/well_known";
-import { throwTypeError } from "../helpers/throw";
-import { DUMP_ERR_MAX_LENGTH, LENGTH, SYMBOL, SYMBOL_TYPE, TO_STRING } from "../internal/constants";
-import { dumpObj } from "../helpers/diagnostics";
+import { EMPTY, LENGTH, SYMBOL, SYMBOL_TYPE, TO_STRING, UNDEF_VALUE } from "../internal/constants";
+import { _throwTypeOf } from "../internal/throwIf";
 import { objHasOwn } from "../object/has_own";
 import { asString } from "../string/as_string";
 import { _GlobalPolySymbols, _getGlobalConfig } from "../internal/global";
-import { strSubstring } from "../string/substring";
 import { objKeys } from "../object/object";
 import { objDefine } from "../object/define";
-import { _isPolyfill } from "../internal/poly_helpers";
-import { _tagAsPolyfill } from "../internal/poly_utils";
-import { objCreate } from "../object/create";
+import { POLYFILL_TAG, POLYFILL_TYPE_NAME, _isPolyfill } from "../internal/poly_helpers";
+import { _objCreateNull } from "../internal/own_props";
 import { _uniqueInstanceId } from "../internal/instance";
 
 const UNIQUE_REGISTRY_ID = "_urid";
@@ -31,7 +28,8 @@ let _polyId = 0;
 function _globalSymbolRegistry(): _GlobalPolySymbols {
     if (!_polySymbols) {
         let gblCfg = _getGlobalConfig();
-        _polySymbols = gblCfg.gblSym = gblCfg.gblSym || { k: {}, s:{} };
+        // The keys have no prototype, so a key which is an Object.prototype name (eg. "__proto__") is its own key
+        _polySymbols = gblCfg.gblSym = gblCfg.gblSym || { k: _objCreateNull(), s: {} };
     }
 
     return _polySymbols;
@@ -52,10 +50,14 @@ let _wellKnownSymbolCache: { [key in keyof typeof WellKnownSymbols ]: symbol };
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polyNewSymbol(description?: string | number): symbol {
+    // Like the native Symbol() an undefined description is undefined (and empty in the symbol's string), and any other
+    // description is converted to a string once (so an object's toString() is used)
+    const desc = description === UNDEF_VALUE ? UNDEF_VALUE : asString(description);
+
     // Create a unique identifier for this symbol instance
     const uniqueId = "_" + _polyId++ + "_" + _uniqueInstanceId.v;
-    const symString = SYMBOL + "(" + description + ")";
-    
+    const symString = SYMBOL + "(" + (desc || EMPTY) + ")";
+
     function _setProp(name: string, value: any) {
         objDefine(theSymbol as any, name, {
             v: value,
@@ -63,16 +65,20 @@ export function polyNewSymbol(description?: string | number): symbol {
             w: false
         });
     }
-    
-    let theSymbol = objCreate(null) as symbol;
 
-    _setProp("description", asString(description));
+    let theSymbol = _objCreateNull() as symbol;
+
+    _setProp("description", desc);
     _setProp(TO_STRING, () => symString + POLY_SYM + uniqueId);
     _setProp("valueOf", () => theSymbol);
     _setProp("v", symString);
     _setProp("_uid", uniqueId);
 
-    return _tagAsPolyfill(theSymbol as any, SYMBOL_TYPE) as symbol;
+    // Tagged as a polyfill symbol (see isSymbol() and polySymbolKeyFor())
+    _setProp(POLYFILL_TAG, true);
+    _setProp(POLYFILL_TYPE_NAME, SYMBOL_TYPE);
+
+    return theSymbol;
 }
 
 /**
@@ -84,13 +90,21 @@ export function polyNewSymbol(description?: string | number): symbol {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polySymbolFor(key: string): symbol {
+    // Like the native function the key is converted to a string once
+    key = asString(key);
+
     let registry = _globalSymbolRegistry();
     if (!objHasOwn(registry.k, key)) {
         let newSymbol: any = polyNewSymbol(key);
         let regId = objKeys(registry.s)[LENGTH];
         newSymbol[UNIQUE_REGISTRY_ID] = () => regId + "_" + newSymbol[TO_STRING]();
-        registry.k[key] = newSymbol;
-        registry.s[newSymbol[UNIQUE_REGISTRY_ID]()] = asString(key);
+        objDefine(registry.k, key, {
+            v: newSymbol,
+            w: true,
+            e: true,
+            c: true
+        });
+        registry.s[newSymbol[UNIQUE_REGISTRY_ID]()] = key;
     }
 
     return registry.k[key];
@@ -105,13 +119,19 @@ export function polySymbolFor(key: string): symbol {
  */
 /*#__NO_SIDE_EFFECTS__*/
 export function polySymbolKeyFor(sym: symbol): string | undefined {
-    if (!sym || !sym[TO_STRING] || strSubstring(sym[TO_STRING](), 0, 6) != SYMBOL) {
-        throwTypeError(dumpObj(sym, 0, DUMP_ERR_MAX_LENGTH) + " is not a symbol");
+    // A polyfill symbol of every version has the polyfill tag (only v0.12.0 and later also have the polyfill type)
+    let isPoly = _isPolyfill(sym);
+
+    // Like the native function a value which isn't a symbol throws a TypeError without converting it (so the message
+    // only includes its type), while a native symbol (eg. on a runtime without Symbol.keyFor) has no key, like v0.16.0
+    if (!isPoly && typeof sym !== SYMBOL_TYPE) {
+        _throwTypeOf(sym, " is not a symbol");
     }
 
-    const regId = _isPolyfill(sym) && (sym as any)[UNIQUE_REGISTRY_ID] && (sym as any)[UNIQUE_REGISTRY_ID]();
+    // Only a polyfill symbol registered by v0.10.1 or later has a registry id
+    const regId = isPoly && (sym as any)[UNIQUE_REGISTRY_ID] && (sym as any)[UNIQUE_REGISTRY_ID]();
 
-    return regId ? _globalSymbolRegistry().s[regId] : undefined;
+    return regId ? _globalSymbolRegistry().s[regId] : UNDEF_VALUE;
 }
 
 /**
@@ -138,7 +158,8 @@ export function polySymbolKeyFor(sym: symbol): string | undefined {
 export function polyGetKnownSymbol(name: string | WellKnownSymbols): symbol {
     !_wellKnownSymbolCache && (_wellKnownSymbolCache = {} as any);
     let result: symbol;
-    let knownName: WellKnownSymbols = (_wellKnownSymbolMap as any)[name];
+    // Only a name of the map itself (not an inherited one, eg. "toString")
+    let knownName: WellKnownSymbols = objHasOwn(_wellKnownSymbolMap, name) ? (_wellKnownSymbolMap as any)[name] : UNDEF_VALUE;
     if (knownName) {
         result = (_wellKnownSymbolCache as any)[knownName] = _wellKnownSymbolCache[knownName] || polyNewSymbol(SYMBOL + "." + knownName);
     }
