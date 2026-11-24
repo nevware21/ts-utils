@@ -1051,6 +1051,39 @@ describe("polyfills match the native functions", () => {
             assert.equal(polySymbolKeyFor(valueOfSym), "valueOf");
         });
 
+        it("polySymbolFor() supports __proto__ in a shared registry which an earlier version created (its keys have Object.prototype)", function() {
+            const setPrototypeOf = (Object as any).setPrototypeOf;
+            if (!setPrototypeOf) {
+                this.skip();
+                return;
+            }
+
+            polySymbolFor("the registry exists");
+            const registry: any = _getGlobalConfig().gblSym;
+            const keys = registry.k;
+            const keysProto = Object.getPrototypeOf(keys);
+            const ownProtoKey = Object.getOwnPropertyDescriptor(keys, "__proto__");
+            let protoSym: any;
+
+            // Like the registry of v0.10.1 to v0.16.0, which is created as { k: {}, s: {} }
+            delete keys["__proto__"];
+            setPrototypeOf(keys, Object.prototype);
+            try {
+                protoSym = polySymbolFor("__proto__");
+
+                assert.ok(protoSym, "A symbol is returned");
+                assert.strictEqual(polySymbolFor("__proto__"), protoSym, "The same symbol is returned again");
+                assert.equal(polySymbolKeyFor(protoSym), "__proto__");
+                assert.ok(Object.prototype.hasOwnProperty.call(keys, "__proto__"), "__proto__ is an own key of the registry");
+                assert.strictEqual(Object.getPrototypeOf(keys), Object.prototype, "The prototype of the registry's keys is unchanged");
+            } finally {
+                delete keys["__proto__"];
+                setPrototypeOf(keys, keysProto);
+                protoSym && protoSym._urid && delete registry.s[protoSym._urid()];
+                ownProtoKey && Object.defineProperty(keys, "__proto__", ownProtoKey);
+            }
+        });
+
         it("polySymbolFor() converts the key once, like Symbol.for()", () => {
             const calls: string[] = [];
             const key = {
@@ -1171,6 +1204,7 @@ describe("polyfills match the native functions", () => {
             assert.equal(sym["__nw21$polytype__"], "symbol", "The polyfill type");
         });
     });
+
     describe("polyStrPadStart and polyStrPadEnd", () => {
         it("convert the value to a string and the targetLength to a length, like String.prototype.padStart / padEnd", () => {
             const nativePadStart = (String.prototype as any).padStart;

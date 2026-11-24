@@ -344,4 +344,18 @@ describe("error messages limit the dump of a value", () => {
             assert.equal(error.message, typeCases[lp][2], typeCases[lp][0] + " message only includes the type");
         }
     });
+
+    it("includes null for a null value (rather than its typeof, object), like the native messages", () => {
+        const nullCases: any[] = [
+            ["polySymbolKeyFor", () => polySymbolKeyFor(null as any), "null is not a symbol"],
+            ["polyArrFrom", () => polyArrFrom([1], null as any), "null is not a function"],
+            ["polyObjFromEntries entry", () => polyObjFromEntries([null] as any), "null is not an entry object"]
+        ];
+
+        for (let lp = 0; lp < nullCases.length; lp++) {
+            const error = _getError(nullCases[lp][1]);
+            assert.instanceOf(error, TypeError, nullCases[lp][0] + " should throw");
+            assert.equal(error.message, nullCases[lp][2], nullCases[lp][0] + " message includes null");
+        }
+    });
 });
