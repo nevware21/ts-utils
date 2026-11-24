@@ -49,4 +49,11 @@ describe("iterToArray with an array-like which isn't iterable", () => {
         assert.throws(() => iterToArray({ length: Infinity } as any), RangeError);
         assert.throws(() => iterToArray({ length: Math.pow(2, 32) } as any), RangeError);
     });
+
+    it("reads the values by index when it has a next which is not a function (as in v0.16.0)", () => {
+        assert.deepEqual(iterToArray({ length: 2, 0: "a", 1: "b", next: 5 } as any), ["a", "b"], "A number");
+        assert.deepEqual(iterToArray({ length: 2, 0: "a", 1: "b", next: "x" } as any), ["a", "b"], "A string");
+        assert.deepEqual(iterToArray({ length: 2, 0: "a", 1: "b", next: {} } as any), ["a", "b"], "An object");
+        assert.deepEqual(iterToArray({ length: 2, 0: "a", 1: "b", next: 5 } as any, (value: any, idx) => value + idx), ["a0", "b1"], "With a callbackfn");
+    });
 });

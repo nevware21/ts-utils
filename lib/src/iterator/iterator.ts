@@ -6,11 +6,14 @@
  * Licensed under the MIT license.
  */
 
-import { getKnownSymbol, isSymbol } from "../symbol/symbol";
+import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 import { isFunction, isStrictNullOrUndefined } from "../helpers/base";
 import { asString } from "../string/as_string";
 import { IAsyncIterable } from "./types";
+import { SYMBOL_TYPE } from "../internal/constants";
+import { ICachedValue } from "../helpers/types";
+import { safeGetLazy } from "../helpers/safe_lazy";
 
 let _iterKey: PropertyKey;
 
@@ -26,11 +29,22 @@ let _iterKey: PropertyKey;
 export function _getIterKey(): PropertyKey {
     if (!_iterKey) {
         let sym: any = getKnownSymbol(WellKnownSymbols.iterator);
-        _iterKey = isSymbol(sym) ? sym : asString(sym);
+        // isSymbol() is also true for a polyfill symbol (an object), so the type is checked
+        _iterKey = typeof sym === SYMBOL_TYPE ? sym : asString(sym);
     }
 
     return _iterKey;
 }
+
+/**
+ * @internal
+ * @ignore
+ * Identifies whether Symbol.iterator is a native symbol, so the native values (eg. an array, a string, a Map or a Set)
+ * are iterable, otherwise (eg. IE, or with a global Symbol shim) the native iterators are emulated. It is evaluated
+ * once, when its value is first read (like the other lazy values it is evaluated again for each read while
+ * setBypassLazyCache(true) is set, eg. by the tests)
+ */
+export const _hasNativeIterator: ICachedValue<boolean> = (/*#__PURE__*/safeGetLazy(() => typeof getKnownSymbol(WellKnownSymbols.iterator) === SYMBOL_TYPE, false));
 
 /**
  * Checks if the type of value looks like an iterator instance (contains a next function).

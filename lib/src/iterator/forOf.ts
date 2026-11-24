@@ -7,13 +7,14 @@
  */
 
 import { fnCall } from "../funcs/funcs";
-import { isArray, isFunction, isMap, isPrimitive, isSet, isStrictNullOrUndefined } from "../helpers/base";
+import { isArray, isFunction, isMap, isObject, isPrimitive, isSet, isStrictNullOrUndefined, isString, isStringObject } from "../helpers/base";
+import { asString } from "../string/as_string";
 import { _checkArrayLength, _toLength } from "../helpers/length";
 import { safe } from "../helpers/safe";
 import { throwTypeError } from "../helpers/throw";
-import { CALL, FUNCTION, NULL_VALUE, OBJECT } from "../internal/constants";
+import { FUNCTION, NULL_VALUE, OBJECT } from "../internal/constants";
 import { _pushOwnValue } from "../object/define";
-import { _getIterKey, isIterator } from "./iterator";
+import { _getIterKey, _hasNativeIterator, isIterator } from "./iterator";
 
 /**
  * @internal
@@ -52,18 +53,23 @@ export function _closeIter(iter: any): void {
  * - An iterable is processed using the iterator returned by its `[Symbol.iterator]()`, even when it is also an
  * iterator (has a `next()` function), and only an iterator which is not iterable is used as-is. The built-in
  * iterators and generators return themselves, while an object such as a jQuery collection (which has a `next()`
- * function that is not an iterator function) is processed using its iterator. On a runtime without `Symbol.iterator`
- * (eg. IE), where an array isn't iterable, an array (which isn't also an iterator) is processed by its indexes
- * (since 0.20.0), like the native array iterator its values are read as they are iterated (so a value added by the
- * `callbackFn` is also processed). Likewise a `Map` (its `[key, value]` entries) or `Set` (its values) which isn't
- * iterable (eg. on IE 11, which has no iterator functions) is processed (since 0.20.0) using its `forEach()`, as a
- * copy of its entries / values when processing starts (so a value added by the `callbackFn` is not processed).
+ * function that is not an iterator function) is processed using its iterator.
  * - When the iteration stops before the iterator is done, because the `callbackFn` returns -1 or throws, the
  * iterator is closed by calling its `return()` function (if any), so a generator's `finally` block is run. The
  * error thrown by the `callbackFn` is then re-thrown (rather than any error thrown by `return()`). The iterator is
  * not closed when the iterator itself throws.
  * - A `TypeError` is thrown when `[Symbol.iterator]()` doesn't return an iterator, when `next()` returns a value
  * which is not an object, or when `return()` returns a value which is not an object after the `callbackFn` returns -1.
+ *
+ * Unlike `for...of` (which throws a `TypeError` for a value which isn't iterable) an array which isn't iterable is
+ * processed (since 0.20.0) by its indexes, eg. on a runtime without `Symbol.iterator` (such as IE) or an array whose own
+ * `[Symbol.iterator]` is `null` or `undefined`, like the native array iterator its values are read as they are iterated
+ * (so a value added by the `callbackFn` is also processed). Likewise a `Map` (its `[key, value]` entries) or `Set` (its
+ * values) which isn't iterable (eg. on IE 11, which has no iterator functions) is processed (since 0.20.0) using its
+ * `forEach()`, as a copy of its entries / values when processing starts (so a value added by the `callbackFn` is not
+ * processed). On a runtime without `Symbol.iterator` a string or `String` object is processed by its code points (like
+ * the native String iterator). The polyfills (`polyArrFrom` and `polyObjFromEntries`) instead follow the native
+ * functions, so they only emulate these iterators on a runtime without `Symbol.iterator`.
  * @remarks
  * If Symbols are NOT supported then the iterable MUST be using the same polyFill for the well know symbols,
  * if you are targetting a mixed environment you SHOULD either
@@ -108,10 +114,11 @@ export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value
         } else if (isIterator(iter)) {
             _iterForOf(iter, callbackfn, thisArg);
         } else {
-            // On a runtime without Symbol.iterator (eg. IE) an array isn't iterable, so (like the native array iterator,
-            // where it is iterable) its values are read by index as they are iterated, and a Map or Set (eg. IE 11) is
-            // processed using a copy of its entries / values
-            let values = isArray(iter) ? iter : _getMapSetValues(iter);
+            // An array which isn't iterable (eg. on IE, or its own [Symbol.iterator] is undefined) has its values read by
+            // index as they are iterated (like the native array iterator), a Map or Set (eg. IE 11) is processed using a
+            // copy of its entries / values and (only on a runtime without Symbol.iterator) a string by its code points
+            // (like the String iterator). Unlike for...of (which throws a TypeError) any other value isn't processed
+            let values = _getEmulatedStrValues(iter) || (isArray(iter) ? iter : _getMapSetValues(iter));
             values && _iterForOf(_createIndexIterator(values), callbackfn, thisArg);
         }
     }
@@ -123,26 +130,55 @@ export function iterForOf<T>(iter: Iterator<T> | Iterable<T>, callbackfn: (value
  * Returns the `[key, value]` entries of a `Map` or the values of a `Set` using its `forEach()`, for a Map or Set which
  * isn't iterable (eg. on IE 11, which has Map and Set without Symbol.iterator or their iterator functions). This is
  * only used when the value isn't iterable, so it doesn't change how an iterable Map or Set is processed, and only for
- * a value which has a `forEach()` function (so an object with a `Symbol.toStringTag` of "Map" isn't processed).
+ * a value which has a `forEach()` function (so an object with a `Symbol.toStringTag` of "Map" isn't processed). The
+ * helpers (eg. iterForOf) use it for a Map or Set which isn't iterable on every runtime, while the polyfills
+ * (polyArrFrom and polyObjFromEntries) only use it on a runtime without a native Symbol.iterator, like the native
+ * functions.
  * @param value - The value to get the entries / values of
- * @returns A new array of the entries of a Map or the values of a Set, otherwise null
+ * @param cb - When given (by the polyfills), each entry / value is passed to it as it is read (like the native Map and
+ * Set iterators, which read the values live, so a value which the callback adds or deletes is or isn't read), rather
+ * than being copied
+ * @returns A new array of the entries of a Map or the values of a Set (empty when the cb is given), otherwise null
  */
-export function _getMapSetValues(value: any): any[] | null {
+export function _getMapSetValues(value: any, cb?: (value: any) => void): any[] | null {
     let values: any[] = NULL_VALUE;
     let isMapValue: boolean;
 
     // An object which is only identified as a Map or Set (eg. by its Symbol.toStringTag) without a forEach() function
-    // isn't one, so (like a value which isn't iterable) it has no values. The forEach() is checked first, as most
-    // values don't have one and it's quicker than identifying the value
-    if (value && isFunction(value.forEach) && ((isMapValue = isMap(value)) || isSet(value))) {
+    // isn't one, so (like a value which isn't iterable) it has no values. The value is identified before its forEach is
+    // read, so (like the native functions) an array-like's own forEach (eg. a getter) isn't read
+    if (((isMapValue = isMap(value)) || isSet(value)) && isFunction(value.forEach)) {
         values = [];
         value.forEach((theValue: any, key: any) => {
+            let entry = isMapValue ? [key, theValue] : theValue;
+
             // Like polyArrFrom each value is added as an own property, so an Array.prototype setter doesn't stop it
-            _pushOwnValue(values, isMapValue ? [key, theValue] : theValue);
+            cb ? cb(entry) : _pushOwnValue(values, entry);
         });
     }
 
     return values;
+}
+
+/**
+ * @internal
+ * @ignore
+ * Without a native iterator (eg. IE) returns the values of a string or String object which the native String iterator
+ * would return: the string (converted like the String iterator, so a String object's own toString() is used) split into
+ * its code points (each surrogate pair, or any other single code unit, including an unpaired surrogate), otherwise (and
+ * for any other value) null
+ * @param value - The value
+ * @returns The code points of the string, or null
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function _getEmulatedStrValues(value: any): string[] | null {
+    // Only a string or an object is checked (so the other values don't check for the native iterator), and the native
+    // iterator is checked before an object is identified, so where there is one an object isn't read (eg. its
+    // Symbol.toStringTag)
+    let isStr = isString(value);
+
+    return (isStr || isObject(value)) && !_hasNativeIterator.v && (isStr || isStringObject(value)) ?
+        (asString(value).match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\s\S]/g) || []) : NULL_VALUE;
 }
 
 /**
@@ -189,8 +225,10 @@ export function _createIndexIterator<T>(values: ArrayLike<T>): Iterator<T> {
  * @param iter - The iterator to process
  * @param callbackfn - The function called for each value, it can return -1 to stop the iteration
  * @param thisArg - The this value of the callbackfn, the iterator is used when it is omitted, null or undefined
+ * @param nextFn - The iterator's next() when it has already been read (eg. to identify an iterator which isn't
+ * iterable), so (like the native GetIteratorDirect) it isn't read again
  */
-export function _iterForOf<T>(iter: Iterator<T>, callbackfn: (value: T, count?: number, iter?: Iterator<T>) => void | number, thisArg?: any): void {
+export function _iterForOf<T>(iter: Iterator<T>, callbackfn: (value: T, count?: number, iter?: Iterator<T>) => void | number, thisArg?: any, nextFn?: Iterator<T>["next"]): void {
     let count = 0;
     let iterResult: IteratorResult<T>;
     let value: T;
@@ -200,9 +238,13 @@ export function _iterForOf<T>(iter: Iterator<T>, callbackfn: (value: T, count?: 
     // a result which is not an object or is done. A TypeError is thrown when the iterator is not an object with a
     // next() function (eg. when the [Symbol.iterator]() of an iterable doesn't return an iterator)
     let closeIter = false;
+
+    // Like for...of the iterator must be an object, whose next() is read once (and called for every value)
+    _throwIfNotResult(iter);
+    nextFn = nextFn || iter.next;
     try {
         for (;;) {
-            iterResult = iter.next();
+            iterResult = fnCall(nextFn, iter);
 
             // The result is checked inline (only calling _throwIfNotResult to throw the TypeError when it isn't an
             // object), as a call for every value is noticeably slower (eg. for a generator)
@@ -215,9 +257,10 @@ export function _iterForOf<T>(iter: Iterator<T>, callbackfn: (value: T, count?: 
                 break;
             }
 
+            // The callbackfn is called with the intrinsic call (not its own, or a replaced Function.prototype.call)
             value = iterResult.value;
             closeIter = true;
-            if (callbackfn[CALL](isStrictNullOrUndefined(thisArg) ? iter : thisArg, value, count++, iter) === -1) {
+            if (fnCall(callbackfn, isStrictNullOrUndefined(thisArg) ? iter : thisArg, value, count++, iter) === -1) {
                 break;
             }
 

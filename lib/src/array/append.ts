@@ -8,19 +8,22 @@
 
 import { isArray, isUndefined } from "../helpers/base";
 import { isIterable, isIterator } from "../iterator/iterator";
-import { _getMapSetValues, iterForOf } from "../iterator/forOf";
+import { iterToArray } from "../iterator/iterToArray";
 import { fnApply } from "../funcs/funcs";
-import { OBJECT } from "../internal/constants";
+import { LENGTH } from "../internal/constants";
 
 /**
  * Appends the `elms` to the `target` where the elms may be an array, a single object
  * or an iterator object
  *
- * An array, an iterator or an iterable (eg. a `Set`) adds each of its values, any other value is added as a single
- * element. On a runtime without `Symbol.iterator` (eg. IE) a `Map` (its `[key, value]` entries) or `Set` (its
- * values) is still added using a copy of its entries / values, but a value which is only iterable where there is
- * `Symbol.iterator` (eg. an `arguments` object or a typed array) is added as a single element, use {@link arrFrom}
- * (eg. `arrAppend(target, arrFrom(arguments))`) to add its values on every runtime.
+ * An array is added by its indexes, an iterator or an iterable (eg. a `Set`) adds each of its values and any other
+ * value is added as a single element. Every value of an iterator or iterable is read before any are added (like
+ * spread), so the target isn't changed when the iterator throws. The values are added with one `push()` call (like
+ * `target.push(...values)`), unless there are more of them than `apply()` accepts as arguments, when each value is
+ * pushed (since 0.20.0 also for an array, which threw a `RangeError`). On a runtime without `Symbol.iterator` (eg. IE) a
+ * value which is only iterable where there is `Symbol.iterator` (eg. a `Map`, `Set`, string or `arguments` object) is
+ * added as a single element, use {@link arrFrom} (eg. `arrAppend(target, arrFrom(theSet))`) to add its values on every
+ * runtime.
  * @group Array
  * @group Iterator
  * @example
@@ -57,17 +60,27 @@ import { OBJECT } from "../internal/constants";
  */
 export function arrAppend<T>(target: T[], elms: T | T[] | Iterator<T>): T[] {
     if (!isUndefined(elms) && target) {
-        let values: any[];
+        let values: T[];
         if (isArray(elms)) {
-            // This is not just "target.push(elms)" but becomes effectively "target.push(elms[0], elms[1], ...)"
-            fnApply(target.push, target, elms);
-        } else if (isIterator<T>(elms) || isIterable<T>(elms) || (values = typeof elms === OBJECT && _getMapSetValues(elms))) {
-            // A Map or Set which isn't iterable (eg. IE 11, which has no iterator functions) appends a copy of its
-            // entries / values, each is pushed (like an iterable) so a large Map or Set can't exceed the argument limit
-            // of apply(). Any other value is appended as-is
-            iterForOf(values || elms as Iterable<T>, (elm) => {
-                target.push(elm);
-            });
+            values = elms;
+        } else if (isIterator<T>(elms) || isIterable<T>(elms)) {
+            // Every value is read before any are appended (like spread), so the target isn't changed when the iterator
+            // throws, and an iterator of the target (eg. its values()) doesn't also return the values which are appended
+            // (which never finishes)
+            values = iterToArray(elms);
+        }
+
+        if (values) {
+            try {
+                // This is not just "target.push(values)" but becomes effectively "target.push(values[0], values[1], ...)"
+                fnApply(target.push, target, values);
+            } catch (e) {
+                // There are more values than apply() accepts as arguments (eg. a RangeError, or "Out of stack space" on
+                // IE), so each value is pushed. Like apply() the length is read once, as the values may be the target
+                for (let idx = 0, len = values[LENGTH]; idx < len; idx++) {
+                    target.push(values[idx]);
+                }
+            }
         } else {
             target.push(elms as T);
         }

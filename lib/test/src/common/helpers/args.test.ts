@@ -237,3 +237,76 @@ describe("readArgs closes the iterator like for...of", () => {
         assert.deepEqual(readArgs(_createIterable({}), 0, 2), [0, 1]);
     });
 });
+
+describe("readArgs converts the start and end of an iterable like arrSlice", () => {
+    // A start / end which records each time it is converted to a number
+    function _counted(value: number, calls: string[], name: string): any {
+        return {
+            valueOf: () => {
+                calls.push(name);
+                return value;
+            }
+        };
+    }
+
+    it("converts the start and end once (like Array.prototype.slice), rather than for each value", function() {
+        if (!hasSymbol()) {
+            this.skip();
+            return;
+        }
+
+        const values = ["a", "b", "c", "d"];
+        const ranges = [[1, undefined], [1, 3], [-2, undefined], [1, -1], [-3, -1], [0, 2], [undefined, -1]];
+        ranges.forEach(([start, end]) => {
+            const sliceCalls: string[] = [];
+            const readArgsCalls: string[] = [];
+            const expected = values.slice(
+                start === undefined ? undefined : _counted(start, sliceCalls, "start"),
+                end === undefined ? undefined : _counted(end, sliceCalls, "end"));
+            // A Set is an iterable without a length
+            const result = readArgs(new Set(values),
+                start === undefined ? undefined : _counted(start, readArgsCalls, "start"),
+                end === undefined ? undefined : _counted(end, readArgsCalls, "end"));
+
+            const details = "readArgs(iterable, " + start + ", " + end + ")";
+            assert.deepEqual(result, expected, details);
+            assert.deepEqual(readArgsCalls, sliceCalls, details + " converts the start and end like slice");
+        });
+    });
+});
+
+describe("readArgs with a [Symbol.iterator] which isn't a function", () => {
+    it("throws a TypeError for a falsy [Symbol.iterator] which isn't null or undefined, like Array.from", function() {
+        if (!hasSymbol()) {
+            this.skip();
+            return;
+        }
+
+        const nativeFrom = (Array as any).from;
+        [0, false, "", NaN, 5].forEach((iterFn) => {
+            const value: any = {};
+            value[getKnownSymbol(WellKnownSymbols.iterator)] = iterFn;
+
+            const details = "[Symbol.iterator] is " + (typeof iterFn === "string" ? JSON.stringify(iterFn) : String(iterFn));
+
+            assert.throws(() => readArgs(value), TypeError, undefined, details);
+            if (nativeFrom) {
+                assert.throws(() => nativeFrom(value), TypeError, undefined, "Array.from: " + details);
+            }
+        });
+    });
+
+    it("ignores a null or undefined [Symbol.iterator], like Array.from", function() {
+        if (!hasSymbol()) {
+            this.skip();
+            return;
+        }
+
+        [null, undefined].forEach((iterFn) => {
+            const value: any = {};
+            value[getKnownSymbol(WellKnownSymbols.iterator)] = iterFn;
+
+            assert.deepEqual(readArgs(value), [], "[Symbol.iterator] is " + iterFn);
+        });
+    });
+});

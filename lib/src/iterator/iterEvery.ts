@@ -7,23 +7,26 @@
  */
 
 import { fnCall } from "../funcs/funcs";
+import { UNDEF_VALUE } from "../internal/constants";
 import { _iterForOf } from "./forOf";
-import { _asIterator, _getIteratorThisArg } from "./helpers";
+import { _asIterator, _getIteratorThisArg, _throwIfNotIterCallbackFn } from "./helpers";
 import { IterPredicateCallbackFn } from "./types";
 
 /**
  * Tests whether all values in the iterator / iterable match the predicate.
  * The value is processed like `for...of` (and {@link iterForOf}), so an iterable (including a string or an array) is
- * processed using its iterator (a string by its code points on a runtime which supports `Symbol.iterator`) and an
- * iterator which is not iterable is used as-is. Unlike `for...of` (and iterForOf, which only also processes an array)
- * any other array-like which is not iterable (eg. `{ length: 2, 0: "a", 1: "b" }`, or `arguments` or a string on a
- * runtime without `Symbol.iterator`) is processed using its indexes, and a `Map` or `Set` which is not iterable (eg. on
- * IE 11) using a copy of its `[key, value]` entries / values.
+ * processed using its iterator (a string by its code points, which (since 0.20.0) are also emulated on a runtime
+ * without `Symbol.iterator`, eg. IE) and an iterator which is not iterable is used as-is. Unlike `for...of` (and
+ * iterForOf, which only also processes an array and a string) any other array-like which is not iterable (eg.
+ * `{ length: 2, 0: "a", 1: "b" }`, or `arguments` on a runtime without `Symbol.iterator`) is processed using its
+ * indexes, and a `Map` or `Set` which is not iterable (eg. on IE 11) using a copy of its `[key, value]` entries /
+ * values.
  * @since 0.15.0
  * @group Iterator
- * @throws TypeError when the value's `[Symbol.iterator]` isn't `null`, `undefined` or a function, when its
- * `[Symbol.iterator]()` doesn't return an iterator, or the iterator's `next()` returns a value which is not an object,
- * or (like `for...of`) when it stops early and the iterator's `return()` doesn't return an object
+ * @throws TypeError when the callbackfn isn't a function (before any value is read), when the value's
+ * `[Symbol.iterator]` isn't `null`, `undefined` or a function, when its `[Symbol.iterator]()` doesn't return an
+ * iterator, or the iterator's `next()` returns a value which is not an object, or (like `for...of`) when it stops early
+ * and the iterator's `return()` doesn't return an object
  * @example
  * ```ts
  * iterEvery([2, 4, 6], (value) => value % 2 === 0); // true
@@ -33,14 +36,18 @@ import { IterPredicateCallbackFn } from "./types";
 /*#__NO_SIDE_EFFECTS__*/
 export function iterEvery<T>(iter: Iterator<T> | Iterable<T>, callbackfn: IterPredicateCallbackFn<T>, thisArg?: any): boolean {
     let source = _asIterator(iter);
+
+    // Like the native helper the callbackfn is checked once the value's iterator has been resolved, before any value
+    // is read (closing the source when it isn't a function)
+    _throwIfNotIterCallbackFn(callbackfn, source);
     let allMatched = true;
 
-    _iterForOf(source, (value, count) => {
-        if (!fnCall(callbackfn, _getIteratorThisArg(source, thisArg), value, count)) {
+    _iterForOf(source.i, (value, count) => {
+        if (!fnCall(callbackfn, _getIteratorThisArg(source.i, thisArg), value, count)) {
             allMatched = false;
             return -1;
         }
-    });
+    }, UNDEF_VALUE, source.n);
 
     return allMatched;
 }

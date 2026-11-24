@@ -518,4 +518,15 @@ describe("the lazy iterator helpers are done after their source or callbackfn th
         assert.deepEqual(iterToArray(iterTake(value, 5)), [1, 2]);
         assert.equal(nextCalls, 0, "The value's own next() should not be called");
     });
+
+    it("read an array-like by index when its next is not a function", () => {
+        const value: any = { length: 2, 0: 1, 1: 2, next: 5 };
+
+        assert.deepEqual(iterToArray(iterMap(value, (item: any) => item * 10)), [10, 20]);
+        assert.deepEqual(iterToArray(iterFilter(value, () => true)), [1, 2]);
+        assert.deepEqual(iterToArray(iterTake(value, 5)), [1, 2]);
+        assert.isTrue(iterSome(value, (item: any) => item === 2));
+        assert.isTrue(iterEvery(value, (item: any) => item > 0));
+        assert.equal(iterReduce(value, (acc: number, item: any) => acc + item, 0), 3);
+    });
 });

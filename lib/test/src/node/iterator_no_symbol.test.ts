@@ -7,6 +7,7 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
+import { WellKnownSymbols } from "../../../src/symbol/well_known";
 
 // Only run with Node, where the modules can be loaded again (using require) while the global Symbol is removed, as the
 // iterator symbol is resolved (to the native or the polyfill symbol) and cached when it is first used. The arrays
@@ -97,6 +98,26 @@ describe("iterForOf and the helpers which use it on a runtime without Symbol", (
 
         assert.isFalse(result, "The modules should be loaded without Symbol");
         assert.isFunction(Symbol, "Symbol should be restored");
+    });
+
+    it("caches the string key of the polyfill iterator symbol, rather than the polyfill symbol object", () => {
+        const result = _runWithoutSymbol((modules) => {
+            let polySymbol = modules.symbol.getKnownSymbol(WellKnownSymbols.iterator);
+            let key = modules.iterator._getIterKey();
+
+            return {
+                keyType: typeof key,
+                isPolySymbol: key === polySymbol,
+                matchesPolySymbol: key === String(polySymbol),
+                isIterable: modules.iterator.isIterable(modules.create.createIterableIterator({ n: () => true }))
+            };
+        });
+
+        // Using the polyfill symbol object as the key would convert it into its string key on every property access
+        assert.equal(result.keyType, "string");
+        assert.isFalse(result.isPolySymbol, "The key isn't the polyfill symbol object");
+        assert.isTrue(result.matchesPolySymbol, "The key is the polyfill symbol's string key");
+        assert.isTrue(result.isIterable, "An iterable created with the polyfill symbol is iterable");
     });
 
     it("iterForOf processes an array", () => {
@@ -312,7 +333,76 @@ describe("iterForOf and the helpers which use it on a runtime without Symbol", (
         assert.deepEqual(results.set, { c: 3 }, "polyObjFromEntries of a Set of entries");
     });
 
-    it("arrAppend appends the entries of a Map and the values of a Set, like it does where they are iterable", () => {
+    it("polyArrFrom and polyObjFromEntries read a Map or Set live (like its iterator), so a value changed by the mapFn or a key conversion is used", () => {
+        // A mapFn (or a key's conversion) which deletes a value which hasn't been read yet and adds another
+        const changeSet = (theSet: Set<any>, deleteValue: any, addValue: any) => {
+            let changed = false;
+            return () => {
+                if (!changed) {
+                    changed = true;
+                    theSet.delete(deleteValue);
+                    theSet.add(addValue);
+                }
+            };
+        };
+
+        const getResults = (from: (value: any, mapFn?: any) => any[], fromEntries: (value: any) => any) => {
+            let set = new Set([1, 2]);
+            let change = changeSet(set, 2, 3);
+            let arrResult = from(set, (value: number) => {
+                change();
+                return value;
+            });
+
+            // The first entry's key conversion deletes the second entry and adds a third
+            let entries = new Set<any>();
+            let bEntry = ["b", 2];
+            let keyChange = changeSet(entries, bEntry, ["c", 3]);
+            entries.add([{
+                toString: () => {
+                    keyChange();
+                    return "a";
+                }
+            }, 1]);
+            entries.add(bEntry);
+
+            let ctorCalls = 0;
+            let ctorResult = from.call(function(this: any) {
+                ctorCalls++;
+                return this;
+            }, new Set(["x"]));
+
+            return { arrResult, objResult: fromEntries(entries), ctorCalls, ctorLength: ctorResult.length, ctorValue: ctorResult[0] };
+        };
+
+        const polyResults = _runWithoutSymbol((modules) => getResults(modules.polyArray.polyArrFrom, modules.fromEntries.polyObjFromEntries));
+        const expected = { arrResult: [1, 3], objResult: { a: 1, c: 3 }, ctorCalls: 1, ctorLength: 1, ctorValue: "x" };
+
+        assert.deepEqual(polyResults, expected, "polyArrFrom / polyObjFromEntries");
+        assert.deepEqual(getResults(Array.from, Object.fromEntries), expected, "Array.from / Object.fromEntries");
+    });
+
+    it("polyArrFrom doesn't read the forEach of an array-like which isn't a Map or Set, like Array.from", () => {
+        const getReads = (from: (value: any) => any[]) => {
+            let reads = 0;
+            let arrayLike: any = { length: 2, 0: "a", 1: "b" };
+            Object.defineProperty(arrayLike, "forEach", {
+                get: () => {
+                    reads++;
+                    return () => {
+                        // Not called
+                    };
+                }
+            });
+
+            return { result: from(arrayLike), reads };
+        };
+
+        assert.deepEqual(_runWithoutSymbol((modules) => getReads(modules.polyArray.polyArrFrom)), { result: ["a", "b"], reads: 0 }, "polyArrFrom");
+        assert.deepEqual(getReads(Array.from), { result: ["a", "b"], reads: 0 }, "Array.from");
+    });
+
+    it("arrAppend appends a Map or a Set as a single value (it isn't iterable without Symbol.iterator, arrFrom adds its values)", () => {
         const results = _runWithoutSymbol((modules) => {
             return {
                 map: modules.append.arrAppend([0], new Map<any, any>([["a", 1], ["b", 2]])),
@@ -321,19 +411,19 @@ describe("iterForOf and the helpers which use it on a runtime without Symbol", (
             };
         });
 
-        assert.deepEqual(results.map, [0, ["a", 1], ["b", 2]], "arrAppend of a Map");
-        assert.deepEqual(results.set, [0, 1, 2, 3], "arrAppend of a Set");
-        assert.deepEqual(results.emptyMap, [0], "arrAppend of an empty Map");
+        assert.deepEqual(results.map, [0, new Map<any, any>([["a", 1], ["b", 2]])], "arrAppend of a Map appends the Map");
+        assert.deepEqual(results.set, [0, new Set([1, 2, 3])], "arrAppend of a Set appends the Set");
+        assert.deepEqual(results.emptyMap, [0, new Map()], "arrAppend of an empty Map appends the Map");
     });
 
-    it("arrAppend appends every value of a large Set (more than apply() accepts as arguments)", () => {
+    it("arrAppend appends every value of a large iterator (more than apply() accepts as arguments)", () => {
         const results = _runWithoutSymbol((modules) => {
             const theSet = new Set<number>();
             for (let lp = 0; lp < 200000; lp++) {
                 theSet.add(lp);
             }
 
-            const result = modules.append.arrAppend([-1], theSet);
+            const result = modules.append.arrAppend([-1], theSet.values());
 
             return {
                 length: result.length,
@@ -419,5 +509,77 @@ describe("iterForOf and the helpers which use it on a runtime without Symbol", (
 
         assert.deepEqual(Object.getOwnPropertyDescriptor(results.set, "0"), { value: "own", writable: true, enumerable: true, configurable: true });
         assert.deepEqual(results.entries, { k: "v" }, "polyObjFromEntries of a Map");
+    });
+
+    it("polyObjFromEntries reads an array or a string by its indexes (like their native iterators), and arrAppend appends every value of an array", () => {
+        const results = _runWithoutSymbol((modules) => {
+            const run = (fn: () => any) => {
+                try {
+                    return fn();
+                } catch (e) {
+                    return (e as any).name;
+                }
+            };
+
+            return {
+                array: run(() => modules.fromEntries.polyObjFromEntries([["a", 1], ["b", 2]])),
+                emptyString: run(() => modules.fromEntries.polyObjFromEntries("")),
+                emptyStringObject: run(() => modules.fromEntries.polyObjFromEntries(new String(""))),
+                string: run(() => modules.fromEntries.polyObjFromEntries("ab")),
+                notIterable: run(() => modules.fromEntries.polyObjFromEntries({ a: 1 })),
+                append: modules.append.arrAppend([0], [1, 2])
+            };
+        });
+
+        assert.deepEqual(results.array, { a: 1, b: 2 }, "An array");
+        assert.deepEqual(results.emptyString, {}, "An empty string has no entries");
+        assert.deepEqual(results.emptyStringObject, {}, "An empty String object has no entries");
+        assert.equal(results.string, "TypeError", "The characters of a string are not entries");
+        assert.equal(results.notIterable, "TypeError", "An object isn't iterable");
+        assert.deepEqual(results.append, [0, 1, 2], "arrAppend of an array");
+    });
+
+    it("iterForOf, iterToArray and iterMap process a string by its code points, like the String iterator, and arrAppend appends it as a single value", () => {
+        const results = _runWithoutSymbol((modules) => {
+            const forOfValues: string[] = [];
+            modules.forOf.iterForOf("a😀b", (value: string) => {
+                forOfValues.push(value);
+            });
+
+            return {
+                forOf: forOfValues,
+                stringObject: modules.iterToArray.iterToArray(new String("a😀")),
+                map: modules.iterToArray.iterToArray(modules.iterMap.iterMap("ab", (value: string) => value + value)),
+                append: modules.append.arrAppend([0], "a😀"),
+                appendEmpty: modules.append.arrAppend([0], "")
+            };
+        });
+
+        assert.deepEqual(results.forOf, ["a", "😀", "b"], "iterForOf of a string");
+        assert.deepEqual(results.stringObject, ["a", "😀"], "iterToArray of a String object");
+        assert.deepEqual(results.map, ["aa", "bb"], "iterMap of a string");
+        assert.deepEqual(results.append, [0, "a😀"], "arrAppend of a string appends the string (it isn't iterable without Symbol.iterator)");
+        assert.deepEqual(results.appendEmpty, [0, ""], "arrAppend of an empty string appends the string");
+
+        // Like where there is Symbol.iterator
+        assert.deepEqual(Array.from("a😀b"), ["a", "😀", "b"], "Array.from()");
+    });
+
+    it("arrAppend appends an array by its indexes (unlike spread an array's own polyfill iterator isn't used)", () => {
+        const results = _runWithoutSymbol((modules) => {
+            const withIterator: any = [1, 2];
+            let idx = 0;
+            withIterator[modules.symbol.getKnownSymbol("iterator")] = () => ({
+                next: () => (idx < 2 ? { value: "x" + idx++, done: false } : { value: undefined, done: true })
+            });
+
+            return {
+                own: modules.append.arrAppend([0], withIterator),
+                array: modules.append.arrAppend([0], [1, 2])
+            };
+        });
+
+        assert.deepEqual(results.own, [0, 1, 2], "The array's own polyfill iterator isn't used");
+        assert.deepEqual(results.array, [0, 1, 2], "An array without one is appended by its indexes");
     });
 });
