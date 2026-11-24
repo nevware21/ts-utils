@@ -1724,6 +1724,53 @@ describe("polyfills match the native functions", () => {
             }
         });
 
+        it("use the next() of an iterable's iterator which was read once, even when it isn't a function, like the native Iterator.from() and its helpers", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            // An iterable whose iterator's next getter returns undefined the first time it is read, and a function after that
+            function _iterable(counts: { next: number }): any {
+                const iterable: any = {};
+                iterable[Symbol.iterator] = () => {
+                    let idx = 0;
+                    return {
+                        get next() {
+                            counts.next++;
+                            return counts.next === 1 ? undefined : () => (idx < 2 ? { value: idx++, done: false } : { value: undefined, done: true });
+                        }
+                    };
+                };
+
+                return iterable;
+            }
+
+            const helpers: { [name: string]: (iter: any) => any } = {
+                iterToArray: (iter) => iterToArray(iter),
+                iterMap: (iter) => iterToArray(iterMap(iter, (value: any) => value)),
+                iterFilter: (iter) => iterToArray(iterFilter(iter, () => true)),
+                iterTake: (iter) => iterToArray(iterTake(iter, 5)),
+                iterEvery: (iter) => iterEvery(iter, () => true),
+                iterSome: (iter) => iterSome(iter, () => false),
+                iterReduce: (iter) => iterReduce(iter, (prev: any, value: any) => prev + value, 0)
+            };
+
+            Object.keys(helpers).forEach((name) => {
+                const counts = { next: 0 };
+
+                assert.throws(() => helpers[name](_iterable(counts)), TypeError, undefined, name + " calls the undefined next()");
+                assert.equal(counts.next, 1, name + " read next once");
+            });
+
+            const IteratorCls = (getGlobal() as any).Iterator;
+            if (IteratorCls && IteratorCls.from) {
+                const counts = { next: 0 };
+                assert.throws(() => IteratorCls.from(_iterable(counts)).toArray(), TypeError, undefined, "Iterator.from()");
+                assert.equal(counts.next, 1, "Iterator.from() read next once");
+            }
+        });
+
         it("return() returns an undefined value (rather than the value passed to it), like the native helpers", () => {
             const helpers: { [name: string]: (iter: any) => any } = {
                 iterMap: (iter) => iterMap(iter, (value: any) => value),

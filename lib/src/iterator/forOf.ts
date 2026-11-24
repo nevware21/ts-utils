@@ -225,10 +225,10 @@ export function _createIndexIterator<T>(values: ArrayLike<T>): Iterator<T> {
  * @param iter - The iterator to process
  * @param callbackfn - The function called for each value, it can return -1 to stop the iteration
  * @param thisArg - The this value of the callbackfn, the iterator is used when it is omitted, null or undefined
- * @param nextFn - The iterator's next() when it has already been read (eg. to identify an iterator which isn't
- * iterable), so (like the native GetIteratorDirect) it isn't read again
+ * @param source - The iterator helper's source (from _asIterator), whose next() has already been read, so (like the
+ * native GetIteratorDirect) it isn't read again, even when it isn't a function (calling it throws a TypeError)
  */
-export function _iterForOf<T>(iter: Iterator<T>, callbackfn: (value: T, count?: number, iter?: Iterator<T>) => void | number, thisArg?: any, nextFn?: Iterator<T>["next"]): void {
+export function _iterForOf<T>(iter: Iterator<T>, callbackfn: (value: T, count?: number, iter?: Iterator<T>) => void | number, thisArg?: any, source?: { n: Iterator<T>["next"] }): void {
     let count = 0;
     let iterResult: IteratorResult<T>;
     let value: T;
@@ -241,7 +241,7 @@ export function _iterForOf<T>(iter: Iterator<T>, callbackfn: (value: T, count?: 
 
     // Like for...of the iterator must be an object, whose next() is read once (and called for every value)
     _throwIfNotResult(iter);
-    nextFn = nextFn || iter.next;
+    let nextFn = source ? source.n : iter.next;
     try {
         for (;;) {
             iterResult = fnCall(nextFn, iter);

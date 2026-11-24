@@ -7,7 +7,7 @@
  */
 
 import { ArrFromMapFn, ArrPredicateCallbackFn, ArrPredicateCallbackFn2 } from "../array/callbacks";
-import { isArray, isFunction, isNullOrUndefined, isStrictNullOrUndefined, isStrictUndefined, objToString } from "../helpers/base";
+import { isArray, isFunction, isMap, isNullOrUndefined, isSet, isStrictNullOrUndefined, isStrictUndefined, isStringObject, objToString } from "../helpers/base";
 import { ArrCls, LENGTH, ObjClass, UNDEF_VALUE } from "../internal/constants";
 import { _throwIfNotCallbackFn, _throwIfNullOrUndefined, _throwTypeOf, _toObject } from "../internal/throwIf";
 import { _checkArrayLength, _toLength, _toRelIndex } from "../helpers/length";
@@ -416,9 +416,6 @@ export function polyArrFrom<T, U = T>(theValue: ArrayLike<T> | Iterable<T>, mapF
     // without using its own (replaceable) call property and each value is added as an own property (defined on the
     // result of a constructor, so a TypeError is thrown when it can't be)
     function _addValue(value: T) {
-        // The result is created before the first value is added, as a Map / Set (which isn't iterable) is read live
-        result = result || (isCtor ? new ctor() : []);
-
         let theValue = mapFn ? fnCall(mapFn, thisArg, value, count) : value;
         _pushOwnValue(result, theValue, count++, isCtor);
     }
@@ -441,7 +438,14 @@ export function polyArrFrom<T, U = T>(theValue: ArrayLike<T> | Iterable<T>, mapF
         // change which values are read). Otherwise (and on a runtime with Symbol, where the value isn't iterable, so
         // unlike iterForOf and the iterator helpers a Map or Set isn't read with its forEach()) the value is an
         // array-like, which (like the native function) is converted to an object (so a primitive's length and indexes
-        // are read from its wrapper object), whose length is only read once
+        // are read from its wrapper object), whose length is only read once.
+        // Like the native function (which creates the result before it reads an iterable) the result is created before
+        // an emulated Map / Set iterator reads its values (live) and before a String object is converted (by its
+        // emulated iterator)
+        if (!_hasNativeIterator.v && (isMap(theValue) || isSet(theValue) || isStringObject(theValue))) {
+            result = isCtor ? new ctor() : [];
+        }
+
         let values: ArrayLike<any> = _getEmulatedStrValues(theValue) || (!_hasNativeIterator.v && _getMapSetValues(theValue, _addValue)) || ObjClass(theValue);
         // An emulated iterator (a string's values, an array or a Map / Set, whose values were added) is read like an
         // iterable (so a constructor is called without arguments), any other array-like's length is read once (and like

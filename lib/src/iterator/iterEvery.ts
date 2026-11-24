@@ -47,7 +47,7 @@ export function iterEvery<T>(iter: Iterator<T> | Iterable<T>, callbackfn: IterPr
             allMatched = false;
             return -1;
         }
-    }, UNDEF_VALUE, source.n);
+    }, UNDEF_VALUE, source);
 
     return allMatched;
 }

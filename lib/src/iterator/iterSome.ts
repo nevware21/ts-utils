@@ -47,7 +47,7 @@ export function iterSome<T>(iter: Iterator<T> | Iterable<T>, callbackfn: IterPre
             matched = true;
             return -1;
         }
-    }, UNDEF_VALUE, source.n);
+    }, UNDEF_VALUE, source);
 
     return matched;
 }

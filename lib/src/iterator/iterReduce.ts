@@ -49,7 +49,7 @@ export function iterReduce<T, R = T>(iter: Iterator<T> | Iterable<T>, callbackfn
         } else {
             accumulator = callbackfn(accumulator, value, count, source.i);
         }
-    }, UNDEF_VALUE, source.n);
+    }, UNDEF_VALUE, source);
 
     if (!hasAccumulator) {
         throwTypeError("Reduce of empty iterator with no initial value");

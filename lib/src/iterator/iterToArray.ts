@@ -45,11 +45,11 @@ export function iterToArray<T, R = T>(iter: Iterator<T> | Iterable<T> | ArrayLik
     if (isFunction(mapFn)) {
         _iterForOf(source.i, (value, count) => {
             _pushOwnValue(values, fnCall(mapFn, _getIteratorThisArg(source.i, thisArg), value, count as number));
-        }, UNDEF_VALUE, source.n);
+        }, UNDEF_VALUE, source);
     } else {
         _iterForOf(source.i, (value) => {
             _pushOwnValue(values, value as any as R);
-        }, UNDEF_VALUE, source.n);
+        }, UNDEF_VALUE, source);
     }
 
     return values;

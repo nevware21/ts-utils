@@ -427,6 +427,50 @@ describe("array helpers", () => {
             assert.deepEqual(Array.prototype.slice.call(arrAppend(target, iterator)), [0, 1, 2, 3]);
             assert.deepEqual(pushCalls, [[1, 2, 3]], "push() was called once with every value");
         });
+
+        it("Validate an error from push() which isn't a RangeError is thrown, without pushing or reading the values again", () => {
+            // A push() which appends its values and then throws for a call with more than one value
+            let target: any = [0];
+            target.push = function () {
+                Array.prototype.push.apply(this, arguments);
+                if (arguments.length > 1) {
+                    throw new Error("push");
+                }
+
+                return this.length;
+            };
+
+            let reads = 0;
+            let values: any = [1, 2];
+            Object.defineProperty(values, 0, {
+                get: () => {
+                    reads++;
+                    return 1;
+                },
+                enumerable: true
+            });
+
+            assert.throws(() => arrAppend(target, values), Error, "push");
+            assert.deepEqual(Array.prototype.slice.call(target), [0, 1, 2], "The values were pushed once, like target.push(...values)");
+            assert.equal(reads, 1, "The value's getter was read once");
+        });
+
+        it("Validate a RangeError (more values than apply() accepts as arguments) pushes each value", () => {
+            // A push() which (like apply() with too many arguments) throws a RangeError for a call with more than one value
+            let target: any = [0];
+            let pushCalls: any[][] = [];
+            target.push = function () {
+                pushCalls.push(Array.prototype.slice.call(arguments));
+                if (arguments.length > 1) {
+                    throw new RangeError("too many arguments");
+                }
+
+                return Array.prototype.push.apply(this, arguments);
+            };
+
+            assert.deepEqual(Array.prototype.slice.call(arrAppend(target, [1, 2])), [0, 1, 2]);
+            assert.deepEqual(pushCalls, [[1, 2], [1], [2]], "Each value was pushed after the RangeError");
+        });
     });
 
     describe("arrIndexOf", () => {

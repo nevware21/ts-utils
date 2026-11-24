@@ -382,6 +382,45 @@ describe("iterForOf and the helpers which use it on a runtime without Symbol", (
         assert.deepEqual(getResults(Array.from, Object.fromEntries), expected, "Array.from / Object.fromEntries");
     });
 
+    it("polyArrFrom creates the result of a constructor before it reads a Map, Set or String object, like Array.from", () => {
+        function getResults(from: any) {
+            const results: any = {};
+
+            const empty = new Set<number>();
+            results.addToEmpty = Array.prototype.slice.call(from.call(function () {
+                empty.add(1);
+            }, empty));
+
+            const full = new Set<number>([5, 6]);
+            results.clear = Array.prototype.slice.call(from.call(function () {
+                full.clear();
+            }, full));
+
+            const map = new Map<any, any>([["a", 1]]);
+            results.addToMap = Array.prototype.slice.call(from.call(function () {
+                map.set("b", 2);
+            }, map));
+
+            // Like the String iterator a String object is converted when it is read, after the constructor is called
+            const order: string[] = [];
+            const str: any = new String("ab");
+            str.toString = () => {
+                order.push("toString");
+                return "ab";
+            };
+            from.call(function () {
+                order.push("constructor");
+            }, str);
+            results.strOrder = order;
+
+            return results;
+        }
+
+        const expected = getResults(Array.from);
+        assert.deepEqual(expected, { addToEmpty: [1], clear: [], addToMap: [["a", 1], ["b", 2]], strOrder: ["constructor", "toString"] }, "Array.from");
+        assert.deepEqual(_runWithoutSymbol((modules) => getResults(modules.polyArray.polyArrFrom)), expected, "polyArrFrom");
+    });
+
     it("polyArrFrom doesn't read the forEach of an array-like which isn't a Map or Set, like Array.from", () => {
         const getReads = (from: (value: any) => any[]) => {
             let reads = 0;
