@@ -98,7 +98,12 @@ export function polySymbolFor(key: string): symbol {
         let newSymbol: any = polyNewSymbol(key);
         let regId = objKeys(registry.s)[LENGTH];
         newSymbol[UNIQUE_REGISTRY_ID] = () => regId + "_" + newSymbol[TO_STRING]();
-        registry.k[key] = newSymbol;
+        objDefine(registry.k, key, {
+            v: newSymbol,
+            w: true,
+            e: true,
+            c: true
+        });
         registry.s[newSymbol[UNIQUE_REGISTRY_ID]()] = key;
     }
 
