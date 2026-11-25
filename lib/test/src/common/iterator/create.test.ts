@@ -461,4 +461,41 @@ describe("createIterator results keep their value", () => {
         native.next();
         assert.equal(nativeFirst.value, first.value);
     });
+
+    it("a done result has its own undefined value, like the native iterators", () => {
+        const iterator = createIterator<number>({
+            n: function() {
+                return true;
+            }
+        });
+
+        const done = iterator.next();
+        assert.isTrue(Object.prototype.hasOwnProperty.call(done, "value"), "The done result has an own value");
+        assert.equal(done.value, undefined);
+        assert.equal(done.done, true);
+
+        const nativeDone = ([] as any)[getKnownSymbol(WellKnownSymbols.iterator)]().next();
+        assert.isTrue(Object.prototype.hasOwnProperty.call(nativeDone, "value"), "The native done result has an own value");
+        assert.equal(nativeDone.value, undefined);
+    });
+
+    it("a done result doesn't return an inherited Object.prototype.value", () => {
+        let doneValue: any;
+        Object.defineProperty(Object.prototype, "value", {
+            get: () => "inherited",
+            configurable: true
+        });
+
+        try {
+            doneValue = createIterator<number>({
+                n: function() {
+                    return true;
+                }
+            }).next().value;
+        } finally {
+            delete (Object.prototype as any).value;
+        }
+
+        assert.equal(doneValue, undefined, "The done result's own value is used");
+    });
 });

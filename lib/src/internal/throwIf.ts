@@ -8,7 +8,7 @@
 
 import { isFunction, isStrictNullOrUndefined } from "../helpers/base";
 import { throwTypeError } from "../helpers/throw";
-import { ObjClass } from "./constants";
+import { NULL_VALUE, ObjClass } from "./constants";
 
 /**
  * Throws a TypeError if the provided object is null or undefined.
@@ -41,14 +41,15 @@ export function _toObject<T>(value: T): T {
 /**
  * Throws a TypeError for a value which isn't the type a polyfill expects (eg. "is not a function"), like the native
  * functions the value isn't converted or read (so none of its code, eg. a getter, a `toJSON()` or a Proxy trap, is run
- * and a large value doesn't create a large message), only its type (`typeof`) is included in the message.
+ * and a large value doesn't create a large message), only its type (`typeof`, or `null` for a `null` value, like the
+ * native messages) is included in the message.
  * @param value - The value which isn't the expected type
  * @param message - The rest of the message, eg. " is not a function"
  * @internal
  * @ignore
  */
 export function _throwTypeOf(value: any, message: string): never {
-    return throwTypeError(typeof value + message);
+    return throwTypeError((value === NULL_VALUE ? "null" : typeof value) + message);
 }
 
 /**

@@ -7,7 +7,9 @@
  */
 
 import { assert } from "@nevware21/tripwire-chai";
-import { polyArrFind, polyArrFindLast } from "../../../../src/polyfills/array";
+import { polyArrFind, polyArrFindLast, polyArrFrom, polyArrIncludes } from "../../../../src/polyfills/array";
+import { polyArrAt } from "../../../../src/array/at";
+import { polyArrFill } from "../../../../src/array/fill";
 import { polyObjFromEntries } from "../../../../src/polyfills/object/objFromEntries";
 import { polyObjGetOwnPropertyDescriptors } from "../../../../src/polyfills/object/objGetOwnProperty";
 import { polyObjEntries, polyObjKeys, polyObjValues } from "../../../../src/polyfills/object/objKeys";
@@ -16,8 +18,10 @@ import { polyGetKnownSymbol, polyNewSymbol, polySymbolFor, polySymbolKeyFor } fr
 import { polyObjHasOwn } from "../../../../src/object/has_own";
 import { polyArrWith } from "../../../../src/array/with";
 import { polyArrFlatMap } from "../../../../src/array/flatMap";
+import { arrAppend } from "../../../../src/array/append";
 import { polyStrSubstr } from "../../../../src/string/substring";
 import { iterToArray } from "../../../../src/iterator/iterToArray";
+import { readArgs } from "../../../../src/funcs/readArgs";
 import { polyStrPadEnd, polyStrPadStart } from "../../../../src/string/pad";
 import { polyStrReplaceAll } from "../../../../src/string/replace_all";
 import { polyStrMatchAll } from "../../../../src/string/match_all";
@@ -26,19 +30,73 @@ import { polyStrEndsWith } from "../../../../src/string/ends_with";
 import { polyStrIncludes } from "../../../../src/string/includes";
 import { polyStrAt } from "../../../../src/string/at";
 import { polyStrTrim, polyStrTrimEnd, polyStrTrimStart } from "../../../../src/polyfills/trim";
+import { iterFilter } from "../../../../src/iterator/iterFilter";
+import { iterMap } from "../../../../src/iterator/iterMap";
+import { iterTake } from "../../../../src/iterator/iterTake";
+import { iterEvery } from "../../../../src/iterator/iterEvery";
+import { iterSome } from "../../../../src/iterator/iterSome";
+import { iterReduce } from "../../../../src/iterator/iterReduce";
+import { iterForOf } from "../../../../src/iterator/forOf";
 import { getKnownSymbol, hasSymbol as hasSymbolFn } from "../../../../src/symbol/symbol";
 import { WellKnownSymbols } from "../../../../src/symbol/well_known";
 import { getGlobal } from "../../../../src/helpers/environment";
 import { _initTestHooks, setBypassLazyCache } from "../../../../src/helpers/lazy";
 import { polyStrSymSplit } from "../../../../src/polyfills/split";
-import { POLYFILL_TYPE_NAME } from "../../../../src/internal/poly_helpers";
+import { POLYFILL_TAG, POLYFILL_TYPE_NAME } from "../../../../src/internal/poly_helpers";
 import { _getGlobalConfig } from "../../../../src/internal/global";
+import { dumpObj } from "../../../../src/helpers/diagnostics";
 
 // The polyfills (and the helpers which work like a native function) compared with the native functions, for the
 // values and operations (eg. how often a getter or valueOf() is called) where they used to be different
 describe("polyfills match the native functions", () => {
     const hasSymbol = typeof Symbol === "function" && !!Symbol.iterator;
     const hasProxy = typeof Proxy === "function";
+
+    // An iterable whose iterator has a "next" getter, which counts how often it is read
+    function _nextCountingIterable(values: any[], counts: { next: number }): any {
+        const iterable: any = {};
+        iterable[Symbol.iterator] = () => {
+            let idx = 0;
+            const iterator: any = {};
+            Object.defineProperty(iterator, "next", {
+                get: () => {
+                    counts.next++;
+                    return () => (idx < values.length ? { value: values[idx++], done: false } : { value: undefined, done: true });
+                }
+            });
+
+            return iterator;
+        };
+
+        return iterable;
+    }
+
+    // An iterable whose next() throws an EvalError
+    function _throwingIterable(): any {
+        const iterable: any = {};
+        iterable[Symbol.iterator] = () => ({
+            next: () => {
+                throw new EvalError("next");
+            }
+        });
+
+        return iterable;
+    }
+
+    // An iterator which isn't iterable, whose "next" getter counts how often it is read and only returns the next()
+    // function the first time
+    function _directIterator(values: any[], counts: { next: number }): any {
+        let idx = 0;
+        const iterator: any = {};
+        Object.defineProperty(iterator, "next", {
+            get: () => {
+                counts.next++;
+                return counts.next === 1 ? () => (idx < values.length ? { value: values[idx++], done: false } : { value: undefined, done: true }) : undefined;
+            }
+        });
+
+        return iterator;
+    }
 
     // Calls the callback with the global Symbol replaced (eg. with undefined like IE, or with a shim), while the lazy
     // Symbol is bypassed (so getKnownSymbol() uses it), then restores it
@@ -100,6 +158,103 @@ describe("polyfills match the native functions", () => {
         });
     });
 
+    describe("polyArrFrom", () => {
+        it("uses an array's own [Symbol.iterator], like Array.from", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            const arr: any = ["a", "b"];
+            arr[Symbol.iterator] = () => ["x"][Symbol.iterator]();
+
+            assert.deepEqual(polyArrFrom(arr), ["x"]);
+            assert.deepEqual(Array.from(arr), ["x"], "Array.from");
+        });
+
+        it("reads an array whose own [Symbol.iterator] is null as an array-like, like Array.from", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            const arr: any = ["a", "b"];
+            arr[Symbol.iterator] = null;
+
+            assert.deepEqual(polyArrFrom(arr), ["a", "b"]);
+            assert.deepEqual(Array.from(arr), ["a", "b"], "Array.from");
+        });
+
+        it("reads the iterator's next() once, like Array.from", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            const counts = { next: 0 };
+            assert.deepEqual(polyArrFrom(_nextCountingIterable([1, 2, 3], counts)), [1, 2, 3]);
+            assert.equal(counts.next, 1, "polyArrFrom read next once");
+
+            counts.next = 0;
+            Array.from(_nextCountingIterable([1, 2, 3], counts));
+            assert.equal(counts.next, 1, "Array.from read next once");
+        });
+
+        it("doesn't iterate a Map or Set whose own [Symbol.iterator] is null (it isn't iterable), like Array.from", function() {
+            if (!hasSymbol || typeof Map !== "function") {
+                this.skip();
+                return;
+            }
+
+            const map: any = new Map([["k", "v"]]);
+            map[Symbol.iterator] = null;
+
+            assert.deepEqual(polyArrFrom(map), []);
+            assert.deepEqual(Array.from(map), [], "Array.from");
+        });
+
+        it("adds own values when the prototype of Array.prototype is a Proxy (which the native function doesn't use)", function() {
+            if (!hasProxy) {
+                this.skip();
+                return;
+            }
+
+            const orgProto = Object.getPrototypeOf(Array.prototype);
+            const traps: string[] = [];
+            const isIndex = (key: PropertyKey) => typeof key === "string" && /^\d+$/.test(key);
+            const proxy = new Proxy(orgProto, {
+                has: (target: any, key: PropertyKey) => {
+                    isIndex(key) && traps.push("has " + String(key));
+                    return Reflect.has(target, key);
+                },
+                set: (target: any, key: PropertyKey, value: any, receiver: any) => {
+                    if (isIndex(key)) {
+                        // Swallows the value (so an assignment which used the prototype would lose it)
+                        traps.push("set " + String(key));
+                        return true;
+                    }
+
+                    return Reflect.set(target, key, value, receiver);
+                }
+            });
+
+            let result: any[];
+            let nativeResult: any[];
+            try {
+                Object.setPrototypeOf(Array.prototype, proxy);
+                result = polyArrFrom({ length: 2, 0: "a", 1: "b" });
+                nativeResult = Array.from({ length: 2, 0: "a", 1: "b" });
+            } finally {
+                // Restored before any assert is used
+                Object.setPrototypeOf(Array.prototype, orgProto);
+            }
+
+            assert.deepEqual(traps, [], "The Proxy wasn't used");
+            assert.deepEqual(result, ["a", "b"]);
+            assert.deepEqual(nativeResult, ["a", "b"], "Array.from");
+        });
+    });
+
     describe("polyObjFromEntries", () => {
         it("converts an object key once and keeps a symbol (eg. from a Symbol object or Symbol.toPrimitive), like Object.fromEntries", function() {
             if (!hasSymbol) {
@@ -131,6 +286,37 @@ describe("polyfills match the native functions", () => {
                 assert.equal(nativeResult[Symbol.for("polyObjFromEntries.symObj")], 1, "Object.fromEntries: the Symbol object key");
                 assert.equal(nativeResult[Symbol.for("polyObjFromEntries.toPrim")], 2, "Object.fromEntries: the Symbol.toPrimitive key");
             }
+        });
+
+        it("uses an array's own [Symbol.iterator], and throws for an array whose own [Symbol.iterator] is null, like Object.fromEntries", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            const nativeFromEntries = (Object as any).fromEntries;
+            const ownIter: any = [["a", 1]];
+            ownIter[Symbol.iterator] = () => [["z", 9]][Symbol.iterator]();
+            const nullIter: any = [["a", 1]];
+            nullIter[Symbol.iterator] = null;
+
+            assert.deepEqual(polyObjFromEntries(ownIter), { z: 9 });
+            assert.throws(() => polyObjFromEntries(nullIter), TypeError);
+            if (nativeFromEntries) {
+                assert.deepEqual(nativeFromEntries(ownIter), { z: 9 }, "Object.fromEntries");
+                assert.throws(() => nativeFromEntries(nullIter), TypeError, undefined, "Object.fromEntries");
+            }
+        });
+
+        it("reads the iterator's next() once", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            const counts = { next: 0 };
+            assert.deepEqual(polyObjFromEntries(_nextCountingIterable([["a", 1], ["b", 2]], counts)), { a: 1, b: 2 });
+            assert.equal(counts.next, 1);
         });
     });
 
@@ -226,6 +412,84 @@ describe("polyfills match the native functions", () => {
         });
     });
 
+    describe("the array polyfills convert a primitive array to an object (ToObject) before reading it", () => {
+        it("call a strict getter of Number.prototype with the Number object, like the native functions", () => {
+            const previousLength = Object.getOwnPropertyDescriptor(Number.prototype, "length");
+            const previous0 = Object.getOwnPropertyDescriptor(Number.prototype, "0");
+            const arrayProto: any = Array.prototype;
+            const calls: { [name: string]: { poly: Function, native: Function, args: any[] } } = {
+                at: { poly: polyArrAt, native: arrayProto.at, args: [0] },
+                fill: { poly: polyArrFill, native: arrayProto.fill, args: ["y", 1] },
+                includes: { poly: polyArrIncludes, native: arrayProto.includes, args: ["z"] },
+                find: { poly: polyArrFind, native: arrayProto.find, args: [() => false] },
+                findLast: { poly: polyArrFindLast, native: arrayProto.findLast, args: [() => false] },
+                with: { poly: polyArrWith, native: arrayProto.with, args: [0, "y"] },
+
+                // An array-like (a value which isn't iterable), Array.from() is called with the value (the `this`)
+                from: { poly: polyArrFrom, native: function(this: any) {
+                    return Array.from(this);
+                }, args: [] }
+            };
+            const receivers: { [name: string]: string[] } = {};
+            const nativeReceivers: { [name: string]: string[] } = {};
+            let current: string[];
+
+            try {
+                Object.defineProperty(Number.prototype, "length", {
+                    get: function() {
+                        "use strict";
+                        current.push("length " + typeof this);
+                        return 1;
+                    },
+                    configurable: true
+                });
+                Object.defineProperty(Number.prototype, "0", {
+                    get: function() {
+                        "use strict";
+                        current.push("0 " + typeof this);
+                        return "x";
+                    },
+                    configurable: true
+                });
+
+                Object.keys(calls).forEach((name) => {
+                    const call = calls[name];
+                    current = receivers[name] = [];
+                    call.poly.apply(null, [5].concat(call.args));
+
+                    if (call.native) {
+                        current = nativeReceivers[name] = [];
+                        call.native.apply(5, call.args);
+                    }
+                });
+            } finally {
+                // Restored before any assert is used
+                if (previousLength) {
+                    Object.defineProperty(Number.prototype, "length", previousLength);
+                } else {
+                    delete (Number.prototype as any).length;
+                }
+
+                if (previous0) {
+                    Object.defineProperty(Number.prototype, "0", previous0);
+                } else {
+                    delete (Number.prototype as any)[0];
+                }
+            }
+
+            Object.keys(calls).forEach((name) => {
+                assert.equal(receivers[name][0], "length object", name + " read the length of the Number object");
+                receivers[name].forEach((receiver) => {
+                    assert.isTrue(/ object$/.test(receiver), name + ": " + receiver);
+                });
+
+                if (nativeReceivers[name]) {
+                    assert.deepEqual(receivers[name], nativeReceivers[name], name + " like the native function");
+                }
+            });
+        });
+    });
+
     describe("polyStrSubstr", () => {
         it("throws a TypeError for a Symbol, like String.prototype.substr", function() {
             if (!hasSymbol) {
@@ -235,6 +499,290 @@ describe("polyfills match the native functions", () => {
 
             assert.throws(() => polyStrSubstr(Symbol("s") as any, 0, 3), TypeError);
             assert.throws(() => String.prototype.substr.call(Symbol("s"), 0, 3), TypeError, undefined, "String.prototype.substr");
+        });
+    });
+
+    describe("iterToArray", () => {
+        it("adds each value as an own property when Array.prototype has a setter for the index, like Array.from", function() {
+            if (!hasSymbol || typeof Set !== "function") {
+                this.skip();
+                return;
+            }
+
+            const previous = Object.getOwnPropertyDescriptor(Array.prototype, "0");
+            let setterCalls = 0;
+            let result: any[];
+            let nativeResult: any[];
+            try {
+                Object.defineProperty(Array.prototype, "0", {
+                    set: () => {
+                        setterCalls++;
+                    },
+                    configurable: true
+                });
+
+                result = iterToArray(new Set(["a", "b"]));
+                nativeResult = Array.from(new Set(["a", "b"]));
+            } finally {
+                // Restored before any assert is used
+                if (previous) {
+                    Object.defineProperty(Array.prototype, "0", previous);
+                } else {
+                    delete (Array.prototype as any)[0];
+                }
+            }
+
+            assert.equal(setterCalls, 0, "The Array.prototype setter wasn't called");
+            assert.deepEqual(Object.keys(result), ["0", "1"]);
+            assert.deepEqual(Object.keys(nativeResult), ["0", "1"], "Array.from");
+        });
+    });
+
+    describe("arrAppend", () => {
+        it("reads the [Symbol.iterator] to identify an iterable and again to iterate it (spread reads it once)", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            let reads = 0;
+            const iterable: any = {};
+            Object.defineProperty(iterable, Symbol.iterator, {
+                get: () => {
+                    reads++;
+                    return () => [1, 2][Symbol.iterator]();
+                }
+            });
+
+            assert.deepEqual(arrAppend([0], iterable), [0, 1, 2]);
+            assert.equal(reads, 2);
+        });
+
+        it("doesn't change the target when the iterator throws, like spread", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            let count = 0;
+            const iterable: any = {};
+            iterable[Symbol.iterator] = () => ({
+                next: () => {
+                    if (count++ < 2) {
+                        return { value: count, done: false };
+                    }
+
+                    throw new EvalError("next");
+                }
+            });
+
+            const target = [0];
+            assert.throws(() => arrAppend(target, iterable), EvalError);
+            assert.deepEqual(target, [0], "No values were appended");
+        });
+
+        it("appends an array by its indexes (unlike spread its own [Symbol.iterator] isn't used)", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            const arr: any = [1, 2];
+            arr[Symbol.iterator] = () => ["x"][Symbol.iterator]();
+
+            assert.deepEqual(arrAppend([0], arr), [0, 1, 2]);
+        });
+
+        it("appends the values of an array whose own [Symbol.iterator] is null or undefined", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            const nullIter: any = [1, 2];
+            nullIter[Symbol.iterator] = null;
+            const undefinedIter: any = [3, 4];
+            undefinedIter[Symbol.iterator] = undefined;
+
+            assert.deepEqual(arrAppend([0], nullIter), [0, 1, 2], "A null iterator");
+            assert.deepEqual(arrAppend([0], undefinedIter), [0, 3, 4], "An undefined iterator");
+        });
+
+        it("appends an array by its indexes (unlike spread a replaced Array.prototype[Symbol.iterator] isn't read or used)", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            const orgDesc = Object.getOwnPropertyDescriptor(Array.prototype, Symbol.iterator);
+            const orgValues = Array.prototype.values;
+            let reads = 0;
+            let result: any[];
+            let appendReads: number;
+            let nativeResult: any[];
+
+            Object.defineProperty(Array.prototype, Symbol.iterator, {
+                get: () => {
+                    reads++;
+                    return function () {
+                        return orgValues.call(["x"]);
+                    };
+                },
+                configurable: true
+            });
+
+            try {
+                // The results are compared once the iterator is restored (as the assertions may use it)
+                result = arrAppend([0], [1, 2]);
+                appendReads = reads;
+
+                // The native spread (ES2015 syntax isn't used, so this compiles to ES5)
+                nativeResult = new Function("target", "values", "target.push(...values); return target;")([0], [1, 2]);
+            } finally {
+                Object.defineProperty(Array.prototype, Symbol.iterator, orgDesc);
+            }
+
+            assert.deepEqual(result, [0, 1, 2], "The replaced iterator wasn't used");
+            assert.equal(appendReads, 0, "The iterator wasn't read");
+            assert.deepEqual(nativeResult, [0, "x"], "spread");
+            assert.equal(reads - appendReads, 1, "spread read it once");
+        });
+
+        it("throws a TypeError when the [Symbol.iterator] of an iterable returns a value which isn't an object (including a falsy value), like spread", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            [null, undefined, false, 0, "", "abc"].forEach((iterResult) => {
+                const iterable: any = {};
+                iterable[Symbol.iterator] = () => iterResult;
+                const arr: any = [1, 2];
+                arr[Symbol.iterator] = () => iterResult;
+                const target = [0];
+
+                assert.throws(() => arrAppend(target, iterable), TypeError, undefined, "An iterable returning " + dumpObj(iterResult));
+                assert.deepEqual(arrAppend([0], arr), [0, 1, 2], "An array returning " + dumpObj(iterResult) + " is appended by its indexes");
+                assert.deepEqual(target, [0], "Nothing was appended");
+                assert.throws(() => new Function("target", "values", "target.push(...values);")([0], iterable), TypeError, undefined, "spread of " + dumpObj(iterResult));
+            });
+        });
+
+        it("reads the next() of an iterator which isn't iterable to identify it and again to iterate it (the native GetIteratorDirect reads it once)", () => {
+            const counts = { next: 0 };
+
+            // The iterator's next getter only returns its next() for the first read, so (as it's read again to iterate it)
+            // nothing is appended
+            assert.deepEqual(arrAppend([0], _directIterator([1, 2], counts)), [0], "The second read of next isn't a function");
+            assert.equal(counts.next, 2, "next was read twice");
+        });
+
+        it("reads an array which uses the native array iterator by its indexes (unlike spread a replaced next() of the native array iterators isn't called), but uses it for an array iterator or an arguments object", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            const arrayIterProto = Object.getPrototypeOf([][Symbol.iterator]());
+            const orgNext = arrayIterProto.next;
+            let nextCalls = 0;
+            let result: any[];
+            let iterResult: any[];
+            let argsResult: any[];
+            let nativeResult: any[];
+            let appendCalls: number;
+            let iterCalls: number;
+            let argsCalls: number;
+            const theArgs = (function() {
+                return arguments;
+            } as any)(3, 4);
+
+            arrayIterProto.next = function() {
+                nextCalls++;
+                return orgNext.call(this);
+            };
+
+            try {
+                // The results are compared once next() is restored (as the assertions may use it)
+                result = arrAppend([0], [1, 2]);
+                appendCalls = nextCalls;
+                nextCalls = 0;
+                iterResult = arrAppend([0], [1, 2][Symbol.iterator]());
+                iterCalls = nextCalls;
+                nextCalls = 0;
+                argsResult = arrAppend([0], theArgs as any);
+                argsCalls = nextCalls;
+                nextCalls = 0;
+                nativeResult = new Function("target", "values", "target.push(...values); return target;")([0], [1, 2]);
+            } finally {
+                arrayIterProto.next = orgNext;
+            }
+
+            assert.deepEqual(result, [0, 1, 2]);
+            assert.equal(appendCalls, 0, "The array was read by its indexes (the documented difference from spread)");
+            assert.deepEqual(iterResult, [0, 1, 2], "An array iterator");
+            assert.equal(iterCalls, 3, "The replaced next() was called for each value of an array iterator (and once more for done)");
+            assert.deepEqual(argsResult, [0, 3, 4], "An arguments object");
+            assert.equal(argsCalls, 3, "The replaced next() was called for each value of an arguments object (and once more for done)");
+            assert.deepEqual(nativeResult, [0, 1, 2], "spread");
+            assert.equal(nextCalls, 3, "spread called the replaced next()");
+        });
+    });
+
+    describe("readArgs", () => {
+        it("returns an array for a string, like Array.prototype.slice.call()", () => {
+            assert.deepEqual(readArgs("hello" as any, 1), ["e", "l", "l", "o"]);
+            assert.deepEqual(Array.prototype.slice.call("hello", 1), ["e", "l", "l", "o"], "Array.prototype.slice.call");
+        });
+
+        it("converts the start / end before creating the iterator, unlike Array.from(value).slice() (which reads every value first)", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            const throwingStart = {
+                valueOf: (): number => {
+                    throw new RangeError("start");
+                }
+            };
+
+            let iterCalls = 0;
+            const iterable: any = {};
+            iterable[Symbol.iterator] = () => {
+                iterCalls++;
+                return _throwingIterable()[Symbol.iterator]();
+            };
+
+            assert.throws(() => readArgs(iterable, throwingStart as any, -1), RangeError, undefined, "The start threw first");
+            assert.equal(iterCalls, 0, "The iterator wasn't created");
+            assert.throws(() => Array.from(_throwingIterable()).slice(throwingStart as any, -1), EvalError, undefined, "Array.from(value).slice() calls next() first");
+
+            // Also before a [Symbol.iterator] which isn't a function throws
+            const notCallable: any = {};
+            notCallable[Symbol.iterator] = {};
+            assert.throws(() => readArgs(notCallable, throwingStart as any, -1), RangeError, undefined, "The start of a non-callable [Symbol.iterator]");
+
+            // And when the iterator has no values
+            const empty: any = {};
+            empty[Symbol.iterator] = () => [][Symbol.iterator]();
+            assert.throws(() => readArgs(empty, throwingStart as any, -1), RangeError, undefined, "The start of an empty iterable");
+        });
+
+        it("reads a Map whose own [Symbol.iterator] is null (it isn't iterable) by a copy of its entries, unlike Array.from (and polyArrFrom)", function() {
+            if (!hasSymbol || typeof Map !== "function") {
+                this.skip();
+                return;
+            }
+
+            const map: any = new Map([["k", "v"]]);
+            map[Symbol.iterator] = null;
+
+            // A helper (like iterForOf) processes a Map or Set which isn't iterable, while the polyfill follows the native
+            // function (an array-like without a length, so it has no values)
+            assert.deepEqual(readArgs(map), [["k", "v"]]);
+            assert.deepEqual(polyArrFrom(map), [], "polyArrFrom");
+            assert.deepEqual(Array.from(map), [], "Array.from");
         });
     });
 
@@ -503,6 +1051,39 @@ describe("polyfills match the native functions", () => {
             assert.equal(polySymbolKeyFor(valueOfSym), "valueOf");
         });
 
+        it("polySymbolFor() supports __proto__ in a shared registry which an earlier version created (its keys have Object.prototype)", function() {
+            const setPrototypeOf = (Object as any).setPrototypeOf;
+            if (!setPrototypeOf) {
+                this.skip();
+                return;
+            }
+
+            polySymbolFor("the registry exists");
+            const registry: any = _getGlobalConfig().gblSym;
+            const keys = registry.k;
+            const keysProto = Object.getPrototypeOf(keys);
+            const ownProtoKey = Object.getOwnPropertyDescriptor(keys, "__proto__");
+            let protoSym: any;
+
+            // Like the registry of v0.10.1 to v0.16.0, which is created as { k: {}, s: {} }
+            delete keys["__proto__"];
+            setPrototypeOf(keys, Object.prototype);
+            try {
+                protoSym = polySymbolFor("__proto__");
+
+                assert.ok(protoSym, "A symbol is returned");
+                assert.strictEqual(polySymbolFor("__proto__"), protoSym, "The same symbol is returned again");
+                assert.equal(polySymbolKeyFor(protoSym), "__proto__");
+                assert.ok(Object.prototype.hasOwnProperty.call(keys, "__proto__"), "__proto__ is an own key of the registry");
+                assert.strictEqual(Object.getPrototypeOf(keys), Object.prototype, "The prototype of the registry's keys is unchanged");
+            } finally {
+                delete keys["__proto__"];
+                setPrototypeOf(keys, keysProto);
+                protoSym && protoSym._urid && delete registry.s[protoSym._urid()];
+                ownProtoKey && Object.defineProperty(keys, "__proto__", ownProtoKey);
+            }
+        });
+
         it("polySymbolFor() converts the key once, like Symbol.for()", () => {
             const calls: string[] = [];
             const key = {
@@ -623,6 +1204,7 @@ describe("polyfills match the native functions", () => {
             assert.equal(sym["__nw21$polytype__"], "symbol", "The polyfill type");
         });
     });
+
     describe("polyStrPadStart and polyStrPadEnd", () => {
         it("convert the value to a string and the targetLength to a length, like String.prototype.padStart / padEnd", () => {
             const nativePadStart = (String.prototype as any).padStart;
@@ -939,6 +1521,352 @@ describe("polyfills match the native functions", () => {
             assert.strictEqual(calls[0][0], splitter, "Called with the splitter as this");
             assert.equal(calls[0][1], "a,b");
             assert.equal(calls[0][2], 1);
+        });
+    });
+
+    describe("polyArrFrom with a constructor this", () => {
+        it("creates the result with the constructor, like Array.from", () => {
+            const calls: any[][] = [];
+            const Ctor: any = function(this: any) {
+                calls.push(Array.prototype.slice.call(arguments));
+            };
+
+            const arrayLike: any = (polyArrFrom as any).call(Ctor, { length: 3, 0: "a", 2: "c" });
+            assert.isTrue(arrayLike instanceof Ctor, "An instance of the constructor");
+            assert.deepEqual(calls, [[3]], "An array-like passes its length");
+            assert.deepEqual(Object.getOwnPropertyDescriptor(arrayLike, "0"), { value: "a", writable: true, enumerable: true, configurable: true });
+            assert.equal(arrayLike[1], undefined);
+            assert.equal(arrayLike.length, 3, "The length is set");
+
+            const nativeArrayLike: any = (Array.from as any).call(Ctor, { length: 3, 0: "a", 2: "c" });
+            assert.isTrue(nativeArrayLike instanceof Ctor, "Array.from");
+            assert.equal(nativeArrayLike.length, 3, "Array.from length");
+
+            if (hasSymbol) {
+                calls.length = 0;
+                const iterable: any = (polyArrFrom as any).call(Ctor, new Set(["x", "y"]) as any);
+                assert.deepEqual(calls, [[]], "An iterable passes no arguments");
+                assert.equal(iterable.length, 2);
+                assert.equal(iterable[1], "y");
+            }
+        });
+
+        it("creates an Array when this is Array, undefined or a function which isn't a constructor", () => {
+            assert.isTrue(Array.isArray((polyArrFrom as any).call(Array, [1])), "Array");
+            assert.isTrue(Array.isArray((polyArrFrom as any).call(undefined, [1])), "undefined");
+
+            // A built-in function which isn't a constructor (on every runtime), and an arrow function (created from its
+            // source, as an arrow function written here is compiled to an ES5 function, which is a constructor, and only
+            // identified as not being a constructor on a runtime with Proxy)
+            assert.isTrue(Array.isArray((polyArrFrom as any).call(Math.max, [1])), "A built-in function which isn't a constructor");
+            assert.isTrue(Array.isArray((Array.from as any).call(Math.max, [1])), "Array.from with a built-in function");
+            if (hasProxy) {
+                const arrowFn = new Function("return () => { throw new Error(\"Not called\"); }")();
+                assert.isTrue(Array.isArray((polyArrFrom as any).call(arrowFn, [1])), "An arrow function isn't a constructor");
+                assert.isTrue(Array.isArray((Array.from as any).call(arrowFn, [1])), "Array.from with an arrow function");
+            }
+        });
+    });
+
+    describe("the polyfills and helpers don't use a replaced Function.prototype.call", () => {
+        it("call a callback (or the intrinsic slice) with the intrinsic call, like the native functions", () => {
+            const funcProto: any = Function.prototype;
+            const orgCall = funcProto.call;
+            const results: { [name: string]: any } = {};
+            let calls = 0;
+            const forOfValues: any[] = [];
+
+            funcProto.call = function(this: any) {
+                calls++;
+                return orgCall.apply(this, arguments);
+            };
+
+            try {
+                // The results are compared once call is restored (as the assertions may use it)
+                results.from = polyArrFrom([1, 2]);
+                results.readArgs = readArgs([1, 2, 3], 1);
+                iterForOf([1, 2], (value) => {
+                    forOfValues.push(value);
+                });
+                results.flatMap = polyArrFlatMap([1, [2]], (value: any) => [value]);
+                results.descriptors = polyObjGetOwnPropertyDescriptors({ a: 1 });
+                results.calls = calls;
+                results.nativeFrom = Array.from([1, 2]);
+                results.nativeCalls = calls - results.calls;
+            } finally {
+                funcProto.call = orgCall;
+            }
+
+            assert.equal(results.calls, 0, "The replaced call wasn't used");
+            assert.equal(results.nativeCalls, 0, "Array.from didn't use it");
+            assert.deepEqual(results.from, [1, 2]);
+            assert.deepEqual(results.readArgs, [2, 3]);
+            assert.deepEqual(forOfValues, [1, 2]);
+            assert.deepEqual(results.flatMap, [1, [2]]);
+            assert.deepEqual(results.descriptors, { a: { value: 1, writable: true, enumerable: true, configurable: true } });
+        });
+    });
+
+    describe("the polyfills don't read a value to create a TypeError, like the native functions", () => {
+        it("don't call a Proxy's traps for the error (only for the operations of the native function)", function() {
+            if (!hasProxy) {
+                this.skip();
+                return;
+            }
+
+            const traps: string[] = [];
+            const handler: ProxyHandler<any> = {
+                get: (target, key) => {
+                    traps.push("get " + String(key));
+                    return target[key];
+                },
+                getOwnPropertyDescriptor: (target, key) => {
+                    traps.push("getOwnPropertyDescriptor " + String(key));
+                    return Object.getOwnPropertyDescriptor(target, key);
+                },
+                ownKeys: (target) => {
+                    traps.push("ownKeys");
+                    return Reflect.ownKeys(target);
+                },
+                has: (target, key) => {
+                    traps.push("has " + String(key));
+                    return key in target;
+                }
+            };
+            const proxy = new Proxy({ toString: () => "described" }, handler);
+            const objCls: any = Object;
+            const symbolCls: any = Symbol;
+
+            // polySymbolKeyFor identifies a polyfill symbol by its polyfill tag, which (unlike the native function) is
+            // read from the value, but every runtime with a Proxy has a native Symbol, so it is only seen when the poly
+            // function is called directly
+            const tagTrap = "get " + POLYFILL_TAG;
+            const cases: { [name: string]: [() => any, () => any] } = {
+                "polyArrFrom mapFn": [() => polyArrFrom([1], proxy), () => Array.from([1], proxy)],
+                "polyObjFromEntries": [() => polyObjFromEntries(proxy), () => objCls.fromEntries(proxy)],
+                "polySymbolKeyFor": [() => polySymbolKeyFor(proxy), () => symbolCls.keyFor(proxy)]
+            };
+
+            Object.keys(cases).forEach((name) => {
+                traps.length = 0;
+                assert.throws(cases[name][0], TypeError, undefined, name);
+                const polyTraps = traps.splice(0, traps.length);
+                if (name !== "polyObjFromEntries" || objCls.fromEntries) {
+                    assert.throws(cases[name][1], TypeError, undefined, name + " native");
+                    assert.deepEqual(polyTraps, name === "polySymbolKeyFor" ? [tagTrap].concat(traps) : traps, name + " called the same traps as the native function");
+                }
+            });
+
+            // A description or key is converted once, like the native functions
+            traps.length = 0;
+            assert.equal((polyNewSymbol(proxy) as any).description, "described");
+            const polyTraps = traps.splice(0, traps.length);
+            assert.equal((Symbol(proxy) as any).description, "described", "Symbol()");
+            assert.deepEqual(polyTraps, traps, "polyNewSymbol() called the same traps as Symbol()");
+
+            traps.length = 0;
+            polySymbolFor(proxy);
+            const forTraps = traps.splice(0, traps.length);
+            Symbol.for(proxy);
+            assert.deepEqual(forTraps, traps, "polySymbolFor() called the same traps as Symbol.for()");
+        });
+    });
+
+    describe("the iterator helpers", () => {
+        it("read the source iterator's next() once, like the native iterator helpers", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            const helpers: { [name: string]: (iter: any) => any } = {
+                iterMap: (iter) => iterMap(iter, (value: any) => value),
+                iterFilter: (iter) => iterFilter(iter, () => true),
+                iterTake: (iter) => iterTake(iter, 5)
+            };
+
+            Object.keys(helpers).forEach((name) => {
+                const counts = { next: 0 };
+                assert.deepEqual(iterToArray(helpers[name](_nextCountingIterable([1, 2, 3], counts))), [1, 2, 3], name);
+                assert.equal(counts.next, 1, name + " read next once");
+            });
+        });
+
+        it("read the next() of an iterator which isn't iterable once, like the native Iterator.from() and its helpers", () => {
+            const helpers: { [name: string]: (iter: any) => any } = {
+                iterToArray: (iter) => iterToArray(iter),
+                iterMap: (iter) => iterToArray(iterMap(iter, (value: any) => value)),
+                iterFilter: (iter) => iterToArray(iterFilter(iter, () => true)),
+                iterTake: (iter) => iterToArray(iterTake(iter, 5)),
+                iterEvery: (iter) => iterEvery(iter, () => true),
+                iterSome: (iter) => iterSome(iter, () => false),
+                iterReduce: (iter) => iterReduce(iter, (prev: any, value: any) => prev + value, 0)
+            };
+            const expected: { [name: string]: any } = {
+                iterEvery: true,
+                iterSome: false,
+                iterReduce: 6
+            };
+
+            Object.keys(helpers).forEach((name) => {
+                const counts = { next: 0 };
+                const result = helpers[name](_directIterator([1, 2, 3], counts));
+
+                assert.deepEqual(result, name in expected ? expected[name] : [1, 2, 3], name);
+                assert.equal(counts.next, 1, name + " read next once");
+            });
+
+            const IteratorCls = (getGlobal() as any).Iterator;
+            if (IteratorCls && IteratorCls.from) {
+                const counts = { next: 0 };
+                assert.deepEqual(IteratorCls.from(_directIterator([1, 2, 3], counts)).toArray(), [1, 2, 3], "Iterator.from()");
+                assert.equal(counts.next, 1, "Iterator.from() read next once");
+            }
+        });
+
+        it("use the next() of an iterable's iterator which was read once, even when it isn't a function, like the native Iterator.from() and its helpers", function() {
+            if (!hasSymbol) {
+                this.skip();
+                return;
+            }
+
+            // An iterable whose iterator's next getter returns undefined the first time it is read, and a function after that
+            function _iterable(counts: { next: number }): any {
+                const iterable: any = {};
+                iterable[Symbol.iterator] = () => {
+                    let idx = 0;
+                    return {
+                        get next() {
+                            counts.next++;
+                            return counts.next === 1 ? undefined : () => (idx < 2 ? { value: idx++, done: false } : { value: undefined, done: true });
+                        }
+                    };
+                };
+
+                return iterable;
+            }
+
+            const helpers: { [name: string]: (iter: any) => any } = {
+                iterToArray: (iter) => iterToArray(iter),
+                iterMap: (iter) => iterToArray(iterMap(iter, (value: any) => value)),
+                iterFilter: (iter) => iterToArray(iterFilter(iter, () => true)),
+                iterTake: (iter) => iterToArray(iterTake(iter, 5)),
+                iterEvery: (iter) => iterEvery(iter, () => true),
+                iterSome: (iter) => iterSome(iter, () => false),
+                iterReduce: (iter) => iterReduce(iter, (prev: any, value: any) => prev + value, 0)
+            };
+
+            Object.keys(helpers).forEach((name) => {
+                const counts = { next: 0 };
+
+                assert.throws(() => helpers[name](_iterable(counts)), TypeError, undefined, name + " calls the undefined next()");
+                assert.equal(counts.next, 1, name + " read next once");
+            });
+
+            const IteratorCls = (getGlobal() as any).Iterator;
+            if (IteratorCls && IteratorCls.from) {
+                const counts = { next: 0 };
+                assert.throws(() => IteratorCls.from(_iterable(counts)).toArray(), TypeError, undefined, "Iterator.from()");
+                assert.equal(counts.next, 1, "Iterator.from() read next once");
+            }
+        });
+
+        it("return() returns an undefined value (rather than the value passed to it), like the native helpers", () => {
+            const helpers: { [name: string]: (iter: any) => any } = {
+                iterMap: (iter) => iterMap(iter, (value: any) => value),
+                iterFilter: (iter) => iterFilter(iter, () => true),
+                iterTake: (iter) => iterTake(iter, 5)
+            };
+
+            Object.keys(helpers).forEach((name) => {
+                const helper = helpers[name]([1, 2, 3]);
+                helper.next();
+                const result = helper.return(7);
+
+                assert.isTrue(result.done, name);
+                assert.isUndefined(result.value, name + " has an undefined value");
+                assert.isTrue("value" in result, name + " has its own value");
+            });
+
+            const IteratorCls = (getGlobal() as any).Iterator;
+            if (IteratorCls && IteratorCls.from) {
+                const nativeHelper = IteratorCls.from([1, 2, 3]).map((value: any) => value);
+                nativeHelper.next();
+                assert.isUndefined(nativeHelper.return(7).value, "The native map()");
+            }
+        });
+
+        it("throw a TypeError for a callbackfn which isn't a function before reading a value (closing the source), like Iterator.from(value) and its helpers", () => {
+            const log: string[] = [];
+            const source = () => {
+                let idx = 0;
+                const iter: any = {
+                    next: () => {
+                        log.push("next");
+                        return idx < 2 ? { value: idx++, done: false } : { value: undefined, done: true };
+                    },
+                    return: () => {
+                        log.push("return");
+                        return { done: true };
+                    }
+                };
+
+                return iter;
+            };
+            const helpers: { [name: string]: (iter: any) => any } = {
+                iterMap: (iter) => iterMap(iter, 5 as any),
+                iterFilter: (iter) => iterFilter(iter, 5 as any),
+                iterEvery: (iter) => iterEvery(iter, 5 as any),
+                iterSome: (iter) => iterSome(iter, 5 as any),
+                iterReduce: (iter) => iterReduce(iter, 5 as any, 0)
+            };
+
+            Object.keys(helpers).forEach((name) => {
+                log.length = 0;
+                assert.throws(() => helpers[name](source()), TypeError, undefined, name);
+                assert.deepEqual(log, ["return"], name + " closed the source without reading a value");
+            });
+
+            // A source whose return() throws still throws the TypeError
+            log.length = 0;
+            const throwingReturn = source();
+            throwingReturn.return = () => {
+                log.push("return");
+                throw new Error("return");
+            };
+            assert.throws(() => iterMap(throwingReturn, 5 as any), TypeError, undefined, "The return() error is ignored");
+            assert.deepEqual(log, ["return"]);
+
+            // Like the current spec the native helpers close the source when an argument isn't valid (engines from
+            // before that change, eg. Node 22, don't close it), and none of them read a value
+            const IteratorCls = (getGlobal() as any).Iterator;
+            if (IteratorCls && IteratorCls.from) {
+                ["map", "filter", "every", "some", "reduce"].forEach((name) => {
+                    log.length = 0;
+                    assert.throws(() => IteratorCls.from(source())[name](5), TypeError, undefined, "The native " + name + "()");
+                    assert.include(["", "return"], log.join(","), "The native " + name + "() didn't read a value");
+                });
+            }
+        });
+
+        it("iterTake converts the count once, like the native take()", () => {
+            let calls = 0;
+            const count: any = {
+                valueOf: () => {
+                    calls++;
+                    return 2;
+                }
+            };
+
+            assert.deepEqual(iterToArray(iterTake([1, 2, 3], count)), [1, 2]);
+            assert.equal(calls, 1, "valueOf() was called once");
+
+            const IteratorCls = (getGlobal() as any).Iterator;
+            if (IteratorCls && IteratorCls.from) {
+                calls = 0;
+                assert.deepEqual(IteratorCls.from([1, 2, 3]).take(count).toArray(), [1, 2], "The native take()");
+                assert.equal(calls, 1, "The native take() called valueOf() once");
+            }
         });
     });
 });

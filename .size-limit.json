@@ -2,35 +2,35 @@
   {
     "name": "es5-full",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "41.25 kb",
+    "limit": "41.75 kb",
     "brotli": false,
     "running": false
   },
   {
     "name": "es6-full",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "40 kb",
+    "limit": "40.5 kb",
     "brotli": false,
     "running": false
   },
   {
     "name": "es5-full-brotli",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "15 kb",
+    "limit": "15.25 kb",
     "brotli": true,
     "running": false
   },
   {
     "name": "es6-full-brotli",
     "path": "lib/dist/es6/mod/ts-utils.js",
-    "limit": "15 kb",
+    "limit": "15.25 kb",
     "brotli": true,
     "running": false
   },
   {
     "name": "es5-zip",
     "path": "lib/dist/es5/mod/ts-utils.js",
-    "limit": "16.5 kb",
+    "limit": "16.75 kb",
     "gzip": true,
     "running": false
   },

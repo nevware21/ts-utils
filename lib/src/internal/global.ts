@@ -23,7 +23,7 @@ declare let self: any;
  */
 export interface _GlobalPolySymbols {
     k: { [key: string ]: symbol },
-    s: { [sym: symbol ]: string },
+    s: { [sym: symbol ]: string }
 }
 
 /**

@@ -106,6 +106,33 @@ describe("iterator helpers with a [Symbol.iterator] which isn't a function", () 
         assert.throws(() => iterFilter(value, () => true), TypeError);
         assert.throws(() => iterTake(value, 1), TypeError);
     });
+
+    it("each helper throws a TypeError for a falsy, Symbol or object (with a call property) [Symbol.iterator], like Array.from", function() {
+        if (typeof Symbol !== "function" || !Symbol.iterator) {
+            this.skip();
+            return;
+        }
+
+        const nativeFrom = (Array as any).from;
+
+        // Only null and undefined are ignored (any other falsy value isn't), and an object with a call property isn't a
+        // function
+        const iterFns: any[] = [0, false, "", NaN, Symbol("s"), { call: () => createArrayIterator(["x"]) }];
+
+        Object.keys(helpers).forEach((name) => {
+            iterFns.forEach((iterFn) => {
+                _notCallable(iterFn).forEach((value, idx) => {
+                    const iterName = typeof iterFn === "object" ? "an object with a call property" : (typeof iterFn === "string" ? JSON.stringify(iterFn) : String(iterFn));
+                    const details = name + " with a [Symbol.iterator] of " + iterName + " (" + (idx ? "an iterator" : "an array-like") + ")";
+
+                    assert.throws(() => helpers[name](value), TypeError, undefined, details);
+                    if (nativeFrom) {
+                        assert.throws(() => nativeFrom(value), TypeError, undefined, "Array.from: " + details);
+                    }
+                });
+            });
+        });
+    });
 });
 
 describe("iterators with an Object.prototype value or v property", () => {

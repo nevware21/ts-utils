@@ -205,16 +205,19 @@ describe("dumpObj maxLength", () => {
     });
 
     it("limits the dump of a value in an error message to 1024 characters", () => {
+        // A helper's error which includes the value (the polyfills which check a value's type don't read it, like the
+        // native functions)
+        const prefix = "Prototype must be an Object or function: ";
         let message: string;
         try {
-            polyArrFrom([1], { value: new Array(5001).join("x") } as any);
+            polyObjCreate(new Array(5001).join("x") as any);
         } catch (e) {
             message = e.message;
         }
 
-        assert.include(message, "is not a function");
-        assert.equal(message.length, 1024 + " is not a function".length, "The message should be limited");
-        assert.equal(message.substring(1021, 1024), "...");
+        assert.equal(message.substring(0, prefix.length), prefix);
+        assert.equal(message.length, prefix.length + 1024, "The message should be limited");
+        assert.equal(message.substring(prefix.length + 1021), "...");
     });
 });
 
@@ -315,10 +318,7 @@ describe("error messages limit the dump of a value", () => {
     it("limits the dump of the value to 1024 characters", () => {
         const cases: any[] = [
             ["mathToInt", () => mathToInt({ valueOf: () => Infinity, v: big }, true), RangeError],
-            ["polyObjCreate", () => polyObjCreate(big), TypeError],
-            ["polyObjFromEntries entry", () => polyObjFromEntries([big] as any), TypeError],
-            ["polyObjFromEntries iterable", () => polyObjFromEntries({ v: big } as any), TypeError],
-            ["polyArrFrom", () => polyArrFrom([1], { v: big } as any), TypeError]
+            ["polyObjCreate", () => polyObjCreate(big), TypeError]
         ];
 
         for (let lp = 0; lp < cases.length; lp++) {
@@ -332,6 +332,9 @@ describe("error messages limit the dump of a value", () => {
         // Like the native functions, the polyfills which check a value's type don't read (or convert) the value for the
         // error, so the message only includes its type
         const typeCases: any[] = [
+            ["polyObjFromEntries entry", () => polyObjFromEntries([big] as any), "string is not an entry object"],
+            ["polyObjFromEntries iterable", () => polyObjFromEntries({ v: big } as any), "object is not iterable"],
+            ["polyArrFrom", () => polyArrFrom([1], { v: big } as any), "object is not a function"],
             ["polySymbolKeyFor", () => polySymbolKeyFor(big as any), "string is not a symbol"]
         ];
 
@@ -339,6 +342,20 @@ describe("error messages limit the dump of a value", () => {
             const error = _getError(typeCases[lp][1]);
             assert.instanceOf(error, TypeError, typeCases[lp][0] + " should throw");
             assert.equal(error.message, typeCases[lp][2], typeCases[lp][0] + " message only includes the type");
+        }
+    });
+
+    it("includes null for a null value (rather than its typeof, object), like the native messages", () => {
+        const nullCases: any[] = [
+            ["polySymbolKeyFor", () => polySymbolKeyFor(null as any), "null is not a symbol"],
+            ["polyArrFrom", () => polyArrFrom([1], null as any), "null is not a function"],
+            ["polyObjFromEntries entry", () => polyObjFromEntries([null] as any), "null is not an entry object"]
+        ];
+
+        for (let lp = 0; lp < nullCases.length; lp++) {
+            const error = _getError(nullCases[lp][1]);
+            assert.instanceOf(error, TypeError, nullCases[lp][0] + " should throw");
+            assert.equal(error.message, nullCases[lp][2], nullCases[lp][0] + " message includes null");
         }
     });
 });

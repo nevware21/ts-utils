@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 
+import { UNDEF_VALUE } from "../internal/constants";
 import { getKnownSymbol } from "../symbol/symbol";
 import { WellKnownSymbols } from "../symbol/well_known";
 
@@ -255,8 +256,9 @@ export function createIterator<T>(ctx: CreateIteratorContext<T>): Iterator<T> {
         // Like the native iterators the value is read when the result is created, so a result keeps its value
         // (previously it was a getter which returned the current value, so an earlier result had a later value). The
         // done and value are own properties of the literal, as an assignment would call an inherited setter (or throw
-        // for an inherited read-only property), eg. an Object.prototype.value accessor would intercept every value
-        return (isDone ? { done: isDone } : { done: isDone, value: ctx.v }) as IteratorResult<T>;
+        // for an inherited read-only property), eg. an Object.prototype.value accessor would intercept every value. A
+        // done result also has its own (undefined) value, like the native iterators, so an inherited one isn't returned
+        return { done: isDone, value: isDone ? UNDEF_VALUE : ctx.v } as IteratorResult<T>;
     }
 
     // The return() and throw() functions, which are done and return the result of the ctx's r() or t() function

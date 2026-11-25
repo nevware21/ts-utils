@@ -362,6 +362,115 @@ describe("array helpers", () => {
             assert.equal(target[0], 1, "Should have value of 1");
             assert.equal(target[1], 0, "Should have value of 0 (the index from the first element)");
         });
+
+        it("Validate appending an iterator of the target, every value is read before any are appended", () => {
+            let target = [1, 2];
+            let nextCalls = 0;
+
+            // An iterator of the target's values (reading its current length, like the array iterator), which throws
+            // (rather than never finishing) when the values which are appended are also read
+            let iterator = {
+                next: () => {
+                    if (nextCalls++ > 10) {
+                        throw new Error("The appended values were also read");
+                    }
+
+                    return (nextCalls <= target.length ? { value: target[nextCalls - 1], done: false } : { value: undefined, done: true }) as IteratorResult<number>;
+                }
+            };
+
+            assert.deepEqual(arrAppend(target, iterator), [1, 2, 1, 2]);
+            assert.equal(nextCalls, 3, "next() was called for each value and once more for done");
+        });
+
+        it("Validate appending an array with more values than apply() accepts as arguments", () => {
+            // More arguments than apply() accepts on every runtime (eg. V8 ~125,000, SpiderMonkey 500,000)
+            let values: number[] = [];
+            for (let lp = 0; lp < 1000000; lp++) {
+                values.push(lp);
+            }
+
+            let target = arrAppend([-1], values);
+            assert.equal(target.length, 1000001, "Every value was appended");
+            assert.equal(target[0], -1);
+            assert.equal(target[1], 0);
+            assert.equal(target[1000000], 999999);
+        });
+
+        it("Validate appending a large array to itself appends its values once", () => {
+            let target: number[] = [];
+            for (let lp = 0; lp < 1000000; lp++) {
+                target.push(lp);
+            }
+
+            // When each value is pushed the length is read once (like apply()), so the appended values aren't also appended
+            assert.equal(arrAppend(target, target), target);
+            assert.equal(target.length, 2000000, "The values were appended once");
+            assert.equal(target[1000000], 0);
+            assert.equal(target[1999999], 999999);
+        });
+
+        it("Validate the values of an iterator are appended with one push() call, like spread", () => {
+            let target: any = [0];
+            let pushCalls: any[][] = [];
+            target.push = function () {
+                pushCalls.push(Array.prototype.slice.call(arguments));
+                return Array.prototype.push.apply(this, arguments);
+            };
+
+            let values = [1, 2, 3];
+            let idx = 0;
+            let iterator = {
+                next: () => (idx < values.length ? { value: values[idx++], done: false } : { value: undefined, done: true }) as IteratorResult<number>
+            };
+
+            assert.deepEqual(Array.prototype.slice.call(arrAppend(target, iterator)), [0, 1, 2, 3]);
+            assert.deepEqual(pushCalls, [[1, 2, 3]], "push() was called once with every value");
+        });
+
+        it("Validate an error from push() which isn't a RangeError is thrown, without pushing or reading the values again", () => {
+            // A push() which appends its values and then throws for a call with more than one value
+            let target: any = [0];
+            target.push = function () {
+                Array.prototype.push.apply(this, arguments);
+                if (arguments.length > 1) {
+                    throw new Error("push");
+                }
+
+                return this.length;
+            };
+
+            let reads = 0;
+            let values: any = [1, 2];
+            Object.defineProperty(values, 0, {
+                get: () => {
+                    reads++;
+                    return 1;
+                },
+                enumerable: true
+            });
+
+            assert.throws(() => arrAppend(target, values), Error, "push");
+            assert.deepEqual(Array.prototype.slice.call(target), [0, 1, 2], "The values were pushed once, like target.push(...values)");
+            assert.equal(reads, 1, "The value's getter was read once");
+        });
+
+        it("Validate a RangeError (more values than apply() accepts as arguments) pushes each value", () => {
+            // A push() which (like apply() with too many arguments) throws a RangeError for a call with more than one value
+            let target: any = [0];
+            let pushCalls: any[][] = [];
+            target.push = function () {
+                pushCalls.push(Array.prototype.slice.call(arguments));
+                if (arguments.length > 1) {
+                    throw new RangeError("too many arguments");
+                }
+
+                return Array.prototype.push.apply(this, arguments);
+            };
+
+            assert.deepEqual(Array.prototype.slice.call(arrAppend(target, [1, 2])), [0, 1, 2]);
+            assert.deepEqual(pushCalls, [[1, 2], [1], [2]], "Each value was pushed after the RangeError");
+        });
     });
 
     describe("arrIndexOf", () => {
@@ -1398,4 +1507,44 @@ describe("array helpers", () => {
             return e;
         }
     }
+});
+
+describe("arrAppend with a Map whose [Symbol.iterator] isn't a function", () => {
+    function _map(iterFn: any): any {
+        const map: any = new Map([["k", "v"]]);
+        map[Symbol.iterator] = iterFn;
+        return map;
+    }
+
+    it("appends a Map whose [Symbol.iterator] isn't null, undefined or a function (incl. a falsy one) as a single value (it isn't iterable, Array.from throws a TypeError)", function() {
+        if (typeof Symbol !== "function" || !Symbol.iterator || typeof Map !== "function") {
+            this.skip();
+            return;
+        }
+
+        const nativeFrom = (Array as any).from;
+        [5, 0, false, "", {}].forEach((iterFn) => {
+            const details = "[Symbol.iterator] is " + JSON.stringify(iterFn);
+
+            const map = _map(iterFn);
+            assert.deepEqual(arrAppend([0], map), [0, map], details);
+            if (nativeFrom) {
+                assert.throws(() => nativeFrom(_map(iterFn)), TypeError, undefined, "Array.from: " + details);
+            }
+        });
+    });
+
+    it("appends a Map with a null or undefined [Symbol.iterator] (it isn't iterable) as a single value", function() {
+        if (typeof Symbol !== "function" || !Symbol.iterator || typeof Map !== "function") {
+            this.skip();
+            return;
+        }
+
+        // A Map or Set which isn't iterable is also appended as a single value on a runtime without Symbol.iterator (eg.
+        // IE 11), see iterator_no_symbol.test.ts
+        [null, undefined].forEach((iterFn) => {
+            const map = _map(iterFn);
+            assert.deepEqual(arrAppend([0], map), [0, map], "[Symbol.iterator] is " + iterFn);
+        });
+    });
 });
