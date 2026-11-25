@@ -339,6 +339,81 @@ describe("polyfills entry installs the polyfills", () => {
         assert.strictEqual(results.trimEnd, results.trimRight, "trimEnd is the same function as trimRight");
     });
 
+    it("installs the polyfills (and uses a native function for a missing alias) when Array.prototype has a read-only index", () => {
+        const results: any = {};
+
+        _withoutNatives([[String.prototype, "trimStart"], [String.prototype, "trimEnd"]], () => {
+            // Like a changed Array.prototype, a read-only index 0 (so assigning index 0 of an array, eg. with push(),
+            // throws a TypeError)
+            defineProperty(Array.prototype, "0", {
+                value: undefined,
+                writable: false,
+                configurable: true
+            });
+
+            try {
+                _installPolyfills();
+            } catch (e) {
+                results.error = e;
+            } finally {
+                delete (Array.prototype as any)[0];
+            }
+
+            results.trimStart = (String.prototype as any).trimStart;
+            results.trimLeft = (String.prototype as any).trimLeft;
+        });
+
+        assert.isUndefined(results.error, "The polyfills were installed without an error");
+        assert.isFunction(results.trimStart, "trimStart is installed");
+        assert.strictEqual(results.trimStart, results.trimLeft, "trimStart is the same function as trimLeft");
+    });
+
+    it("installs the polyfills with the native function's name and length when Object.prototype has a get and set", () => {
+        const results: any = {};
+
+        _withoutNatives([[String.prototype, "padStart"], [Array.prototype, "with"]], () => {
+            // Like a polluted Object.prototype, which Object.defineProperty() reads for a descriptor which inherits from it
+            // (so a descriptor with a value and the inherited get / set throws a TypeError). Their own descriptors have no
+            // prototype, so the first doesn't stop the second being added
+            const pollute = (name: string) => {
+                const desc = Object.create(null);
+                desc.value = () => "polluted";
+                desc.writable = desc.configurable = true;
+                defineProperty(Object.prototype, name, desc);
+            };
+
+            pollute("get");
+            pollute("set");
+
+            try {
+                _installPolyfills();
+            } catch (e) {
+                results.error = e;
+            } finally {
+                delete (Object.prototype as any).get;
+                delete (Object.prototype as any).set;
+            }
+
+            results.padStart = (String.prototype as any).padStart;
+            results.with = (Array.prototype as any).with;
+        });
+
+        assert.isUndefined(results.error, "The polyfills were installed without an error");
+        assert.isFunction(results.padStart, "padStart is installed");
+
+        // Only where a function's name and length can be changed (ES2015+, they can't on IE)
+        const fnNameDesc = getOwnPropertyDescriptor(function testName() {
+            // Not called
+        }, "name");
+        if (fnNameDesc && fnNameDesc.configurable) {
+            assert.equal(results.padStart.name, "padStart");
+            assert.equal(results.padStart.length, 1);
+            assert.equal(results.with.name, "with");
+            assert.equal(results.with.length, 2);
+            assert.deepEqual(getOwnPropertyDescriptor(results.padStart, "name"), { value: "padStart", writable: false, enumerable: false, configurable: true }, "Like a native function's name");
+        }
+    });
+
     it("installs a polyfill (not the other native function) for isFrozen or isSealed, which share a polyfill but aren't aliases", () => {
         const results: any = {};
         const nativeIsFrozen = Object.isFrozen;

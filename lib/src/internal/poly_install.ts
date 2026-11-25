@@ -7,7 +7,7 @@
  */
 
 import { arrForEach } from "../array/forEach";
-import { _pushOwnValue, objDefine, objDefineProp } from "../object/define";
+import { _pushOwnValue, objDefine } from "../object/define";
 import { fnApply, fnCall } from "../funcs/funcs";
 import { safe } from "../helpers/safe";
 import { ArrCls, ArrProto, GET_OWN_PROPERTY_NAMES, LENGTH, ObjClass, StrProto } from "./constants";
@@ -89,10 +89,12 @@ function _addPolyfills(target: any, polyfills: any, isProto?: boolean) {
                 // A prototype polyfill passes the instance (this) as the first argument, while a static (class)
                 // function like Object.entries() or Array.from() is called with its arguments as-is. Like the native
                 // functions it has the native function's name and length (where they can be changed, ES2015+, so not on
-                // IE), the trim functions have no arguments and a few have 2, every other one has 1 argument
+                // IE), the trim functions have no arguments and a few have 2, every other one has 1 argument. They are
+                // defined with objDefine (configurable, not enumerable and not writable, like a native function's), whose
+                // descriptor has no prototype, so a get or set added to Object.prototype doesn't stop them being defined
                 theFn = makePolyFn(poly, !isProto);
-                safe(objDefineProp, [theFn, "name", { value: key, configurable: true }]);
-                safe(objDefineProp, [theFn, LENGTH, { value: isTrim ? 0 : (/^(substr|replaceAll|with|hasOwn|is)$/.test(key) ? 2 : 1), configurable: true }]);
+                safe(objDefine, [theFn, "name", { v: key, e: false }]);
+                safe(objDefine, [theFn, LENGTH, { v: isTrim ? 0 : (/^(substr|replaceAll|with|hasOwn|is)$/.test(key) ? 2 : 1), e: false }]);
                 _pushOwnValue(installed, { p: poly, f: theFn });
             }
 
