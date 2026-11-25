@@ -7,18 +7,23 @@
  */
 
 import { isArrayLike } from "../helpers/base";
+import { _toLength } from "../helpers/length";
 import { arrForEach } from "./forEach";
-import { arrIncludes } from "./includes";
-import { _strArgsToArr } from "./slice";
 import { LENGTH } from "../internal/constants";
+import { _createIncludes } from "../internal/identity_map";
 
 /**
  * The arrDifference() method returns a new array containing elements from the first array
- * that do not exist in any of the other provided arrays. Uses strict equality (===) for comparison.
+ * that do not exist in any of the other provided arrays. Uses the SameValueZero comparison (like strict equality
+ * `===`, except that `NaN` is equal to `NaN`).
  *
  * Like {@link https://nevware21.github.io/ts-utils/typedoc/functions/arrForEach.html | arrForEach} an empty slot (or a
  * missing index) of the first array is skipped, so it isn't included as `undefined`, while one in another array
- * excludes an `undefined` value of the first array.
+ * excludes an `undefined` value of the first array. Since 0.20.0 each of the other arrays is read by index, so a string
+ * is compared by its characters (rather than matching a substring) and an array-like's own `includes()` isn't called.
+ * An array to exclude is only read when a value of the first array isn't in any of the arrays to exclude before it, and
+ * only until that value is found, and each of its indexes is read at most once (and its length only when it is first
+ * reached), so a change made to it during the call (eg. by a getter of the first array) may not be seen.
  * @since 0.14.0
  * @group Array
  * @group ArrayLike
@@ -47,23 +52,31 @@ export function arrDifference<T>(theArray: ArrayLike<T> | null | undefined): T[]
 
     if (isArrayLike(theArray)) {
         // The arrays to exclude are the arguments after theArray, which are only read so they are not copied into a new
-        // array. A string's own includes() matches a substring, so its characters are compared instead
-        let excludeArrays = _strArgsToArr(arguments as ArrayLike<ArrayLike<T>>);
+        // array (any value which isn't an array-like is ignored)
+        let theArgs = arguments;
+
+        // Whether a value is included in each array-like to exclude which a value has reached (compared like
+        // arrIncludes(), SameValueZero). An array-like is only read when a value isn't in any of those before it (as
+        // before, when it was searched with includes()), and only until the value is found, continuing from the last
+        // index read, so each index is read at most once. As an array-like is only reached after those before it, these
+        // are added in order (index lp - 1) so there are no empty slots, which would be read from Array.prototype. A
+        // string is read by its characters (rather than its own includes() matching a substring), and an empty slot is
+        // undefined
+        let excludes: Array<(item: T) => boolean> = [];
 
         arrForEach(theArray, (item) => {
-            let excluded = false;
-            for (let lp = 1; lp < excludeArrays[LENGTH]; lp++) {
-                let exclValue = excludeArrays[lp];
-                // Check if excludeArray is valid before using arrIncludes
-                if (isArrayLike(exclValue) && arrIncludes(exclValue, item)) {
-                    excluded = true;
-                    break;
+            for (let lp = 1; lp < theArgs[LENGTH]; lp++) {
+                if (lp > excludes[LENGTH]) {
+                    let values: ArrayLike<T> = theArgs[lp];
+                    excludes.push(_createIncludes(values, isArrayLike(values) ? _toLength(values) : 0));
+                }
+
+                if (excludes[lp - 1](item)) {
+                    return;
                 }
             }
 
-            if (!excluded) {
-                result.push(item);
-            }
+            result.push(item);
         });
     }
     

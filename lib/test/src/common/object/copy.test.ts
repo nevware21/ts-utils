@@ -568,4 +568,21 @@ describe("objCopyProps and objDeepCopy behaviors", () => {
         assert.equal(result[4999].id, 4999);
         assert.ok(result[0] !== source[0], "The entries are copied");
     });
+
+    it("should only call the handler once for an object referenced twice which isn't copied", () => {
+        // An object whose prototype isn't Object.prototype (like a class instance) is kept rather than copied
+        const shared = Object.create({ value: 1 });
+        let sharedCalls = 0;
+        const result = objDeepCopy({ first: shared, second: shared }, (details) => {
+            if (details.value === shared) {
+                sharedCalls++;
+            }
+
+            return false;
+        });
+
+        assert.equal(result.first, shared, "The instance isn't copied");
+        assert.equal(result.second, shared);
+        assert.equal(sharedCalls, 1, "The second reference uses the visited entry");
+    });
 });

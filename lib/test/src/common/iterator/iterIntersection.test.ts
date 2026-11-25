@@ -38,4 +38,28 @@ describe("iterIntersection", () => {
         assert.deepEqual(iterIntersection([]), []);
         assert.deepEqual(iterIntersection(null as any), []);
     });
+
+    it("doesn't include a repeated value of the first iterable which isn't in a later one", () => {
+        assert.deepEqual(iterIntersection([1, 1], [2]), []);
+        assert.deepEqual(iterIntersection([1, 2, 1, 2], createArrayIterator([2])), [2]);
+    });
+
+    it("doesn't read an index 0 added to Array.prototype or Object.prototype when there are no iterables (as in v0.16.0)", () => {
+        const arrProto: any = Array.prototype;
+        const objProto: any = Object.prototype;
+        let results: any[][];
+
+        try {
+            arrProto[0] = [1, 2];
+            results = [iterIntersection()];
+            delete arrProto[0];
+            objProto[0] = [3, 4];
+            results.push(iterIntersection());
+        } finally {
+            delete arrProto[0];
+            delete objProto[0];
+        }
+
+        assert.deepEqual(results, [[], []]);
+    });
 });

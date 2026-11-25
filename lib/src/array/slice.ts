@@ -6,10 +6,8 @@
  * Licensed under the MIT license.
  */
 
-import { isStringLike } from "../helpers/base";
-import { ArrProto, ArrSlice, CALL, FuncCall, LENGTH } from "../internal/constants";
+import { ArrProto, ArrSlice, FuncCall } from "../internal/constants";
 import { _unwrapFunction } from "../internal/unwrapFunction";
-import { arrMap } from "./map";
 
 /**
  * The arrSlice() method returns a shallow copy of a portion of an array into a new array object
@@ -89,24 +87,4 @@ export const arrSlice: {
 export function _arrSliceToArr<T>(theArray: ArrayLike<T> | null | undefined, start?: number, end?: number): T[] {
     // ArrSlice.call(theArray, ...) passing on the arguments as-is, as an explicit undefined start / end is slower
     return (FuncCall as Function).apply(ArrSlice, arguments);
-}
-
-/**
- * @internal
- * @ignore
- * Returns the values with any string (or String object) converted into an array of its characters (as a string has its
- * own functions, such as includes(), which work with substrings), the values are returned as-is (without a copy) when
- * none of them are a string.
- * @param values - The values to check
- * @returns The values, or a new array of the converted values
- */
-/*#__NO_SIDE_EFFECTS__*/
-export function _strArgsToArr<T>(values: ArrayLike<ArrayLike<T>>): ArrayLike<ArrayLike<T>> {
-    for (let lp = 0; lp < values[LENGTH]; lp++) {
-        if (isStringLike(values[lp])) {
-            return arrMap(values, (value) => isStringLike(value) ? ArrSlice[CALL](value) : value);
-        }
-    }
-
-    return values;
 }

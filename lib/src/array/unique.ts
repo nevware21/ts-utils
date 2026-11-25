@@ -7,7 +7,7 @@
  */
 
 import { isArrayLike } from "../helpers/base";
-import { _createIdentityMap } from "../internal/identity_map";
+import { _createSeenSet } from "../internal/identity_map";
 import { arrForEach } from "./forEach";
 
 /**
@@ -42,10 +42,13 @@ export function arrUnique<T>(theArray: ArrayLike<T> | null | undefined): T[] {
     const result: T[] = [];
 
     if (isArrayLike(theArray)) {
-        const seen = _createIdentityMap<number>();
+        const seen = _createSeenSet();
 
         arrForEach(theArray, (item) => {
-            !seen(item, 1) && result.push(item);
+            if (!seen.has(item)) {
+                seen.add(item);
+                result.push(item);
+            }
         });
     }
 

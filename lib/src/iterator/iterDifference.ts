@@ -7,10 +7,10 @@
  */
 
 import { arrForEach } from "../array/forEach";
-import { arrIncludes } from "../array/includes";
 import { iterForOf } from "./forOf";
 import { iterToArray } from "./iterToArray";
 import { LENGTH } from "../internal/constants";
+import { _createSeenSet } from "../internal/identity_map";
 
 /**
  * Returns values from `iter` that are absent from all `excludeIters`.
@@ -31,21 +31,22 @@ export function iterDifference<T>(iter: Iterator<T> | Iterable<T>): T[] {
     // The iterators to exclude are the arguments after iter, which are only read so they are not copied into a new array
     let theArgs = arguments;
     let sourceValues = iterToArray(iter);
-    let excludedValues: T[] = [];
+
+    // The excluded values (compared like arrIncludes(), SameValueZero), so a source value is found in the set rather
+    // than by searching every excluded value (without a usable Set an object, function or symbol is still searched for)
+    let excluded = _createSeenSet();
 
     for (let lp = 1; lp < theArgs[LENGTH]; lp++) {
         iterForOf(theArgs[lp], (value: T) => {
-            if (!arrIncludes(excludedValues, value)) {
-                excludedValues.push(value);
-            }
+            // Without a usable Set an object, function or symbol is added without searching for it, so adding many
+            // isn't quadratic, but one which is repeated is stored (and searched) again
+            excluded.add(value);
         });
     }
 
     let result: T[] = [];
     arrForEach(sourceValues, (value) => {
-        if (!arrIncludes(excludedValues, value)) {
-            result.push(value);
-        }
+        !excluded.has(value) && result.push(value);
     });
 
     return result;

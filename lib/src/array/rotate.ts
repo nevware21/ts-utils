@@ -8,13 +8,15 @@
 
 import { _arrSliceToArr } from "./slice";
 import { isArrayLike } from "../helpers/base";
-import { arrAppend } from "./append";
+import { ArrCls } from "../internal/constants";
 import { _toLength } from "../helpers/length";
 
 /**
  * The arrRotate() method returns a new array with elements rotated by the specified number of positions.
  * Positive values rotate left (elements shift forward), negative values rotate right
- * (elements shift backward). The original array is not modified.
+ * (elements shift backward). The original array is not modified. An empty slot (or a missing index of an array-like)
+ * is `undefined` in the result, except when the count is 0 or a multiple of the length, where a copy (with its empty
+ * slots) is returned.
  *
  * Like the other array helpers (eg.
  * {@link https://nevware21.github.io/ts-utils/typedoc/functions/arrForEach.html | arrForEach}) a string (or `String`
@@ -25,7 +27,7 @@ import { _toLength } from "../helpers/length";
  * @group ArrayLike
  * @typeParam T - Identifies the type of array elements
  * @param theArray - The array or array-like object to rotate
- * @param count - Number of positions to rotate. Positive = right, negative = left
+ * @param count - Number of positions to rotate. Positive = left, negative = right
  * @returns A new array with elements rotated
  * @example
  * ```ts
@@ -55,14 +57,27 @@ export function arrRotate<T>(theArray: ArrayLike<T> | null | undefined, count: n
             if (rotations < 0) {
                 rotations = len + rotations;
             }
-            
+
             // If no effective rotation needed
             if (rotations !== 0) {
-                // Split at rotation point and recombine
-                // For positive count: rotate left (elements shift forward)
-                result = [];
-                arrAppend(result, _arrSliceToArr(theArray, rotations));
-                arrAppend(result, _arrSliceToArr(theArray, 0, rotations));
+                // Rotate left by a whole number of positions (for a positive count), as in v0.16.0 where the rotation
+                // was the start / end passed to slice(). The normalized rotation is in (0, len] or NaN, and new
+                // ArrCls(len) has already checked len is at most 2^32 - 1, so `>>> 0` truncates a fraction (eg. for a
+                // length of 3, -0.5 is normalized to 2.5, rotating 2 left, which is one right), NaN (eg. for a count of
+                // Infinity or undefined) is 0, and a tiny negative fraction (eg. -1e-17, where `len + rotations` rounds
+                // to `len`) is `len`, which is reset to 0 before the first read. Each index is read once, in the order
+                // of the result, into a presized array (rather than copying two slices and appending them), so an empty
+                // slot is undefined (as in v0.16.0) even when the converted rotation is 0, while the copy returned for
+                // a count of 0 or a multiple of the length keeps it
+                result = new ArrCls(len);
+                rotations >>>= 0;
+                for (let idx = 0; idx < len; idx++) {
+                    if (rotations === len) {
+                        rotations = 0;
+                    }
+
+                    result[idx] = theArray[rotations++];
+                }
             }
         }
 

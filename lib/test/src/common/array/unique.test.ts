@@ -89,4 +89,77 @@ describe("arrUnique", () => {
         assert.equal(result[2], s1);
         assert.equal(result[3], 1);
     });
+
+    it("should treat -0 and +0 as the same value, keeping the first", () => {
+        let result = arrUnique([-0, 1, 0, -0]);
+        assert.deepEqual(result, [-0, 1]);
+        assert.equal(1 / result[0], -Infinity, "The first value (-0) is kept");
+
+        result = arrUnique([0, -0]);
+        assert.deepEqual(result, [0]);
+        assert.equal(1 / result[0], Infinity, "The first value (+0) is kept");
+    });
+
+    it("should work without a native Set or Map (IE 9 / 10)", () => {
+        const a = { a: 1 };
+        const theGlobal: any = getGlobal();
+        const orgSet = theGlobal.Set;
+        const orgMap = theGlobal.Map;
+        let result: any[];
+
+        theGlobal.Set = undefined;
+        theGlobal.Map = undefined;
+        try {
+            result = arrUnique<any>([a, a, -0, 0, NaN, NaN, "1", 1]);
+        } finally {
+            theGlobal.Set = orgSet;
+            theGlobal.Map = orgMap;
+        }
+
+        assert.equal(result.length, 5);
+        assert.equal(result[0], a);
+        assert.equal(1 / result[1], -Infinity, "The first value (-0) is kept");
+        assert.isTrue(result[2] !== result[2], "NaN is kept once");
+        assert.equal(result[3], "1");
+        assert.equal(result[4], 1);
+    });
+
+    it("should find each value with the runtime's Set, rather than by searching the result", () => {
+        const theGlobal: any = getGlobal();
+        const orgSet = theGlobal.Set;
+        const searched: any[] = [];
+        let result: number[];
+
+        // A Set which records the values it is searched for. It finds NaN and treats -0 and +0 as the same value, so
+        // once it has been checked (by searching for NaN and -0) it is used directly
+        theGlobal.Set = function () {
+            const values = new orgSet();
+
+            return {
+                has: (value: any) => {
+                    searched.push(value);
+                    return values.has(value);
+                },
+                add: (value: any) => {
+                    values.add(value);
+                }
+            };
+        };
+
+        try {
+            result = arrUnique([1, 2, 1]);
+        } finally {
+            theGlobal.Set = orgSet;
+        }
+
+        assert.deepEqual(result, [1, 2]);
+        assert.deepEqual(searched, [NaN, -0, 1, 2, 1], "The check of NaN and -0, then each value");
+    });
+
+    it("should skip an empty slot, rather than adding it as undefined (unlike arrUnion)", () => {
+        // eslint-disable-next-line no-sparse-arrays
+        assert.deepEqual(arrUnique([1, , 3, 1]), [1, 3]);
+        // eslint-disable-next-line no-sparse-arrays
+        assert.deepEqual(arrUnique([1, , undefined]), [1, undefined], "An undefined value is still added");
+    });
 });
