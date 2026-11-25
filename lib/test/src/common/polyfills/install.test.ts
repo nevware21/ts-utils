@@ -236,4 +236,137 @@ describe("polyfills entry installs the polyfills", () => {
         assert.deepEqual(results.arrayKeys, ["0"], "for-in over an array only returns its indexes");
         assert.deepEqual(results.stringKeys, ["0"], "for-in over a String only returns its indexes");
     });
+    it("installs the polyfills with the native function's name and length, and an alias is the same function", () => {
+        const results: any = {};
+
+        _withoutNatives([[String.prototype, "trimStart"], [String.prototype, "trimLeft"], [String.prototype, "padStart"], [String.prototype, "substr"], [Array.prototype, "with"], [Object, "hasOwn"], [Array, "from"]], () => {
+            _installPolyfills();
+            results.trimStart = (String.prototype as any).trimStart;
+            results.trimLeft = (String.prototype as any).trimLeft;
+            results.padStart = (String.prototype as any).padStart;
+            results.substr = (String.prototype as any).substr;
+            results.with = (Array.prototype as any).with;
+            results.hasOwn = (Object as any).hasOwn;
+            results.from = (Array as any).from;
+        });
+
+        // Whether a function's name and length can be changed (ES2015+, they can't on IE)
+        const fnNameDesc = getOwnPropertyDescriptor(function testName() {
+            // Not called
+        }, "name");
+        const nameDesc = getOwnPropertyDescriptor(results.padStart, "name");
+        if (fnNameDesc && fnNameDesc.configurable) {
+            assert.equal(results.trimStart.name, "trimStart");
+            assert.equal(results.trimStart.length, 0);
+            assert.equal(results.padStart.length, 1);
+            assert.equal(results.substr.length, 2);
+            assert.equal(results.with.name, "with");
+            assert.equal(results.with.length, 2);
+            assert.equal(results.hasOwn.name, "hasOwn");
+            assert.equal(results.hasOwn.length, 2);
+            assert.equal(results.from.name, "from");
+            assert.equal(results.from.length, 1);
+            assert.deepEqual(nameDesc, { value: "padStart", writable: false, enumerable: false, configurable: true }, "Like a native function's name");
+        }
+
+        assert.strictEqual(results.trimLeft, results.trimStart, "trimLeft is the same function as trimStart (like the native functions)");
+        if (String.prototype.trimLeft && String.prototype.trimStart) {
+            // Only a runtime with both has the alias (eg. not one with only trimLeft, or IE with neither)
+            assert.strictEqual(String.prototype.trimLeft, String.prototype.trimStart, "The native trimLeft is trimStart");
+        }
+    });
+
+    it("installs the native function for a missing alias, when the runtime only has the other name", () => {
+        const results: any = {};
+        const nativeTrimLeft = String.prototype.trimLeft;
+        const nativeTrimRight = String.prototype.trimRight;
+
+        _withoutNatives([[String.prototype, "trimStart"], [String.prototype, "trimEnd"]], () => {
+            _installPolyfills();
+            results.trimStart = (String.prototype as any).trimStart;
+            results.trimEnd = (String.prototype as any).trimEnd;
+            results.trimLeft = (String.prototype as any).trimLeft;
+            results.trimRight = (String.prototype as any).trimRight;
+        });
+
+        // Without the native trimLeft / trimRight (eg. IE) the polyfill is installed for both names
+        assert.isFunction(results.trimStart, "trimStart is installed");
+        assert.isFunction(results.trimEnd, "trimEnd is installed");
+        assert.strictEqual(results.trimStart, results.trimLeft, "trimStart is the same function as trimLeft");
+        assert.strictEqual(results.trimEnd, results.trimRight, "trimEnd is the same function as trimRight");
+        if (nativeTrimLeft) {
+            assert.strictEqual(results.trimStart, nativeTrimLeft, "trimStart is the native trimLeft");
+            assert.strictEqual(results.trimLeft, nativeTrimLeft, "trimLeft wasn't replaced");
+        }
+
+        if (nativeTrimRight) {
+            assert.strictEqual(results.trimEnd, nativeTrimRight, "trimEnd is the native trimRight");
+            assert.strictEqual(results.trimRight, nativeTrimRight, "trimRight wasn't replaced");
+        }
+    });
+
+    it("installs the polyfills (and uses a native function for a missing alias) when Array.prototype has an index setter", () => {
+        const results: any = {};
+
+        _withoutNatives([[String.prototype, "trimStart"], [String.prototype, "trimEnd"]], () => {
+            // Like a changed Array.prototype, an index 0 setter which doesn't add the value to the array (so the value
+            // of index 0 is the inherited undefined)
+            defineProperty(Array.prototype, "0", {
+                get: () => undefined,
+                set: () => {
+                    // The value is ignored
+                },
+                configurable: true
+            });
+
+            try {
+                _installPolyfills();
+            } catch (e) {
+                results.error = e;
+            } finally {
+                delete (Array.prototype as any)[0];
+            }
+
+            results.trimStart = (String.prototype as any).trimStart;
+            results.trimLeft = (String.prototype as any).trimLeft;
+            results.trimEnd = (String.prototype as any).trimEnd;
+            results.trimRight = (String.prototype as any).trimRight;
+        });
+
+        assert.isUndefined(results.error, "The polyfills were installed without an error");
+        assert.isFunction(results.trimStart, "trimStart is installed");
+        assert.strictEqual(results.trimStart, results.trimLeft, "trimStart is the same function as trimLeft");
+        assert.strictEqual(results.trimEnd, results.trimRight, "trimEnd is the same function as trimRight");
+    });
+
+    it("installs a polyfill (not the other native function) for isFrozen or isSealed, which share a polyfill but aren't aliases", () => {
+        const results: any = {};
+        const nativeIsFrozen = Object.isFrozen;
+        const nativeIsSealed = Object.isSealed;
+        const sealed = Object.seal({ a: 1 });
+
+        _withoutNatives([[Object, "isFrozen"]], () => {
+            _installPolyfills();
+            results.isFrozen = (Object as any).isFrozen;
+            results.isFrozenSealed = (Object as any).isFrozen(sealed);
+        });
+
+        _withoutNatives([[Object, "isSealed"]], () => {
+            _installPolyfills();
+            results.isSealed = (Object as any).isSealed;
+        });
+
+        _withoutNatives([[Object, "isFrozen"], [Object, "isSealed"]], () => {
+            _installPolyfills();
+            results.bothIsFrozen = (Object as any).isFrozen;
+            results.bothIsSealed = (Object as any).isSealed;
+        });
+
+        assert.notStrictEqual(results.isFrozen, nativeIsSealed, "isFrozen isn't the native isSealed");
+        assert.isFalse(results.isFrozenSealed, "A sealed object with a property isn't frozen");
+        assert.equal(results.isFrozenSealed, nativeIsFrozen(sealed), "Like the native isFrozen");
+        assert.notStrictEqual(results.isSealed, nativeIsFrozen, "isSealed isn't the native isFrozen");
+        assert.notStrictEqual(results.bothIsFrozen, results.bothIsSealed, "Like the native functions, isFrozen and isSealed are different functions");
+        assert.notStrictEqual(nativeIsFrozen, nativeIsSealed, "The native isFrozen isn't isSealed");
+    });
 });

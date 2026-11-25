@@ -8,7 +8,7 @@
 
 import { assert } from "@nevware21/tripwire-chai";
 import { PROTOTYPE } from "../../../../src/internal/constants";
-import { makePolyFn } from "../../../../src/internal/poly_helpers";
+import { makePolyFn } from "../../../../src/internal/poly_install";
 
 class TestClass {
 
@@ -55,5 +55,48 @@ describe("polyfill helpers", () => {
         assert.equal(testObj1, result1);
         assert.equal("Goodbye!", result2);
         assert.equal(undefined, result3);
+    });
+
+    it("makePolyFn adds the instance and each argument as own values, when Array.prototype has a setter for the index", () => {
+        const previous0 = Object.getOwnPropertyDescriptor(Array.prototype, "0");
+        const previous1 = Object.getOwnPropertyDescriptor(Array.prototype, "1");
+        let setterCalls = 0;
+        let received: any[];
+        const polyFn: any = makePolyFn(function(value: any, arg: any) {
+            received = [value, arg];
+        });
+
+        try {
+            Object.defineProperty(Array.prototype, "0", {
+                set: () => {
+                    setterCalls++;
+                },
+                configurable: true
+            });
+            Object.defineProperty(Array.prototype, "1", {
+                set: () => {
+                    setterCalls++;
+                },
+                configurable: true
+            });
+
+            polyFn.call("instance", "argument");
+        } finally {
+            // Restored before any assert is used
+            if (previous0) {
+                Object.defineProperty(Array.prototype, "0", previous0);
+            } else {
+                delete (Array.prototype as any)[0];
+            }
+
+            if (previous1) {
+                Object.defineProperty(Array.prototype, "1", previous1);
+            } else {
+                delete (Array.prototype as any)[1];
+            }
+        }
+
+        assert.equal(setterCalls, 0, "The Array.prototype setters weren't called");
+        assert.deepEqual(received, ["instance", "argument"]);
     });
 });
