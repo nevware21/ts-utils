@@ -7,7 +7,7 @@
  */
 
 import { arrForEach } from "../array/forEach";
-import { objDefine, objDefineProp } from "../object/define";
+import { _pushOwnValue, objDefine, objDefineProp } from "../object/define";
 import { fnApply, fnCall } from "../funcs/funcs";
 import { safe } from "../helpers/safe";
 import { ArrCls, ArrProto, GET_OWN_PROPERTY_NAMES, LENGTH, ObjClass, StrProto } from "./constants";
@@ -62,10 +62,11 @@ function _addPolyfills(target: any, polyfills: any, isProto?: boolean) {
     let installed: { p: Function, f: Function }[] = [];
     let keys = polyObjKeys(polyfills);
 
-    // A native function is used for a missing alias (another trim key with the same polyfill)
+    // A native function is used for a missing alias (another trim key with the same polyfill). Each entry is added as an
+    // own value, so an Array.prototype index setter (which doesn't add the value to the array) doesn't lose it
     arrForEach(keys, (key) => {
         if (target[key]) {
-            installed.push({ p: polyfills[key], f: target[key] });
+            _pushOwnValue(installed, { p: polyfills[key], f: target[key] });
         }
     });
 
@@ -92,7 +93,7 @@ function _addPolyfills(target: any, polyfills: any, isProto?: boolean) {
                 theFn = makePolyFn(poly, !isProto);
                 safe(objDefineProp, [theFn, "name", { value: key, configurable: true }]);
                 safe(objDefineProp, [theFn, LENGTH, { value: isTrim ? 0 : (/^(substr|replaceAll|with|hasOwn|is)$/.test(key) ? 2 : 1), configurable: true }]);
-                installed.push({ p: poly, f: theFn });
+                _pushOwnValue(installed, { p: poly, f: theFn });
             }
 
             // It is defined (writable and configurable but not enumerable) like the native functions, so for-in over an
