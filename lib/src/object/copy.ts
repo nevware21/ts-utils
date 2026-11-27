@@ -126,8 +126,8 @@ function _deepCopy<T>(visitMap: _IdentityMap<_RecursiveVisitMap>, value: T, ctx:
 
     if (!isPrim) {
         // Add the value to the visit map before it is copied, so a recursive reference gets the same (partial) copy
-        const theEntry = visitMap(value, newEntry);
-        if (!theEntry) {
+        const theEntry = visitMap.getOrAdd(value, newEntry);
+        if (theEntry === newEntry) {
             let idx = 0;
             let handler: ObjDeepCopyHandler | null = userHandler;
             while (!(handler || (idx < defaultDeepCopyHandlers[LENGTH] ? defaultDeepCopyHandlers[idx++] : _defaultDeepCopyHandler))[CALL](ctx, details)) {
@@ -135,7 +135,7 @@ function _deepCopy<T>(visitMap: _IdentityMap<_RecursiveVisitMap>, value: T, ctx:
             }
         }
 
-        return (theEntry || newEntry).v;
+        return theEntry.v;
     }
 
     // Only a primitive with a user handler gets here, which can override the provided value

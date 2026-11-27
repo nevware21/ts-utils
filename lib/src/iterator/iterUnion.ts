@@ -6,9 +6,9 @@
  * Licensed under the MIT license.
  */
 
-import { arrIncludes } from "../array/includes";
 import { iterForOf } from "./forOf";
 import { LENGTH } from "../internal/constants";
+import { _createSeenSet } from "../internal/identity_map";
 
 /**
  * Returns unique values from all provided iterators / iterables.
@@ -30,9 +30,14 @@ export function iterUnion<T>(): T[] {
     let iters: ArrayLike<Iterator<T> | Iterable<T>> = arguments;
     let result: T[] = [];
 
+    // The values which have been added (compared like arrIncludes(), SameValueZero), so a value is found in the set
+    // rather than by searching the result (without a usable Set an object, function or symbol is still searched for)
+    let seen = _createSeenSet();
+
     for (let lp = 0; lp < iters[LENGTH]; lp++) {
         iterForOf(iters[lp], (value) => {
-            if (!arrIncludes(result, value)) {
+            if (!seen.has(value)) {
+                seen.add(value);
                 result.push(value);
             }
         });
