@@ -305,7 +305,7 @@ Some additional polyfills are provided for simple backward compatibility to enab
 
 > Notes:
 > - While some polyfills are provided to "somewhat" support older environments this library does not intend to become a fully fledged polyfill library. And the polyfills provided (or contributed) are just the minimum set that have been required over time. And should be less necessary are time moves forward.
-> - Several functions use the [Object.defineProperty](https://caniuse.com/?search=Object.defineProperty) and therefore support is limited to runtimes or good polyfills that can correctly implement this functionality. (eg. createIterator; createIterable)
+> - Several functions use the [Object.defineProperty](https://caniuse.com/?search=Object.defineProperty) and therefore support is limited to runtimes or good polyfills that can correctly implement this functionality. (eg. objDefine, objDefineAccessors, getLazy, createCachedValue, createEnum, scheduleTimeout, getKnownSymbol and the helpers which read a well-known symbol, such as createIterable and iterForOf)
 
 ### TypeScript Support
 

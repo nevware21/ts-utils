@@ -21,10 +21,11 @@ import { isUnsafePropKey } from "./isUnsafePropKey";
  * the callback still propagate.
  * @param theObject - The object to iterate over
  * @param callbackfn - The callback to call for each key, returning -1 stops the iteration
- * @param ctx - The already resolved `this` value to use when calling the callback
+ * @param ctx - The already resolved `this` value to use when calling the callback (undefined when it isn't passed,
+ * eg. for an arrow function)
  * @returns -1 if the callback requested the iteration to stop, otherwise undefined
  */
-export function _objForEachKey<T>(theObject: T, callbackfn: (key: string, value: T[keyof T]) => void | number, ctx: any): number | void {
+export function _objForEachKey<T>(theObject: T, callbackfn: (key: string, value: T[keyof T]) => void | number, ctx?: any): number | void {
     for (const prop in theObject) {
         if (objHasOwn(theObject, prop)) {
             let value: any;

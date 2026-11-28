@@ -582,6 +582,59 @@ describe("objDefine descriptor handling", () => {
         assert.throws(() => Object.defineProperty({}, "a", undefined as any), TypeError);
     });
 
+    it("objDefineProps skips a string or symbol key whose getter throws", function() {
+        if (typeof Symbol !== "function") {
+            this.skip();
+            return;
+        }
+
+        const throwSym = Symbol("throws");
+        const okSym = Symbol("ok");
+        const propDescMap: any = {
+            a: { v: 1 },
+            get b() {
+                throw new Error("b");
+            },
+            [okSym]: { v: 2 }
+        };
+
+        Object.defineProperty(propDescMap, throwSym, {
+            get: () => {
+                throw new Error("symbol");
+            },
+            enumerable: true
+        });
+
+        const target: any = objDefineProps({}, propDescMap);
+        assert.deepEqual([target.a, target[okSym]], [1, 2]);
+        assert.isFalse("b" in target, "The string key whose getter throws is skipped");
+        assert.isFalse(throwSym in target, "The symbol key whose getter throws is skipped");
+    });
+
+    it("objDefineProps throws a TypeError for a null or undefined propDescMap, like Object.defineProperties", () => {
+        assert.throws(() => objDefineProps({}, null as any), TypeError);
+        assert.throws(() => objDefineProps({}, undefined as any), TypeError);
+        assert.throws(() => Object.defineProperties({}, null as any), TypeError);
+    });
+
+    it("objDefineProps doesn't throw for a falsy propDescMap which isn't null or undefined, like Object.defineProperties", () => {
+        const target = {};
+        assert.strictEqual(objDefineProps(target, 0 as any), target);
+        assert.strictEqual(objDefineProps(target, "" as any), target);
+        assert.strictEqual(Object.defineProperties(target, 0 as any), target);
+    });
+
+    it("objDefineProps defines each index of a primitive string propDescMap as a read-only undefined property, like a String object", () => {
+        const target: any = objDefineProps({}, "ab" as any);
+        const strTarget: any = objDefineProps({}, new String("ab") as any);
+        const desc: any = Object.getOwnPropertyDescriptor(target, "0");
+
+        assert.deepEqual(Object.keys(target), ["0", "1"]);
+        assert.isUndefined(target[0]);
+        assert.isFalse(desc.writable, "The index is read-only");
+        assert.deepEqual(desc, Object.getOwnPropertyDescriptor(strTarget, "0"), "Like the index of a String object");
+    });
+
     it("a getter (g) or setter (s) takes precedence over a lazy value (l)", () => {
         const target: any = {};
         objDefine(target, "a", { l: getLazy(() => "lazy"), g: () => "getter" } as any);

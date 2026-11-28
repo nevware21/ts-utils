@@ -8,14 +8,13 @@
 
 import { ArrProto, FUNCTION, LENGTH, OBJECT, ObjClass, ObjProto } from "../internal/constants";
 import { isFunction, isStrictUndefined } from "../helpers/base";
-import { objForEachKey } from "./for_each_key";
+import { _objForEachKey } from "./for_each_key";
 import { objHasOwn } from "./has_own";
 import { _throwIfNullOrUndefined } from "../internal/throwIf";
 import { ILazyValue } from "../helpers/types";
 import { _pureAssign, _pureRef } from "../internal/treeshake_helpers";
-import { arrForEach } from "../array/forEach";
-import { _objPropertyIsEnumerable } from "./property_is_enumerable";
-import { _objCreateNull, _objGetOwnPropertyDescriptor, _objGetOwnPropertySymbols, _objGetPrototypeOf } from "../internal/own_props";
+import { forEachOwnKey } from "./forEachOwnKey";
+import { _objCreateNull, _objGetOwnPropertyDescriptor, _objGetPrototypeOf } from "../internal/own_props";
 
 /**
  * Definition of the Property Descriptor mappings for the objDefine functions.
@@ -124,8 +123,10 @@ function _createProp(value: ObjDefinePropDescriptor): PropertyDescriptor {
     prop[propMap["e"]] = true;
 
     // Only the own keys of the value which are own keys of the propMap are used (an allow-list), so an unexpected key such
-    // as "constructor" or one added to Object.prototype (eg. Object.prototype.x = "get") can't map to a descriptor key
-    objForEachKey(value, (key: keyof ObjDefinePropDescriptor, propValue) => {
+    // as "constructor" or one added to Object.prototype (eg. Object.prototype.x = "get") can't map to a descriptor key.
+    // The value has been checked above, so its keys are read without the checks of objForEachKey() (the keys of a
+    // primitive, eg. the indexes of a string, aren't in the propMap)
+    _objForEachKey(value, (key: keyof ObjDefinePropDescriptor, propValue) => {
         if (key === "l") {
             lazyValue = propValue;
         } else if (objHasOwn(propMap, key)) {
@@ -322,7 +323,10 @@ export function _pushOwnValue<T>(theArray: T[], value: T, idx: number = theArray
 /**
  * The objDefineProps() method defines new or modifies existing properties directly for the target object using the keys
  * and configuration from the propDescMap argument. This will call {@link objDefineProperties} after creating the required
- * PropertyDescriptorMap from the propDescMap values.
+ * PropertyDescriptorMap from the propDescMap values. Only the own enumerable (string and symbol) keys of the
+ * propDescMap are used, a key whose getter throws is skipped, and (like Object.defineProperties) a null or undefined
+ * propDescMap throws a TypeError. Since 0.20.0 a key whose getter throws is skipped (its error was thrown) and a null
+ * or undefined propDescMap also throws without `Object.getOwnPropertySymbols`, eg. on IE (it returned the target).
  * Note, the default values (true) for `configurable` and `enumerable` are different from the defaults provided by objDefineProperties.
  * @since 0.6.0
  * @group Object
@@ -333,18 +337,17 @@ export function _pushOwnValue<T>(theArray: T[], value: T, idx: number = theArray
  * @returns The target object.
  */
 export function objDefineProps<T>(target: T, propDescMap: ObjDefinePropDescriptorMap) {
+    // Like Object.defineProperties a null or undefined propDescMap throws (forEachOwnKey would skip it)
+    _throwIfNullOrUndefined(propDescMap);
+
     // The map has no prototype, so (like Object.defineProperties) a "__proto__" key (eg. from JSON.parse) is defined, and
     // a read-only property of Object.prototype (eg. when it is frozen) doesn't stop a key being added
     let props: PropertyDescriptorMap = _objCreateNull();
 
-    objForEachKey(propDescMap, (key, value: ObjDefinePropDescriptor) => {
-        props[key] = _createProp(value);
-    });
-
-    arrForEach(_objGetOwnPropertySymbols(propDescMap), (sym) => {
-        if (_objPropertyIsEnumerable(propDescMap, sym)) {
-            props[sym] = _createProp(propDescMap[sym]);
-        }
+    // Each own enumerable key (string and symbol) is used, like Object.defineProperties, and (like objForEachKey) a key
+    // whose getter throws is skipped
+    forEachOwnKey(propDescMap, (key, value: ObjDefinePropDescriptor) => {
+        props[key as any] = _createProp(value);
     });
 
     return objDefineProperties(target, props);

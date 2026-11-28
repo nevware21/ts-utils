@@ -187,19 +187,19 @@ export function createEnumValueMap<E>(values: { [key in keyof E]: E[keyof E] }):
  *    Bear = 3
  * };
  * // Creates a simple mapping to a string value
- * const animalFamilyMap = createValueMap<typeof Animal, string>({
+ * const animalFamilyMap = createSimpleMap<typeof Animal, string>({
  *    Dog: [ Animal.Dog, "Canidae"],
  *    Cat: [ Animal.Cat, "Felidae"],
  *    Butterfly: [ Animal.Butterfly, "Papilionidae"],
  *    Bear: [ Animal.Bear, "Ursidae"]
  * });
  * // You end up with an object that maps everything to the name
- * animalMap.Dog === "Canidae";     // true with typeof animalMap.Dog is "string"
- * animalMap[0] === "Canidae";      // true with typeof animalMap[0] is "string"
- * animalMap["Dog"] === "Canidae";  // true with typeof animalMap["Dog"] is "string"
- * animalMap.Cat === "Felidae";     // true with typeof animalMap.Cat is "string"
- * animalMap[1] === "Felidae";      // true with typeof animalMap[1] is "string"
- * animalMap["Cat"] === "Felidae";  // true with typeof animalMap["Cat"] is "string"
+ * animalFamilyMap.Dog === "Canidae";     // true with typeof animalFamilyMap.Dog is "string"
+ * animalFamilyMap[0] === "Canidae";      // true with typeof animalFamilyMap[0] is "string"
+ * animalFamilyMap["Dog"] === "Canidae";  // true with typeof animalFamilyMap["Dog"] is "string"
+ * animalFamilyMap.Cat === "Felidae";     // true with typeof animalFamilyMap.Cat is "string"
+ * animalFamilyMap[1] === "Felidae";      // true with typeof animalFamilyMap[1] is "string"
+ * animalFamilyMap["Cat"] === "Felidae";  // true with typeof animalFamilyMap["Cat"] is "string"
  * ```
  * @param values - The values to populate on the new object
  * @typeParam E - Identifies the const enum type (eg. typeof Animal);
@@ -246,14 +246,14 @@ export function createSimpleMap<E, V>(values: { [key in keyof E]: [ E[keyof E], 
  *     Bear: [ Animal.Bear, "Ursidae"]
  * });
  * // You end up with a strongly types result for each value
- * animalMap.Dog === "Canidae";     // true with typeof animalMap.Dog is (const) "Canidae"
- * animalMap[0] === "Canidae";      // true with typeof animalMap[0] is "Canidae"
- * animalMap["Dog"] === "Canidae";  // true with typeof animalMap["Dog"] is "Canidae"
- * animalMap.Cat === "Felidae";     // true with typeof animalMap.Cat is "Felidae"
- * animalMap[1] === "Felidae";      // true with typeof animalMap[1] is "Felidae"
- * animalMap["Cat"] === "Felidae";  // true with typeof animalMap["Cat"] is "Felidae"
+ * animalFamilyMap.Dog === "Canidae";     // true with typeof animalFamilyMap.Dog is (const) "Canidae"
+ * animalFamilyMap[0] === "Canidae";      // true with typeof animalFamilyMap[0] is "Canidae"
+ * animalFamilyMap["Dog"] === "Canidae";  // true with typeof animalFamilyMap["Dog"] is "Canidae"
+ * animalFamilyMap.Cat === "Felidae";     // true with typeof animalFamilyMap.Cat is "Felidae"
+ * animalFamilyMap[1] === "Felidae";      // true with typeof animalFamilyMap[1] is "Felidae"
+ * animalFamilyMap["Cat"] === "Felidae";  // true with typeof animalFamilyMap["Cat"] is "Felidae"
  *
- * or using an interface to define the direct string mappings
+ * // Or using an interface to define the direct string mappings
  *
  * interface IAnimalFamilyMap {
  *     Dog: "Canidae",
@@ -263,7 +263,7 @@ export function createSimpleMap<E, V>(values: { [key in keyof E]: [ E[keyof E], 
  * }
  *
  * // Create a strongly types map
- * const animalFamilyMap = createTypeMap<typeof Animal, IAnimalFamilyMap & {
+ * const animalFamilyMap2 = createTypeMap<typeof Animal, IAnimalFamilyMap & {
  *     // Defined the enum lookups
  *     [Animal.Dog]: "Canidae",
  *     [Animal.Cat]: "Felidae",
@@ -277,12 +277,12 @@ export function createSimpleMap<E, V>(values: { [key in keyof E]: [ E[keyof E], 
  * });
  *
  * // You also end up with a strongly types result for each value
- * animalMap.Dog === "Canidae";     // true with typeof animalMap.Dog is (const) "Canidae"
- * animalMap[0] === "Canidae";      // true with typeof animalMap[0] is "Canidae"
- * animalMap["Dog"] === "Canidae";  // true with typeof animalMap["Dog"] is "Canidae"
- * animalMap.Cat === "Felidae";     // true with typeof animalMap.Cat is "Felidae"
- * animalMap[1] === "Felidae";      // true with typeof animalMap[1] is "Felidae"
- * animalMap["Cat"] === "Felidae";  // true with typeof animalMap["Cat"] is "Felidae"
+ * animalFamilyMap2.Dog === "Canidae";     // true with typeof animalFamilyMap2.Dog is (const) "Canidae"
+ * animalFamilyMap2[0] === "Canidae";      // true with typeof animalFamilyMap2[0] is "Canidae"
+ * animalFamilyMap2["Dog"] === "Canidae";  // true with typeof animalFamilyMap2["Dog"] is "Canidae"
+ * animalFamilyMap2.Cat === "Felidae";     // true with typeof animalFamilyMap2.Cat is "Felidae"
+ * animalFamilyMap2[1] === "Felidae";      // true with typeof animalFamilyMap2[1] is "Felidae"
+ * animalFamilyMap2["Cat"] === "Felidae";  // true with typeof animalFamilyMap2["Cat"] is "Felidae"
  * ```
  * @param values - The values to populate on the new object
  * @typeParam E - Identifies the enum type
