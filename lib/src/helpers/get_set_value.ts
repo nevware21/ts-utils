@@ -9,6 +9,7 @@
 import { isFunction, isNullOrUndefined } from "./base";
 import { strSplit } from "../string/split";
 import { iterForOf } from "../iterator/forOf";
+import { arrForEach } from "../array/forEach";
 import { isUnsafeTarget } from "../object/isUnsafeTarget";
 import { isUnsafePropKey } from "../object/isUnsafePropKey";
 import { objHasOwn } from "../object/has_own";
@@ -156,7 +157,7 @@ export function getValueByIter<V, T extends object = any>(target: T, iter: Itera
  * inherited (eg. built-in) function, eg. `"hasOwnProperty.call"` sets the target's own
  * `hasOwnProperty` to `{ call: value }`. Any objects which were added for the path are removed
  * again when the value is not set (unless one was passed to an inherited setter). Since 0.20.0 the parts of the
- * path are set with {@link setValueByIter}, so they have the same checks and the added objects are
+ * path are set like {@link setValueByIter}, so they have the same checks and the added objects are
  * removed in the same way (an empty part, eg. the second part of `"a..b"`, is still used as a key).
  * @since 0.9.1
  * @group Value
@@ -176,8 +177,10 @@ export function getValueByIter<V, T extends object = any>(target: T, iter: Itera
  */
 export function setValueByKey<T>(target: any, path: string, value: T) {
     if (target && path) {
-        // The parts of the path are set with the same checks (and the removal of any added objects) as setValueByIter
-        setValueByIter(target, strSplit(path, "."), value);
+        // The parts of the path are set with the same checks (and the removal of any added objects) as setValueByIter,
+        // the array of the parts is read by index (so the iterator code isn't included) and the parts are strings (so
+        // they aren't converted)
+        _setValue(target, strSplit(path, "."), value, arrForEach);
     }
 }
 
@@ -230,90 +233,107 @@ export function setValueByKey<T>(target: any, path: string, value: T) {
  */
 export function setValueByIter<T>(target: any, iter: Iterator<string> | Iterable<string>, value: T) {
     if (target && iter) {
-        let lastKey: string | undefined;
-        let isValidPath = true;
-        let isSet = false;
+        // Each key is converted to a property key (a string, unless it's a symbol) once, like a property access does,
+        // so a key which converts to an unsafe key (eg. ["constructor"] or an object whose toString() returns
+        // "constructor") is also blocked, and the converted key is the one which is used (a polyfill symbol is an
+        // object, which is converted to its unique string key like a property access does)
+        _setValue(target, iter, value, (keys: any, callbackfn: (key: string) => void | number) =>
+            iterForOf(keys, (theKey: string) => callbackfn(isSymbol(theKey) ? theKey : asString(theKey))));
+    }
+}
 
-        // The first object which is added for the path, where it was added and the null or undefined value it replaced
-        let added: any;
-        let addedTarget: any;
-        let addedKey: any;
-        let addedPrev: any;
-        let addedIsOwn: boolean | undefined;
+/**
+ * @internal
+ * @ignore
+ * Sets the value of the target at the path of the keys (the body of setValueByKey and setValueByIter). The forEachFn
+ * calls the callback with each key, which is used as it is passed, and stops when the callback returns -1 (arrForEach
+ * for the parts of a setValueByKey path, which are strings, or for setValueByIter a function which reads the keys
+ * with iterForOf and converts each one to a property key)
+ * @param target - The target object
+ * @param keys - The keys of the path
+ * @param value - The value to set
+ * @param forEachFn - Calls the callback for each key
+ */
+function _setValue<T>(target: any, keys: any, value: T, forEachFn: (keys: any, callbackfn: (key: string) => void | number) => void) {
+    let lastKey: string | undefined;
+    let isValidPath = true;
+    let isSet = false;
 
-        try {
-            iterForOf(iter, (theKey: string) => {
-                // The key is converted to a property key (a string, unless it's a symbol) once, like a property access
-                // does, so a key which converts to an unsafe key (eg. ["constructor"] or an object whose toString()
-                // returns "constructor") is also blocked, and the converted key is the one which is used (a polyfill symbol
-                // is an object, which is converted to its unique string key like a property access does)
-                let key: string = isSymbol(theKey) ? theKey : asString(theKey);
-                if (isUnsafeTarget(target) || isUnsafePropKey(key)) {
+    // The first object which is added for the path, where it was added and the null or undefined value it replaced
+    let added: any;
+    let addedTarget: any;
+    let addedKey: any;
+    let addedPrev: any;
+    let addedIsOwn: boolean | undefined;
+
+    try {
+        forEachFn(keys, (key: string) => {
+            if (isUnsafeTarget(target) || isUnsafePropKey(key)) {
+                isValidPath = false;
+                return -1;
+            }
+
+            // The previous key wasn't the last one, so its value is the next target (a key which converts to an
+            // empty string is also used, like a property access)
+            if (lastKey !== UNDEF_VALUE) {
+                let next = target[lastKey];
+
+                // A missing value, or an inherited function (eg. the hasOwnProperty of an object or a method of a
+                // class), is replaced by an object which is added as an own property of the target, so the path sets
+                // the target's own properties rather than changing an inherited (eg. built-in) function. Any other
+                // inherited value (eg. the object returned by a getter of a class) is still used
+                if (isNullOrUndefined(next) || (isFunction(next) && !objHasOwn(target, lastKey))) {
+                    // Add an empty object / map
+                    let newValue = {};
+                    if (!added) {
+                        // Only the first added object is tracked, as any later objects are added to it, and this
+                        // preserves any existing intermediate objects
+                        added = newValue;
+                        addedTarget = target;
+                        addedKey = lastKey;
+                        addedPrev = next;
+                        addedIsOwn = objHasOwn(target, lastKey);
+                    }
+
+                    target[lastKey] = newValue;
+                    next = target[lastKey];
+                }
+
+                if (isFunction(next) && !objHasOwn(target, lastKey)) {
+                    // The added object didn't become an own property (eg. an inherited setter took it) and an
+                    // inherited getter returned a function rather than it, which is not walked into
                     isValidPath = false;
                     return -1;
                 }
 
-                // The previous key wasn't the last one, so its value is the next target (a key which converts to an
-                // empty string is also used, like a property access)
-                if (lastKey !== UNDEF_VALUE) {
-                    let next = target[lastKey];
-
-                    // A missing value, or an inherited function (eg. the hasOwnProperty of an object or a method of a
-                    // class), is replaced by an object which is added as an own property of the target, so the path sets
-                    // the target's own properties rather than changing an inherited (eg. built-in) function. Any other
-                    // inherited value (eg. the object returned by a getter of a class) is still used
-                    if (isNullOrUndefined(next) || (isFunction(next) && !objHasOwn(target, lastKey))) {
-                        // Add an empty object / map
-                        let newValue = {};
-                        if (!added) {
-                            // Only the first added object is tracked, as any later objects are added to it, and this
-                            // preserves any existing intermediate objects
-                            added = newValue;
-                            addedTarget = target;
-                            addedKey = lastKey;
-                            addedPrev = next;
-                            addedIsOwn = objHasOwn(target, lastKey);
-                        }
-
-                        target[lastKey] = newValue;
-                        next = target[lastKey];
-                    }
-
-                    if (isFunction(next) && !objHasOwn(target, lastKey)) {
-                        // The added object didn't become an own property (eg. an inherited setter took it) and an
-                        // inherited getter returned a function rather than it, which is not walked into
-                        isValidPath = false;
-                        return -1;
-                    }
-
-                    target = next;
-                }
-
-                lastKey = key;
-            });
-
-            // The last key is a string or (like the other keys) a symbol, it is only undefined when there were no keys
-            if (isValidPath && !isUnsafeTarget(target) && lastKey !== UNDEF_VALUE && !isUnsafePropKey(lastKey)) {
-                target[lastKey] = value;
-                isSet = true;
+                target = next;
             }
-        } finally {
-            // The first object which was added (and so any objects added to it) is removed when the value was not set,
-            // because the path is not valid or something threw (eg. the iterator, its return() or a getter)
-            if (!isSet && added) {
-                try {
-                    // Only the object which was added is removed, rather than a value which replaced it (eg. by a getter),
-                    // and an own null or undefined value which it replaced is restored
-                    if (addedTarget[addedKey] === added) {
-                        if (addedIsOwn) {
-                            addedTarget[addedKey] = addedPrev;
-                        } else {
-                            delete addedTarget[addedKey];
-                        }
+
+            lastKey = key;
+        });
+
+        // The last key is a string or (like the other keys) a symbol, it is only undefined when there were no keys, and
+        // it has already been checked by isUnsafePropKey() (only the target may have changed)
+        if (isValidPath && !isUnsafeTarget(target) && lastKey !== UNDEF_VALUE) {
+            target[lastKey] = value;
+            isSet = true;
+        }
+    } finally {
+        // The first object which was added (and so any objects added to it) is removed when the value was not set,
+        // because the path is not valid or something threw (eg. the iterator, its return() or a getter)
+        if (!isSet && added) {
+            try {
+                // Only the object which was added is removed, rather than a value which replaced it (eg. by a getter),
+                // and an own null or undefined value which it replaced is restored
+                if (addedTarget[addedKey] === added) {
+                    if (addedIsOwn) {
+                        addedTarget[addedKey] = addedPrev;
+                    } else {
+                        delete addedTarget[addedKey];
                     }
-                } catch (e) {
-                    // Ignore cleanup failures and preserve existing behavior.
                 }
+            } catch (e) {
+                // Ignore cleanup failures and preserve existing behavior.
             }
         }
     }

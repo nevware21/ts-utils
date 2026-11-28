@@ -245,6 +245,40 @@ describe("extend helpers", () => {
             assert.equal(JSON.stringify(arr1), JSON.stringify(expected));
             assert.notEqual(JSON.stringify(arr2), JSON.stringify(expected));
         });
+
+        it("updates the target itself, keeping the values (and their objects) which no argument replaces", () => {
+            let inner = { value: 1 };
+            let list = [1, 2];
+            let target: any = { a: inner, b: list, c: "keep" };
+
+            let result = objExtend(target, { c: "replaced" }, { d: { value: 2 } });
+
+            assert.ok(result === target, "The target is returned");
+            assert.ok(target.a === inner, "The target's own object isn't replaced by a copy of itself");
+            assert.ok(target.b === list, "The target's own array isn't replaced by a copy of itself");
+            assert.equal(target.c, "replaced");
+            assert.deepEqual(target.d, { value: 2 });
+        });
+
+        it("doesn't read or assign the target's own properties, eg. one with a getter and no setter", () => {
+            let reads = 0;
+            let target: any = { b: 1 };
+            Object.defineProperty(target, "a", {
+                get: () => {
+                    reads++;
+                    return "getter";
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            let result = objExtend(target, { b: 2 });
+
+            assert.ok(result === target, "The target is returned");
+            assert.equal(reads, 0, "The target's getter isn't read");
+            assert.equal(target.a, "getter");
+            assert.equal(target.b, 2);
+        });
     });
 
     describe("deepExtend", () => {
@@ -467,6 +501,51 @@ describe("extend helpers", () => {
             assert.ok(arr2 !== result, "Returned array should not be the passed argument");
             assert.notEqual(JSON.stringify(arr1), JSON.stringify(expected));
             assert.notEqual(JSON.stringify(arr2), JSON.stringify(expected));
+        });
+
+        it("reads each of the target's getters once (only for the copy)", () => {
+            let reads = 0;
+            let target: any = {};
+            Object.defineProperty(target, "a", {
+                get: () => {
+                    reads++;
+                    return "getter";
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            let result = deepExtend(target, { b: 2 });
+
+            assert.ok(result !== target, "A copy of the target is returned");
+            assert.equal(reads, 1, "The target's getter is read once");
+            assert.deepEqual(result, { a: "getter", b: 2 });
+        });
+
+        it("makes a reference to the target within its copy a reference to the copy", () => {
+            let target: any = { a: 1 };
+            target.self = target;
+
+            let result = deepExtend(target, { b: 2 });
+
+            assert.ok(result !== target, "A copy of the target is returned");
+            assert.ok(result.self === result, "The reference to the target is the copy (not a second copy)");
+            assert.equal(result.b, 2);
+        });
+
+        it("extends and returns a target which objDeepCopy doesn't copy (eg. a class instance), keeping its own objects", () => {
+            class Foo {
+                public a: any = { x: 1 };
+            }
+
+            let target: any = new Foo();
+            let inner = target.a;
+
+            let result = deepExtend(target, { b: 2 });
+
+            assert.ok(result === target, "The class instance itself is extended and returned");
+            assert.ok(target.a === inner, "Its own object isn't replaced by a copy of itself");
+            assert.equal(target.b, 2);
         });
 
     });

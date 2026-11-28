@@ -149,6 +149,49 @@ describe("setValueByKey", () => {
             }
         }
     });
+
+    it("reads the parts of its path by index, so a replaced Array.prototype[Symbol.iterator] isn't called", function () {
+        if (typeof Symbol !== "function" || !Symbol.iterator) {
+            this.skip();
+            return;
+        }
+
+        let theValue: any = {};
+        let arrayProto: any = Array.prototype;
+        let orgIterator = arrayProto[Symbol.iterator];
+        let iterated = 0;
+
+        try {
+            arrayProto[Symbol.iterator] = function () {
+                iterated++;
+                return orgIterator.call(this);
+            };
+
+            setValueByKey(theValue, "a.b", 1);
+        } finally {
+            arrayProto[Symbol.iterator] = orgIterator;
+        }
+
+        assert.equal(iterated, 0, "The array iterator isn't called");
+        assert.deepEqual(theValue, { a: { b: 1 } });
+    });
+
+    it("stops at an unsafe part of the path, so the value of the part before it isn't read", () => {
+        let reads = 0;
+        let target: any = {};
+        Object.defineProperty(target, "a", {
+            get: () => {
+                reads++;
+                return {};
+            },
+            enumerable: true,
+            configurable: true
+        });
+
+        setValueByKey(target, "a.__proto__.b", 1);
+        assert.equal(reads, 0, "The value of the part before the unsafe part isn't read");
+        assert.deepEqual(Object.keys(target), ["a"], "Nothing is added to the target");
+    });
 });
 
 describe("getValueByIter", () => {
@@ -500,6 +543,17 @@ describe("setValueByIter converts each key like a property access", () => {
         const target4: any = {};
         setValueByIter(target4, ["a", ""], 1);
         assert.deepEqual(target4, { a: { "": 1 } });
+    });
+
+    it("converts an object key with its toString() rather than its valueOf(), like a property access", () => {
+        const key: any = {
+            toString: () => "a",
+            valueOf: () => "b"
+        };
+
+        const target: any = {};
+        setValueByIter(target, [key, "c"], 1);
+        assert.deepEqual(target, { a: { c: 1 } });
     });
 });
 
